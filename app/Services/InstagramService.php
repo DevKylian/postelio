@@ -95,19 +95,31 @@ class InstagramService
 
         \Log::debug('Instagram /me/accounts response', ['response' => $response]);
 
+        // Check direct pages first
         foreach ($pages as $page) {
             if (!empty($page['instagram_business_account']['id'])) {
-                $igId = $page['instagram_business_account']['id'];
+                return $this->resolveIgAccount($page['instagram_business_account']['id'], $accessToken);
+            }
+        }
 
-                $ig = Http::get(self::GRAPH_BASE . "/{$igId}", [
-                    'fields'       => 'id,username',
-                    'access_token' => $accessToken,
-                ])->json();
+        // Fallback: pages managed via Business Manager
+        $businesses = Http::get(self::GRAPH_BASE . '/me/businesses', [
+            'access_token' => $accessToken,
+            'fields'       => 'id,name',
+        ])->json()['data'] ?? [];
 
-                return [
-                    'id'       => $igId,
-                    'username' => $ig['username'] ?? '',
-                ];
+        \Log::debug('Instagram /me/businesses', ['businesses' => $businesses]);
+
+        foreach ($businesses as $business) {
+            $bizPages = Http::get(self::GRAPH_BASE . '/' . $business['id'] . '/owned_pages', [
+                'access_token' => $accessToken,
+                'fields'       => 'id,name,instagram_business_account',
+            ])->json()['data'] ?? [];
+
+            foreach ($bizPages as $page) {
+                if (!empty($page['instagram_business_account']['id'])) {
+                    return $this->resolveIgAccount($page['instagram_business_account']['id'], $accessToken);
+                }
             }
         }
 
@@ -121,8 +133,22 @@ class InstagramService
             'Aucun compte Instagram Business trouvé lié à une Page Facebook. ' .
             'Connecté en tant que : ' . ($me['name'] ?? '?') . ' (id: ' . ($me['id'] ?? '?') . '). ' .
             'Pages trouvées : ' . json_encode($pagesDebug) . '. ' .
+            'Business Manager : ' . json_encode(array_column($businesses, 'name')) . '. ' .
             'Permissions accordées : ' . implode(', ', $grantedPerms)
         );
+    }
+
+    private function resolveIgAccount(string $igId, string $accessToken): array
+    {
+        $ig = Http::get(self::GRAPH_BASE . "/{$igId}", [
+            'fields'       => 'id,username',
+            'access_token' => $accessToken,
+        ])->json();
+
+        return [
+            'id'       => $igId,
+            'username' => $ig['username'] ?? '',
+        ];
     }
 
     /**

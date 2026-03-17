@@ -19,7 +19,7 @@
             <!-- Logo -->
             <div class="mb-8">
                 <a href="/" wire:navigate>
-                    <img src="{{ asset('images/logo_black.png') }}" alt="Postelio" class="h-10 w-auto">
+                    <img src="{{ asset('images/logo_black.png') }}" alt="Postelio" class="h-10 w-auto lg:h-[4.5rem]">
                 </a>
             </div>
 

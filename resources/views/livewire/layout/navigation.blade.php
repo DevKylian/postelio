@@ -38,7 +38,7 @@ $logout = function (Logout $logout) {
         <!-- Sidebar Header / Logo -->
         <div class="p-6 flex items-center gap-3">
             <a href="{{ route('dashboard') }}" wire:navigate>
-                <img src="{{ asset('images/logo_white.png') }}" alt="Postelio" class="h-10 w-auto">
+                <img src="{{ asset('images/logo_white.png') }}" alt="Postelio" class="h-10 w-auto lg:h-[4.5rem]">
             </a>
         </div>
 

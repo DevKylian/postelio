@@ -80,7 +80,11 @@ class InstagramService
             'fields'       => 'id,name',
         ])->json();
 
-        \Log::debug('Instagram OAuth user', ['me' => $me]);
+        $permissions = Http::get(self::GRAPH_BASE . '/me/permissions', [
+            'access_token' => $accessToken,
+        ])->json();
+
+        \Log::debug('Instagram OAuth user', ['me' => $me, 'permissions' => $permissions]);
 
         $response = Http::get(self::GRAPH_BASE . '/me/accounts', [
             'access_token' => $accessToken,
@@ -108,10 +112,16 @@ class InstagramService
         }
 
         $pagesDebug = array_map(fn($p) => ['id' => $p['id'] ?? '?', 'name' => $p['name'] ?? '?', 'has_ig' => !empty($p['instagram_business_account'])], $pages);
+        $grantedPerms = array_column(
+            array_filter($permissions['data'] ?? [], fn($p) => $p['status'] === 'granted'),
+            'permission'
+        );
+
         throw new \RuntimeException(
             'Aucun compte Instagram Business trouvé lié à une Page Facebook. ' .
             'Connecté en tant que : ' . ($me['name'] ?? '?') . ' (id: ' . ($me['id'] ?? '?') . '). ' .
-            'Pages trouvées : ' . json_encode($pagesDebug)
+            'Pages trouvées : ' . json_encode($pagesDebug) . '. ' .
+            'Permissions accordées : ' . implode(', ', $grantedPerms)
         );
     }
 

@@ -228,6 +228,70 @@
                     <p class="text-gray-500 mt-2">Whisper et GPT-4 travaillent sur votre post.</p>
                 </div>
             </div>
+        @elseif($status === 'review_pending')
+            <div class="space-y-8">
+                <!-- Header -->
+                <div class="text-center">
+                    <div class="inline-flex items-center justify-center w-14 h-14 bg-copper/10 rounded-2xl mb-4">
+                        <svg class="w-7 h-7 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-midnight">Vérifiez votre post</h3>
+                    <p class="text-gray-500 mt-1 text-sm">Relisez le contenu avant de le valider. En cas d'erreur, vous pouvez rejeter et recommencer.</p>
+                </div>
+
+                <!-- Preview -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <!-- Image générée -->
+                    @if($previewImageUrl)
+                        <div class="rounded-2xl overflow-hidden shadow-xl border border-gray-100">
+                            <img src="{{ $previewImageUrl }}" alt="Post généré" class="w-full aspect-square object-cover">
+                        </div>
+                    @endif
+
+                    <!-- Texte généré -->
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Contenu du post</span>
+                        </div>
+                        <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 min-h-[180px]">
+                            <p class="text-midnight text-sm leading-relaxed whitespace-pre-line">{{ $previewContent }}</p>
+                        </div>
+                        <p class="text-xs text-gray-400">Vous pouvez copier et modifier ce texte directement sur vos réseaux sociaux.</p>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row gap-4 pt-2">
+                    <button wire:click="validatePost" wire:loading.attr="disabled"
+                            class="flex-1 flex items-center justify-center gap-2 bg-copper text-white font-black uppercase tracking-widest text-sm py-5 rounded-2xl shadow-xl shadow-copper/20 hover:shadow-2xl hover:shadow-copper/30 hover:-translate-y-1 transition-all duration-300 active:scale-95 disabled:opacity-70">
+                        <div wire:loading.remove wire:target="validatePost">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <div wire:loading wire:target="validatePost">
+                            <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                        <span wire:loading.remove wire:target="validatePost">Valider et publier</span>
+                        <span wire:loading wire:target="validatePost" class="animate-pulse">Validation...</span>
+                    </button>
+
+                    <button wire:click="discardPost" wire:loading.attr="disabled"
+                            wire:confirm="Ce post sera supprimé définitivement. Recommencer depuis zéro ?"
+                            class="sm:w-auto flex items-center justify-center gap-2 bg-white border-2 border-gray-200 text-gray-500 font-bold text-sm py-5 px-8 rounded-2xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all duration-300 disabled:opacity-70">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Rejeter et recommencer
+                    </button>
+                </div>
+            </div>
         @elseif($status === 'failed')
             <div class="py-20 flex flex-col items-center justify-center text-center space-y-8">
                 <div class="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center text-white shadow-2xl shadow-red-500/20 animate-scale-in">

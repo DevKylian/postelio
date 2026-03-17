@@ -40,10 +40,10 @@ class ProcessPostGeneration implements ShouldQueue
             // 3. Calcul et Composition Visuelle
             $imagePath = $generator->generate($this->post);
 
-            // 4. Finalisation
+            // 4. Finalisation - en attente de validation par l'utilisateur
             $this->post->update([
                 'image_path' => $imagePath,
-                'status' => 'completed',
+                'status' => 'review_pending',
             ]);
 
         } catch (Exception $e) {

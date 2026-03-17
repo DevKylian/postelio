@@ -18,9 +18,8 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
             <!-- Logo -->
             <div class="mb-8">
-                <a href="/" wire:navigate class="flex items-center gap-3">
-                    <x-application-logo class="w-10 h-10" />
-                    <span class="text-2xl font-black tracking-widest text-midnight uppercase">POSTELIO</span>
+                <a href="/" wire:navigate>
+                    <img src="{{ asset('images/logo_black.png') }}" alt="Postelio" class="h-10 w-auto">
                 </a>
             </div>
 

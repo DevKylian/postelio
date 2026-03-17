@@ -34,7 +34,8 @@ class ProcessPostGeneration implements ShouldQueue
             $this->post->update(['transcription' => $transcript]);
 
             // 2. AI content refinement
-            $refined = $refiner->refine($transcript, $this->post->template);
+            $photoCount = count($this->post->extra_images ?? []);
+            $refined = $refiner->refine($transcript, $this->post->template, $photoCount);
             $this->post->update(['refined_content' => $refined]);
 
             // 3. Image generation (single or carousel array)

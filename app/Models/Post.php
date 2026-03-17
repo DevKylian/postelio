@@ -35,4 +35,16 @@ class Post extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function getCaptionAttribute()
+    {
+        $content = $this->refined_content;
+        $decoded = json_decode($content, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && isset($decoded['caption'])) {
+            return $decoded['caption'];
+        }
+
+        return $content;
+    }
 }

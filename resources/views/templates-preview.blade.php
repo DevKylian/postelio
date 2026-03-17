@@ -169,6 +169,144 @@
                     </div>
                 </div>
 
+                {{-- ── Gabarit Chantier en Détail ── --}}
+                <div class="space-y-4 group" x-data="{ current: 0, total: 3 }">
+                    <div class="aspect-square bg-slate-800 rounded-2xl shadow-lg ring-1 ring-gray-200 overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2">
+                        <!-- Slides -->
+                        <div class="absolute inset-0 transition-opacity duration-300" x-show="current === 0">
+                            <div class="w-full h-full bg-slate-600 flex items-center justify-center">
+                                <p class="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Couverture du projet</p>
+                            </div>
+                            <!-- Title overlay -->
+                            <div class="absolute inset-x-0 bottom-10 bg-black/60 backdrop-blur-sm p-6">
+                                <p class="text-white font-black text-sm uppercase leading-tight font-montserrat">
+                                    Rénovation complète d'une toiture à Nantes
+                                </p>
+                            </div>
+                        </div>
+                        <div class="absolute inset-0 transition-opacity duration-300" x-show="current === 1">
+                            <div class="w-full h-full bg-slate-500 flex items-center justify-center font-bold text-white/20 select-none">PHOTO DÉTAIL 1</div>
+                        </div>
+                        <div class="absolute inset-0 transition-opacity duration-300" x-show="current === 2">
+                            <div class="w-full h-full bg-slate-400 flex items-center justify-center font-bold text-white/20 select-none">PHOTO DÉTAIL 2</div>
+                        </div>
+
+                        <!-- Brand Band -->
+                        <div class="absolute inset-x-0 bottom-0 py-2.5 px-6 flex items-center justify-center" style="background-color: rgba(0,0,0,0.8)">
+                            @if ($hasLogo)
+                                <img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-5 w-5 object-contain rounded absolute right-6">
+                            @endif
+                            <p class="text-white font-bold uppercase tracking-widest text-[10px] font-montserrat">{{ $companyLabel }}</p>
+                        </div>
+
+                        <!-- Controls -->
+                        <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Indicators -->
+                        <div class="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-lg" x-text="(current + 1) + ' / ' + total"></div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-midnight text-lg">Chantier en Détail</h4>
+                        <p class="text-gray-500 text-sm">Une immersion complète avec plusieurs photos d'un même projet.</p>
+                    </div>
+                </div>
+
+                {{-- ── Gabarit Step-by-Step ── --}}
+                <div class="space-y-4 group" x-data="{ current: 0, total: 3 }">
+                    <div class="aspect-square bg-slate-100 rounded-2xl shadow-lg ring-1 ring-gray-200 overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2" style="border-left: 6px solid {{ $brandColor }}">
+                        <!-- Slide 0: Cover -->
+                        <div class="absolute inset-0 p-10 flex flex-col justify-center" x-show="current === 0" style="background-color: {{ $brandColor }}">
+                             <p class="text-white/30 font-black text-4xl mb-2 select-none tracking-tighter">ÉTAPES</p>
+                             <div class="space-y-2">
+                                <div class="h-1.5 w-full bg-white/40 rounded-full"></div>
+                                <div class="h-1.5 w-2/3 bg-white/40 rounded-full"></div>
+                             </div>
+                        </div>
+                        <!-- Slide 1, 2: Photos -->
+                        <div class="absolute inset-0" x-show="current > 0">
+                            <div class="w-full h-full bg-slate-300 flex items-center justify-center font-bold text-slate-500/30 select-none">PHOTO ÉTAPE <span x-text="current"></span></div>
+                            <div class="absolute top-6 left-6 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg" style="background-color: {{ $brandColor }}" x-text="current"></div>
+                            <div class="absolute bottom-0 inset-x-0 h-16 bg-black/70 backdrop-blur-md p-4 flex items-center">
+                                <div class="h-1 w-2/3 bg-white/30 rounded-full"></div>
+                            </div>
+                        </div>
+
+                         <!-- Brand Footer -->
+                         <div class="absolute bottom-0 inset-x-0 h-10 flex items-center justify-center px-4 transition-colors duration-300" :style="current === 0 ? 'background-color: rgba(0,0,0,0.2)' : 'background-color: transparent'">
+                            <p class="font-bold text-[9px] uppercase tracking-widest font-montserrat transition-colors duration-300" :class="current === 0 ? 'text-white/60' : 'text-white'">{{ $companyLabel }}</p>
+                        </div>
+
+                        <!-- Controls -->
+                        <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-midnight text-lg">Step-by-Step</h4>
+                        <p class="text-gray-500 text-sm">Expliquez votre expertise étape par étape, didactique et rassurant.</p>
+                    </div>
+                </div>
+
+                {{-- ── Gabarit Guide Pédagogique ── --}}
+                <div class="space-y-4 group" x-data="{ current: 0, total: 3 }">
+                    <div class="aspect-square rounded-2xl shadow-lg ring-1 ring-gray-200 overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2 bg-slate-50">
+                        <!-- Background texture -->
+                        <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 2px 2px, black 1px, transparent 0); background-size: 24px 24px;"></div>
+                        
+                        <!-- Slide 0: Hook -->
+                        <div class="absolute inset-0 p-10 flex flex-col justify-center text-center" x-show="current === 0" style="background-color: {{ $brandColor }}">
+                            <p class="text-white/40 font-bold text-[10px] uppercase tracking-[0.2em] mb-6 select-none">CONSEIL D'EXPERT</p>
+                            <div class="space-y-3">
+                                <div class="h-2 w-full bg-white/30 rounded-full"></div>
+                                <div class="h-2 w-5/6 mx-auto bg-white/30 rounded-full"></div>
+                                <div class="h-2 w-4/6 mx-auto bg-white/30 rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 1, 2: Body -->
+                        <div class="absolute inset-x-0 top-0 h-1.5" style="background-color: {{ $brandColor }}"></div>
+                        <div class="absolute inset-0 p-12 flex flex-col justify-center" x-show="current > 0">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white mb-6 font-bold text-lg shadow-sm" style="background-color: {{ $brandColor }}" x-text="current + 1"></div>
+                            <div class="space-y-4">
+                                <div class="h-1.5 w-full bg-slate-200 rounded-full"></div>
+                                <div class="h-1.5 w-full bg-slate-200 rounded-full"></div>
+                                <div class="h-1.5 w-3/4 bg-slate-200 rounded-full"></div>
+                            </div>
+                        </div>
+
+                         <!-- Brand Band -->
+                         <div class="absolute bottom-0 inset-x-0 h-12 flex items-center justify-center px-6" style="background-color: #1E293B">
+                            <p class="text-white/60 font-bold uppercase tracking-widest text-[9px] font-montserrat">{{ $companyLabel }}</p>
+                        </div>
+
+                        <!-- Controls -->
+                        <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-midnight text-lg">Guide Pédagogique</h4>
+                        <p class="text-gray-500 text-sm">Apportez de la valeur et positionnez-vous en expert conseil.</p>
+                    </div>
+                </div>
+
             </div>
 
             {{-- Call to action branding --}}

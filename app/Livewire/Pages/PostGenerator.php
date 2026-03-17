@@ -90,7 +90,14 @@ class PostGenerator extends Component
         $post->refresh();
 
         if ($post->status === 'review_pending') {
-            $this->previewContent  = $post->refined_content;
+            $content = $post->refined_content;
+            $decoded = json_decode($content, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE && isset($decoded['caption'])) {
+                $this->previewContent = $decoded['caption'];
+            } else {
+                $this->previewContent = $content;
+            }
 
             if ($post->slides && count($post->slides) > 0) {
                 $this->previewSlides  = array_map(

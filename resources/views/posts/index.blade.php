@@ -135,18 +135,22 @@
                                         Généré le {{ $post->created_at->format('d/m/Y') }}
                                     </p>
                                     <h4 class="font-bold text-midnight truncate text-sm">
-                                        {{ $post->refined_content ?? 'Post sans titre' }}
+                                        {{ $post->caption ?? 'Post sans titre' }}
                                     </h4>
                                 </div>
 
-                                <div class="flex gap-2">
+                                <div class="flex flex-wrap gap-2">
                                     @if($isCarousel)
-                                        {{-- Download first slide for carousels --}}
-                                        <a href="{{ Storage::url($slides[0]) }}" download
-                                           class="flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-xl border border-gray-200 text-midnight text-xs font-bold hover:bg-gray-50 transition-colors">
+                                        <button onclick="downloadAllSlides({{ json_encode(array_map(fn($s) => Storage::url($s), $slides)) }}, '{{ addslashes($post->caption) }}')"
+                                           class="flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-midnight text-white text-xs font-bold hover:bg-midnight/90 transition-colors">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                             </svg>
+                                            Tout télécharger
+                                        </button>
+
+                                        <a href="{{ Storage::url($slides[0]) }}" download
+                                           class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl border border-gray-200 text-midnight text-xs font-bold hover:bg-gray-50 transition-colors">
                                             Slide 1
                                         </a>
                                     @else
@@ -191,4 +195,26 @@
             @endif
         </div>
     </div>
+    <script>
+        async function downloadAllSlides(urls, caption) {
+            // Remove accents and replace non-alphanumeric with underscores
+            const cleanCaption = caption.normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]/gi, '_')
+                .toLowerCase()
+                .substring(0, 30);
+            
+            for (let i = 0; i < urls.length; i++) {
+                const link = document.createElement('a');
+                link.href = urls[i];
+                link.download = `${cleanCaption}_slide_${i + 1}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Small delay to prevent browser from blocking multiple downloads
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+    </script>
 </x-app-layout>

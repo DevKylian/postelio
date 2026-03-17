@@ -42,7 +42,7 @@ class ImageGeneratorService
     private function generateSingle(Post $post): string
     {
         $company    = $post->company;
-        $content    = $post->refined_content;
+        $content    = $this->cleanText($post->refined_content);
         $template   = $post->template;
         $brandColor = $company->brand_color ?? '#F59E0B';
 
@@ -83,15 +83,27 @@ class ImageGeneratorService
     // Carousel: Chantier en Détail
     // -------------------------------------------------------------------------
 
+    private function parseStructuredContent(string $content): array
+    {
+        $data = json_decode($content, true);
+        if (json_last_error() === JSON_ERROR_NONE && isset($data['slides'])) {
+            return $data;
+        }
+        return [
+            'caption' => $content,
+            'slides'  => []
+        ];
+    }
+
     private function generateChantierDetail(Post $post): array
     {
         $company    = $post->company;
-        $content    = $post->refined_content;
+        $decoded    = $this->parseStructuredContent($post->refined_content);
         $brandColor = $company->brand_color ?? '#F59E0B';
         $photos     = $post->extra_images ?? [];
         $slides     = [];
 
-        // Slide 1 – Cover: most impressive photo + big title overlay
+        // Slide 1 – Cover
         $coverImage = $this->manager->create(1080, 1080);
         if (!empty($photos[0]) && Storage::disk('public')->exists($photos[0])) {
             $photo = $this->manager->read(Storage::disk('public')->get($photos[0]));
@@ -100,21 +112,23 @@ class ImageGeneratorService
         } else {
             $coverImage->fill('#1E293B');
         }
-        // Dark gradient overlay bottom half
         $coverImage->drawRectangle(0, 540, function ($draw) {
             $draw->size(1080, 540);
             $draw->background('rgba(0,0,0,0.6)');
         });
-        // Big title – use refined_content first line or generic
-        $titleText = strtoupper(mb_substr($content, 0, 60));
-        $this->drawTextRaw($coverImage, $titleText, 560, 900, 54, '#FFFFFF', 20);
+        
+        $titleText = !empty($decoded['slides'][0]) 
+            ? $this->cleanText($decoded['slides'][0]) 
+            : $this->cleanText(mb_substr($decoded['caption'], 0, 60));
+
+        $this->drawTextRaw($coverImage, strtoupper($titleText), 540, 780, 56, '#FFFFFF', 24);
         $this->drawBottomBand($coverImage, $company, $brandColor);
         $this->addLogo($coverImage, $company->logo_path);
         $path = 'posts/' . $post->id . '_slide_1.png';
         Storage::disk('public')->put($path, $coverImage->toPng());
         $slides[] = $path;
 
-        // Slides 2..N – detail photos with bottom band
+        // Slides 2..N – detail photos
         foreach (array_slice($photos, 1, 4) as $i => $photoPath) {
             $slideImage = $this->manager->create(1080, 1080);
             if (Storage::disk('public')->exists($photoPath)) {
@@ -124,6 +138,16 @@ class ImageGeneratorService
             } else {
                 $slideImage->fill('#1E293B');
             }
+            
+            // Draw specific slide text if available
+            if (!empty($decoded['slides'][$i + 1])) {
+                $slideImage->drawRectangle(0, 800, function ($draw) {
+                    $draw->size(1080, 160);
+                    $draw->background('rgba(0,0,0,0.5)');
+                });
+                $this->drawTextRaw($slideImage, strtoupper($this->cleanText($decoded['slides'][$i + 1])), 800, 960, 38, '#FFFFFF', 30);
+            }
+
             $this->drawBottomBand($slideImage, $company, $brandColor);
             $this->addLogo($slideImage, $company->logo_path);
             $path = 'posts/' . $post->id . '_slide_' . ($i + 2) . '.png';
@@ -134,28 +158,17 @@ class ImageGeneratorService
         return $slides;
     }
 
-    // -------------------------------------------------------------------------
-    // Carousel: Step-by-Step
-    // -------------------------------------------------------------------------
-
     private function generateStepByStep(Post $post): array
     {
         $company    = $post->company;
-        $content    = $post->refined_content;
+        $decoded    = $this->parseStructuredContent($post->refined_content);
         $brandColor = $company->brand_color ?? '#F59E0B';
         $photos     = $post->extra_images ?? [];
         $slides     = [];
 
-        // Parse step labels from content (lines starting with "Étape")
-        $lines      = array_values(array_filter(
-            explode("\n", $content),
-            fn($l) => trim($l) !== ''
-        ));
-
         // Slide 1 – Cover
         $coverImage = $this->manager->create(1080, 1080);
         $coverImage->fill($brandColor);
-        // Dark side strip for style
         $coverImage->drawRectangle(0, 0, function ($draw) {
             $draw->size(12, 1080);
             $draw->background('rgba(0,0,0,0.25)');
@@ -174,8 +187,12 @@ class ImageGeneratorService
             $font->align('center');
             $font->valign('middle');
         });
-        $titleText = !empty($lines[0]) ? mb_strtoupper($lines[0]) : 'NOS ÉTAPES DE TRAVAIL';
-        $this->drawTextRaw($coverImage, $titleText, 300, 780, 52, '#FFFFFF', 22);
+
+        $titleText = !empty($decoded['slides'][0]) 
+            ? strtoupper($this->cleanText($decoded['slides'][0])) 
+            : 'NOS ÉTAPES DE TRAVAIL';
+
+        $this->drawTextRaw($coverImage, $titleText, 540, 700, 56, '#FFFFFF', 24);
         $this->drawBottomBand($coverImage, $company, '#000000');
         $this->addLogo($coverImage, $company->logo_path);
         $path = 'posts/' . $post->id . '_slide_1.png';
@@ -192,12 +209,10 @@ class ImageGeneratorService
             } else {
                 $slideImage->fill('#1E293B');
             }
-            // Dark overlay at bottom 200px
             $slideImage->drawRectangle(0, 880, function ($draw) {
                 $draw->size(1080, 200);
                 $draw->background('rgba(0,0,0,0.72)');
             });
-            // Step number circle (brand color)
             $this->drawCircle($slideImage, 100, 100, 70, $brandColor);
             $slideImage->text((string)($idx + 1), 100, 100, function ($font) {
                 $font->filename($this->fontPath);
@@ -206,8 +221,11 @@ class ImageGeneratorService
                 $font->align('center');
                 $font->valign('middle');
             });
-            // Step label from parsed lines
-            $stepLabel = isset($lines[$idx + 1]) ? mb_strtoupper($lines[$idx + 1]) : ('ÉTAPE ' . ($idx + 1));
+
+            $stepLabel = isset($decoded['slides'][$idx + 1]) 
+                ? strtoupper($this->cleanText($decoded['slides'][$idx + 1])) 
+                : ('ÉTAPE ' . ($idx + 1));
+            
             $stepLabel = preg_replace('/^ÉTAPE\s*\d+\s*[:\-]?\s*/iu', '', $stepLabel);
             $this->drawTextRaw($slideImage, $stepLabel, 900, 960, 38, '#FFFFFF', 28);
             $this->addLogo($slideImage, $company->logo_path);
@@ -219,44 +237,29 @@ class ImageGeneratorService
         return $slides;
     }
 
-    // -------------------------------------------------------------------------
-    // Carousel: Guide Pédagogique (text-only)
-    // -------------------------------------------------------------------------
-
     private function generateGuidePedagogique(Post $post): array
     {
         $company    = $post->company;
-        $content    = $post->refined_content;
+        $decoded    = $this->parseStructuredContent($post->refined_content);
         $brandColor = $company->brand_color ?? '#F59E0B';
         $slides     = [];
 
-        // Parse non-empty lines into sections
-        $lines = array_values(array_filter(
-            array_map('trim', explode("\n", $content)),
-            fn($l) => $l !== ''
-        ));
+        $aiSlides = !empty($decoded['slides']) ? $decoded['slides'] : [];
 
-        // --- Slide 1: Accroche (brand color background + big question) ---
+        // --- Slide 1: Accroche ---
         $slide1 = $this->manager->create(1080, 1080);
         $slide1->fill($brandColor);
-        // Subtle grid texture
-        for ($x = 0; $x < 1080; $x += 60) {
-            $slide1->drawLine(function ($line) use ($x) {
-                $line->from($x, 0)->to($x, 1080)->color('rgba(0,0,0,0.07)')->width(1);
-            });
-        }
-        for ($y = 0; $y < 1080; $y += 60) {
-            $slide1->drawLine(function ($line) use ($y) {
-                $line->from(0, $y)->to(1080, $y)->color('rgba(0,0,0,0.07)')->width(1);
-            });
-        }
-        $question = !empty($lines[0]) ? mb_strtoupper($lines[0]) : 'POURQUOI CHOISIR NOS SERVICES ?';
-        $this->drawTextRaw($slide1, $question, 200, 880, 62, '#FFFFFF', 18);
-        // Small label top
-        $slide1->text('GUIDE EXPERT', 540, 120, function ($font) {
+
+        $question = !empty($aiSlides[0]) 
+            ? strtoupper($this->cleanText($aiSlides[0])) 
+            : 'CONSEIL D\'EXPERT';
+            
+        $this->drawTextRaw($slide1, $question, 540, 540, 68, '#FFFFFF', 20);
+
+        $slide1->text('CONSEIL D\'EXPERT', 540, 220, function ($font) {
             $font->filename($this->fontPath);
-            $font->size(26);
-            $font->color('rgba(255,255,255,0.6)');
+            $font->size(32);
+            $font->color('rgba(255,255,255,0.7)');
             $font->align('center');
             $font->valign('middle');
         });
@@ -265,21 +268,20 @@ class ImageGeneratorService
         Storage::disk('public')->put($path, $slide1->toPng());
         $slides[] = $path;
 
-        // --- Middle slides: benefits / content lines ---
-        $middleLines = array_slice($lines, 1);
-        // Group into chunks of ~2 lines per slide, max 4 middle slides
-        $chunks = array_chunk($middleLines, 2);
-        $chunks = array_slice($chunks, 0, 4);
+        // --- Middle slides ---
+        $middleSlides = array_slice($aiSlides, 1);
+        // If the AI didn't provide enough slides, we fallback to splitting the caption
+        if (count($middleSlides) < 2 && !empty($decoded['caption'])) {
+            $middleSlides = $this->splitTextIntoSlides($decoded['caption'], 140);
+        }
 
-        foreach ($chunks as $ci => $chunk) {
+        foreach ($middleSlides as $ci => $slideContent) {
             $slide = $this->manager->create(1080, 1080);
             $slide->fill('#F8FAFC');
-            // Brand color top accent bar
             $slide->drawRectangle(0, 0, function ($draw) use ($brandColor) {
                 $draw->size(1080, 12);
                 $draw->background($brandColor);
             });
-            // Slide number
             $slideNum = $ci + 2;
             $slide->drawRectangle(80, 120, function ($draw) use ($brandColor) {
                 $draw->size(60, 60);
@@ -292,21 +294,10 @@ class ImageGeneratorService
                 $font->align('center');
                 $font->valign('middle');
             });
-            // Content text (dark)
-            $body = implode("\n", $chunk);
-            $this->drawTextRaw($slide, mb_strtoupper($body), 250, 830, 46, '#1E293B', 22);
-            // Bottom company label
-            $slide->drawRectangle(0, 980, function ($draw) {
-                $draw->size(1080, 100);
-                $draw->background('#1E293B');
-            });
-            $slide->text($this->companyLabel($company), 540, 1030, function ($font) {
-                $font->filename($this->fontPath);
-                $font->size(24);
-                $font->color('#FFFFFF');
-                $font->align('center');
-                $font->valign('middle');
-            });
+            $this->drawTextRaw($slide, strtoupper($this->cleanText($slideContent)), 540, 540, 52, '#1E293B', 24);
+            $this->drawBottomBand($slide, $company, '#1E293B');
+            $this->addLogo($slide, $company->logo_path);
+
             $path = 'posts/' . $post->id . '_slide_' . $slideNum . '.png';
             Storage::disk('public')->put($path, $slide->toPng());
             $slides[] = $path;
@@ -324,7 +315,6 @@ class ImageGeneratorService
             $draw->size(1080, 16);
             $draw->background($brandColor);
         });
-        // Logo centered
         if ($company->logo_path && Storage::disk('public')->exists($company->logo_path)) {
             $logo = $this->manager->read(Storage::disk('public')->get($company->logo_path));
             $logo->scale(width: 200);
@@ -587,17 +577,83 @@ class ImageGeneratorService
      */
     private function drawBottomBand($image, $company, string $bgColor = '#000000'): void
     {
-        $image->drawRectangle(0, 980, function ($draw) use ($bgColor) {
-            $draw->size(1080, 100);
-            $draw->background($bgColor === '#000000' ? 'rgba(0,0,0,0.8)' : $bgColor);
+        // Dark premium band at the bottom
+        $image->drawRectangle(0, 960, function ($draw) use ($bgColor) {
+            $draw->size(1080, 120);
+            $draw->background($bgColor === '#000000' ? 'rgba(0,0,0,0.85)' : $bgColor);
         });
-        $image->text($this->companyLabel($company), 540, 1030, function ($font) {
+        $image->text($this->companyLabel($company), 540, 1020, function ($font) {
             $font->filename($this->fontPath);
-            $font->size(26);
-            $font->color('#FFFFFF');
+            $font->size(28);
+            $font->color('rgba(255,255,255,0.7)');
             $font->align('center');
             $font->valign('middle');
         });
+    }
+
+    /**
+     * Intelligently split long text into slides based on max length.
+     * Tries to split on sentence boundaries or newlines first.
+     */
+    private function splitTextIntoSlides(string $text, int $maxChars = 200, int $maxSlides = 10): array
+    {
+        // Normalize newlines
+        $text = str_replace(["\r\n", "\r"], "\n", $text);
+        
+        // Priority split: single newlines (paragraphs or bullet points)
+        $paragraphs = array_values(array_filter(explode("\n", $text), fn($p) => trim($p) !== ''));
+        
+        $slides = [];
+        $currentSlide = "";
+
+        foreach ($paragraphs as $para) {
+            $para = trim($para);
+            if ($para === "") continue;
+
+            // If a single paragraph is way too long, split it by sentence
+            if (mb_strlen($para) > $maxChars) {
+                // Approximate sentence split
+                $sentences = preg_split('/(?<=[.!?])\s+/', $para, -1, PREG_SPLIT_NO_EMPTY);
+                
+                // FALLBACK: if it's still one big block, split by words
+                if (count($sentences) === 1 && mb_strlen($sentences[0]) > $maxChars) {
+                    $words = explode(' ', $sentences[0]);
+                    $tempChunks = [];
+                    $currentChunk = "";
+                    foreach ($words as $word) {
+                        if (mb_strlen($currentChunk . " " . $word) <= $maxChars) {
+                            $currentChunk .= ($currentChunk === "" ? "" : " ") . $word;
+                        } else {
+                            if ($currentChunk !== "") $tempChunks[] = $currentChunk;
+                            $currentChunk = $word;
+                        }
+                    }
+                    if ($currentChunk !== "") $tempChunks[] = $currentChunk;
+                    $sentences = $tempChunks;
+                }
+
+                foreach ($sentences as $sentence) {
+                    if (mb_strlen($currentSlide . "\n" . $sentence) <= $maxChars) {
+                        $currentSlide .= ($currentSlide === "" ? "" : "\n") . $sentence;
+                    } else {
+                        if ($currentSlide !== "") $slides[] = trim($currentSlide);
+                        $currentSlide = $sentence;
+                    }
+                }
+            } else {
+                // If adding this para exceeds maxChars, start a new slide
+                if (mb_strlen($currentSlide . "\n" . $para) > $maxChars && $currentSlide !== "") {
+                    $slides[] = trim($currentSlide);
+                    $currentSlide = $para;
+                } else {
+                    $currentSlide .= ($currentSlide === "" ? "" : "\n") . $para;
+                }
+            }
+        }
+        
+        if ($currentSlide !== "") $slides[] = trim($currentSlide);
+
+        return array_slice($slides, 0, $maxSlides);
     }
 
     private function drawCircle($image, int $cx, int $cy, int $radius, string $color): void
@@ -613,7 +669,9 @@ class ImageGeneratorService
         $name = $company->name ?? '';
         $city = $company->city ?? '';
 
-        return ($name && $city) ? $name . '  ·  ' . mb_strtoupper($city) : mb_strtoupper($name);
+        $label = ($name && $city) ? $name . '  ·  ' . $city : $name;
+        
+        return mb_strtoupper($this->cleanText($label));
     }
 
     /**
@@ -725,5 +783,37 @@ class ImageGeneratorService
             $logo->scale(width: 130);
             $image->place($logo, 'bottom-right', 40, 40);
         }
+    }
+
+    /**
+     * Remove emojis, markdown formatting and accents from text.
+     */
+    private function cleanText(?string $text): string
+    {
+        if (!$text) return '';
+
+        // Remove markdown bold/italic symbols
+        $text = str_replace(['**', '__', '*', '_'], '', $text);
+
+        // Remove Emojis and special symbols
+        $text = preg_replace('/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{1F900}-\x{1F9FF}\x{1F1E6}-\x{1F1FF}\x{1F3FB}-\x{1F3FF}\x{200D}\x{200B}\x{FE0F}]/u', '', $text);
+
+        // Remove accents (convert é to e, à to a, etc.)
+        $map = [
+            'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A', 'Å' => 'A', 'Æ' => 'AE', 'Ç' => 'C',
+            'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I',
+            'Ð' => 'D', 'Ñ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'O', 'Ő' => 'O',
+            'Ø' => 'O', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ű' => 'U', 'Ý' => 'Y', 'Þ' => 'TH',
+            'ß' => 'ss',
+            'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'a', 'å' => 'a', 'æ' => 'ae', 'ç' => 'c',
+            'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i',
+            'ð' => 'd', 'ñ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'o', 'ő' => 'o',
+            'ø' => 'o', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'u', 'ű' => 'u', 'ý' => 'y', 'þ' => 'th',
+            'ÿ' => 'y'
+        ];
+
+        $text = strtr($text, $map);
+
+        return trim($text);
     }
 }

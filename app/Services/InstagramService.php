@@ -75,10 +75,14 @@ class InstagramService
      */
     public function getInstagramBusinessAccount(string $accessToken): array
     {
-        $pages = Http::get(self::GRAPH_BASE . '/me/accounts', [
+        $response = Http::get(self::GRAPH_BASE . '/me/accounts', [
             'access_token' => $accessToken,
             'fields'       => 'id,name,instagram_business_account',
-        ])->json()['data'] ?? [];
+        ])->json();
+
+        $pages = $response['data'] ?? [];
+
+        \Log::debug('Instagram /me/accounts response', ['response' => $response]);
 
         foreach ($pages as $page) {
             if (!empty($page['instagram_business_account']['id'])) {
@@ -96,7 +100,8 @@ class InstagramService
             }
         }
 
-        throw new \RuntimeException('Aucun compte Instagram Business trouvé lié à une Page Facebook.');
+        $pagesDebug = array_map(fn($p) => ['id' => $p['id'] ?? '?', 'name' => $p['name'] ?? '?', 'has_ig' => !empty($p['instagram_business_account'])], $pages);
+        throw new \RuntimeException('Aucun compte Instagram Business trouvé lié à une Page Facebook. Pages trouvées : ' . json_encode($pagesDebug));
     }
 
     /**

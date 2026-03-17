@@ -171,12 +171,6 @@ class InstagramService
         $imagePath = $post->image_path;
         $imageUrl  = $this->publicUrl($imagePath);
 
-        \Log::debug('Instagram publishPost', [
-            'post_id'    => $post->id,
-            'image_path' => $imagePath,
-            'image_url'  => $imageUrl,
-            'ig_id'      => $igId,
-        ]);
 
         return $this->publishSingleImage($igId, $token, $imageUrl, $caption);
     }
@@ -254,13 +248,6 @@ class InstagramService
 
         $imgbbKey = config('services.imgbb.api_key');
 
-        \Log::debug('Instagram publicUrl', [
-            'storage_path'  => $storagePath,
-            'local_url'     => $localUrl,
-            'imgbb_key_len' => strlen((string) $imgbbKey),
-            'imgbb_key_preview' => $imgbbKey ? (substr($imgbbKey, 0, 4) . '...' . substr($imgbbKey, -4)) : 'NOT SET',
-        ]);
-
         if (!$imgbbKey) {
             return $localUrl;
         }
@@ -271,8 +258,6 @@ class InstagramService
                 'image'      => base64_encode($imageData),
                 'expiration' => 600,
             ])->json();
-
-            \Log::debug('imgbb response', ['response' => $response]);
 
             if (!empty($response['data']['url'])) {
                 return $response['data']['url'];

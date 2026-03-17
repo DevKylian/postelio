@@ -17,6 +17,13 @@ class Post extends Model
         'status',
         'image_before_path',
         'image_after_path',
+        'slides',
+        'extra_images',
+    ];
+
+    protected $casts = [
+        'slides'       => 'array',
+        'extra_images' => 'array',
     ];
 
     public function user()

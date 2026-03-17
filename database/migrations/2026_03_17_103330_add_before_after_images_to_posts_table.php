@@ -11,19 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('posts', function (Blueprint $table) {
-            $table->string('image_before_path')->after('image_path')->nullable();
-            $table->string('image_after_path')->after('image_before_path')->nullable();
-        });
+        // image_before_path and image_after_path already added in create_posts_table migration
+        if (!Schema::hasColumn('posts', 'image_before_path')) {
+            Schema::table('posts', function (Blueprint $table) {
+                $table->string('image_before_path')->nullable();
+                $table->string('image_after_path')->nullable();
+            });
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('posts', function (Blueprint $table) {
-            $table->dropColumn(['image_before_path', 'image_after_path']);
-        });
+        //
     }
 };

@@ -14,14 +14,32 @@ class ImageGeneratorService
 
     public function __construct()
     {
-        $this->manager = new ImageManager(new Driver());
+        $this->manager  = new ImageManager(new Driver());
         $this->fontPath = str_replace('\\', '/', storage_path('fonts/Montserrat-Bold.ttf'));
     }
 
     /**
-     * Generate a 1080x1080 post image.
+     * Generate image(s) for a post.
+     * Returns a single path (string) for single-image templates,
+     * or an array of paths for carousel templates.
      */
-    public function generate(Post $post): string
+    public function generate(Post $post): string|array
+    {
+        $template = $post->template;
+
+        return match ($template) {
+            'chantier_detail'   => $this->generateChantierDetail($post),
+            'step_by_step'      => $this->generateStepByStep($post),
+            'guide_pedagogique' => $this->generateGuidePedagogique($post),
+            default             => $this->generateSingle($post),
+        };
+    }
+
+    // -------------------------------------------------------------------------
+    // Single-image templates
+    // -------------------------------------------------------------------------
+
+    private function generateSingle(Post $post): string
     {
         $company    = $post->company;
         $content    = $post->refined_content;
@@ -46,6 +64,8 @@ class ImageGeneratorService
         } elseif ($template === 'project') {
             $image->fill('#FFFFFF');
             $this->drawProjectElements($image, $post, $company, $brandColor);
+        } elseif ($template === 'quality_focus') {
+            $this->drawQualityFocusElements($image, $post, $company, $brandColor, $content);
         } else {
             $image->fill($brandColor);
             $this->drawText($image, $content, 200, 880, 50);
@@ -57,6 +77,285 @@ class ImageGeneratorService
         Storage::disk('public')->put($fileName, $image->toPng());
 
         return $fileName;
+    }
+
+    // -------------------------------------------------------------------------
+    // Carousel: Chantier en Détail
+    // -------------------------------------------------------------------------
+
+    private function generateChantierDetail(Post $post): array
+    {
+        $company    = $post->company;
+        $content    = $post->refined_content;
+        $brandColor = $company->brand_color ?? '#F59E0B';
+        $photos     = $post->extra_images ?? [];
+        $slides     = [];
+
+        // Slide 1 – Cover: most impressive photo + big title overlay
+        $coverImage = $this->manager->create(1080, 1080);
+        if (!empty($photos[0]) && Storage::disk('public')->exists($photos[0])) {
+            $photo = $this->manager->read(Storage::disk('public')->get($photos[0]));
+            $photo->cover(1080, 1080);
+            $coverImage->place($photo, 'top-left', 0, 0);
+        } else {
+            $coverImage->fill('#1E293B');
+        }
+        // Dark gradient overlay bottom half
+        $coverImage->drawRectangle(0, 540, function ($draw) {
+            $draw->size(1080, 540);
+            $draw->background('rgba(0,0,0,0.6)');
+        });
+        // Big title – use refined_content first line or generic
+        $titleText = strtoupper(mb_substr($content, 0, 60));
+        $this->drawTextRaw($coverImage, $titleText, 560, 900, 54, '#FFFFFF', 20);
+        $this->drawBottomBand($coverImage, $company, $brandColor);
+        $this->addLogo($coverImage, $company->logo_path);
+        $path = 'posts/' . $post->id . '_slide_1.png';
+        Storage::disk('public')->put($path, $coverImage->toPng());
+        $slides[] = $path;
+
+        // Slides 2..N – detail photos with bottom band
+        foreach (array_slice($photos, 1, 4) as $i => $photoPath) {
+            $slideImage = $this->manager->create(1080, 1080);
+            if (Storage::disk('public')->exists($photoPath)) {
+                $photo = $this->manager->read(Storage::disk('public')->get($photoPath));
+                $photo->cover(1080, 1080);
+                $slideImage->place($photo, 'top-left', 0, 0);
+            } else {
+                $slideImage->fill('#1E293B');
+            }
+            $this->drawBottomBand($slideImage, $company, $brandColor);
+            $this->addLogo($slideImage, $company->logo_path);
+            $path = 'posts/' . $post->id . '_slide_' . ($i + 2) . '.png';
+            Storage::disk('public')->put($path, $slideImage->toPng());
+            $slides[] = $path;
+        }
+
+        return $slides;
+    }
+
+    // -------------------------------------------------------------------------
+    // Carousel: Step-by-Step
+    // -------------------------------------------------------------------------
+
+    private function generateStepByStep(Post $post): array
+    {
+        $company    = $post->company;
+        $content    = $post->refined_content;
+        $brandColor = $company->brand_color ?? '#F59E0B';
+        $photos     = $post->extra_images ?? [];
+        $slides     = [];
+
+        // Parse step labels from content (lines starting with "Étape")
+        $lines      = array_values(array_filter(
+            explode("\n", $content),
+            fn($l) => trim($l) !== ''
+        ));
+
+        // Slide 1 – Cover
+        $coverImage = $this->manager->create(1080, 1080);
+        $coverImage->fill($brandColor);
+        // Dark side strip for style
+        $coverImage->drawRectangle(0, 0, function ($draw) {
+            $draw->size(12, 1080);
+            $draw->background('rgba(0,0,0,0.25)');
+        });
+        $coverImage->text('ÉTAPE', 540, 380, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(60);
+            $font->color('rgba(255,255,255,0.25)');
+            $font->align('center');
+            $font->valign('middle');
+        });
+        $coverImage->text('PAR ÉTAPE', 540, 460, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(60);
+            $font->color('rgba(255,255,255,0.25)');
+            $font->align('center');
+            $font->valign('middle');
+        });
+        $titleText = !empty($lines[0]) ? mb_strtoupper($lines[0]) : 'NOS ÉTAPES DE TRAVAIL';
+        $this->drawTextRaw($coverImage, $titleText, 300, 780, 52, '#FFFFFF', 22);
+        $this->drawBottomBand($coverImage, $company, '#000000');
+        $this->addLogo($coverImage, $company->logo_path);
+        $path = 'posts/' . $post->id . '_slide_1.png';
+        Storage::disk('public')->put($path, $coverImage->toPng());
+        $slides[] = $path;
+
+        // Slides 2..N – one per photo/step
+        foreach ($photos as $idx => $photoPath) {
+            $slideImage = $this->manager->create(1080, 1080);
+            if (Storage::disk('public')->exists($photoPath)) {
+                $photo = $this->manager->read(Storage::disk('public')->get($photoPath));
+                $photo->cover(1080, 1080);
+                $slideImage->place($photo, 'top-left', 0, 0);
+            } else {
+                $slideImage->fill('#1E293B');
+            }
+            // Dark overlay at bottom 200px
+            $slideImage->drawRectangle(0, 880, function ($draw) {
+                $draw->size(1080, 200);
+                $draw->background('rgba(0,0,0,0.72)');
+            });
+            // Step number circle (brand color)
+            $this->drawCircle($slideImage, 100, 100, 70, $brandColor);
+            $slideImage->text((string)($idx + 1), 100, 100, function ($font) {
+                $font->filename($this->fontPath);
+                $font->size(56);
+                $font->color('#FFFFFF');
+                $font->align('center');
+                $font->valign('middle');
+            });
+            // Step label from parsed lines
+            $stepLabel = isset($lines[$idx + 1]) ? mb_strtoupper($lines[$idx + 1]) : ('ÉTAPE ' . ($idx + 1));
+            $stepLabel = preg_replace('/^ÉTAPE\s*\d+\s*[:\-]?\s*/iu', '', $stepLabel);
+            $this->drawTextRaw($slideImage, $stepLabel, 900, 960, 38, '#FFFFFF', 28);
+            $this->addLogo($slideImage, $company->logo_path);
+            $path = 'posts/' . $post->id . '_slide_' . ($idx + 2) . '.png';
+            Storage::disk('public')->put($path, $slideImage->toPng());
+            $slides[] = $path;
+        }
+
+        return $slides;
+    }
+
+    // -------------------------------------------------------------------------
+    // Carousel: Guide Pédagogique (text-only)
+    // -------------------------------------------------------------------------
+
+    private function generateGuidePedagogique(Post $post): array
+    {
+        $company    = $post->company;
+        $content    = $post->refined_content;
+        $brandColor = $company->brand_color ?? '#F59E0B';
+        $slides     = [];
+
+        // Parse non-empty lines into sections
+        $lines = array_values(array_filter(
+            array_map('trim', explode("\n", $content)),
+            fn($l) => $l !== ''
+        ));
+
+        // --- Slide 1: Accroche (brand color background + big question) ---
+        $slide1 = $this->manager->create(1080, 1080);
+        $slide1->fill($brandColor);
+        // Subtle grid texture
+        for ($x = 0; $x < 1080; $x += 60) {
+            $slide1->drawLine(function ($line) use ($x) {
+                $line->from($x, 0)->to($x, 1080)->color('rgba(0,0,0,0.07)')->width(1);
+            });
+        }
+        for ($y = 0; $y < 1080; $y += 60) {
+            $slide1->drawLine(function ($line) use ($y) {
+                $line->from(0, $y)->to(1080, $y)->color('rgba(0,0,0,0.07)')->width(1);
+            });
+        }
+        $question = !empty($lines[0]) ? mb_strtoupper($lines[0]) : 'POURQUOI CHOISIR NOS SERVICES ?';
+        $this->drawTextRaw($slide1, $question, 200, 880, 62, '#FFFFFF', 18);
+        // Small label top
+        $slide1->text('GUIDE EXPERT', 540, 120, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(26);
+            $font->color('rgba(255,255,255,0.6)');
+            $font->align('center');
+            $font->valign('middle');
+        });
+        $this->addLogo($slide1, $company->logo_path);
+        $path = 'posts/' . $post->id . '_slide_1.png';
+        Storage::disk('public')->put($path, $slide1->toPng());
+        $slides[] = $path;
+
+        // --- Middle slides: benefits / content lines ---
+        $middleLines = array_slice($lines, 1);
+        // Group into chunks of ~2 lines per slide, max 4 middle slides
+        $chunks = array_chunk($middleLines, 2);
+        $chunks = array_slice($chunks, 0, 4);
+
+        foreach ($chunks as $ci => $chunk) {
+            $slide = $this->manager->create(1080, 1080);
+            $slide->fill('#F8FAFC');
+            // Brand color top accent bar
+            $slide->drawRectangle(0, 0, function ($draw) use ($brandColor) {
+                $draw->size(1080, 12);
+                $draw->background($brandColor);
+            });
+            // Slide number
+            $slideNum = $ci + 2;
+            $slide->drawRectangle(80, 120, function ($draw) use ($brandColor) {
+                $draw->size(60, 60);
+                $draw->background($brandColor);
+            });
+            $slide->text((string)$slideNum, 110, 150, function ($font) {
+                $font->filename($this->fontPath);
+                $font->size(32);
+                $font->color('#FFFFFF');
+                $font->align('center');
+                $font->valign('middle');
+            });
+            // Content text (dark)
+            $body = implode("\n", $chunk);
+            $this->drawTextRaw($slide, mb_strtoupper($body), 250, 830, 46, '#1E293B', 22);
+            // Bottom company label
+            $slide->drawRectangle(0, 980, function ($draw) {
+                $draw->size(1080, 100);
+                $draw->background('#1E293B');
+            });
+            $slide->text($this->companyLabel($company), 540, 1030, function ($font) {
+                $font->filename($this->fontPath);
+                $font->size(24);
+                $font->color('#FFFFFF');
+                $font->align('center');
+                $font->valign('middle');
+            });
+            $path = 'posts/' . $post->id . '_slide_' . $slideNum . '.png';
+            Storage::disk('public')->put($path, $slide->toPng());
+            $slides[] = $path;
+        }
+
+        // --- Last slide: CTA ---
+        $lastSlideNum = count($slides) + 1;
+        $cta = $this->manager->create(1080, 1080);
+        $cta->fill('#1E293B');
+        $cta->drawRectangle(0, 0, function ($draw) use ($brandColor) {
+            $draw->size(1080, 16);
+            $draw->background($brandColor);
+        });
+        $cta->drawRectangle(0, 1064, function ($draw) use ($brandColor) {
+            $draw->size(1080, 16);
+            $draw->background($brandColor);
+        });
+        // Logo centered
+        if ($company->logo_path && Storage::disk('public')->exists($company->logo_path)) {
+            $logo = $this->manager->read(Storage::disk('public')->get($company->logo_path));
+            $logo->scale(width: 200);
+            $cta->place($logo, 'center', 0, -80);
+        }
+        $cta->text('UN PROJET EN TÊTE ?', 540, 620, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(48);
+            $font->color('#FFFFFF');
+            $font->align('center');
+            $font->valign('middle');
+        });
+        $cta->text('Contactez-nous pour un devis gratuit', 540, 700, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(30);
+            $font->color('rgba(255,255,255,0.7)');
+            $font->align('center');
+            $font->valign('middle');
+        });
+        $cta->text($this->companyLabel($company), 540, 820, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(26);
+            $font->color('#F59E0B');
+            $font->align('center');
+            $font->valign('middle');
+        });
+        $path = 'posts/' . $post->id . '_slide_' . $lastSlideNum . '.png';
+        Storage::disk('public')->put($path, $cta->toPng());
+        $slides[] = $path;
+
+        return $slides;
     }
 
     // -------------------------------------------------------------------------
@@ -74,13 +373,8 @@ class ImageGeneratorService
         }
     }
 
-    /**
-     * Semi-transparent dark strip at the very bottom of the review template.
-     * Shows company name + city.
-     */
     private function drawCompanyBadge($image, $company): void
     {
-        // Dark overlay strip (960 → 1080)
         $image->drawRectangle(0, 960, function ($draw) {
             $draw->size(1080, 120);
             $draw->background('rgba(0, 0, 0, 0.35)');
@@ -103,7 +397,6 @@ class ImageGeneratorService
         $imageHeight  = 1080 - $bannerHeight;
         $halfWidth    = 540;
 
-        // Photos side-by-side
         if ($post->image_before_path && Storage::disk('public')->exists($post->image_before_path)) {
             $before = $this->manager->read(Storage::disk('public')->get($post->image_before_path));
             $before->cover($halfWidth, $imageHeight);
@@ -116,19 +409,16 @@ class ImageGeneratorService
             $image->place($after, 'top-right', 0, 0);
         }
 
-        // White separator line
         $image->drawRectangle($halfWidth - 1, 0, function ($draw) use ($imageHeight) {
             $draw->size(2, $imageHeight);
             $draw->background('#FFFFFF');
         });
 
-        // Brand color banner
         $image->drawRectangle(0, $imageHeight, function ($draw) use ($bannerHeight, $brandColor) {
             $draw->size(1080, $bannerHeight);
             $draw->background($brandColor);
         });
 
-        // AVANT / APRÈS at ~60% of the banner height
         $labelY = $imageHeight + intval($bannerHeight * 0.62);
 
         $image->text('AVANT', 162, $labelY, function ($font) {
@@ -147,7 +437,6 @@ class ImageGeneratorService
             $font->valign('middle');
         });
 
-        // Company name centered at ~28% of the banner height
         $companyY = $imageHeight + intval($bannerHeight * 0.28);
         $label    = $this->companyLabel($company);
 
@@ -162,19 +451,16 @@ class ImageGeneratorService
 
     private function drawFaqElements($image, string $brandColor): void
     {
-        // Top border
         $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
             $draw->size(1080, 20);
             $draw->background($brandColor);
         });
 
-        // Small dash/divider
         $image->drawRectangle(490, 250, function ($draw) use ($brandColor) {
             $draw->size(100, 10);
             $draw->background($brandColor);
         });
 
-        // Label "FAQ ARTISAN"
         $image->text('FAQ ARTISAN', 540, 320, function ($font) use ($brandColor) {
             $font->filename($this->fontPath);
             $font->size(35);
@@ -183,7 +469,6 @@ class ImageGeneratorService
             $font->valign('middle');
         });
 
-        // Watermark question mark
         $image->text('?', 950, 950, function ($font) {
             $font->filename($this->fontPath);
             $font->size(300);
@@ -192,16 +477,12 @@ class ImageGeneratorService
             $font->valign('middle');
         });
 
-        // Bottom line
         $image->drawRectangle(100, 900, function ($draw) {
             $draw->size(880, 1);
             $draw->background('rgba(255, 255, 255, 0.1)');
         });
     }
 
-    /**
-     * Company name at the bottom of the FAQ template, tinted in brand color.
-     */
     private function drawFaqCompanyName($image, $company, string $brandColor): void
     {
         $label = $this->companyLabel($company);
@@ -224,19 +505,13 @@ class ImageGeneratorService
         }
     }
 
-    /**
-     * Brand-colored accent line + dark overlay with company name at the bottom
-     * of the lifestyle template.
-     */
     private function drawLifestyleOverlay($image, $company, string $brandColor): void
     {
-        // Dark gradient strip
         $image->drawRectangle(0, 968, function ($draw) {
             $draw->size(1080, 112);
             $draw->background('rgba(0, 0, 0, 0.55)');
         });
 
-        // Brand color accent line
         $image->drawRectangle(0, 966, function ($draw) use ($brandColor) {
             $draw->size(1080, 4);
             $draw->background($brandColor);
@@ -253,9 +528,85 @@ class ImageGeneratorService
         });
     }
 
+    /**
+     * Focus Qualité: full-bleed photo + "SÉLECTION PRO" badge top-right + bottom black band.
+     */
+    private function drawQualityFocusElements($image, Post $post, $company, string $brandColor, string $content): void
+    {
+        // Full-bleed photo
+        $photoPath = $post->image_before_path;
+        if ($photoPath && Storage::disk('public')->exists($photoPath)) {
+            $photo = $this->manager->read(Storage::disk('public')->get($photoPath));
+            $photo->cover(1080, 1080);
+            $image->place($photo, 'top-left', 0, 0);
+        } else {
+            $image->fill('#1E293B');
+        }
+
+        // "SÉLECTION PRO" badge top-right
+        $image->drawRectangle(780, 40, function ($draw) use ($brandColor) {
+            $draw->size(260, 60);
+            $draw->background($brandColor);
+        });
+        $image->text('SÉLECTION PRO', 910, 70, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(22);
+            $font->color('#FFFFFF');
+            $font->align('center');
+            $font->valign('middle');
+        });
+
+        // Bottom dark band
+        $image->drawRectangle(0, 880, function ($draw) {
+            $draw->size(1080, 200);
+            $draw->background('rgba(0,0,0,0.75)');
+        });
+        // Brand accent line
+        $image->drawRectangle(0, 878, function ($draw) use ($brandColor) {
+            $draw->size(1080, 4);
+            $draw->background($brandColor);
+        });
+        // Content text
+        $this->drawTextRaw($image, mb_strtoupper($content), 900, 1060, 28, '#FFFFFF', 36);
+        // Company name
+        $image->text($this->companyLabel($company), 540, 896, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(22);
+            $font->color('rgba(255,255,255,0.65)');
+            $font->align('center');
+            $font->valign('middle');
+        });
+    }
+
     // -------------------------------------------------------------------------
     // Shared helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * Black bottom band with company label — used for carousel slides.
+     */
+    private function drawBottomBand($image, $company, string $bgColor = '#000000'): void
+    {
+        $image->drawRectangle(0, 980, function ($draw) use ($bgColor) {
+            $draw->size(1080, 100);
+            $draw->background($bgColor === '#000000' ? 'rgba(0,0,0,0.8)' : $bgColor);
+        });
+        $image->text($this->companyLabel($company), 540, 1030, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(26);
+            $font->color('#FFFFFF');
+            $font->align('center');
+            $font->valign('middle');
+        });
+    }
+
+    private function drawCircle($image, int $cx, int $cy, int $radius, string $color): void
+    {
+        $image->drawEllipse($cx, $cy, function ($draw) use ($radius, $color) {
+            $draw->size($radius * 2, $radius * 2);
+            $draw->background($color);
+        });
+    }
 
     private function companyLabel($company): string
     {
@@ -265,6 +616,10 @@ class ImageGeneratorService
         return ($name && $city) ? $name . '  ·  ' . mb_strtoupper($city) : mb_strtoupper($name);
     }
 
+    /**
+     * Draw text with automatic word-wrap, vertically centered in the given bounds.
+     * (Original method — adds quotes, uppercase.)
+     */
     private function drawText($image, $text, $topBound = 420, $bottomBound = 880, $fontSize = 50): void
     {
         $text    = '"' . mb_strtoupper(trim($text, '"')) . '"';
@@ -296,6 +651,45 @@ class ImageGeneratorService
                     $font->size($fontSize);
                 }
                 $font->color('#FFFFFF');
+                $font->align('center');
+                $font->valign('middle');
+            });
+            $y += $lineHeight;
+        }
+    }
+
+    /**
+     * Draw arbitrary text with word-wrap, no quotes added.
+     */
+    private function drawTextRaw($image, string $text, int $topBound, int $bottomBound, int $fontSize, string $color = '#FFFFFF', int $maxChars = 24): void
+    {
+        $words   = explode(' ', $text);
+        $lines   = [];
+        $current = '';
+
+        foreach ($words as $word) {
+            if (mb_strlen($current . ' ' . $word) <= $maxChars) {
+                $current .= ($current ? ' ' : '') . $word;
+            } else {
+                if ($current !== '') $lines[] = $current;
+                $current = $word;
+            }
+        }
+        if ($current !== '') $lines[] = $current;
+
+        $lineHeight      = intval($fontSize * 1.35);
+        $totalTextHeight = count($lines) * $lineHeight;
+        $availableHeight = $bottomBound - $topBound;
+        $startY          = $topBound + ($availableHeight - $totalTextHeight) / 2 + ($lineHeight / 2);
+
+        $y = $startY;
+        foreach ($lines as $line) {
+            $image->text($line, 540, (int)$y, function ($font) use ($fontSize, $color) {
+                if (file_exists($this->fontPath)) {
+                    $font->filename($this->fontPath);
+                    $font->size($fontSize);
+                }
+                $font->color($color);
                 $font->align('center');
                 $font->valign('middle');
             });

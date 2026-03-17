@@ -7,11 +7,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE posts MODIFY COLUMN status ENUM('pending', 'processing', 'completed', 'failed', 'review_pending') NOT NULL DEFAULT 'pending'");
+        // status column already includes review_pending (handled in create_posts_table migration)
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE posts MODIFY COLUMN status ENUM('pending', 'processing', 'completed', 'failed') NOT NULL DEFAULT 'pending'");
+        //
     }
 };

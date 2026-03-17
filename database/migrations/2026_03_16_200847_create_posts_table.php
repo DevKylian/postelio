@@ -19,8 +19,12 @@ return new class extends Migration
             $table->string('image_path')->nullable();
             $table->text('transcription')->nullable();
             $table->text('refined_content')->nullable();
-            $table->string('template')->default('review'); // review, project, etc.
-            $table->enum('status', ['pending', 'processing', 'completed', 'failed'])->default('pending');
+            $table->string('template')->default('review');
+            $table->string('status')->default('pending'); // pending|processing|completed|failed|review_pending
+            $table->string('image_before_path')->nullable();
+            $table->string('image_after_path')->nullable();
+            $table->json('slides')->nullable();
+            $table->json('extra_images')->nullable();
             $table->timestamps();
         });
     }

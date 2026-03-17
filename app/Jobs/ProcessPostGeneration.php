@@ -29,27 +29,36 @@ class ProcessPostGeneration implements ShouldQueue
         try {
             $this->post->update(['status' => 'processing']);
 
-            // 1. Ingestion (Transcription)
+            // 1. Transcription
             $transcript = $transcriber->transcribe($this->post->audio_path);
             $this->post->update(['transcription' => $transcript]);
 
-            // 2. Formatage Sémantique (IA Texte)
+            // 2. AI content refinement
             $refined = $refiner->refine($transcript, $this->post->template);
             $this->post->update(['refined_content' => $refined]);
 
-            // 3. Calcul et Composition Visuelle
-            $imagePath = $generator->generate($this->post);
+            // 3. Image generation (single or carousel array)
+            $result = $generator->generate($this->post);
 
-            // 4. Finalisation - en attente de validation par l'utilisateur
-            $this->post->update([
-                'image_path' => $imagePath,
-                'status' => 'review_pending',
-            ]);
+            if (is_array($result)) {
+                // Carousel: store all slides, use first as thumbnail
+                $this->post->update([
+                    'image_path' => $result[0],
+                    'slides'     => $result,
+                    'status'     => 'review_pending',
+                ]);
+            } else {
+                // Single image
+                $this->post->update([
+                    'image_path' => $result,
+                    'status'     => 'review_pending',
+                ]);
+            }
 
         } catch (Exception $e) {
             Log::error("Post Generation Failed: " . $e->getMessage(), [
-                'post_id' => $this->post->id,
-                'exception' => $e
+                'post_id'   => $this->post->id,
+                'exception' => $e,
             ]);
 
             $this->post->update(['status' => 'failed']);

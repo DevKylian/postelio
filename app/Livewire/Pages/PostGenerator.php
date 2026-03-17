@@ -15,19 +15,35 @@ class PostGenerator extends Component
     public $audio;
     public $imageBefore;
     public $imageAfter;
+    public $extraImages = [];        // for chantier_detail & step_by_step (up to 5)
     public $template = 'review';
-    public $status = 'idle'; // idle, processing, review_pending, completed, failed
+    public $status = 'idle';
     public $generatedPostId;
     public $previewImageUrl;
     public $previewContent;
+    public $previewSlides = [];      // array of URLs for carousel preview
+
+    // Carousel templates
+    const CAROUSEL_TEMPLATES  = ['chantier_detail', 'step_by_step', 'guide_pedagogique'];
+    // Templates requiring photos
+    const PHOTO_TEMPLATES     = ['project', 'lifestyle', 'quality_focus', 'chantier_detail', 'step_by_step'];
+    // Templates requiring before+after
+    const BEFORE_AFTER_TEMPLATES = ['project'];
 
     protected function rules()
     {
+        $isCarousel     = in_array($this->template, self::CAROUSEL_TEMPLATES);
+        $needsPhoto     = in_array($this->template, self::PHOTO_TEMPLATES);
+        $needsAfter     = in_array($this->template, self::BEFORE_AFTER_TEMPLATES);
+        $needsExtra     = in_array($this->template, ['chantier_detail', 'step_by_step']);
+
         return [
-            'audio' => 'required|max:10240',
-            'template' => 'required|in:review,project,faq,lifestyle',
-            'imageBefore' => in_array($this->template, ['project', 'lifestyle']) ? 'required|image|max:5120' : 'nullable',
-            'imageAfter' => $this->template === 'project' ? 'required|image|max:5120' : 'nullable',
+            'audio'         => 'required|max:10240',
+            'template'      => 'required|in:review,project,faq,lifestyle,quality_focus,chantier_detail,step_by_step,guide_pedagogique',
+            'imageBefore'   => ($needsPhoto && !$needsExtra) ? 'required|image|max:5120' : 'nullable|image|max:5120',
+            'imageAfter'    => $needsAfter ? 'required|image|max:5120' : 'nullable',
+            'extraImages'   => $needsExtra ? 'required|array|min:2|max:5' : 'nullable|array',
+            'extraImages.*' => 'image|max:5120',
         ];
     }
 
@@ -37,25 +53,29 @@ class PostGenerator extends Component
 
         $this->status = 'processing';
 
-        // 1. Save Files
-        $audioPath = $this->audio->store('memos', 'public');
+        // Store files
+        $audioPath       = $this->audio->store('memos', 'public');
         $imageBeforePath = $this->imageBefore ? $this->imageBefore->store('projects', 'public') : null;
-        $imageAfterPath = $this->imageAfter ? $this->imageAfter->store('projects', 'public') : null;
+        $imageAfterPath  = $this->imageAfter  ? $this->imageAfter->store('projects', 'public')  : null;
 
-        // 2. Create Post Record
+        $extraImagePaths = [];
+        foreach ($this->extraImages as $img) {
+            $extraImagePaths[] = $img->store('projects', 'public');
+        }
+
         $post = Post::create([
-            'user_id' => Auth::id(),
-            'company_id' => Auth::user()->company->id,
-            'audio_path' => $audioPath,
+            'user_id'           => Auth::id(),
+            'company_id'        => Auth::user()->company->id,
+            'audio_path'        => $audioPath,
             'image_before_path' => $imageBeforePath,
-            'image_after_path' => $imageAfterPath,
-            'template' => $this->template,
-            'status' => 'pending',
+            'image_after_path'  => $imageAfterPath,
+            'extra_images'      => count($extraImagePaths) ? $extraImagePaths : null,
+            'template'          => $this->template,
+            'status'            => 'pending',
         ]);
 
         $this->generatedPostId = $post->id;
 
-        // 3. Run Job synchronously (transcription + IA + image generation)
         try {
             ProcessPostGeneration::dispatchSync($post);
         } catch (\Throwable $e) {
@@ -70,8 +90,21 @@ class PostGenerator extends Component
         $post->refresh();
 
         if ($post->status === 'review_pending') {
-            $this->previewImageUrl = $post->image_path ? \Illuminate\Support\Facades\Storage::url($post->image_path) : null;
-            $this->previewContent = $post->refined_content;
+            $this->previewContent  = $post->refined_content;
+
+            if ($post->slides && count($post->slides) > 0) {
+                $this->previewSlides  = array_map(
+                    fn($p) => \Illuminate\Support\Facades\Storage::url($p),
+                    $post->slides
+                );
+                $this->previewImageUrl = $this->previewSlides[0];
+            } else {
+                $this->previewImageUrl = $post->image_path
+                    ? \Illuminate\Support\Facades\Storage::url($post->image_path)
+                    : null;
+                $this->previewSlides = [];
+            }
+
             $this->status = 'review_pending';
         } else {
             $this->status = 'failed';
@@ -82,7 +115,7 @@ class PostGenerator extends Component
     {
         $post = Post::find($this->generatedPostId);
 
-        if ($post && $post->user_id === \Illuminate\Support\Facades\Auth::id()) {
+        if ($post && $post->user_id === Auth::id()) {
             $post->update(['status' => 'completed']);
         }
 
@@ -93,19 +126,25 @@ class PostGenerator extends Component
     {
         $post = Post::find($this->generatedPostId);
 
-        if ($post && $post->user_id === \Illuminate\Support\Facades\Auth::id()) {
-            foreach ([$post->audio_path, $post->image_path, $post->image_before_path, $post->image_after_path] as $path) {
-                if ($path && \Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+        if ($post && $post->user_id === Auth::id()) {
+            $allPaths = array_filter(array_merge(
+                [$post->audio_path, $post->image_path, $post->image_before_path, $post->image_after_path],
+                $post->slides       ?? [],
+                $post->extra_images ?? []
+            ));
+            foreach ($allPaths as $path) {
+                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
                     \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
                 }
             }
             $post->delete();
         }
 
-        $this->status = 'idle';
-        $this->generatedPostId = null;
-        $this->previewImageUrl = null;
-        $this->previewContent = null;
+        $this->status            = 'idle';
+        $this->generatedPostId   = null;
+        $this->previewImageUrl   = null;
+        $this->previewContent    = null;
+        $this->previewSlides     = [];
     }
 
     public function render()

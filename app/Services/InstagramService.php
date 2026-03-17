@@ -253,6 +253,13 @@ class InstagramService
         $localUrl = Storage::disk('public')->url($storagePath);
 
         $imgbbKey = config('services.imgbb.api_key');
+
+        \Log::debug('Instagram publicUrl', [
+            'storage_path' => $storagePath,
+            'local_url'    => $localUrl,
+            'imgbb_key'    => $imgbbKey ? 'SET' : 'NOT SET',
+        ]);
+
         if (!$imgbbKey) {
             return $localUrl;
         }

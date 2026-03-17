@@ -30,7 +30,7 @@ class InstagramService
         $params = http_build_query([
             'client_id'     => $this->appId,
             'redirect_uri'  => $this->callbackUrl,
-            'scope'         => 'instagram_basic,instagram_content_publish,pages_read_engagement,pages_show_list',
+            'scope'         => 'instagram_basic,instagram_content_publish,pages_read_engagement,pages_show_list,business_management',
             'response_type' => 'code',
             'state'         => $state,
         ]);

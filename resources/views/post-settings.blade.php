@@ -82,7 +82,7 @@
                                 <div>
                                     <p class="text-sm font-semibold text-green-900">Connecté</p>
                                     @if($company->instagram_username)
-                                        <p class="text-xs text-green-700">@{{ $company->instagram_username }}</p>
+                                        <p class="text-xs text-green-700">{{ $company->instagram_username }}</p>
                                     @endif
                                     @if($company->instagram_token_expires_at)
                                         <p class="text-xs text-green-600 mt-0.5">

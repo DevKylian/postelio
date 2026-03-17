@@ -266,10 +266,9 @@ class InstagramService
 
         try {
             $imageData = Storage::disk('public')->get($storagePath);
-            $response  = Http::post('https://api.imgbb.com/1/upload', [
-                'key'    => $imgbbKey,
-                'image'  => base64_encode($imageData),
-                'expiration' => 600, // 10 min, enough for Instagram to fetch it
+            $response  = Http::asForm()->post('https://api.imgbb.com/1/upload?key=' . urlencode($imgbbKey), [
+                'image'      => base64_encode($imageData),
+                'expiration' => 600,
             ])->json();
 
             \Log::debug('imgbb response', ['response' => $response]);

@@ -17,9 +17,15 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $admin = User::create([
+            'name' => 'Admin Postelio',
+            'email' => 'admin@postelio.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+        ]);
+
+        $admin->company()->create([
+            'name' => 'Postelio HQ',
+            'city' => 'Paris',
         ]);
     }
 }

@@ -15,7 +15,6 @@ class ImageGeneratorService
     public function __construct()
     {
         $this->manager = new ImageManager(new Driver());
-        // Use forward slashes for Windows compatibility in Intervention V3
         $this->fontPath = str_replace('\\', '/', storage_path('fonts/Montserrat-Bold.ttf'));
     }
 
@@ -24,66 +23,87 @@ class ImageGeneratorService
      */
     public function generate(Post $post): string
     {
-        $company = $post->company;
-        $content = $post->refined_content;
-        $template = $post->template;
+        $company    = $post->company;
+        $content    = $post->refined_content;
+        $template   = $post->template;
+        $brandColor = $company->brand_color ?? '#F59E0B';
 
-        // 1. Create Canvas
         $image = $this->manager->create(1080, 1080);
 
-        // 2. Apply Background
-        $brandColor = $company->brand_color ?? '#F59E0B';
-        
-        // For reviews, the background is the brand color
         if ($template === 'review') {
             $image->fill($brandColor);
             $this->drawReviewElements($image);
-            $this->drawText($image, $content, 350, 950, 60); // Centered in the middle zone
+            $this->drawText($image, $content, 320, 900, 58);
+            $this->drawCompanyBadge($image, $company);
         } elseif ($template === 'faq') {
-            $image->fill('#0f172a'); // Midnight/Slate dark background
-            $this->drawFaqElements($image);
-            $this->drawText($image, $content, 400, 850, 60); // Centered Question
+            $image->fill('#0f172a');
+            $this->drawFaqElements($image, $brandColor);
+            $this->drawText($image, $content, 380, 840, 55);
+            $this->drawFaqCompanyName($image, $company, $brandColor);
         } elseif ($template === 'lifestyle') {
             $this->drawLifestyleElements($image, $post);
-            // Typically no text on the image for lifestyle as per user request
+            $this->drawLifestyleOverlay($image, $company, $brandColor);
         } elseif ($template === 'project') {
-            // For projects, background doesn't matter much as images cover it
             $image->fill('#FFFFFF');
-            $this->drawProjectElements($image, $post);
-            // No descriptive text on before/after as requested by user
+            $this->drawProjectElements($image, $post, $company, $brandColor);
         } else {
             $image->fill($brandColor);
             $this->drawText($image, $content, 200, 880, 50);
         }
 
-        // 5. Add Logo (Optional: Could be integrated into banner if needed)
-        //$this->addLogo($image, $company->logo_path);
+        $this->addLogo($image, $company->logo_path);
 
-        // 6. Save
         $fileName = 'posts/' . $post->id . '_generated.png';
         Storage::disk('public')->put($fileName, $image->toPng());
 
         return $fileName;
     }
 
-    private function drawReviewElements($image)
+    // -------------------------------------------------------------------------
+    // Template drawers
+    // -------------------------------------------------------------------------
+
+    private function drawReviewElements($image): void
     {
-        $starY = 250;
+        $starY       = 230;
         $starSpacing = 90;
-        $startX = 540 - (($starSpacing * 4) / 2);
+        $startX      = 540 - (($starSpacing * 4) / 2);
 
         for ($i = 0; $i < 5; $i++) {
-            $this->drawStar($image, $startX + ($i * $starSpacing), $starY, 35, 15, '#FACC15'); // Yellow-400 for stars
+            $this->drawStar($image, $startX + ($i * $starSpacing), $starY, 35, 15, '#FACC15');
         }
     }
 
-    private function drawProjectElements($image, Post $post)
+    /**
+     * Semi-transparent dark strip at the very bottom of the review template.
+     * Shows company name + city.
+     */
+    private function drawCompanyBadge($image, $company): void
     {
-        $bannerHeight = 150; // Balanced height for a 1080px canvas
-        $imageHeight = 1080 - $bannerHeight;
-        $halfWidth = 540;
+        // Dark overlay strip (960 → 1080)
+        $image->drawRectangle(0, 960, function ($draw) {
+            $draw->size(1080, 120);
+            $draw->background('rgba(0, 0, 0, 0.35)');
+        });
 
-        // 1. Draw Images Side-by-Side
+        $label = $this->companyLabel($company);
+
+        $image->text($label, 540, 1020, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(30);
+            $font->color('#FFFFFF');
+            $font->align('center');
+            $font->valign('middle');
+        });
+    }
+
+    private function drawProjectElements($image, Post $post, $company, string $brandColor): void
+    {
+        $bannerHeight = 150;
+        $imageHeight  = 1080 - $bannerHeight;
+        $halfWidth    = 540;
+
+        // Photos side-by-side
         if ($post->image_before_path && Storage::disk('public')->exists($post->image_before_path)) {
             $before = $this->manager->read(Storage::disk('public')->get($post->image_before_path));
             $before->cover($halfWidth, $imageHeight);
@@ -96,65 +116,74 @@ class ImageGeneratorService
             $image->place($after, 'top-right', 0, 0);
         }
 
-        // 2. Separator line between images (like in gabarit)
+        // White separator line
         $image->drawRectangle($halfWidth - 1, 0, function ($draw) use ($imageHeight) {
             $draw->size(2, $imageHeight);
             $draw->background('#FFFFFF');
         });
 
-        // 3. Draw Bottom Banner using Brand Color
-        $brandColor = $post->company->brand_color ?? '#F59E0B';
+        // Brand color banner
         $image->drawRectangle(0, $imageHeight, function ($draw) use ($bannerHeight, $brandColor) {
             $draw->size(1080, $bannerHeight);
             $draw->background($brandColor);
         });
 
-        // 4. Draw labels "AVANT" and "APRÈS" in the banner (CLEAN - no background boxes as requested)
-        $labelY = $imageHeight + ($bannerHeight / 2);
-        
-        $image->text('AVANT', 270, $labelY, function ($font) {
+        // AVANT / APRÈS at ~60% of the banner height
+        $labelY = $imageHeight + intval($bannerHeight * 0.62);
+
+        $image->text('AVANT', 162, $labelY, function ($font) {
             $font->filename($this->fontPath);
-            $font->size(40);
+            $font->size(36);
             $font->color('#FFFFFF');
             $font->align('center');
             $font->valign('middle');
         });
 
-        $image->text('APRÈS', 1080 - 270, $labelY, function ($font) {
+        $image->text('APRÈS', 918, $labelY, function ($font) {
             $font->filename($this->fontPath);
-            $font->size(40);
+            $font->size(36);
             $font->color('#FFFFFF');
+            $font->align('center');
+            $font->valign('middle');
+        });
+
+        // Company name centered at ~28% of the banner height
+        $companyY = $imageHeight + intval($bannerHeight * 0.28);
+        $label    = $this->companyLabel($company);
+
+        $image->text($label, 540, $companyY, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(22);
+            $font->color('rgba(255, 255, 255, 0.85)');
             $font->align('center');
             $font->valign('middle');
         });
     }
 
-    private function drawFaqElements($image)
+    private function drawFaqElements($image, string $brandColor): void
     {
-        $orange = '#F59E0B';
-        
-        // 1. Top Orange Border (thick)
-        $image->drawRectangle(0, 0, function ($draw) use ($orange) {
+        // Top border
+        $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
             $draw->size(1080, 20);
-            $draw->background($orange);
+            $draw->background($brandColor);
         });
 
-        // 2. Small Orange Dash/Divider
-        $image->drawRectangle(490, 250, function ($draw) use ($orange) {
+        // Small dash/divider
+        $image->drawRectangle(490, 250, function ($draw) use ($brandColor) {
             $draw->size(100, 10);
-            $draw->background($orange);
+            $draw->background($brandColor);
         });
 
-        // 3. Label "FAQ ARTISAN"
-        $image->text('FAQ ARTISAN', 540, 320, function ($font) use ($orange) {
+        // Label "FAQ ARTISAN"
+        $image->text('FAQ ARTISAN', 540, 320, function ($font) use ($brandColor) {
             $font->filename($this->fontPath);
             $font->size(35);
-            $font->color($orange);
+            $font->color($brandColor);
             $font->align('center');
             $font->valign('middle');
         });
 
-        // 4. Decorative Icon (Question Mark in watermark)
+        // Watermark question mark
         $image->text('?', 950, 950, function ($font) {
             $font->filename($this->fontPath);
             $font->size(300);
@@ -162,17 +191,32 @@ class ImageGeneratorService
             $font->align('center');
             $font->valign('middle');
         });
-        
-        // 5. Bottom border line
+
+        // Bottom line
         $image->drawRectangle(100, 900, function ($draw) {
             $draw->size(880, 1);
             $draw->background('rgba(255, 255, 255, 0.1)');
         });
     }
 
-    private function drawLifestyleElements($image, Post $post)
+    /**
+     * Company name at the bottom of the FAQ template, tinted in brand color.
+     */
+    private function drawFaqCompanyName($image, $company, string $brandColor): void
     {
-        // 1. Fill canvas with the photo only (Raw style as requested)
+        $label = $this->companyLabel($company);
+
+        $image->text($label, 540, 960, function ($font) use ($brandColor) {
+            $font->filename($this->fontPath);
+            $font->size(26);
+            $font->color($brandColor);
+            $font->align('center');
+            $font->valign('middle');
+        });
+    }
+
+    private function drawLifestyleElements($image, Post $post): void
+    {
         if ($post->image_before_path && Storage::disk('public')->exists($post->image_before_path)) {
             $photo = $this->manager->read(Storage::disk('public')->get($post->image_before_path));
             $photo->cover(1080, 1080);
@@ -180,33 +224,94 @@ class ImageGeneratorService
         }
     }
 
-    private function drawLabel($image, $x, $y, $text)
+    /**
+     * Brand-colored accent line + dark overlay with company name at the bottom
+     * of the lifestyle template.
+     */
+    private function drawLifestyleOverlay($image, $company, string $brandColor): void
     {
-        $image->drawRectangle($x - 60, $y - 20, function ($draw) {
-            $draw->size(120, 40);
-            $draw->background('#00000088');
+        // Dark gradient strip
+        $image->drawRectangle(0, 968, function ($draw) {
+            $draw->size(1080, 112);
+            $draw->background('rgba(0, 0, 0, 0.55)');
         });
 
-        $image->text($text, $x, $y, function ($font) {
+        // Brand color accent line
+        $image->drawRectangle(0, 966, function ($draw) use ($brandColor) {
+            $draw->size(1080, 4);
+            $draw->background($brandColor);
+        });
+
+        $label = $this->companyLabel($company);
+
+        $image->text($label, 540, 1024, function ($font) {
             $font->filename($this->fontPath);
-            $font->size(20);
+            $font->size(30);
             $font->color('#FFFFFF');
             $font->align('center');
             $font->valign('middle');
         });
     }
 
-    private function drawStar($image, $centerX, $centerY, $outerRadius, $innerRadius, $color)
+    // -------------------------------------------------------------------------
+    // Shared helpers
+    // -------------------------------------------------------------------------
+
+    private function companyLabel($company): string
+    {
+        $name = $company->name ?? '';
+        $city = $company->city ?? '';
+
+        return ($name && $city) ? $name . '  ·  ' . mb_strtoupper($city) : mb_strtoupper($name);
+    }
+
+    private function drawText($image, $text, $topBound = 420, $bottomBound = 880, $fontSize = 50): void
+    {
+        $text    = '"' . mb_strtoupper(trim($text, '"')) . '"';
+        $words   = explode(' ', $text);
+        $lines   = [];
+        $current = '';
+        $maxChars = 24;
+
+        foreach ($words as $word) {
+            if (strlen($current . ' ' . $word) < $maxChars) {
+                $current .= ($current ? ' ' : '') . $word;
+            } else {
+                $lines[]  = $current;
+                $current  = $word;
+            }
+        }
+        $lines[] = $current;
+
+        $lineHeight      = 70;
+        $totalTextHeight = count($lines) * $lineHeight;
+        $availableHeight = $bottomBound - $topBound;
+        $startY          = $topBound + ($availableHeight - $totalTextHeight) / 2 + ($lineHeight / 2);
+
+        $y = $startY;
+        foreach ($lines as $line) {
+            $image->text($line, 540, $y, function ($font) use ($fontSize) {
+                if (file_exists($this->fontPath)) {
+                    $font->filename($this->fontPath);
+                    $font->size($fontSize);
+                }
+                $font->color('#FFFFFF');
+                $font->align('center');
+                $font->valign('middle');
+            });
+            $y += $lineHeight;
+        }
+    }
+
+    private function drawStar($image, $centerX, $centerY, $outerRadius, $innerRadius, $color): void
     {
         $points = [];
         for ($i = 0; $i < 5; $i++) {
-            // Outer point
-            $angle = deg2rad(-90 + ($i * 72));
+            $angle    = deg2rad(-90 + ($i * 72));
             $points[] = $centerX + ($outerRadius * cos($angle));
             $points[] = $centerY + ($outerRadius * sin($angle));
 
-            // Inner point
-            $angle = deg2rad(-90 + ($i * 72) + 36);
+            $angle    = deg2rad(-90 + ($i * 72) + 36);
             $points[] = $centerX + ($innerRadius * cos($angle));
             $points[] = $centerY + ($innerRadius * sin($angle));
         }
@@ -219,54 +324,12 @@ class ImageGeneratorService
         });
     }
 
-    private function drawText($image, $text, $topBound = 420, $bottomBound = 880, $fontSize = 50)
-    {
-        $text = '"' . mb_strtoupper(trim($text, '"')) . '"'; // Wrap with quotes and force uppercase
-        $words = explode(' ', $text);
-        $lines = [];
-        $currentLine = '';
-        $maxCharsPerLine = 24; // Slightly more characters per line for better flow
-
-        foreach ($words as $word) {
-            if (strlen($currentLine . ' ' . $word) < $maxCharsPerLine) {
-                $currentLine .= ($currentLine ? ' ' : '') . $word;
-            } else {
-                $lines[] = $currentLine;
-                $currentLine = $word;
-            }
-        }
-        $lines[] = $currentLine;
-
-        // Positioning Constraints
-        $lineHeight = 70;
-        
-        $totalTextHeight = count($lines) * $lineHeight;
-        $availableHeight = $bottomBound - $topBound;
-        
-        // Center the whole block vertically in the available space
-        $startY = $topBound + ($availableHeight - $totalTextHeight) / 2 + ($lineHeight / 2);
-
-        $y = $startY;
-        foreach ($lines as $line) {
-            $image->text($line, 540, $y, function ($font) use ($fontSize) {
-                if (file_exists($this->fontPath)) {
-                    $font->filename($this->fontPath);
-                    $font->size($fontSize); 
-                }
-                $font->color('#FFFFFF');
-                $font->align('center');
-                $font->valign('middle');
-            });
-            $y += $lineHeight;
-        }
-    }
-
-    private function addLogo($image, $logoPath)
+    private function addLogo($image, $logoPath): void
     {
         if ($logoPath && Storage::disk('public')->exists($logoPath)) {
             $logo = $this->manager->read(Storage::disk('public')->get($logoPath));
-            $logo->scale(width: 150);
-            $image->place($logo, 'bottom-right', 50, 50);
+            $logo->scale(width: 130);
+            $image->place($logo, 'bottom-right', 40, 40);
         }
     }
 }

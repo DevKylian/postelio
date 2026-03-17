@@ -209,12 +209,16 @@
                     </div>
 
                     <div x-show="mode === 'upload'">
-                        <div x-data="{ isDragging: false }" class="relative">
-                            <input type="file" wire:model="audio" id="audio-input" class="hidden" accept="audio/*">
+                        <div x-data="{ isDragging: false, uploadError: false }"
+                             x-on:livewire-upload-error.window="uploadError = true"
+                             class="relative">
+                            <input type="file" wire:model="audio" id="audio-input" class="hidden" accept="audio/*"
+                                   x-on:change="uploadError = false">
                             <label for="audio-input"
                                    @dragover.prevent="isDragging = true"
                                    @dragleave.prevent="isDragging = false"
-                                   @drop.prevent="isDragging = false"
+                                   @drop.prevent="isDragging = false; uploadError = false"
+                                   :class="uploadError ? 'border-red-400 bg-red-50' : ''"
                                    class="flex flex-col items-center justify-center w-full min-h-[180px] border-2 border-dashed rounded-3xl transition-all duration-300 cursor-pointer {{ $audio ? 'bg-green-50 border-green-500 shadow-lg shadow-green-500/10' : 'border-gray-200 hover:border-copper hover:bg-copper/5 bg-gray-50' }}">
                                 @if ($audio)
                                     <div class="p-3 bg-green-500 rounded-full text-white mb-2 animate-bounce">
@@ -224,15 +228,23 @@
                                     </div>
                                     <span class="text-green-700 font-bold text-sm">Fichier chargé !</span>
                                 @else
-                                    <div class="p-4 bg-white rounded-full text-copper shadow-xl mb-4">
+                                    <div class="p-4 bg-white rounded-full text-copper shadow-xl mb-4" x-show="!uploadError">
                                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                         </svg>
                                     </div>
-                                    <span class="text-midnight font-bold">Cliquez ou glissez votre audio</span>
-                                    <span class="text-gray-400 text-xs mt-1">Maximum 10 Mo</span>
+                                    <span class="text-midnight font-bold" x-show="!uploadError">Cliquez ou glissez votre audio</span>
+                                    <span class="text-gray-400 text-xs mt-1" x-show="!uploadError">MP3, WAV, M4A — Maximum 20 Mo</span>
+                                    <span class="text-red-600 font-bold text-sm" x-show="uploadError">Fichier trop volumineux ou format non supporté</span>
+                                    <span class="text-red-400 text-xs mt-1" x-show="uploadError">Maximum 20 Mo</span>
                                 @endif
                             </label>
+                            <div wire:loading wire:target="audio" class="absolute inset-0 flex items-center justify-center bg-white/70 rounded-3xl">
+                                <svg class="animate-spin w-8 h-8 text-copper" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                                </svg>
+                            </div>
                         </div>
                     </div>
 

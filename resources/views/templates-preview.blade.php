@@ -39,12 +39,26 @@
                 {{-- ── Gabarit Avant/Après ── --}}
                 <div class="space-y-4 group">
                     <div class="aspect-square bg-white rounded-2xl shadow-lg ring-1 ring-gray-200 overflow-hidden flex flex-col relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2">
-                        <div class="flex-1 flex">
-                            <div class="w-1/2 relative overflow-hidden border-r-2 border-white">
-                                <img src="https://images.unsplash.com/photo-1541604193435-225878999ba0?q=80&w=600&h=600&auto=format&fit=crop" alt="Avant" class="w-full h-full object-cover grayscale-[20%] group-hover:scale-110 transition-transform duration-500">
+                        <div class="flex-1 flex min-h-0">
+                            {{-- Photo Avant --}}
+                            <div class="w-1/2 relative overflow-hidden border-r-2 border-white bg-slate-300 flex items-center justify-center group-hover:bg-slate-200 transition-colors duration-500">
+                                <div class="text-center text-slate-500 select-none pointer-events-none">
+                                    <svg class="w-10 h-10 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <p class="text-xs font-bold uppercase tracking-widest">Avant</p>
+                                </div>
                             </div>
-                            <div class="w-1/2 relative overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1621905252507-b354bcadcabc?q=80&w=600&h=600&auto=format&fit=crop" alt="Après" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            {{-- Photo Après --}}
+                            <div class="w-1/2 relative overflow-hidden bg-slate-400 flex items-center justify-center group-hover:bg-slate-300 transition-colors duration-500">
+                                <div class="text-center text-slate-100 select-none pointer-events-none">
+                                    <svg class="w-10 h-10 mx-auto mb-2 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <p class="text-xs font-bold uppercase tracking-widest">Après</p>
+                                </div>
                             </div>
                         </div>
                         {{-- Bandeau marque --}}
@@ -128,8 +142,15 @@
 
                 {{-- ── Gabarit Lifestyle ── --}}
                 <div class="space-y-4 group">
-                    <div class="aspect-square bg-white rounded-2xl shadow-lg ring-1 ring-gray-200 overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2">
-                        <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=800&h=800&auto=format&fit=crop" alt="Lifestyle" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="aspect-square bg-slate-700 rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2 flex items-center justify-center">
+                        {{-- Placeholder photo --}}
+                        <div class="text-center text-slate-400 select-none pointer-events-none">
+                            <svg class="w-14 h-14 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Votre photo</p>
+                        </div>
                         {{-- Overlay branding --}}
                         <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent pt-10 pb-4 px-5">
                             <div class="w-full" style="border-top: 3px solid {{ $brandColor }}; padding-top: 8px;">

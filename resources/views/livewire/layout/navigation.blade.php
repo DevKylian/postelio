@@ -10,7 +10,7 @@ $logout = function (Logout $logout) {
 
 ?>
 
-<div class="lg:w-72 lg:flex-shrink-0 z-50">
+<div class="lg:w-72 lg:flex-shrink-0 z-50 bg-midnight">
     <!-- Mobile Overlay -->
     <div x-show="sidebarOpen" 
          x-transition:enter="transition-opacity ease-linear duration-300"

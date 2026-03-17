@@ -12,6 +12,7 @@ state([
     'name'        => fn () => auth()->user()->company?->name ?? '',
     'city'        => fn () => auth()->user()->company?->city ?? '',
     'brand_color' => fn () => auth()->user()->company?->brand_color ?? '#F59E0B',
+    'logo_path'   => fn () => auth()->user()->company?->logo_path,
     'logo'        => null,
 ]);
 
@@ -42,7 +43,16 @@ $updateCompanySettings = function () {
         Company::create(array_merge($data, ['user_id' => $user->id]));
     }
 
+    // Reload the relationship so the blade template picks up new values (logo, etc.)
+    $user->load('company');
+
     $this->logo = null;
+
+    // Re-sync state from the freshly loaded company
+    $this->name        = $user->company->name;
+    $this->city        = $user->company->city ?? '';
+    $this->brand_color = $user->company->brand_color;
+    $this->logo_path   = $user->company->logo_path;
 
     $this->dispatch('company-updated');
 };
@@ -108,8 +118,8 @@ $updateCompanySettings = function () {
         <div>
             <x-input-label for="logo" value="Logo de la société" />
             <div class="mt-1 flex items-center gap-4">
-                @if (auth()->user()->company?->logo_path)
-                    <img src="{{ Storage::url(auth()->user()->company->logo_path) }}"
+                @if ($logo_path)
+                    <img src="{{ Storage::url($logo_path) }}"
                          alt="Logo actuel"
                          class="h-16 w-16 rounded-lg object-contain border border-gray-200 bg-gray-50 p-1" />
                 @endif

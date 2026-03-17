@@ -23,10 +23,10 @@ $logout = function (Logout $logout) {
          class="fixed inset-0 bg-midnight/60 backdrop-blur-sm z-40 lg:hidden" 
          style="display: none;"></div>
 
-    <aside 
+    <aside
         id="sidebar"
         :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-        class="fixed inset-y-0 left-0 w-72 bg-midnight text-white flex-shrink-0 flex flex-col transition-all duration-300 lg:sticky lg:top-0 lg:h-screen">
+        class="fixed inset-y-0 left-0 w-72 z-50 bg-midnight text-white flex-shrink-0 flex flex-col transition-all duration-300 lg:sticky lg:top-0 lg:h-screen">
         
         <!-- Mobile Close Button -->
         <button @click="sidebarOpen = false" class="lg:hidden absolute top-4 right-4 text-gray-400 hover:text-white p-2">

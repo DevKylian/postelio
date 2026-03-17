@@ -257,7 +257,7 @@
                     <p class="text-gray-500 mt-2 text-lg">Votre post a été généré et ajouté à vos créations.</p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-4 w-full justify-center pt-4">
-                    <a href="{{ route('dashboard') }}" class="bg-midnight text-white font-bold py-4 px-8 rounded-2xl hover:bg-slate-800 transition-all text-center">
+                    <a href="{{ route('posts.index') }}" wire:navigate class="bg-midnight text-white font-bold py-4 px-8 rounded-2xl hover:bg-slate-800 transition-all text-center">
                         Voir mes créations
                     </a>
                     <button wire:click="$set('status', 'idle')" class="bg-gray-100 text-midnight font-bold py-4 px-8 rounded-2xl hover:bg-gray-200 transition-all">

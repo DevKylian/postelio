@@ -51,7 +51,13 @@
                                 <!-- Badge Type -->
                                 <div class="absolute top-4 left-4">
                                     <span class="px-3 py-1 bg-white/90 backdrop-blur-sm shadow-sm rounded-full text-[10px] font-black uppercase tracking-widest text-midnight">
-                                        {{ $post->template === 'review' ? 'Avis Client' : 'Réalisation' }}
+                                        @switch($post->template)
+                                            @case('review') Avis Client @break
+                                            @case('project') Avant / Après @break
+                                            @case('faq') FAQ Artisan @break
+                                            @case('lifestyle') Lifestyle @break
+                                            @default Création @break
+                                        @endswitch
                                     </span>
                                 </div>
                             </div>
@@ -68,7 +74,7 @@
                                 </div>
 
                                 <div class="flex gap-2">
-                                    <a href="{{ Storage::url($post->image_path) }}" download class="flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-xl border border-gray-200 text-midnight text-xs font-bold hover:bg-gray-50 transition-colors">
+                                    <a href="{{ $post->image_path ? Storage::url($post->image_path) : '#' }}" {{ $post->image_path ? 'download' : '' }} class="flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-xl border border-gray-200 text-midnight text-xs font-bold hover:bg-gray-50 transition-colors {{ !$post->image_path ? 'opacity-40 pointer-events-none' : '' }}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                         </svg>

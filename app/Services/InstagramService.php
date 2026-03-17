@@ -272,6 +272,8 @@ class InstagramService
                 'expiration' => 600, // 10 min, enough for Instagram to fetch it
             ])->json();
 
+            \Log::debug('imgbb response', ['response' => $response]);
+
             if (!empty($response['data']['url'])) {
                 return $response['data']['url'];
             }

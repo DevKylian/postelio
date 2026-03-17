@@ -169,7 +169,16 @@ class InstagramService
         }
 
         $imagePath = $post->image_path;
-        return $this->publishSingleImage($igId, $token, $this->publicUrl($imagePath), $caption);
+        $imageUrl  = $this->publicUrl($imagePath);
+
+        \Log::debug('Instagram publishPost', [
+            'post_id'    => $post->id,
+            'image_path' => $imagePath,
+            'image_url'  => $imageUrl,
+            'ig_id'      => $igId,
+        ]);
+
+        return $this->publishSingleImage($igId, $token, $imageUrl, $caption);
     }
 
     private function publishSingleImage(string $igId, string $token, string $imageUrl, string $caption): string

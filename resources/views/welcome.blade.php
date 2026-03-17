@@ -17,8 +17,8 @@
         <header class="sticky top-0 z-50 bg-chalk/80 backdrop-blur-md border-b border-gray-200/50">
             <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
                 <a href="/" class="flex items-center gap-3">
-                    <x-application-logo class="w-8 h-8 fill-current text-copper" />
-                    <span class="text-xl font-black tracking-tight text-midnight uppercase italic">Postelio</span>
+                    <x-application-logo class="w-9 h-9" />
+                    <span class="text-xl font-black tracking-widest text-midnight uppercase">POSTELIO</span>
                 </a>
                 <nav class="flex items-center gap-3">
                     @auth

@@ -19,8 +19,8 @@
             <!-- Logo -->
             <div class="mb-8">
                 <a href="/" wire:navigate class="flex items-center gap-3">
-                    <x-application-logo class="w-10 h-10 fill-current text-copper" />
-                    <span class="text-2xl font-black tracking-tight text-midnight uppercase italic">Postelio</span>
+                    <x-application-logo class="w-10 h-10" />
+                    <span class="text-2xl font-black tracking-widest text-midnight uppercase">POSTELIO</span>
                 </a>
             </div>
 

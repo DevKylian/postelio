@@ -241,6 +241,6 @@ class InstagramService
 
     private function publicUrl(string $storagePath): string
     {
-        return rtrim(config('app.url'), '/') . Storage::disk('public')->url($storagePath);
+        return Storage::disk('public')->url($storagePath);
     }
 }

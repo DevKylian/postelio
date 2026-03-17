@@ -16,8 +16,8 @@
 
         @stack('styles')
     </head>
-    <body class="font-sans antialiased bg-chalk text-midnight" x-data="{ sidebarOpen: false }">
-        <div class="flex min-h-screen overflow-x-hidden">
+    <body class="font-sans antialiased bg-chalk text-midnight h-screen overflow-hidden" x-data="{ sidebarOpen: false }">
+        <div class="flex h-screen overflow-hidden">
             <!-- Sidebar -->
             <livewire:layout.navigation />
 

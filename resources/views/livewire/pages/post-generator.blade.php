@@ -96,39 +96,138 @@
                     </div>
                 </div>
 
-                <!-- Audio Upload -->
-                <div class="space-y-4">
+                <!-- Audio Section -->
+                <div class="space-y-4" x-data="voiceRecorder">
                     <label class="text-sm font-bold text-midnight uppercase tracking-widest flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-copper"></span>
-                        2. Envoyez votre mémo vocal
+                        2. Votre mémo vocal
                     </label>
-                    <div x-data="{ isDragging: false }" 
-                         class="relative">
-                        <input type="file" wire:model="audio" id="audio-input" class="hidden" accept="audio/*">
-                        <label for="audio-input" 
-                               @dragover.prevent="isDragging = true" 
-                               @dragleave.prevent="isDragging = false"
-                               @drop.prevent="isDragging = false"
-                               class="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed rounded-3xl transition-all duration-300 cursor-pointer {{ $audio ? 'bg-green-50 border-green-500 shadow-lg shadow-green-500/10' : 'border-gray-200 hover:border-copper hover:bg-copper/5' }} {{ $audio ? '' : 'bg-gray-50' }}">
-                            
-                            @if ($audio)
-                                <div class="p-3 bg-green-500 rounded-full text-white mb-2 animate-bounce">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
-                                <span class="text-green-700 font-bold text-sm">Mémo chargé !</span>
-                            @else
-                                <div class="p-4 bg-white rounded-full text-copper shadow-xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                                    </svg>
-                                </div>
-                                <span class="text-midnight font-bold">Cliquez ou glissez votre audio</span>
-                                <span class="text-gray-400 text-xs mt-1">Maximum 10 Mo</span>
-                            @endif
-                        </label>
+
+                    <!-- Mode Tabs -->
+                    <div class="flex bg-gray-100 rounded-2xl p-1 gap-1">
+                        <button type="button" @click="mode = 'record'"
+                                :class="mode === 'record' ? 'bg-white shadow-sm text-midnight font-bold' : 'text-gray-400 hover:text-gray-600'"
+                                class="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm transition-all duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                            </svg>
+                            Enregistrer
+                        </button>
+                        <button type="button" @click="mode = 'upload'"
+                                :class="mode === 'upload' ? 'bg-white shadow-sm text-midnight font-bold' : 'text-gray-400 hover:text-gray-600'"
+                                class="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm transition-all duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Importer
+                            <span class="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-full leading-none">test</span>
+                        </button>
                     </div>
+
+                    <!-- Recorder Panel -->
+                    <div x-show="mode === 'record'">
+
+                        <!-- Idle: big mic button -->
+                        <div x-show="recState === 'idle'"
+                             class="flex flex-col items-center justify-center min-h-[180px] border-2 border-dashed border-gray-200 rounded-3xl bg-gray-50 gap-4 transition-all">
+                            <button type="button" @click="startRecording()"
+                                    class="w-20 h-20 bg-copper rounded-full flex items-center justify-center text-white shadow-2xl shadow-copper/30 hover:scale-110 hover:shadow-copper/40 transition-all duration-300 active:scale-95">
+                                <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </button>
+                            <span class="text-midnight font-bold">Appuyez pour enregistrer</span>
+                            <span class="text-gray-400 text-xs">Microphone requis</span>
+                        </div>
+
+                        <!-- Recording -->
+                        <div x-show="recState === 'recording'"
+                             class="flex flex-col items-center justify-center min-h-[180px] border-2 border-dashed border-red-300 rounded-3xl bg-red-50 gap-5 transition-all">
+                            <div class="flex items-center gap-3">
+                                <span class="flex h-4 w-4 relative">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
+                                </span>
+                                <span class="text-red-600 font-black text-2xl tabular-nums" x-text="formatTime(elapsed)">00:00</span>
+                            </div>
+                            <span class="text-red-500 text-sm font-medium">Enregistrement en cours...</span>
+                            <button type="button" @click="stopRecording()"
+                                    class="bg-red-500 text-white font-bold px-8 py-3 rounded-2xl hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20">
+                                Arrêter
+                            </button>
+                        </div>
+
+                        <!-- Done: playback + confirm/redo -->
+                        <div x-show="recState === 'done'"
+                             class="flex flex-col items-center justify-center min-h-[180px] border-2 border-dashed border-amber-300 rounded-3xl bg-amber-50 gap-5 p-6 transition-all">
+                            <audio :src="audioUrl" controls class="w-full rounded-xl"></audio>
+                            <div class="flex gap-3 w-full">
+                                <button type="button" @click="confirmRecording()"
+                                        class="flex-1 bg-copper text-white font-bold py-3 rounded-2xl hover:bg-copper/90 transition-colors text-sm shadow-lg shadow-copper/20">
+                                    Utiliser cet enregistrement
+                                </button>
+                                <button type="button" @click="resetRecording()"
+                                        class="bg-white border-2 border-gray-200 text-gray-500 font-bold py-3 px-5 rounded-2xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all text-sm">
+                                    Recommencer
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Uploading spinner -->
+                        <div x-show="recState === 'uploading'"
+                             class="flex flex-col items-center justify-center min-h-[180px] border-2 border-dashed border-copper/30 rounded-3xl bg-copper/5 gap-4 transition-all">
+                            <svg class="animate-spin h-10 w-10 text-copper" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="text-midnight font-bold">Chargement de l'enregistrement...</span>
+                        </div>
+
+                        <!-- Confirmed -->
+                        <div x-show="recState === 'confirmed'"
+                             class="flex flex-col items-center justify-center min-h-[180px] border-2 border-dashed border-green-500 rounded-3xl bg-green-50 gap-3 transition-all">
+                            <div class="p-3 bg-green-500 rounded-full text-white animate-bounce">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <span class="text-green-700 font-bold">Mémo enregistré !</span>
+                            <button type="button" @click="resetRecording()"
+                                    class="text-xs text-gray-400 hover:text-gray-600 underline">
+                                Recommencer
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Upload Panel (pour les tests) -->
+                    <div x-show="mode === 'upload'">
+                        <div x-data="{ isDragging: false }" class="relative">
+                            <input type="file" wire:model="audio" id="audio-input" class="hidden" accept="audio/*">
+                            <label for="audio-input"
+                                   @dragover.prevent="isDragging = true"
+                                   @dragleave.prevent="isDragging = false"
+                                   @drop.prevent="isDragging = false"
+                                   class="flex flex-col items-center justify-center w-full min-h-[180px] border-2 border-dashed rounded-3xl transition-all duration-300 cursor-pointer {{ $audio ? 'bg-green-50 border-green-500 shadow-lg shadow-green-500/10' : 'border-gray-200 hover:border-copper hover:bg-copper/5 bg-gray-50' }}">
+                                @if ($audio)
+                                    <div class="p-3 bg-green-500 rounded-full text-white mb-2 animate-bounce">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-green-700 font-bold text-sm">Fichier chargé !</span>
+                                @else
+                                    <div class="p-4 bg-white rounded-full text-copper shadow-xl mb-4">
+                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-midnight font-bold">Cliquez ou glissez votre audio</span>
+                                    <span class="text-gray-400 text-xs mt-1">Maximum 10 Mo</span>
+                                @endif
+                            </label>
+                        </div>
+                    </div>
+
                     @error('audio') <span class="text-red-500 text-xs font-medium">{{ $message }}</span> @enderror
                 </div>
 
@@ -332,3 +431,79 @@
         @endif
     </div>
 </div>
+
+@script
+<script>
+    Alpine.data('voiceRecorder', () => ({
+        mode: 'record',
+        recState: 'idle',
+        mediaRecorder: null,
+        chunks: [],
+        audioUrl: null,
+        audioBlob: null,
+        elapsed: 0,
+        timer: null,
+
+        async startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const mimeType = MediaRecorder.isTypeSupported('audio/mp4')
+                    ? 'audio/mp4'
+                    : MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+                        ? 'audio/webm;codecs=opus'
+                        : 'audio/webm';
+                this.mediaRecorder = new MediaRecorder(stream, { mimeType });
+                this.chunks = [];
+                this.elapsed = 0;
+                this.mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) this.chunks.push(e.data); };
+                this.mediaRecorder.onstop = () => this.onStop();
+                this.mediaRecorder.start(100);
+                this.recState = 'recording';
+                this.timer = setInterval(() => this.elapsed++, 1000);
+            } catch (err) {
+                alert('Impossible d\'accéder au microphone. Vérifiez les autorisations du navigateur.');
+            }
+        },
+
+        stopRecording() {
+            if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+                this.mediaRecorder.stop();
+                this.mediaRecorder.stream.getTracks().forEach(t => t.stop());
+            }
+            clearInterval(this.timer);
+        },
+
+        onStop() {
+            const type = this.mediaRecorder.mimeType || 'audio/webm';
+            this.audioBlob = new Blob(this.chunks, { type });
+            if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
+            this.audioUrl = URL.createObjectURL(this.audioBlob);
+            this.recState = 'done';
+        },
+
+        confirmRecording() {
+            this.recState = 'uploading';
+            const type = this.audioBlob.type;
+            const ext = type.includes('mp4') ? 'm4a' : type.includes('ogg') ? 'ogg' : 'webm';
+            const file = new File([this.audioBlob], `recording.${ext}`, { type });
+            this.$wire.upload(
+                'audio',
+                file,
+                () => { this.recState = 'confirmed'; },
+                () => { this.recState = 'done'; alert('Erreur lors de l\'envoi. Réessayez.'); }
+            );
+        },
+
+        resetRecording() {
+            this.recState = 'idle';
+            if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
+            this.audioUrl = null;
+            this.audioBlob = null;
+        },
+
+        formatTime(s) {
+            return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+        },
+    }));
+</script>
+@endscript

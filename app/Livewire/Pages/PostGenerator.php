@@ -55,10 +55,18 @@ class PostGenerator extends Component
 
         $this->generatedPostId = $post->id;
 
-        // 3. Dispatch Job
-        ProcessPostGeneration::dispatch($post);
-        
-        // Refresh the post to get the status updated by the Job
+        // 3. Run Job synchronously (transcription + IA + image generation)
+        try {
+            ProcessPostGeneration::dispatchSync($post);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('PostGenerator: job failed', [
+                'post_id' => $post->id,
+                'error'   => $e->getMessage(),
+            ]);
+            $this->status = 'failed';
+            return;
+        }
+
         $post->refresh();
 
         if ($post->status === 'review_pending') {

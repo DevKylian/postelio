@@ -29,4 +29,8 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+Route::view('post-settings', 'post-settings')
+    ->middleware(['auth', 'verified'])
+    ->name('post-settings');
+
 require __DIR__.'/auth.php';

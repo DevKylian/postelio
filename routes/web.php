@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InstagramController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,5 +33,12 @@ Route::view('profile', 'profile')
 Route::view('post-settings', 'post-settings')
     ->middleware(['auth', 'verified'])
     ->name('post-settings');
+
+// Instagram OAuth
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/auth/instagram', [InstagramController::class, 'connect'])->name('instagram.connect');
+    Route::get('/auth/instagram/callback', [InstagramController::class, 'callback'])->name('instagram.callback');
+    Route::delete('/auth/instagram', [InstagramController::class, 'disconnect'])->name('instagram.disconnect');
+});
 
 require __DIR__.'/auth.php';

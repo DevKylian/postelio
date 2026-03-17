@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'instagram' => [
+        'client_id'     => env('INSTAGRAM_APP_ID'),
+        'client_secret' => env('INSTAGRAM_APP_SECRET'),
+        'redirect'      => env('INSTAGRAM_CALLBACK_URL'),
+    ],
+
 ];

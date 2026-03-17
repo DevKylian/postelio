@@ -41,4 +41,8 @@ return [
         'redirect'      => env('INSTAGRAM_CALLBACK_URL'),
     ],
 
+    'imgbb' => [
+        'api_key' => env('IMGBB_API_KEY'),
+    ],
+
 ];

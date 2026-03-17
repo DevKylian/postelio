@@ -250,6 +250,28 @@ class InstagramService
 
     private function publicUrl(string $storagePath): string
     {
-        return Storage::disk('public')->url($storagePath);
+        $localUrl = Storage::disk('public')->url($storagePath);
+
+        $imgbbKey = config('services.imgbb.api_key');
+        if (!$imgbbKey) {
+            return $localUrl;
+        }
+
+        try {
+            $imageData = Storage::disk('public')->get($storagePath);
+            $response  = Http::post('https://api.imgbb.com/1/upload', [
+                'key'    => $imgbbKey,
+                'image'  => base64_encode($imageData),
+                'expiration' => 600, // 10 min, enough for Instagram to fetch it
+            ])->json();
+
+            if (!empty($response['data']['url'])) {
+                return $response['data']['url'];
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('imgbb upload failed, falling back to local URL', ['error' => $e->getMessage()]);
+        }
+
+        return $localUrl;
     }
 }

@@ -73,8 +73,8 @@ class ImageGeneratorService
 
         $this->addLogo($image, $company->logo_path);
 
-        $fileName = 'posts/' . $post->id . '_generated.png';
-        Storage::disk('public')->put($fileName, $image->toPng());
+        $fileName = 'posts/' . $post->id . '_generated.jpg';
+        Storage::disk('public')->put($fileName, $image->toJpeg(quality: 90));
 
         return $fileName;
     }
@@ -124,8 +124,8 @@ class ImageGeneratorService
         $this->drawTextRaw($coverImage, strtoupper($titleText), 540, 780, 56, '#FFFFFF', 24);
         $this->drawBottomBand($coverImage, $company, $brandColor);
         $this->addLogo($coverImage, $company->logo_path);
-        $path = 'posts/' . $post->id . '_slide_1.png';
-        Storage::disk('public')->put($path, $coverImage->toPng());
+        $path = 'posts/' . $post->id . '_slide_1.jpg';
+        Storage::disk('public')->put($path, $coverImage->toJpeg(quality: 90));
         $slides[] = $path;
 
         // Slides 2..N – detail photos
@@ -145,8 +145,8 @@ class ImageGeneratorService
                 : null;
             $this->drawUnifiedBand($slideImage, $company, $brandColor, $slideText);
             $this->addLogo($slideImage, $company->logo_path);
-            $path = 'posts/' . $post->id . '_slide_' . ($i + 2) . '.png';
-            Storage::disk('public')->put($path, $slideImage->toPng());
+            $path = 'posts/' . $post->id . '_slide_' . ($i + 2) . '.jpg';
+            Storage::disk('public')->put($path, $slideImage->toJpeg(quality: 90));
             $slides[] = $path;
         }
 
@@ -190,8 +190,8 @@ class ImageGeneratorService
         $this->drawTextRaw($coverImage, $titleText, 540, 700, 56, '#FFFFFF', 24);
         $this->drawBottomBand($coverImage, $company, '#000000');
         $this->addLogo($coverImage, $company->logo_path);
-        $path = 'posts/' . $post->id . '_slide_1.png';
-        Storage::disk('public')->put($path, $coverImage->toPng());
+        $path = 'posts/' . $post->id . '_slide_1.jpg';
+        Storage::disk('public')->put($path, $coverImage->toJpeg(quality: 90));
         $slides[] = $path;
 
         // Slides 2..N – one per photo/step
@@ -220,8 +220,8 @@ class ImageGeneratorService
             $stepLabel = preg_replace('/^ÉTAPE\s*\d+\s*[:\-]?\s*/iu', '', $stepLabel);
             $this->drawUnifiedBand($slideImage, $company, $brandColor, $stepLabel);
             $this->addLogo($slideImage, $company->logo_path);
-            $path = 'posts/' . $post->id . '_slide_' . ($idx + 2) . '.png';
-            Storage::disk('public')->put($path, $slideImage->toPng());
+            $path = 'posts/' . $post->id . '_slide_' . ($idx + 2) . '.jpg';
+            Storage::disk('public')->put($path, $slideImage->toJpeg(quality: 90));
             $slides[] = $path;
         }
 
@@ -255,8 +255,8 @@ class ImageGeneratorService
             $font->valign('middle');
         });
         $this->addLogo($slide1, $company->logo_path);
-        $path = 'posts/' . $post->id . '_slide_1.png';
-        Storage::disk('public')->put($path, $slide1->toPng());
+        $path = 'posts/' . $post->id . '_slide_1.jpg';
+        Storage::disk('public')->put($path, $slide1->toJpeg(quality: 90));
         $slides[] = $path;
 
         // --- Middle slides ---
@@ -289,8 +289,8 @@ class ImageGeneratorService
             $this->drawBottomBand($slide, $company, '#1E293B');
             $this->addLogo($slide, $company->logo_path);
 
-            $path = 'posts/' . $post->id . '_slide_' . $slideNum . '.png';
-            Storage::disk('public')->put($path, $slide->toPng());
+            $path = 'posts/' . $post->id . '_slide_' . $slideNum . '.jpg';
+            Storage::disk('public')->put($path, $slide->toJpeg(quality: 90));
             $slides[] = $path;
         }
 
@@ -332,8 +332,8 @@ class ImageGeneratorService
             $font->align('center');
             $font->valign('middle');
         });
-        $path = 'posts/' . $post->id . '_slide_' . $lastSlideNum . '.png';
-        Storage::disk('public')->put($path, $cta->toPng());
+        $path = 'posts/' . $post->id . '_slide_' . $lastSlideNum . '.jpg';
+        Storage::disk('public')->put($path, $cta->toJpeg(quality: 90));
         $slides[] = $path;
 
         return $slides;

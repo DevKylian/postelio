@@ -20,7 +20,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
     Route::view('templates-preview', 'templates-preview')->name('templates-preview');
     Route::view('calendar', 'calendar')->name('calendar');
     Route::view('post-settings', 'post-settings')->name('post-settings');
-    Volt::route('instagram-stats', 'pages.instagram-stats')->name('instagram-stats');
+    Route::view('instagram-stats', 'instagram-stats')->name('instagram-stats');
 
     Route::get('posts', [PostController::class, 'index'])->name('posts.index');
     Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');

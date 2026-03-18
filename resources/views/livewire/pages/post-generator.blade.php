@@ -872,17 +872,24 @@
 
     {{-- ── FAILED ── --}}
     @elseif($status === 'failed')
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm py-24 flex flex-col items-center justify-center text-center space-y-6">
-            <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center text-red-500 animate-scale-in">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm py-16 px-8 flex flex-col items-center justify-center text-center space-y-5">
+            <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center text-red-500">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </div>
-            <div>
+            <div class="space-y-3 max-w-md">
                 <h3 class="text-xl font-bold text-midnight">Échec de la génération</h3>
-                <p class="text-gray-400 mt-1.5 text-sm max-w-sm">Une erreur est survenue lors de la création de votre post. Vérifiez vos fichiers et réessayez.</p>
+                @if($errorMessage)
+                    <div class="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-left">
+                        <p class="text-red-700 text-sm leading-relaxed">{{ $errorMessage }}</p>
+                    </div>
+                    <p class="text-gray-400 text-xs">Corrigez les champs de personnalisation ou videz-les, puis réessayez.</p>
+                @else
+                    <p class="text-gray-400 text-sm">Une erreur est survenue lors de la création de votre post. Vérifiez vos fichiers et réessayez.</p>
+                @endif
             </div>
-            <button wire:click="$set('status', 'idle')"
+            <button wire:click="$set('status', 'idle'); $set('errorMessage', null)"
                     class="bg-copper text-white font-semibold py-3 px-8 rounded-xl hover:bg-amber-500 transition-all shadow-md shadow-copper/20">
                 Réessayer
             </button>

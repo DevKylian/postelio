@@ -64,6 +64,8 @@ class ProcessPostGeneration implements ShouldQueue
             ]);
 
             $this->post->update(['status' => 'failed']);
+
+            throw $e; // re-throw so the Livewire component can show a precise error
         }
     }
 }

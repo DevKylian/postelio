@@ -21,6 +21,7 @@ class PostGenerator extends Component
     public $scheduleType = 'now';    // 'now' | 'scheduled'
     public $scheduledAt  = '';       // datetime-local string
     public $status = 'idle';
+    public $errorMessage = null;
     public $generatedPostId;
     public $previewImageUrl;
     public $previewContent;
@@ -119,6 +120,7 @@ class PostGenerator extends Component
                 'post_id' => $post->id,
                 'error'   => $e->getMessage(),
             ]);
+            $this->errorMessage = $e->getMessage();
             $this->status = 'failed';
             return;
         }
@@ -189,6 +191,7 @@ class PostGenerator extends Component
         }
 
         $this->status            = 'idle';
+        $this->errorMessage      = null;
         $this->generatedPostId   = null;
         $this->previewImageUrl   = null;
         $this->previewContent    = null;

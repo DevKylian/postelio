@@ -163,7 +163,7 @@
                                     <!-- Copy text -->
                                     <button x-data="{ copied: false }"
                                             @click="
-                                                navigator.clipboard.writeText('{{ addslashes($post->refined_content) }}');
+                                                navigator.clipboard.writeText('{{ addslashes($post->caption) }}');
                                                 copied = true;
                                                 setTimeout(() => copied = false, 1500);
                                             "

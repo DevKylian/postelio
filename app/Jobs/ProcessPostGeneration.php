@@ -35,7 +35,8 @@ class ProcessPostGeneration implements ShouldQueue
 
             // 2. AI content refinement
             $photoCount = count($this->post->extra_images ?? []);
-            $refined = $refiner->refine($transcript, $this->post->template, $photoCount);
+            $templateOptions = $this->post->template_options ?? [];
+            $refined = $refiner->refine($transcript, $this->post->template, $photoCount, $templateOptions);
             $this->post->update(['refined_content' => $refined]);
 
             // 3. Image generation (single or carousel array)
@@ -63,6 +64,8 @@ class ProcessPostGeneration implements ShouldQueue
             ]);
 
             $this->post->update(['status' => 'failed']);
+
+            throw $e; // re-throw so the Livewire component can show a precise error
         }
     }
 }

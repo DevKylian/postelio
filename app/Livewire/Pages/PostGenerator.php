@@ -21,10 +21,25 @@ class PostGenerator extends Component
     public $scheduleType = 'now';    // 'now' | 'scheduled'
     public $scheduledAt  = '';       // datetime-local string
     public $status = 'idle';
+    public $errorMessage = null;
     public $generatedPostId;
     public $previewImageUrl;
     public $previewContent;
     public $previewSlides = [];      // array of URLs for carousel preview
+
+    // ── Template customization options ──
+    public $tone          = 'professionnel'; // professionnel | chaleureux | expert | dynamique
+    public $includeHashtags = true;
+    public $clientName    = '';    // review: optional client first name
+    public $serviceType   = '';    // review: type of work done
+    public $workCategory  = '';    // project: type of works
+    public $jobDuration   = '';    // project: duration
+    public $faqCategory   = '';    // faq: category
+    public $season        = 'auto'; // conseil_saisonnier: season
+    public $targetSlides  = '5';   // guide_pedagogique: desired slide count
+    public $customNote    = '';    // any template: free-form extra context for AI
+    public $isAnalyzing   = false;
+    public $analysisSuccess = false;
 
     // Carousel templates
     const CAROUSEL_TEMPLATES  = ['chantier_detail', 'step_by_step', 'guide_pedagogique'];
@@ -32,6 +47,46 @@ class PostGenerator extends Component
     const PHOTO_TEMPLATES     = ['project', 'lifestyle', 'quality_focus', 'chantier_detail', 'step_by_step'];
     // Templates requiring before+after
     const BEFORE_AFTER_TEMPLATES = ['project'];
+
+    public function updatedAudio()
+    {
+        if (!$this->audio) return;
+
+        $this->isAnalyzing = true;
+        $this->analysisSuccess = false;
+
+        try {
+            // 1. Store temporarily to have a local path
+            $path = $this->audio->store('temp_memos', 'public');
+
+            // 2. Transcribe
+            $transcriber = app(\App\Services\PostGeneration\TranscriptionService::class);
+            $transcript = $transcriber->transcribe($path);
+
+            // 3. Extract fields
+            $refiner = app(\App\Services\PostGeneration\ContentRefinerService::class);
+            $extracted = $refiner->extractFields($transcript);
+
+            // 4. Update properties (only if not null)
+            if (!empty($extracted['clientName']))    $this->clientName    = $extracted['clientName'];
+            if (!empty($extracted['serviceType']))   $this->serviceType   = $extracted['serviceType'];
+            if (!empty($extracted['workCategory']))  $this->workCategory  = $extracted['workCategory'];
+            if (!empty($extracted['jobDuration']))   $this->jobDuration   = $extracted['jobDuration'];
+            if (!empty($extracted['faqCategory']))   $this->faqCategory   = $extracted['faqCategory'];
+            if (!empty($extracted['season']))        $this->season        = $extracted['season'];
+            if (!empty($extracted['tone']))          $this->tone          = $extracted['tone'];
+
+            $this->analysisSuccess = true;
+
+            // Optional: cleanup temp file
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Audio analysis failed: ' . $e->getMessage());
+        } finally {
+            $this->isAnalyzing = false;
+        }
+    }
 
     protected function rules()
     {
@@ -49,6 +104,8 @@ class PostGenerator extends Component
             'extraImages.*' => 'image|max:5120',
             'scheduleType'  => 'required|in:now,scheduled',
             'scheduledAt'   => $this->scheduleType === 'scheduled' ? 'required|date|after:now' : 'nullable',
+            'tone'          => 'required|in:professionnel,chaleureux,expert,dynamique',
+            'customNote'    => 'nullable|string|max:300',
         ];
     }
 
@@ -68,6 +125,19 @@ class PostGenerator extends Component
             $extraImagePaths[] = $img->store('projects', 'public');
         }
 
+        $templateOptions = [
+            'tone'           => $this->tone,
+            'includeHashtags'=> $this->includeHashtags,
+            'clientName'     => $this->clientName ?: null,
+            'serviceType'    => $this->serviceType ?: null,
+            'workCategory'   => $this->workCategory ?: null,
+            'jobDuration'    => $this->jobDuration ?: null,
+            'faqCategory'    => $this->faqCategory ?: null,
+            'season'         => $this->season !== 'auto' ? $this->season : null,
+            'targetSlides'   => (int) $this->targetSlides,
+            'customNote'     => $this->customNote ?: null,
+        ];
+
         $post = Post::create([
             'user_id'           => Auth::id(),
             'company_id'        => Auth::user()->company->id,
@@ -76,6 +146,7 @@ class PostGenerator extends Component
             'image_after_path'  => $imageAfterPath,
             'extra_images'      => count($extraImagePaths) ? $extraImagePaths : null,
             'template'          => $this->template,
+            'template_options'  => $templateOptions,
             'status'            => 'pending',
             'scheduled_at'      => ($this->scheduleType === 'scheduled' && $this->scheduledAt)
                                     ? \Carbon\Carbon::parse($this->scheduledAt)
@@ -91,6 +162,7 @@ class PostGenerator extends Component
                 'post_id' => $post->id,
                 'error'   => $e->getMessage(),
             ]);
+            $this->errorMessage = $e->getMessage();
             $this->status = 'failed';
             return;
         }
@@ -98,14 +170,7 @@ class PostGenerator extends Component
         $post->refresh();
 
         if ($post->status === 'review_pending') {
-            $content = $post->refined_content;
-            $decoded = json_decode($content, true);
-            
-            if (json_last_error() === JSON_ERROR_NONE && isset($decoded['caption'])) {
-                $this->previewContent = $decoded['caption'];
-            } else {
-                $this->previewContent = $content;
-            }
+            $this->previewContent = $post->caption;
 
             if ($post->slides && count($post->slides) > 0) {
                 $this->previewSlides  = array_map(
@@ -161,6 +226,7 @@ class PostGenerator extends Component
         }
 
         $this->status            = 'idle';
+        $this->errorMessage      = null;
         $this->generatedPostId   = null;
         $this->previewImageUrl   = null;
         $this->previewContent    = null;

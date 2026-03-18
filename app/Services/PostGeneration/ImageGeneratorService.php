@@ -39,24 +39,49 @@ class ImageGeneratorService
     // Single-image templates
     // -------------------------------------------------------------------------
 
+    /**
+     * Extract the short text meant for the image from the structured refined_content.
+     * Falls back gracefully so old posts (plain string) still work.
+     * Strips hashtags and enforces a hard char limit as a safety net.
+     */
+    private function extractImageText(Post $post, int $maxChars = 80): string
+    {
+        $data = json_decode($post->refined_content, true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            // Use image_text when present, otherwise a truncated caption
+            $raw = $data['image_text'] ?? mb_substr($data['caption'] ?? '', 0, $maxChars);
+        } else {
+            // Legacy plain-text fallback
+            $raw = $post->refined_content;
+        }
+
+        // Strip any hashtags that sneaked through
+        $raw = preg_replace('/#\S+/', '', $raw);
+
+        // Hard truncate + clean
+        return $this->cleanText(mb_substr(trim($raw), 0, $maxChars));
+    }
+
     private function generateSingle(Post $post): string
     {
         $company    = $post->company;
-        $content    = $this->cleanText($post->refined_content);
         $template   = $post->template;
         $brandColor = $company->brand_color ?? '#F59E0B';
 
         $image = $this->manager->create(1080, 1080);
 
         if ($template === 'review') {
+            $imageText = $this->extractImageText($post, 70);
             $image->fill($brandColor);
             $this->drawReviewElements($image);
-            $this->drawText($image, $content, 320, 900, 58);
+            $this->drawText($image, $imageText, 320, 900, 58);
             $this->drawCompanyBadge($image, $company);
         } elseif ($template === 'faq') {
+            $imageText = $this->extractImageText($post, 75);
             $image->fill('#0f172a');
             $this->drawFaqElements($image, $brandColor);
-            $this->drawText($image, $content, 380, 840, 55);
+            $this->drawText($image, $imageText, 380, 840, 55);
             $this->drawFaqCompanyName($image, $company, $brandColor);
         } elseif ($template === 'lifestyle') {
             $this->drawLifestyleElements($image, $post);
@@ -65,14 +90,18 @@ class ImageGeneratorService
             $image->fill('#FFFFFF');
             $this->drawProjectElements($image, $post, $company, $brandColor);
         } elseif ($template === 'quality_focus') {
-            $this->drawQualityFocusElements($image, $post, $company, $brandColor, $content);
+            $imageText = $this->extractImageText($post, 55);
+            $this->drawQualityFocusElements($image, $post, $company, $brandColor, $imageText);
         } elseif ($template === 'conseil_saisonnier') {
-            $this->drawConseilSaisonnierElements($image, $company, $brandColor, $content);
+            $imageText = $this->extractImageText($post, 85);
+            $this->drawConseilSaisonnierElements($image, $company, $brandColor, $imageText);
         } elseif ($template === 'erreur_a_eviter') {
-            $this->drawErreurAEviterElements($image, $company, $brandColor, $content);
+            $imageText = $this->extractImageText($post, 75);
+            $this->drawErreurAEviterElements($image, $company, $brandColor, $imageText);
         } else {
+            $imageText = $this->extractImageText($post, 80);
             $image->fill($brandColor);
-            $this->drawText($image, $content, 200, 880, 50);
+            $this->drawText($image, $imageText, 200, 880, 50);
         }
 
         $this->addLogo($image, $company->logo_path);

@@ -40,11 +40,174 @@
                 }
             }
             @endphp
-
-            {{-- ── STEP 1 : Template ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            {{-- ── STEP 1 : Votre mémo vocal ── --}}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" x-data="voiceRecorder">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
                     <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">1</div>
+                    <div>
+                        <h3 class="font-semibold text-midnight text-base">Votre mémo vocal</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Décrivez votre projet — l'IA pré-remplira les champs suivants.</p>
+                    </div>
+                </div>
+
+                <div class="p-6 space-y-4">
+                    {{-- Tab Switcher --}}
+                    <div class="flex bg-gray-100 rounded-xl p-1 gap-1">
+                        <button type="button" @click="mode = 'record'"
+                                :class="mode === 'record' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
+                                class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm transition-all duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                            </svg>
+                            Enregistrer
+                        </button>
+                        <button type="button" @click="mode = 'upload'"
+                                :class="mode === 'upload' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
+                                class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm transition-all duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Importer un fichier
+                        </button>
+                    </div>
+
+                    {{-- Record Mode --}}
+                    <div x-show="mode === 'record'">
+                        <div x-show="recState === 'idle'"
+                             class="flex flex-col items-center justify-center min-h-[200px] rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 gap-5 transition-all">
+                            <button type="button" @click="startRecording()"
+                                    class="w-16 h-16 bg-copper rounded-full flex items-center justify-center text-white shadow-xl shadow-copper/25 hover:scale-105 hover:shadow-copper/40 transition-all duration-300">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            </button>
+                            <div class="text-center">
+                                <p class="text-xs font-semibold text-midnight">Appuyez pour enregistrer</p>
+                            </div>
+                        </div>
+
+                        <div x-show="recState === 'recording'"
+                             class="flex flex-col items-center justify-center min-h-[200px] rounded-2xl bg-red-50 border-2 border-dashed border-red-200 gap-5 transition-all">
+                            <div class="flex items-center gap-3">
+                                <span class="flex h-3 w-3 relative">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                </span>
+                                <span class="text-red-600 font-bold text-2xl tabular-nums" x-text="formatTime(elapsed)">00:00</span>
+                            </div>
+                            <button type="button" @click="stopRecording()"
+                                    class="bg-red-500 text-white font-semibold px-6 py-2 rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20 text-sm">
+                                Arrêter
+                            </button>
+                        </div>
+
+                        <div x-show="recState === 'done'"
+                             class="flex flex-col gap-4 p-5 rounded-2xl bg-amber-50 border-2 border-dashed border-amber-200 transition-all">
+                            <audio :src="audioUrl" controls class="w-full rounded-xl h-10"></audio>
+                            <div class="flex gap-2">
+                                <button type="button" @click="confirmRecording()"
+                                        class="flex-1 bg-copper text-white font-semibold py-2.5 rounded-xl hover:bg-amber-500 transition-colors text-xs shadow-md shadow-copper/20">
+                                    Analyser ce mémo
+                                </button>
+                                <button type="button" @click="resetRecording()"
+                                        class="px-4 py-2.5 border-2 border-gray-200 text-gray-500 font-semibold rounded-xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all text-xs bg-white">
+                                    Recommencer
+                                </button>
+                            </div>
+                        </div>
+
+                        <div x-show="recState === 'uploading' || $wire.isAnalyzing"
+                             class="flex flex-col items-center justify-center min-h-[200px] rounded-2xl bg-copper/[0.02] border-2 border-dashed border-copper/10 gap-6 transition-all">
+                            <div class="flex items-center gap-1 h-8">
+                                <div class="w-1 bg-copper rounded-full animate-[pulse_1s_infinite_0ms]" style="height: 40%"></div>
+                                <div class="w-1 bg-copper rounded-full animate-[pulse_1s_infinite_100ms]" style="height: 70%"></div>
+                                <div class="w-1 bg-copper rounded-full animate-[pulse_1s_infinite_200ms]" style="height: 100%"></div>
+                                <div class="w-1 bg-copper rounded-full animate-[pulse_1s_infinite_300ms]" style="height: 60%"></div>
+                                <div class="w-1 bg-copper rounded-full animate-[pulse_1s_infinite_400ms]" style="height: 80%"></div>
+                            </div>
+                            <div class="text-center space-y-1">
+                                <p class="text-sm text-midnight font-bold">Analyse intelligente en cours</p>
+                                <p class="text-[11px] text-gray-400">L'IA extrait les détails de votre projet...</p>
+                            </div>
+                        </div>
+
+                        <div x-show="recState === 'confirmed' && !$wire.isAnalyzing"
+                             class="flex flex-col items-center justify-center min-h-[200px] rounded-2xl bg-green-50 border-2 border-dashed border-green-300 gap-4 transition-all">
+                            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-green-500/20">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm font-semibold text-green-800">Mémo analysé avec succès !</p>
+                                <button type="button" @click="resetRecording()"
+                                        class="text-[10px] text-green-600 hover:text-green-800 underline mt-1">
+                                    Enregistrer un autre vocal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Upload Mode --}}
+                    <div x-show="mode === 'upload'">
+                        <div x-data="{ uploadError: false }"
+                             x-on:livewire-upload-error.window="uploadError = true"
+                             class="relative">
+                            <input type="file" wire:model.live="audio" id="audio-input-step1" class="hidden" accept="audio/*"
+                                   x-on:change="uploadError = false">
+                            <label for="audio-input-step1"
+                                   class="flex flex-col items-center justify-center w-full min-h-[200px] border-2 border-dashed rounded-2xl transition-all duration-200 cursor-pointer
+                                        {{ $audio ? 'border-green-400 bg-green-50' : 'border-gray-200 hover:border-copper hover:bg-copper/5 bg-gray-50' }}">
+                                @if ($audio && !$isAnalyzing)
+                                    <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-green-500/20 mb-3">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-sm font-semibold text-green-800">Fichier chargé et analysé</p>
+                                @elseif($isAnalyzing)
+                                    <div class="flex flex-col items-center gap-4">
+                                        <div class="flex items-center gap-1 h-6">
+                                            <div class="w-1 bg-copper rounded-full animate-[pulse_1s_infinite_0ms]" style="height: 60%"></div>
+                                            <div class="w-1 bg-copper rounded-full animate-[pulse_1s_infinite_150ms]" style="height: 100%"></div>
+                                            <div class="w-1 bg-copper rounded-full animate-[pulse_1s_infinite_300ms]" style="height: 70%"></div>
+                                        </div>
+                                        <p class="text-xs text-midnight font-bold">Analyse en cours...</p>
+                                    </div>
+                                @else
+                                    <div wire:loading wire:target="audio" class="flex flex-col items-center animate-pulse">
+                                        <svg class="animate-spin h-8 w-8 text-copper mb-3" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <p class="text-xs text-midnight font-semibold">Envoi du fichier...</p>
+                                    </div>
+                                    <div wire:loading.remove wire:target="audio" class="flex flex-col items-center">
+                                        <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-copper shadow-md mb-3">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                            </svg>
+                                        </div>
+                                        <p class="text-sm font-semibold text-midnight">Importer votre mémo audio</p>
+                                    </div>
+                                @endif
+                            </label>
+                        </div>
+                    </div>
+
+                    @if($analysisSuccess)
+                    <div class="flex items-center gap-2 text-xs font-semibold text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-100">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        L'IA a pré-rempli les champs basés sur votre vocal.
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            {{-- ── STEP 2 : Template ── --}}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">2</div>
                     <div>
                         <h3 class="font-semibold text-midnight text-base">Choisissez votre gabarit</h3>
                         <p class="text-xs text-gray-400 mt-0.5">Quel type de post voulez-vous créer ?</p>
@@ -106,172 +269,274 @@
                 </div>
             </div>
 
-            {{-- ── STEP 2 : Mémo Vocal ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" x-data="voiceRecorder">
-                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">2</div>
+            {{-- ── PERSONNALISATION DU GABARIT ── --}}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" x-data="{ expanded: false }">
+                <button type="button" 
+                        @click="expanded = !expanded" 
+                        class="w-full px-6 py-5 border-b border-gray-50 flex items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
+                        <div class="text-left">
+                            <h3 class="font-semibold text-midnight text-base leading-tight">
+                                Personnaliser le gabarit 
+                                <span class="hidden sm:inline text-gray-400 font-normal"> - Affinez le ton, le style et les détails — l'IA s'adapte.</span>
+                            </h3>
+                            <p class="sm:hidden text-xs text-gray-400 mt-0.5">Affinez le ton, le style et les détails — l'IA s'adapte.</p>
+                        </div>
+                    </div>
+                    <div class="text-gray-400 group-hover:text-copper transition-colors shrink-0">
+                        <svg class="w-5 h-5 transition-transform duration-300 transform" :class="expanded ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </button>
+
+                <div class="p-6 space-y-6" 
+                     x-show="expanded" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 transform -translate-y-2"
+                     x-transition:enter-end="opacity-100 transform translate-y-0">
+
+                    {{-- ── Ton de voix ── --}}
                     <div>
-                        <h3 class="font-semibold text-midnight text-base">Votre mémo vocal</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Décrivez votre projet — l'IA s'occupe du reste.</p>
-                    </div>
-                </div>
-
-                <div class="p-6 space-y-4">
-                    {{-- Tab Switcher --}}
-                    <div class="flex bg-gray-100 rounded-xl p-1 gap-1">
-                        <button type="button" @click="mode = 'record'"
-                                :class="mode === 'record' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
-                                class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm transition-all duration-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                            </svg>
-                            Enregistrer
-                        </button>
-                        <button type="button" @click="mode = 'upload'"
-                                :class="mode === 'upload' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
-                                class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm transition-all duration-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
-                            Importer un fichier
-                            <span class="text-[9px] font-bold bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-full leading-none">test</span>
-                        </button>
-                    </div>
-
-                    {{-- Record Mode --}}
-                    <div x-show="mode === 'record'">
-
-                        {{-- Idle --}}
-                        <div x-show="recState === 'idle'"
-                             class="flex flex-col items-center justify-center min-h-[220px] rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 gap-5 transition-all">
-                            <button type="button" @click="startRecording()"
-                                    class="w-20 h-20 bg-copper rounded-full flex items-center justify-center text-white shadow-xl shadow-copper/25 hover:scale-105 hover:shadow-copper/40 transition-all duration-300 active:scale-95">
-                                <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                                </svg>
-                            </button>
-                            <div class="text-center">
-                                <p class="font-semibold text-midnight">Appuyez pour enregistrer</p>
-                                <p class="text-sm text-gray-400 mt-1">Accès microphone requis · Max 5 minutes</p>
-                            </div>
-                        </div>
-
-                        {{-- Recording --}}
-                        <div x-show="recState === 'recording'"
-                             class="flex flex-col items-center justify-center min-h-[220px] rounded-2xl bg-red-50 border-2 border-dashed border-red-200 gap-5 transition-all">
-                            <div class="flex items-center gap-3">
-                                <span class="flex h-3 w-3 relative">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                                </span>
-                                <span class="text-red-600 font-bold text-3xl tabular-nums" x-text="formatTime(elapsed)">00:00</span>
-                            </div>
-                            <p class="text-red-400 text-sm">Enregistrement en cours...</p>
-                            <button type="button" @click="stopRecording()"
-                                    class="bg-red-500 text-white font-semibold px-8 py-3 rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20">
-                                Arrêter l'enregistrement
-                            </button>
-                        </div>
-
-                        {{-- Done / Preview --}}
-                        <div x-show="recState === 'done'"
-                             class="flex flex-col gap-4 p-5 rounded-2xl bg-amber-50 border-2 border-dashed border-amber-200 transition-all">
-                            <audio :src="audioUrl" controls class="w-full rounded-xl h-12"></audio>
-                            <div class="flex gap-3">
-                                <button type="button" @click="confirmRecording()"
-                                        class="flex-1 bg-copper text-white font-semibold py-3 rounded-xl hover:bg-amber-500 transition-colors text-sm shadow-md shadow-copper/20">
-                                    Utiliser cet enregistrement
-                                </button>
-                                <button type="button" @click="resetRecording()"
-                                        class="px-5 py-3 border-2 border-gray-200 text-gray-500 font-semibold rounded-xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all text-sm bg-white">
-                                    Recommencer
-                                </button>
-                            </div>
-                        </div>
-
-                        {{-- Uploading --}}
-                        <div x-show="recState === 'uploading'"
-                             class="flex flex-col items-center justify-center min-h-[220px] rounded-2xl bg-copper/5 border-2 border-dashed border-copper/20 gap-4 transition-all">
-                            <svg class="animate-spin h-10 w-10 text-copper" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            <p class="text-midnight font-semibold">Chargement de l'enregistrement...</p>
-                        </div>
-
-                        {{-- Confirmed --}}
-                        <div x-show="recState === 'confirmed'"
-                             class="flex flex-col items-center justify-center min-h-[220px] rounded-2xl bg-green-50 border-2 border-dashed border-green-300 gap-4 transition-all">
-                            <div class="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-green-500/20">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <div class="text-center">
-                                <p class="font-semibold text-green-800">Mémo enregistré !</p>
-                                <button type="button" @click="resetRecording()"
-                                        class="text-xs text-green-600 hover:text-green-800 underline mt-1">
-                                    Recommencer
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Upload Mode --}}
-                    <div x-show="mode === 'upload'">
-                        <div x-data="{ uploadError: false }"
-                             x-on:livewire-upload-error.window="uploadError = true"
-                             class="relative">
-                            <input type="file" wire:model="audio" id="audio-input" class="hidden" accept="audio/*"
-                                   x-on:change="uploadError = false">
-                            <label for="audio-input"
-                                   @dragover.prevent
-                                   @drop.prevent="uploadError = false"
-                                   :class="uploadError ? 'border-red-300 bg-red-50' : ''"
-                                   class="flex flex-col items-center justify-center w-full min-h-[220px] border-2 border-dashed rounded-2xl transition-all duration-200 cursor-pointer
-                                        {{ $audio ? 'border-green-400 bg-green-50' : 'border-gray-200 hover:border-copper hover:bg-copper/5 bg-gray-50' }}">
-                                @if ($audio)
-                                    <div class="w-14 h-14 bg-green-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-green-500/20 mb-3">
-                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    <p class="font-semibold text-green-800">Fichier chargé avec succès</p>
-                                @else
-                                    <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-copper shadow-md mb-4" x-show="!uploadError">
-                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                        </svg>
-                                    </div>
-                                    <p class="font-semibold text-midnight" x-show="!uploadError">Cliquez ou glissez votre fichier audio</p>
-                                    <p class="text-sm text-gray-400 mt-1" x-show="!uploadError">MP3, WAV, M4A · Maximum 20 Mo</p>
-                                    <p class="font-semibold text-red-600" x-show="uploadError">Fichier non supporté ou trop volumineux</p>
-                                    <p class="text-sm text-red-400 mt-1" x-show="uploadError">Maximum 20 Mo — MP3, WAV ou M4A</p>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Ton de voix</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                            @php
+                            $tones = [
+                                ['id' => 'professionnel', 'label' => 'Professionnel', 'desc' => 'Sérieux & direct', 'icon' => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', 'color' => 'blue'],
+                                ['id' => 'chaleureux',    'label' => 'Chaleureux',    'desc' => 'Humain & proche', 'icon' => 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z', 'color' => 'rose'],
+                                ['id' => 'expert',        'label' => 'Expert',        'desc' => 'Technique & précis', 'icon' => 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', 'color' => 'indigo'],
+                                ['id' => 'dynamique',     'label' => 'Dynamique',     'desc' => 'Vendeur & impact', 'icon' => 'M13 10V3L4 14h7v7l9-11h-7z', 'color' => 'amber'],
+                            ];
+                            $colorMap = [
+                                'blue'   => ['sel' => 'border-blue-400 bg-blue-50', 'icon' => 'bg-blue-100 text-blue-500', 'dot' => 'bg-blue-500', 'label' => 'text-blue-700'],
+                                'rose'   => ['sel' => 'border-rose-400 bg-rose-50', 'icon' => 'bg-rose-100 text-rose-500', 'dot' => 'bg-rose-500', 'label' => 'text-rose-700'],
+                                'indigo' => ['sel' => 'border-indigo-400 bg-indigo-50', 'icon' => 'bg-indigo-100 text-indigo-500', 'dot' => 'bg-indigo-500', 'label' => 'text-indigo-700'],
+                                'amber'  => ['sel' => 'border-amber-400 bg-amber-50', 'icon' => 'bg-amber-100 text-amber-500', 'dot' => 'bg-amber-500', 'label' => 'text-amber-700'],
+                            ];
+                            @endphp
+                            @foreach($tones as $t)
+                            @php $c = $colorMap[$t['color']]; @endphp
+                            <button type="button"
+                                    wire:click="$set('tone', '{{ $t['id'] }}')"
+                                    @if($isAnalyzing) disabled @endif
+                                    class="group relative flex flex-col items-start gap-2.5 p-3.5 rounded-xl border-2 text-left transition-all duration-200
+                                        {{ $tone === $t['id'] ? $c['sel'] . ' shadow-sm' : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50' }}
+                                        {{ $isAnalyzing ? 'animate-pulse opacity-60 pointer-events-none' : '' }}">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all {{ $tone === $t['id'] ? $c['icon'] : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200' }}">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $t['icon'] }}" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold {{ $tone === $t['id'] ? $c['label'] : 'text-midnight' }} leading-tight">{{ $t['label'] }}</p>
+                                    <p class="text-[11px] text-gray-400 mt-0.5">{{ $t['desc'] }}</p>
+                                </div>
+                                @if($tone === $t['id'])
+                                <div class="absolute top-2.5 right-2.5 w-4 h-4 rounded-full {{ $c['dot'] }} flex items-center justify-center">
+                                    <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
                                 @endif
-                            </label>
-                            <div wire:loading wire:target="audio" class="absolute inset-0 flex items-center justify-center bg-white/80 rounded-2xl">
-                                <svg class="animate-spin w-8 h-8 text-copper" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-                                </svg>
-                            </div>
+                            </button>
+                            @endforeach
                         </div>
                     </div>
 
-                    @error('audio')
-                        <p class="text-red-500 text-sm font-medium flex items-center gap-1.5">
-                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            {{ $message }}
-                        </p>
-                    @enderror
+                    {{-- ── Hashtags ── --}}
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-midnight">Inclure des hashtags</p>
+                                <p class="text-xs text-gray-400">L'IA ajoute 3-5 hashtags pertinents automatiquement</p>
+                            </div>
+                        </div>
+                        <button type="button"
+                                wire:click="$set('includeHashtags', {{ $includeHashtags ? 'false' : 'true' }})"
+                                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none
+                                    {{ $includeHashtags ? 'bg-copper' : 'bg-gray-300' }}">
+                            <span class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200
+                                {{ $includeHashtags ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                        </button>
+                    </div>
+
+                    {{-- ── Champs spécifiques au gabarit ── --}}
+
+                    {{-- REVIEW : Prénom du client + service --}}
+                    @if($template === 'review')
+                    <div class="space-y-3 pt-1 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest pt-2">Détails de l'avis</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-semibold text-gray-600 block">Prénom du client <span class="text-gray-400 font-normal">(optionnel)</span></label>
+                                <input type="text"
+                                       wire:model.defer="clientName"
+                                       placeholder="ex: Marie, Jean-Pierre..."
+                                       @if($isAnalyzing) disabled @endif
+                                       class="w-full px-3.5 py-2.5 border rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all placeholder-gray-300
+                                            {{ $isAnalyzing ? 'animate-pulse bg-copper/[0.03] border-copper/20' : 'border-gray-200' }}">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-semibold text-gray-600 block">Service réalisé <span class="text-gray-400 font-normal">(optionnel)</span></label>
+                                <input type="text"
+                                       wire:model.defer="serviceType"
+                                       placeholder="ex: pose de carrelage, peinture..."
+                                       @if($isAnalyzing) disabled @endif
+                                       class="w-full px-3.5 py-2.5 border rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all placeholder-gray-300
+                                            {{ $isAnalyzing ? 'animate-pulse bg-copper/[0.03] border-copper/20' : 'border-gray-200' }}">
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- PROJECT : Type de travaux + durée --}}
+                    @if($template === 'project')
+                    <div class="space-y-3 pt-1 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest pt-2">Détails du chantier</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-semibold text-gray-600 block">Type de travaux</label>
+                                <select wire:model.defer="workCategory"
+                                        @if($isAnalyzing) disabled @endif
+                                        class="w-full px-3.5 py-2.5 border rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all
+                                            {{ $isAnalyzing ? 'animate-pulse bg-copper/[0.03] border-copper/20' : 'border-gray-200' }}">
+                                    <option value="">Sélectionner...</option>
+                                    <option value="Peinture">Peinture</option>
+                                    <option value="Carrelage">Carrelage</option>
+                                    <option value="Maçonnerie">Maçonnerie</option>
+                                    <option value="Plomberie">Plomberie</option>
+                                    <option value="Électricité">Électricité</option>
+                                    <option value="Menuiserie">Menuiserie</option>
+                                    <option value="Charpente / Toiture">Charpente / Toiture</option>
+                                    <option value="Isolation">Isolation</option>
+                                    <option value="Rénovation complète">Rénovation complète</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-semibold text-gray-600 block">Durée du chantier</label>
+                                <select wire:model.defer="jobDuration"
+                                        @if($isAnalyzing) disabled @endif
+                                        class="w-full px-3.5 py-2.5 border rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all
+                                            {{ $isAnalyzing ? 'animate-pulse bg-copper/[0.03] border-copper/20' : 'border-gray-200' }}">
+                                    <option value="">Sélectionner...</option>
+                                    <option value="1 journée">1 journée</option>
+                                    <option value="2-3 jours">2-3 jours</option>
+                                    <option value="1 semaine">1 semaine</option>
+                                    <option value="2 semaines">2 semaines</option>
+                                    <option value="1 mois">1 mois</option>
+                                    <option value="Plusieurs mois">Plusieurs mois</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- FAQ : Catégorie --}}
+                    @if($template === 'faq')
+                    <div class="space-y-3 pt-1 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest pt-2">Catégorie de la FAQ</p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            @php
+                            $faqCats = [
+                                ['id' => 'technique',       'label' => 'Technique',       'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
+                                ['id' => 'tarifs',          'label' => 'Tarifs & délais', 'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
+                                ['id' => 'entretien',       'label' => 'Entretien',       'icon' => 'M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z'],
+                                ['id' => 'garanties',       'label' => 'Garanties',       'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'],
+                            ];
+                            @endphp
+                            @foreach($faqCats as $cat)
+                            <button type="button"
+                                    wire:click="$set('faqCategory', '{{ $cat['id'] }}')"
+                                    class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-center transition-all duration-200
+                                        {{ $faqCategory === $cat['id'] ? 'border-violet-400 bg-violet-50 shadow-sm' : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50' }}">
+                                <svg class="w-5 h-5 {{ $faqCategory === $cat['id'] ? 'text-violet-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $cat['icon'] }}" />
+                                </svg>
+                                <span class="text-xs font-semibold {{ $faqCategory === $cat['id'] ? 'text-violet-700' : 'text-gray-500' }} leading-tight">{{ $cat['label'] }}</span>
+                            </button>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- CONSEIL SAISONNIER : Saison --}}
+                    @if($template === 'conseil_saisonnier')
+                    <div class="space-y-3 pt-1 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest pt-2">Saison ciblée</p>
+                        <div class="grid grid-cols-5 gap-2">
+                            @php
+                            $seasons = [
+                                ['id' => 'auto',      'label' => 'Auto',      'emoji' => '🤖'],
+                                ['id' => 'printemps', 'label' => 'Printemps', 'emoji' => '🌸'],
+                                ['id' => 'ete',       'label' => 'Été',       'emoji' => '☀️'],
+                                ['id' => 'automne',   'label' => 'Automne',   'emoji' => '🍂'],
+                                ['id' => 'hiver',     'label' => 'Hiver',     'emoji' => '❄️'],
+                            ];
+                            @endphp
+                            @foreach($seasons as $s)
+                            <button type="button"
+                                    wire:click="$set('season', '{{ $s['id'] }}')"
+                                    class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-center transition-all duration-200
+                                        {{ $season === $s['id'] ? 'border-violet-400 bg-violet-50 shadow-sm' : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50' }}">
+                                <span class="text-2xl leading-none">{{ $s['emoji'] }}</span>
+                                <span class="text-[10px] font-semibold {{ $season === $s['id'] ? 'text-violet-700' : 'text-gray-500' }}">{{ $s['label'] }}</span>
+                            </button>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- GUIDE PÉDAGOGIQUE : Nombre de slides --}}
+                    @if($template === 'guide_pedagogique')
+                    <div class="space-y-3 pt-1 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest pt-2">Nombre de slides souhaité</p>
+                        <div class="flex gap-2">
+                            @foreach([3, 4, 5, 6, 7] as $n)
+                            <button type="button"
+                                    wire:click="$set('targetSlides', '{{ $n }}')"
+                                    class="flex-1 py-2.5 rounded-xl border-2 text-sm font-bold transition-all duration-200
+                                        {{ $targetSlides == $n ? 'border-violet-400 bg-violet-50 text-violet-700 shadow-sm' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-gray-50' }}">
+                                {{ $n }}
+                            </button>
+                            @endforeach
+                        </div>
+                        <p class="text-xs text-gray-400">Incluant la slide d'accroche et le call-to-action final.</p>
+                    </div>
+                    @endif
+
+                    {{-- ── Note libre pour l'IA ── --}}
+                    <div class="space-y-1.5 pt-1 border-t border-gray-100">
+                        <label class="text-xs font-semibold text-gray-600 block pt-2">
+                            Contexte supplémentaire <span class="text-gray-400 font-normal">(optionnel)</span>
+                        </label>
+                        <div class="relative">
+                            <textarea wire:model.defer="customNote"
+                                      placeholder="Précision pour l'IA — ex: 'Client dans le 16e Paris', 'Travaux urgence dégâts des eaux', 'Mettre en avant le label RGE'..."
+                                      rows="2"
+                                      maxlength="300"
+                                      class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all placeholder-gray-300 resize-none"></textarea>
+                            <span class="absolute bottom-2 right-3 text-[10px] text-gray-300 pointer-events-none">max 300 car.</span>
+                        </div>
+                        @error('customNote') <p class="text-red-500 text-xs font-medium">{{ $message }}</p> @enderror
+                    </div>
+
                 </div>
             </div>
 
-            {{-- ── STEP 3 : Photos (conditionnel) ── --}}
+            {{-- REMOVED OLD STEP 2 POSITION --}}
+
+            {{-- ── STEP 4 : Photos (conditionnel) ── --}}
             @if(in_array($template, ['project', 'lifestyle', 'quality_focus']))
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
+                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>
                     <div>
                         <h3 class="font-semibold text-midnight text-base">
                             {{ $template === 'project' ? 'Photos Avant & Après' : ($template === 'quality_focus' ? 'Photo du matériel' : 'Photo Lifestyle') }}
@@ -352,11 +617,11 @@
             </div>
             @endif
 
-            {{-- ── STEP 3 : Photos carrousel ── --}}
+            {{-- ── STEP 4 : Photos carrousel ── --}}
             @if(in_array($template, ['chantier_detail', 'step_by_step']))
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
+                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>
                     <div class="flex items-center justify-between flex-1">
                         <div>
                             <h3 class="font-semibold text-midnight text-base">Photos du chantier</h3>
@@ -633,17 +898,24 @@
 
     {{-- ── FAILED ── --}}
     @elseif($status === 'failed')
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm py-24 flex flex-col items-center justify-center text-center space-y-6">
-            <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center text-red-500 animate-scale-in">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm py-16 px-8 flex flex-col items-center justify-center text-center space-y-5">
+            <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center text-red-500">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </div>
-            <div>
+            <div class="space-y-3 max-w-md">
                 <h3 class="text-xl font-bold text-midnight">Échec de la génération</h3>
-                <p class="text-gray-400 mt-1.5 text-sm max-w-sm">Une erreur est survenue lors de la création de votre post. Vérifiez vos fichiers et réessayez.</p>
+                @if($errorMessage)
+                    <div class="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-left">
+                        <p class="text-red-700 text-sm leading-relaxed">{{ $errorMessage }}</p>
+                    </div>
+                    <p class="text-gray-400 text-xs">Corrigez les champs de personnalisation ou videz-les, puis réessayez.</p>
+                @else
+                    <p class="text-gray-400 text-sm">Une erreur est survenue lors de la création de votre post. Vérifiez vos fichiers et réessayez.</p>
+                @endif
             </div>
-            <button wire:click="$set('status', 'idle')"
+            <button wire:click="$set('status', 'idle'); $set('errorMessage', null)"
                     class="bg-copper text-white font-semibold py-3 px-8 rounded-xl hover:bg-amber-500 transition-all shadow-md shadow-copper/20">
                 Réessayer
             </button>

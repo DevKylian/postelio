@@ -10,6 +10,7 @@ class Company extends Model
         'user_id',
         'name',
         'city',
+        'trade',
         'brand_color',
         'logo_path',
         'instagram_access_token',

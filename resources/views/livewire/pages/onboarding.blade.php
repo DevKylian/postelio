@@ -40,7 +40,7 @@ $selectTrade = function (string $trade) {
 $updatedLogo = function () {
     try {
         $this->validateOnly('logo', [
-            'logo' => ['nullable', 'image', 'max:2048'],
+            'logo' => ['nullable', 'image', 'max:10240'],
         ]);
     } catch (\Illuminate\Validation\ValidationException $e) {
         $this->logo = null;
@@ -59,7 +59,7 @@ $nextStep = function () {
     if ($this->step === 3) {
         $this->validate([
             'brand_color' => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
-            'logo'        => ['nullable', 'image', 'max:2048'],
+            'logo'        => ['nullable', 'image', 'max:10240'],
         ]);
     }
 
@@ -309,7 +309,7 @@ $complete = function () {
                         {{-- Logo --}}
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-3">
-                                Logo <span class="text-gray-400 font-normal">(optionnel — PNG, JPG, max 2 Mo)</span>
+                                Logo <span class="text-gray-400 font-normal">(optionnel — PNG, JPG, max 10 Mo)</span>
                             </label>
 
                             @if($logo)
@@ -334,7 +334,7 @@ $complete = function () {
                                     </div>
                                     <div class="text-center">
                                         <p class="text-sm font-semibold text-gray-600 group-hover:text-amber-700 transition-colors">Cliquez pour uploader votre logo</p>
-                                        <p class="text-xs text-gray-400 mt-0.5">PNG, JPG, SVG — Max 2 Mo</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">PNG, JPG, SVG — Max 10 Mo</p>
                                     </div>
                                     <input wire:model="logo" type="file" accept="image/*" class="hidden" />
                                 </label>

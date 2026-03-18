@@ -14,6 +14,7 @@ class Post extends Model
         'transcription',
         'refined_content',
         'template',
+        'template_options',
         'status',
         'scheduled_at',
         'image_before_path',
@@ -23,9 +24,10 @@ class Post extends Model
     ];
 
     protected $casts = [
-        'slides'       => 'array',
-        'extra_images' => 'array',
-        'scheduled_at' => 'datetime',
+        'slides'           => 'array',
+        'extra_images'     => 'array',
+        'template_options' => 'array',
+        'scheduled_at'     => 'datetime',
     ];
 
     public function user()

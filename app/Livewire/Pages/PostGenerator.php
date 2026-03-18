@@ -26,6 +26,18 @@ class PostGenerator extends Component
     public $previewContent;
     public $previewSlides = [];      // array of URLs for carousel preview
 
+    // ── Template customization options ──
+    public $tone          = 'professionnel'; // professionnel | chaleureux | expert | dynamique
+    public $includeHashtags = true;
+    public $clientName    = '';    // review: optional client first name
+    public $serviceType   = '';    // review: type of work done
+    public $workCategory  = '';    // project: type of works
+    public $jobDuration   = '';    // project: duration
+    public $faqCategory   = '';    // faq: category
+    public $season        = 'auto'; // conseil_saisonnier: season
+    public $targetSlides  = '5';   // guide_pedagogique: desired slide count
+    public $customNote    = '';    // any template: free-form extra context for AI
+
     // Carousel templates
     const CAROUSEL_TEMPLATES  = ['chantier_detail', 'step_by_step', 'guide_pedagogique'];
     // Templates requiring photos
@@ -49,6 +61,8 @@ class PostGenerator extends Component
             'extraImages.*' => 'image|max:5120',
             'scheduleType'  => 'required|in:now,scheduled',
             'scheduledAt'   => $this->scheduleType === 'scheduled' ? 'required|date|after:now' : 'nullable',
+            'tone'          => 'required|in:professionnel,chaleureux,expert,dynamique',
+            'customNote'    => 'nullable|string|max:300',
         ];
     }
 
@@ -68,6 +82,19 @@ class PostGenerator extends Component
             $extraImagePaths[] = $img->store('projects', 'public');
         }
 
+        $templateOptions = [
+            'tone'           => $this->tone,
+            'includeHashtags'=> $this->includeHashtags,
+            'clientName'     => $this->clientName ?: null,
+            'serviceType'    => $this->serviceType ?: null,
+            'workCategory'   => $this->workCategory ?: null,
+            'jobDuration'    => $this->jobDuration ?: null,
+            'faqCategory'    => $this->faqCategory ?: null,
+            'season'         => $this->season !== 'auto' ? $this->season : null,
+            'targetSlides'   => (int) $this->targetSlides,
+            'customNote'     => $this->customNote ?: null,
+        ];
+
         $post = Post::create([
             'user_id'           => Auth::id(),
             'company_id'        => Auth::user()->company->id,
@@ -76,6 +103,7 @@ class PostGenerator extends Component
             'image_after_path'  => $imageAfterPath,
             'extra_images'      => count($extraImagePaths) ? $extraImagePaths : null,
             'template'          => $this->template,
+            'template_options'  => $templateOptions,
             'status'            => 'pending',
             'scheduled_at'      => ($this->scheduleType === 'scheduled' && $this->scheduledAt)
                                     ? \Carbon\Carbon::parse($this->scheduledAt)
@@ -100,7 +128,7 @@ class PostGenerator extends Component
         if ($post->status === 'review_pending') {
             $content = $post->refined_content;
             $decoded = json_decode($content, true);
-            
+
             if (json_last_error() === JSON_ERROR_NONE && isset($decoded['caption'])) {
                 $this->previewContent = $decoded['caption'];
             } else {

@@ -453,9 +453,9 @@ $complete = function () {
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between mt-8">
+                    <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 mt-8">
                         <button wire:click="prevStep" type="button"
-                                class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:text-slate-800 hover:bg-gray-100 transition-all duration-200">
+                                class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:text-slate-800 hover:bg-gray-100 transition-all duration-200">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                             </svg>
@@ -464,10 +464,10 @@ $complete = function () {
                         <button wire:click="complete"
                                 wire:loading.attr="disabled"
                                 type="button"
-                                class="flex items-center gap-2 px-5 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm bg-amber-400 text-slate-900 hover:bg-amber-500 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-60 whitespace-nowrap flex-shrink-0">
+                                class="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-sm bg-amber-400 text-slate-900 hover:bg-amber-500 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-60">
                             <span wire:loading.remove wire:target="complete">Accéder à mon espace</span>
                             <span wire:loading wire:target="complete">Enregistrement…</span>
-                            <svg wire:loading.remove wire:target="complete" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg wire:loading.remove wire:target="complete" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                             </svg>
                         </button>

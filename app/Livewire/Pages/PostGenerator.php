@@ -40,7 +40,7 @@ class PostGenerator extends Component
 
         return [
             'audio'         => 'required|max:10240',
-            'template'      => 'required|in:review,project,faq,lifestyle,quality_focus,chantier_detail,step_by_step,guide_pedagogique',
+            'template'      => 'required|in:review,project,faq,lifestyle,quality_focus,conseil_saisonnier,erreur_a_eviter,chantier_detail,step_by_step,guide_pedagogique',
             'imageBefore'   => ($needsPhoto && !$needsExtra) ? 'required|image|max:5120' : 'nullable|image|max:5120',
             'imageAfter'    => $needsAfter ? 'required|image|max:5120' : 'nullable',
             'extraImages'   => $needsExtra ? 'required|array|min:2|max:5' : 'nullable|array',

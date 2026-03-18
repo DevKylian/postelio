@@ -17,7 +17,7 @@
         <header class="sticky top-0 z-50 bg-chalk/80 backdrop-blur-md border-b border-gray-200/50">
             <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
                 <a href="/">
-                    <img src="{{ asset('images/logo_black.png') }}" alt="Postelio" class="h-9 w-auto lg:h-[4.5rem]">
+                    <span class="text-midnight font-bold text-xl tracking-widest">POSTELIO</span>
                 </a>
                 <nav class="flex items-center gap-3">
                     @auth

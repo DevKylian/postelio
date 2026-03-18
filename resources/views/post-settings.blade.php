@@ -82,7 +82,7 @@
                                     <span class="w-2 h-2 rounded-full bg-green-400 shrink-0"></span>
                                     <span class="text-sm font-semibold text-midnight">Connecté</span>
                                     @if($company->instagram_username)
-                                        <span class="text-xs text-gray-400">· @{{ $company->instagram_username }}</span>
+                                        <span class="text-xs text-gray-400">· {{ $company->instagram_username }}</span>
                                     @endif
                                 </div>
                                 @if($company->instagram_token_expires_at)

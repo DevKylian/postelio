@@ -48,8 +48,8 @@ class ContentRefinerService
         $plainPatterns = [
             '/^je ne peux pas/i',
             '/^je ne suis pas en mesure/i',
-            '/^il m[\'']est impossible/i',
-            '/^il ne m[\'']est pas possible/i',
+            "/^il m['']est impossible/i",
+            "/^il ne m['']est pas possible/i",
             '/^désolé[,\s]/i',
             '/^je suis désolé/i',
             '/^malheureusement[,\s]/i',

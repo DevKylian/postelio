@@ -3,46 +3,35 @@
 use App\Http\Controllers\InstagramController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
+use Livewire\Volt\Volt;
 
 Route::view('/', 'welcome');
 
-Route::get('posts', [PostController::class, 'index'])
+// Onboarding (auth required, but NOT onboarding middleware)
+Volt::route('onboarding', 'pages.onboarding')
     ->middleware(['auth', 'verified'])
-    ->name('posts.index');
+    ->name('onboarding');
 
-Route::delete('posts/{post}', [PostController::class, 'destroy'])
-    ->middleware(['auth', 'verified'])
-    ->name('posts.destroy');
+// App routes (require auth + verified + onboarding completed)
+Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::view('generate-post', 'generate-post')->name('generate-post');
+    Route::view('templates-preview', 'templates-preview')->name('templates-preview');
+    Route::view('calendar', 'calendar')->name('calendar');
+    Route::view('post-settings', 'post-settings')->name('post-settings');
 
-Route::view('generate-post', 'generate-post')
-    ->middleware(['auth', 'verified'])
-    ->name('generate-post');
+    Route::get('posts', [PostController::class, 'index'])->name('posts.index');
+    Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
-Route::view('templates-preview', 'templates-preview')
-    ->middleware(['auth', 'verified'])
-    ->name('templates-preview');
-
-Route::view('calendar', 'calendar')
-    ->middleware(['auth', 'verified'])
-    ->name('calendar');
-
-Route::view('profile', 'profile')
-    ->middleware(['auth'])
-    ->name('profile');
-
-Route::view('post-settings', 'post-settings')
-    ->middleware(['auth', 'verified'])
-    ->name('post-settings');
-
-// Instagram OAuth
-Route::middleware(['auth', 'verified'])->group(function () {
+    // Instagram OAuth
     Route::get('/auth/instagram', [InstagramController::class, 'connect'])->name('instagram.connect');
     Route::get('/auth/instagram/callback', [InstagramController::class, 'callback'])->name('instagram.callback');
     Route::delete('/auth/instagram', [InstagramController::class, 'disconnect'])->name('instagram.disconnect');
 });
+
+Route::view('profile', 'profile')
+    ->middleware(['auth'])
+    ->name('profile');
 
 require __DIR__.'/auth.php';

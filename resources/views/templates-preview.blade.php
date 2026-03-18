@@ -1,9 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1 class="font-bold text-2xl lg:text-3xl text-midnight tracking-tight">
-            {{ __('Gabarits de publications') }}
-        </h1>
-        <p class="text-gray-500 text-sm mt-1">Découvrez les styles visuels que Postelio peut créer pour vous.</p>
+        <div>
+            <h1 class="font-bold text-xl lg:text-2xl text-midnight tracking-tight leading-tight">
+                Gabarits de publications
+            </h1>
+            <p class="text-gray-400 text-sm mt-0.5">Découvrez les styles visuels que Postelio peut créer pour vous.</p>
+        </div>
     </x-slot>
 
     @php
@@ -15,26 +17,26 @@
         $hasLogo    = $company?->logo_path && Storage::disk('public')->exists($company->logo_path);
     @endphp
 
-    <div class="py-10 px-4 sm:px-6 lg:px-8">
+    <div class="py-8 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
 
             {{-- Banner si le branding n'est pas configuré --}}
             @if (!$company || !$company->name)
-            <div class="mb-8 flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-5 py-4 text-sm">
-                <svg class="w-5 h-5 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="mb-6 flex items-center gap-3 bg-amber-50 border border-amber-100 text-amber-800 rounded-xl px-4 py-3.5 text-sm">
+                <svg class="w-4 h-4 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span>
+                <span class="text-sm">
                     Les aperçus utilisent des valeurs par défaut.
-                    <a href="{{ route('post-settings') }}" wire:navigate class="font-semibold underline hover:text-amber-900">
+                    <a href="{{ route('post-settings') }}" wire:navigate class="font-semibold underline hover:text-amber-900 ml-1">
                         Configurez votre branding
                     </a>
-                    pour voir vos vraies couleurs et nom de société.
+                    pour voir vos vraies couleurs.
                 </span>
             </div>
             @endif
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                 {{-- ── Gabarit Avant/Après ── --}}
                 <div class="space-y-4 group">

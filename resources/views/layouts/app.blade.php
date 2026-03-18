@@ -5,37 +5,43 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Postelio') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         @stack('styles')
     </head>
-    <body class="font-sans antialiased bg-chalk text-midnight h-screen overflow-hidden" x-data="{ sidebarOpen: false }">
+    <body class="font-sans antialiased bg-[#F1F5F9] text-midnight h-screen overflow-hidden" x-data="{ sidebarOpen: false }">
         <div class="flex h-screen overflow-hidden">
             <!-- Sidebar -->
             <livewire:layout.navigation />
 
             <!-- Main Content -->
-            <div class="flex-1 min-w-0 flex flex-col">
+            <div class="flex-1 min-w-0 flex flex-col overflow-hidden">
+
                 <!-- Page Heading -->
                 @if (isset($header))
-                    <header class="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-20">
-                        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex items-center gap-4">
-                            <!-- Mobile Toggle -->
-                            <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-xl bg-chalk text-midnight hover:bg-gray-200 transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                            </button>
+                    <header class="bg-white/90 backdrop-blur-md border-b border-gray-200/60 sticky top-0 z-20 shrink-0">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="flex items-center gap-4 py-4">
+                                <!-- Mobile Toggle -->
+                                <button @click="sidebarOpen = true"
+                                        class="lg:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100 hover:text-midnight transition-colors focus:outline-none focus:ring-2 focus:ring-copper/30">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                </button>
 
-                            <div class="flex-1">
-                                {{ $header }}
+                                <div class="flex-1 min-w-0">
+                                    {{ $header }}
+                                </div>
                             </div>
                         </div>
                     </header>

@@ -39,7 +39,7 @@ $logout = function (Logout $logout) {
         <!-- Logo -->
         <div class="px-5 pt-6 pb-4 border-b border-white/[0.06]">
             <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-2.5">
-                <img src="{{ asset('images/logo_white.png') }}" alt="Postelio" class="h-10 w-auto">
+                <img src="{{ asset('images/logo_white.png') }}" alt="Postelio" class="w-auto" style="height: 70px;">
             </a>
         </div>
 

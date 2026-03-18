@@ -6,56 +6,46 @@ use OpenAI\Laravel\Facades\OpenAI;
 
 class ContentRefinerService
 {
+    // Templates that display dynamic text on the generated image
+    const TEMPLATES_WITH_IMAGE_TEXT = ['review', 'faq', 'quality_focus', 'conseil_saisonnier', 'erreur_a_eviter'];
+
     /**
-     * Refine raw transcription into a percutant post content based on template.
-     *
-     * @param array $options  template_options from the Post model
+     * Refine raw transcription into structured post content.
+     * Always returns JSON: { caption, image_text? } for single templates,
+     * or { caption, slides } for carousel templates.
      */
     public function refine(string $transcript, string $template, int $photoCount = 0, array $options = []): string
     {
-        $prompt    = $this->getPromptForTemplate($template, $photoCount, $options);
-        $maxTokens = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique']) ? 1200 : 150;
+        $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique']);
+        $prompt     = $this->getPromptForTemplate($template, $photoCount, $options);
+        $maxTokens  = $isCarousel ? 1200 : 600;
 
         $response = OpenAI::chat()->create([
-            'model' => 'gpt-4o',
-            'messages' => [
+            'model'           => 'gpt-4o',
+            'messages'        => [
                 ['role' => 'system', 'content' => $prompt],
-                ['role' => 'user', 'content' => "Voici le contenu à transformer : " . $transcript],
+                ['role' => 'user',   'content' => "Voici le contenu à transformer : " . $transcript],
             ],
-            'max_tokens' => $maxTokens,
-            'temperature' => 0.7,
-            'response_format' => in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique'])
-                ? ['type' => 'json_object']
-                : null,
+            'max_tokens'      => $maxTokens,
+            'temperature'     => 0.7,
+            'response_format' => ['type' => 'json_object'],
         ]);
 
-        $content = trim($response->choices[0]->message->content, '" ');
+        $raw = trim($response->choices[0]->message->content);
 
-        // Clean common AI prefixes
-        $prefixes = ['caption:', 'légende:', 'post:', 'titre:'];
-        foreach ($prefixes as $prefix) {
-            if (str_starts_with(mb_strtolower($content), $prefix)) {
-                $content = trim(mb_substr($content, mb_strlen($prefix)));
-            }
-        }
+        // Detect refusals embedded in the JSON or in plain text
+        $this->assertNotRefusal($raw);
 
-        // Detect AI refusals and throw instead of returning garbage content
-        if ($this->isAIRefusal($content)) {
-            throw new \RuntimeException(
-                'L\'IA n\'a pas pu générer le contenu : les informations fournies semblent incohérentes avec le mémo vocal. '
-                . 'Vérifiez que le champ "Service réalisé" ou "Type de travaux" correspond bien à ce que vous décrivez dans l\'audio, ou laissez ces champs vides.'
-            );
-        }
-
-        return $content;
+        return $raw;
     }
 
     /**
-     * Detect if the AI response is a refusal rather than actual content.
+     * Throw if the AI returned a refusal instead of content.
      */
-    private function isAIRefusal(string $content): bool
+    private function assertNotRefusal(string $raw): void
     {
-        $patterns = [
+        // Check plain-text refusals (JSON format broken)
+        $plainPatterns = [
             '/^je ne peux pas/i',
             '/^je ne suis pas en mesure/i',
             '/^il m[\'']est impossible/i',
@@ -63,23 +53,28 @@ class ContentRefinerService
             '/^désolé[,\s]/i',
             '/^je suis désolé/i',
             '/^malheureusement[,\s]/i',
-            '/^le contenu (fourni|audio) ne (me )?permet pas/i',
-            '/^les informations (fournies|disponibles) ne/i',
-            '/^l[\'']audio ne (contient|fournit|permet)/i',
-            '/^ce (texte|contenu|mémo) ne (me )?permet pas/i',
-            '/^aucune information suffisante/i',
-            '/^je n[\'']ai pas (assez|suffisamment)/i',
-            '/^cet avis ne concerne pas/i',
-            '/^le service (mentionné|décrit)/i',
         ];
-
-        foreach ($patterns as $pattern) {
-            if (preg_match($pattern, trim($content))) {
-                return true;
+        foreach ($plainPatterns as $p) {
+            if (preg_match($p, trim($raw))) {
+                throw new \RuntimeException(
+                    'L\'IA n\'a pas pu générer le contenu : les informations fournies semblent incohérentes avec le mémo vocal. '
+                    . 'Vérifiez que le champ "Service réalisé" ou "Type de travaux" correspond bien à ce que vous décrivez dans l\'audio, ou laissez ces champs vides.'
+                );
             }
         }
 
-        return false;
+        // Check refusal embedded inside the JSON
+        $data = json_decode($raw, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $textToCheck = ($data['caption'] ?? '') . ' ' . ($data['image_text'] ?? '');
+            foreach ($plainPatterns as $p) {
+                if (preg_match($p, trim($textToCheck))) {
+                    throw new \RuntimeException(
+                        'L\'IA n\'a pas pu générer le contenu. Vérifiez la cohérence des champs de personnalisation avec votre mémo vocal, ou laissez-les vides.'
+                    );
+                }
+            }
+        }
     }
 
     private function getPromptForTemplate(string $template, int $photoCount = 0, array $options = []): string
@@ -88,61 +83,110 @@ class ContentRefinerService
         $includeHashtags = $options['includeHashtags'] ?? true;
         $customNote      = $options['customNote'] ?? null;
 
-        $toneInstruction = $this->toneInstruction($tone);
+        $toneInstruction    = $this->toneInstruction($tone);
         $hashtagInstruction = $includeHashtags
-            ? "Ajoute 3 à 5 hashtags pertinents à la fin du texte."
+            ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende."
             : "N'ajoute aucun hashtag.";
 
-        $contextHints = $this->buildContextHints($template, $options);
+        $noRefuseRule = "RÈGLE ABSOLUE : Tu dois TOUJOURS générer le contenu demandé. Si certains champs de contexte semblent ne pas correspondre au mémo vocal, ignore-les et travaille avec le transcript audio uniquement. Ne refuse jamais.";
 
-        // Absolute rule injected into every prompt
-        $noRefuseRule = "RÈGLE ABSOLUE : Tu dois TOUJOURS générer le contenu demandé. Si certains champs de contexte semblent ne pas correspondre au mémo vocal, ignore-les et travaille uniquement avec ce qui est disponible dans le transcript. Ne refuse jamais de répondre.";
+        $extraNote = $customNote ? " Note de l'artisan : {$customNote}." : '';
 
-        $jsonCarouselInstruction = "Tu dois répondre UNIQUEMENT par un objet JSON avec cette structure :
+        // ── JSON schema descriptions ──────────────────────────────────────────
+
+        // For templates that show text on the image
+        $jsonSingleWithImageText = fn(string $captionDesc, string $imageTextDesc) =>
+            "Tu dois répondre UNIQUEMENT par un objet JSON valide avec exactement cette structure :
 {
-  \"caption\": \"La légende Instagram complète du post (300-500 caractères, style expert, hashtags à la fin)\",
-  \"slides\": [\"Texte court pour le slide 1\", \"Texte court pour le slide 2\", ...]
+  \"caption\": \"{$captionDesc}\",
+  \"image_text\": \"{$imageTextDesc}\"
+}
+IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponctuation lourde.";
+
+        // For templates that do NOT show text on the image (lifestyle, project)
+        $jsonCaptionOnly = "Tu dois répondre UNIQUEMENT par un objet JSON valide avec exactement cette structure :
+{\"caption\": \"La légende Instagram complète (250-400 caractères, storytelling, {$hashtagInstruction})\"}";
+
+        // For carousels
+        $jsonCarousel = "Tu dois répondre UNIQUEMENT par un objet JSON valide avec cette structure :
+{
+  \"caption\": \"La légende Instagram complète (300-500 caractères, {$hashtagInstruction})\",
+  \"slides\": [\"Texte slide 1\", \"Texte slide 2\", ...]
 }";
 
-        $extraNote = $customNote ? "\nNote additionnelle de l'artisan : {$customNote}" : '';
-        $base = $noRefuseRule . " ";
-
         return match ($template) {
-            'review' => $base . "Tu es un expert en marketing pour artisans. {$toneInstruction} "
-                . ($options['clientName'] ? "Le prénom du client est : {$options['clientName']}. " : "")
-                . ($options['serviceType'] ? "Contexte du service (indicatif) : {$options['serviceType']}. " : "")
-                . "Ta mission est d'extraire le positif d'un avis client et de le transformer en une phrase courte, percutante et émotionnelle de 100 caractères maximum. {$hashtagInstruction} Ne réponds que par la phrase formatée.{$extraNote}",
 
-            'project' => $base . "Tu es un expert en marketing pour artisans. {$toneInstruction} "
-                . ($options['workCategory'] ? "Type de travaux : {$options['workCategory']}. " : "")
-                . ($options['jobDuration'] ? "Durée du chantier : {$options['jobDuration']}. " : "")
-                . "Ta mission est de résumer un projet de chantier en une phrase courte et inspirante de 120 caractères maximum. {$hashtagInstruction} Ne réponds que par la phrase formatée.{$extraNote}",
+            // ── Single templates WITH image text ─────────────────────────────
 
-            'faq' => $base . "Tu es un expert en marketing pour artisans. {$toneInstruction} "
-                . ($options['faqCategory'] ? "Catégorie de la FAQ : {$options['faqCategory']}. " : "")
-                . "Ta mission est d'extraire une question pertinente posée par un client ou un conseil expert et de la transformer en une question courte (style FAQ) de 100 caractères maximum. {$hashtagInstruction} Ne réponds que par la question formatée avec un point d'interrogation.{$extraNote}",
+            'review' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
+                . ($options['clientName'] ? " Prénom du client : {$options['clientName']}." : "")
+                . ($options['serviceType'] ? " Contexte du service (indicatif) : {$options['serviceType']}." : "")
+                . "{$extraNote} "
+                . $jsonSingleWithImageText(
+                    "Légende Instagram complète avec storytelling (250-400 caractères). {$hashtagInstruction}",
+                    "Citation courte et percutante tirée de l'avis client. MAX 70 caractères. Sans hashtag."
+                ),
 
-            'lifestyle' => $base . "Tu es un expert en marketing pour artisans. {$toneInstruction} Ta mission est de créer une légende courte, inspirante et 'lifestyle' qui met en avant l'ambiance ou la passion du métier à partir de l'audio de 120 caractères maximum. {$hashtagInstruction} Ne réponds que par la phrase formatée.{$extraNote}",
+            'faq' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
+                . ($options['faqCategory'] ? " Catégorie FAQ : {$options['faqCategory']}." : "")
+                . "{$extraNote} "
+                . $jsonSingleWithImageText(
+                    "Légende Instagram avec la réponse développée à la question (250-400 caractères). {$hashtagInstruction}",
+                    "La question seule, courte, percutante, avec point d'interrogation. MAX 75 caractères. Sans hashtag."
+                ),
 
-            'quality_focus' => $base . "Tu es un expert en marketing pour artisans. {$toneInstruction} À partir de la description vocale, rédige une courte légende Instagram (120 caractères max) qui explique pourquoi ce matériau ou matériel garantit un meilleur résultat ou une meilleure durabilité. {$hashtagInstruction} Ne réponds que par la légende formatée.{$extraNote}",
+            'quality_focus' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
+                . $jsonSingleWithImageText(
+                    "Légende Instagram qui développe pourquoi ce matériau/équipement garantit qualité et durabilité (250-400 caractères). {$hashtagInstruction}",
+                    "Nom ou courte description du matériau/équipement mis en valeur. MAX 55 caractères. Majuscules recommandées. Sans hashtag."
+                ),
 
-            'conseil_saisonnier' => $base . "Tu es un expert en marketing pour artisans. {$toneInstruction} "
-                . ($options['season'] ? "Saison ciblée : {$options['season']}. " : "")
-                . "À partir du mémo vocal, rédige un conseil saisonnier pratique et utile en 1 phrase percutante de 120 caractères maximum. Commence par un verbe d'action concret (ex: 'Vérifiez', 'Anticipez', 'Pensez à', 'Préparez'). {$hashtagInstruction} Ne réponds que par la phrase formatée, sans guillemets.{$extraNote}",
+            'conseil_saisonnier' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
+                . ($options['season'] ? " Saison ciblée : {$options['season']}." : "")
+                . "{$extraNote} "
+                . $jsonSingleWithImageText(
+                    "Légende Instagram avec contexte saisonnier développé (250-400 caractères). {$hashtagInstruction}",
+                    "Le conseil saisonnier actionnable, commençant par un verbe (Vérifiez, Anticipez, Préparez...). MAX 85 caractères. Sans hashtag."
+                ),
 
-            'erreur_a_eviter' => $base . "Tu es un expert en marketing pour artisans. {$toneInstruction} À partir du mémo vocal, identifie une erreur fréquente et formule-la en une phrase courte et impactante de 110 caractères maximum. Style alerte directe (ex: 'Attendre que la fuite empire avant d'appeler.'). {$hashtagInstruction} Ne réponds que par la phrase formatée, sans guillemets.{$extraNote}",
+            'erreur_a_eviter' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
+                . $jsonSingleWithImageText(
+                    "Légende Instagram qui décrit l'erreur et explique comment l'éviter (250-400 caractères). {$hashtagInstruction}",
+                    "L'erreur formulée en alerte courte et directe (ex: Peindre sur une surface humide.). MAX 75 caractères. Sans hashtag."
+                ),
 
-            'chantier_detail' => $base . "Tu es un expert en marketing pour artisans. {$toneInstruction} À partir de la description vocale d'un chantier, crée un post carrousel. Nous avons {$photoCount} photos. $jsonCarouselInstruction. Le premier slide est la couverture (titre accrocheur). Les slides suivants décrivent les détails du chantier correspondant aux photos. {$hashtagInstruction}{$extraNote}",
+            // ── Single templates WITHOUT image text ──────────────────────────
 
-            'step_by_step' => $base . "Tu es un expert en marketing pour artisans. {$toneInstruction} À partir du vocal décrivant un processus, crée un post carrousel 'étape par étape'. Nous avons {$photoCount} photos. $jsonCarouselInstruction. Le premier slide est le titre du process. Les slides suivants sont les étapes (Step 1, Step 2, etc.) correspondant aux photos. Maximum 60 caractères par slide. {$hashtagInstruction}{$extraNote}",
+            'lifestyle' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
+                . str_replace('{$hashtagInstruction}', $hashtagInstruction, $jsonCaptionOnly),
 
-            'guide_pedagogique' => (function() use ($base, $jsonCarouselInstruction, $toneInstruction, $hashtagInstruction, $options, $extraNote) {
+            'project' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
+                . ($options['workCategory'] ? " Type de travaux : {$options['workCategory']}." : "")
+                . ($options['jobDuration'] ? " Durée : {$options['jobDuration']}." : "")
+                . "{$extraNote} "
+                . str_replace('{$hashtagInstruction}', $hashtagInstruction, $jsonCaptionOnly),
+
+            // ── Carousels ─────────────────────────────────────────────────────
+
+            'chantier_detail' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
+                . "À partir de la description vocale d'un chantier, crée un post carrousel. Nous avons {$photoCount} photos. "
+                . "{$jsonCarousel} Le premier slide est la couverture (titre accrocheur, MAX 50 caractères). Les slides suivants décrivent les détails correspondant aux photos (MAX 60 caractères chacun).",
+
+            'step_by_step' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
+                . "À partir du vocal décrivant un processus, crée un carrousel étape par étape. Nous avons {$photoCount} photos. "
+                . "{$jsonCarousel} Le premier slide est le titre du process (MAX 50 caractères). Les slides suivants sont les étapes numérotées (MAX 55 caractères chacun, sans le préfixe 'Étape X :').",
+
+            'guide_pedagogique' => (function() use ($noRefuseRule, $toneInstruction, $extraNote, $jsonCarousel, $options) {
                 $targetSlides = isset($options['targetSlides']) ? (int)$options['targetSlides'] : 5;
                 $slidesRange  = max(3, $targetSlides - 1) . ' à ' . min(8, $targetSlides + 1);
-                return $base . "Tu es un expert en marketing pour artisans. {$toneInstruction} À partir du vocal, crée un post carrousel éducatif. $jsonCarouselInstruction. Le premier slide est une question/accroche forte. Les slides suivants ({$slidesRange} slides) développent les conseils. Le dernier slide doit être un appel à l'action. Maximum 100 caractères par slide. {$hashtagInstruction}{$extraNote}";
+                return "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
+                    . "À partir du vocal, crée un carrousel éducatif. "
+                    . "{$jsonCarousel} Le premier slide est une question/accroche forte (MAX 80 caractères). "
+                    . "Les slides suivants ({$slidesRange} au total) développent les conseils (MAX 90 caractères chacun). "
+                    . "Le dernier slide est un appel à l'action (MAX 60 caractères).";
             })(),
 
-            default => "Tu es un rédacteur web pro. {$toneInstruction} Transforme ce texte en une légende courte (150 chars max) pour un post Instagram. {$hashtagInstruction} Ne réponds que par la phrase formatée.{$extraNote}",
+            default => "{$noRefuseRule} {\"caption\": \"Légende Instagram courte (150 caractères max). {$hashtagInstruction}\"}",
         };
     }
 

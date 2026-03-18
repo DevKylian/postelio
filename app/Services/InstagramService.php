@@ -236,6 +236,41 @@ class InstagramService
         return $result['id'];
     }
 
+    /**
+     * Get account-level stats: followers, following, media count, profile picture, bio.
+     */
+    public function getAccountStats(string $accessToken, string $igId): array
+    {
+        $response = Http::get(self::GRAPH_BASE . "/{$igId}", [
+            'fields'       => 'id,username,name,biography,followers_count,follows_count,media_count,profile_picture_url,website',
+            'access_token' => $accessToken,
+        ])->json();
+
+        if (isset($response['error'])) {
+            throw new \RuntimeException('Account stats error: ' . json_encode($response['error']));
+        }
+
+        return $response;
+    }
+
+    /**
+     * Get recent media with engagement metrics.
+     */
+    public function getRecentMedia(string $accessToken, string $igId, int $limit = 12): array
+    {
+        $response = Http::get(self::GRAPH_BASE . "/{$igId}/media", [
+            'fields'       => 'id,caption,media_type,media_url,thumbnail_url,timestamp,like_count,comments_count',
+            'limit'        => $limit,
+            'access_token' => $accessToken,
+        ])->json();
+
+        if (isset($response['error'])) {
+            throw new \RuntimeException('Media fetch error: ' . json_encode($response['error']));
+        }
+
+        return $response['data'] ?? [];
+    }
+
     private function publicUrl(string $storagePath): string
     {
         $localUrl = Storage::disk('public')->url($storagePath);

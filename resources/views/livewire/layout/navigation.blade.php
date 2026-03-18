@@ -39,7 +39,7 @@ $logout = function (Logout $logout) {
         <!-- Logo -->
         <div class="px-5 pt-6 pb-4 border-b border-white/[0.06]">
             <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-2.5">
-                <img src="{{ asset('images/logo_white.png') }}" alt="Postelio" class="w-auto" style="height: 70px;">
+                <span class="text-white font-bold text-xl tracking-widest">POSTELIO</span>
             </a>
         </div>
 
@@ -85,6 +85,13 @@ $logout = function (Logout $logout) {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
                 </svg>
                 <span>Gabarits</span>
+            </x-sidebar-link>
+
+            <x-sidebar-link :href="route('instagram-stats')" :active="request()->routeIs('instagram-stats')" wire:navigate>
+                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <span>Statistiques</span>
             </x-sidebar-link>
 
             <!-- Section: Compte -->

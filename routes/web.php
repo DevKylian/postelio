@@ -17,7 +17,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
 
     Route::view('dashboard', 'dashboard')->name('dashboard');
     Route::view('generate-post', 'generate-post')->name('generate-post');
-    Volt::route('templates-preview', 'pages.templates-preview')->name('templates-preview');
+    Route::view('templates-preview', 'templates-preview')->name('templates-preview');
     Route::view('calendar', 'calendar')->name('calendar');
     Route::view('post-settings', 'post-settings')->name('post-settings');
     Route::view('instagram-stats', 'instagram-stats')->name('instagram-stats');

@@ -152,7 +152,7 @@ new class extends Component {
                     <div class="flex items-center gap-2 flex-wrap">
                         <h2 class="text-white font-bold text-xl leading-tight">{{ $account['name'] ?? $account['username'] }}</h2>
                         @if(!empty($account['username']))
-                            <span class="text-white/40 text-sm">@{{ $account['username'] }}</span>
+                            <span class="text-white/40 text-sm">&#64;{{ $account['username'] }}</span>
                         @endif
                     </div>
                     @if(!empty($account['biography']))

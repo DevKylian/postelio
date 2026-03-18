@@ -1,7 +1,6 @@
 <?php
 
 use App\Services\InstagramService;
-use Livewire\Attributes\Computed;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -10,6 +9,13 @@ new class extends Component {
     public array $media = [];
     public ?string $error = null;
     public string $sortBy = 'recent'; // recent | likes | comments
+
+    public array $sortedMedia = [];
+    public int $totalLikes = 0;
+    public int $totalComments = 0;
+    public int $avgLikes = 0;
+    public int $avgComments = 0;
+    public array $topPosts = [];
 
     public function mount(InstagramService $instagram): void
     {
@@ -30,18 +36,31 @@ new class extends Component {
                 $company->instagram_business_account_id,
                 24
             );
+            $this->computeStats();
         } catch (\Throwable $e) {
             $this->error = $e->getMessage();
         }
     }
 
-    public function sortMedia(string $by): void
+    private function computeStats(): void
     {
-        $this->sortBy = $by;
+        $this->totalLikes    = array_sum(array_column($this->media, 'like_count'));
+        $this->totalComments = array_sum(array_column($this->media, 'comments_count'));
+        $count               = count($this->media);
+        $this->avgLikes      = $count > 0 ? (int) round($this->totalLikes / $count) : 0;
+        $this->avgComments   = $count > 0 ? (int) round($this->totalComments / $count) : 0;
+
+        $sorted = $this->media;
+        usort($sorted, fn($a, $b) =>
+            (($b['like_count'] ?? 0) + ($b['comments_count'] ?? 0)) <=>
+            (($a['like_count'] ?? 0) + ($a['comments_count'] ?? 0))
+        );
+        $this->topPosts = array_slice($sorted, 0, 3);
+
+        $this->recomputeSortedMedia();
     }
 
-    #[Computed]
-    public function sortedMedia(): array
+    private function recomputeSortedMedia(): void
     {
         $media = $this->media;
 
@@ -51,44 +70,13 @@ new class extends Component {
             usort($media, fn($a, $b) => ($b['comments_count'] ?? 0) <=> ($a['comments_count'] ?? 0));
         }
 
-        return $media;
+        $this->sortedMedia = $media;
     }
 
-    #[Computed]
-    public function totalLikes(): int
+    public function sortMedia(string $by): void
     {
-        return array_sum(array_column($this->media, 'like_count'));
-    }
-
-    #[Computed]
-    public function totalComments(): int
-    {
-        return array_sum(array_column($this->media, 'comments_count'));
-    }
-
-    #[Computed]
-    public function avgLikes(): int
-    {
-        $count = count($this->media);
-        return $count > 0 ? (int) round($this->totalLikes() / $count) : 0;
-    }
-
-    #[Computed]
-    public function avgComments(): int
-    {
-        $count = count($this->media);
-        return $count > 0 ? (int) round($this->totalComments() / $count) : 0;
-    }
-
-    #[Computed]
-    public function topPosts(): array
-    {
-        $sorted = $this->media;
-        usort($sorted, fn($a, $b) =>
-            (($b['like_count'] ?? 0) + ($b['comments_count'] ?? 0)) <=>
-            (($a['like_count'] ?? 0) + ($a['comments_count'] ?? 0))
-        );
-        return array_slice($sorted, 0, 3);
+        $this->sortBy = $by;
+        $this->recomputeSortedMedia();
     }
 };
 

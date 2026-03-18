@@ -19,11 +19,11 @@ state([
     'trades'      => [
         ['key' => 'plombier',      'label' => 'Plombier',       'icon' => '🔧'],
         ['key' => 'electricien',   'label' => 'Électricien',    'icon' => '⚡'],
-        ['key' => 'menuisier',     'label' => 'Menuisier',      'icon' => '🪚'],
+        ['key' => 'menuisier',     'label' => 'Menuisier',      'icon' => '🔨'],
         ['key' => 'macon',         'label' => 'Maçon',          'icon' => '🧱'],
         ['key' => 'peintre',       'label' => 'Peintre',        'icon' => '🎨'],
         ['key' => 'couvreur',      'label' => 'Couvreur',       'icon' => '🏠'],
-        ['key' => 'carreleur',     'label' => 'Carreleur',      'icon' => '🪟'],
+        ['key' => 'carreleur',     'label' => 'Carreleur',      'icon' => '📐'],
         ['key' => 'chauffagiste',  'label' => 'Chauffagiste',   'icon' => '🌡️'],
         ['key' => 'serrurier',     'label' => 'Serrurier',      'icon' => '🔑'],
         ['key' => 'paysagiste',    'label' => 'Paysagiste',     'icon' => '🌿'],

@@ -84,16 +84,12 @@ class InstagramService
             'access_token' => $accessToken,
         ])->json();
 
-        \Log::debug('Instagram OAuth user', ['me' => $me, 'permissions' => $permissions]);
-
         $response = Http::get(self::GRAPH_BASE . '/me/accounts', [
             'access_token' => $accessToken,
             'fields'       => 'id,name,instagram_business_account',
         ])->json();
 
         $pages = $response['data'] ?? [];
-
-        \Log::debug('Instagram /me/accounts response', ['response' => $response]);
 
         // Check direct pages first
         foreach ($pages as $page) {
@@ -107,8 +103,6 @@ class InstagramService
             'access_token' => $accessToken,
             'fields'       => 'id,name',
         ])->json()['data'] ?? [];
-
-        \Log::debug('Instagram /me/businesses', ['businesses' => $businesses]);
 
         foreach ($businesses as $business) {
             $bizPages = Http::get(self::GRAPH_BASE . '/' . $business['id'] . '/owned_pages', [

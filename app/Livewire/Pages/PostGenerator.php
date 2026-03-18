@@ -38,6 +38,8 @@ class PostGenerator extends Component
     public $season        = 'auto'; // conseil_saisonnier: season
     public $targetSlides  = '5';   // guide_pedagogique: desired slide count
     public $customNote    = '';    // any template: free-form extra context for AI
+    public $isAnalyzing   = false;
+    public $analysisSuccess = false;
 
     // Carousel templates
     const CAROUSEL_TEMPLATES  = ['chantier_detail', 'step_by_step', 'guide_pedagogique'];
@@ -45,6 +47,46 @@ class PostGenerator extends Component
     const PHOTO_TEMPLATES     = ['project', 'lifestyle', 'quality_focus', 'chantier_detail', 'step_by_step'];
     // Templates requiring before+after
     const BEFORE_AFTER_TEMPLATES = ['project'];
+
+    public function updatedAudio()
+    {
+        if (!$this->audio) return;
+
+        $this->isAnalyzing = true;
+        $this->analysisSuccess = false;
+
+        try {
+            // 1. Store temporarily to have a local path
+            $path = $this->audio->store('temp_memos', 'public');
+
+            // 2. Transcribe
+            $transcriber = app(\App\Services\PostGeneration\TranscriptionService::class);
+            $transcript = $transcriber->transcribe($path);
+
+            // 3. Extract fields
+            $refiner = app(\App\Services\PostGeneration\ContentRefinerService::class);
+            $extracted = $refiner->extractFields($transcript);
+
+            // 4. Update properties (only if not null)
+            if (!empty($extracted['clientName']))    $this->clientName    = $extracted['clientName'];
+            if (!empty($extracted['serviceType']))   $this->serviceType   = $extracted['serviceType'];
+            if (!empty($extracted['workCategory']))  $this->workCategory  = $extracted['workCategory'];
+            if (!empty($extracted['jobDuration']))   $this->jobDuration   = $extracted['jobDuration'];
+            if (!empty($extracted['faqCategory']))   $this->faqCategory   = $extracted['faqCategory'];
+            if (!empty($extracted['season']))        $this->season        = $extracted['season'];
+            if (!empty($extracted['tone']))          $this->tone          = $extracted['tone'];
+
+            $this->analysisSuccess = true;
+
+            // Optional: cleanup temp file
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Audio analysis failed: ' . $e->getMessage());
+        } finally {
+            $this->isAnalyzing = false;
+        }
+    }
 
     protected function rules()
     {
@@ -128,14 +170,7 @@ class PostGenerator extends Component
         $post->refresh();
 
         if ($post->status === 'review_pending') {
-            $content = $post->refined_content;
-            $decoded = json_decode($content, true);
-
-            if (json_last_error() === JSON_ERROR_NONE && isset($decoded['caption'])) {
-                $this->previewContent = $decoded['caption'];
-            } else {
-                $this->previewContent = $content;
-            }
+            $this->previewContent = $post->caption;
 
             if ($post->slides && count($post->slides) > 0) {
                 $this->previewSlides  = array_map(

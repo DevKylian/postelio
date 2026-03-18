@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\InstagramService;
+use Livewire\Attributes\Computed;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -39,7 +40,8 @@ new class extends Component {
         $this->sortBy = $by;
     }
 
-    public function getSortedMediaProperty(): array
+    #[Computed]
+    public function sortedMedia(): array
     {
         $media = $this->media;
 
@@ -52,29 +54,34 @@ new class extends Component {
         return $media;
     }
 
-    public function getTotalLikesProperty(): int
+    #[Computed]
+    public function totalLikes(): int
     {
         return array_sum(array_column($this->media, 'like_count'));
     }
 
-    public function getTotalCommentsProperty(): int
+    #[Computed]
+    public function totalComments(): int
     {
         return array_sum(array_column($this->media, 'comments_count'));
     }
 
-    public function getAvgLikesProperty(): int
+    #[Computed]
+    public function avgLikes(): int
     {
         $count = count($this->media);
-        return $count > 0 ? (int) round($this->totalLikes / $count) : 0;
+        return $count > 0 ? (int) round($this->totalLikes() / $count) : 0;
     }
 
-    public function getAvgCommentsProperty(): int
+    #[Computed]
+    public function avgComments(): int
     {
         $count = count($this->media);
-        return $count > 0 ? (int) round($this->totalComments / $count) : 0;
+        return $count > 0 ? (int) round($this->totalComments() / $count) : 0;
     }
 
-    public function getTopPostsProperty(): array
+    #[Computed]
+    public function topPosts(): array
     {
         $sorted = $this->media;
         usort($sorted, fn($a, $b) =>

@@ -186,6 +186,18 @@ IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponct
                     . "Le dernier slide est un appel à l'action (MAX 60 caractères).";
             })(),
 
+                'custom' => (function () use ($options, $noRefuseRule, $toneInstruction, $hashtagInstruction, $extraNote, $includeHashtags) {
+                $customPrompt = $options['custom_template_prompt'] ?? null;
+                if ($customPrompt) {
+                    return $customPrompt
+                        . "\n\n{$toneInstruction}"
+                        . "\n" . ($includeHashtags ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende." : "N'ajoute aucun hashtag.")
+                        . ($extraNote ? "\n{$extraNote}" : "");
+                }
+                return "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
+                    . "{\"caption\": \"Légende Instagram (250-400 caractères). {$hashtagInstruction}\", \"image_text\": null}";
+            })(),
+
                 default => "{$noRefuseRule} {\"caption\": \"Légende Instagram courte (150 caractères max). {$hashtagInstruction}\"}",
             };
     }

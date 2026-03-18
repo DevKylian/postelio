@@ -30,10 +30,38 @@
                 ],
             ];
 
+            // Inject custom templates as a separate group if any exist
+            if ($customTemplates && count($customTemplates) > 0) {
+                $customGroup = [
+                    'key'       => 'custom',
+                    'category'  => 'Mes modèles personnalisés',
+                    'badge'     => 'IA',
+                    'templates' => [],
+                ];
+                foreach ($customTemplates as $ct) {
+                    $customGroup['templates'][] = [
+                        'id'              => 'custom_' . $ct->id,
+                        'custom_id'       => $ct->id,
+                        'label'           => $ct->name,
+                        'desc'            => $ct->description ?? 'Modèle personnalisé généré par IA.',
+                        'icon'            => 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+                        'visual_style'    => $ct->visual_style,
+                    ];
+                }
+                $templateGroups[] = $customGroup;
+            }
+
             $selectedTemplateInfo = null;
             foreach ($templateGroups as $group) {
                 foreach ($group['templates'] as $tpl) {
-                    if ($tpl['id'] === $template) {
+                    $tplId = $tpl['id'];
+                    // For custom templates, match on 'custom' with the right custom_id
+                    if ($group['key'] === 'custom') {
+                        if ($template === 'custom' && isset($tpl['custom_id']) && $customTemplateId == $tpl['custom_id']) {
+                            $selectedTemplateInfo = $tpl;
+                            break 2;
+                        }
+                    } elseif ($tplId === $template) {
                         $selectedTemplateInfo = $tpl;
                         break 2;
                     }
@@ -230,24 +258,40 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 {{ $group['key'] === 'single' ? 'lg:grid-cols-3' : 'lg:grid-cols-3' }} gap-3">
                             @foreach($group['templates'] as $tpl)
+                            @php
+                                $isCustomTpl = $group['key'] === 'custom';
+                                $isSelected  = $isCustomTpl
+                                    ? ($template === 'custom' && $customTemplateId == ($tpl['custom_id'] ?? null))
+                                    : ($template === $tpl['id']);
+                                $clickAction = $isCustomTpl
+                                    ? "wire:\$dispatch('selectCustomTemplate', { id: {$tpl['custom_id']} })"
+                                    : "wire:click=\"\$set('template', '{$tpl['id']}')\"; \$wire.customTemplateId = null";
+                            @endphp
                             <button type="button"
-                                    wire:click="$set('template', '{{ $tpl['id'] }}')"
+                                    @if($isCustomTpl)
+                                        wire:click="$set('customTemplateId', {{ $tpl['custom_id'] }}); $set('template', 'custom')"
+                                    @else
+                                        wire:click="$set('template', '{{ $tpl['id'] }}'); $set('customTemplateId', null)"
+                                    @endif
                                     class="group relative flex flex-col gap-3 p-4 rounded-xl border-2 text-left transition-all duration-200
-                                        {{ $template === $tpl['id']
-                                            ? 'border-copper bg-copper/[0.04] shadow-sm'
+                                        {{ $isSelected
+                                            ? ($isCustomTpl ? 'border-indigo-500 bg-indigo-50/50 shadow-sm' : 'border-copper bg-copper/[0.04] shadow-sm')
                                             : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/50' }}">
 
                                 <div class="flex items-start justify-between">
                                     <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200
-                                        {{ $template === $tpl['id']
-                                            ? 'bg-copper text-white'
-                                            : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
+                                        {{ $isSelected
+                                            ? ($isCustomTpl ? 'text-white' : 'bg-copper text-white')
+                                            : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}"
+                                         @if($isCustomTpl && $isSelected) style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)"
+                                         @elseif($isCustomTpl && !$isSelected) style="" @endif>
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $tpl['icon'] }}" />
                                         </svg>
                                     </div>
-                                    @if($template === $tpl['id'])
-                                    <div class="w-5 h-5 rounded-full bg-copper flex items-center justify-center">
+                                    @if($isSelected)
+                                    <div class="w-5 h-5 rounded-full flex items-center justify-center {{ $isCustomTpl ? '' : 'bg-copper' }}"
+                                         @if($isCustomTpl) style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)" @endif>
                                         <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                                         </svg>
@@ -256,9 +300,14 @@
                                 </div>
 
                                 <div>
-                                    <p class="font-semibold text-sm {{ $template === $tpl['id'] ? 'text-copper' : 'text-midnight' }} leading-tight">
-                                        {{ $tpl['label'] }}
-                                    </p>
+                                    <div class="flex items-center gap-1.5">
+                                        <p class="font-semibold text-sm leading-tight {{ $isSelected ? ($isCustomTpl ? 'text-indigo-600' : 'text-copper') : 'text-midnight' }}">
+                                            {{ $tpl['label'] }}
+                                        </p>
+                                        @if($isCustomTpl)
+                                            <span class="text-[9px] font-bold text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded-full leading-none">IA</span>
+                                        @endif
+                                    </div>
                                     <p class="text-xs text-gray-400 mt-1 leading-relaxed">{{ $tpl['desc'] }}</p>
                                 </div>
                             </button>

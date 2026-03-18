@@ -5,6 +5,7 @@ namespace App\Livewire\Pages;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Post;
+use App\Models\CustomTemplate;
 use App\Jobs\ProcessPostGeneration;
 use App\Jobs\PublishToInstagramJob;
 use Illuminate\Support\Facades\Auth;
@@ -37,9 +38,10 @@ class PostGenerator extends Component
     public $faqCategory   = '';    // faq: category
     public $season        = 'auto'; // conseil_saisonnier: season
     public $targetSlides  = '5';   // guide_pedagogique: desired slide count
-    public $customNote    = '';    // any template: free-form extra context for AI
-    public $isAnalyzing   = false;
-    public $analysisSuccess = false;
+    public $customNote      = '';    // any template: free-form extra context for AI
+    public $customTemplateId = null; // ID of the selected CustomTemplate when template='custom'
+    public $isAnalyzing     = false;
+    public $analysisSuccess  = false;
 
     // Carousel templates
     const CAROUSEL_TEMPLATES  = ['chantier_detail', 'step_by_step', 'guide_pedagogique'];
@@ -97,7 +99,7 @@ class PostGenerator extends Component
 
         return [
             'audio'         => 'required|max:10240',
-            'template'      => 'required|in:review,project,faq,lifestyle,quality_focus,conseil_saisonnier,erreur_a_eviter,chantier_detail,step_by_step,guide_pedagogique',
+            'template'      => 'required|in:review,project,faq,lifestyle,quality_focus,conseil_saisonnier,erreur_a_eviter,chantier_detail,step_by_step,guide_pedagogique,custom',
             'imageBefore'   => ($needsPhoto && !$needsExtra) ? 'required|image|max:5120' : 'nullable|image|max:5120',
             'imageAfter'    => $needsAfter ? 'required|image|max:5120' : 'nullable',
             'extraImages'   => $needsExtra ? 'required|array|min:2|max:5' : 'nullable|array',
@@ -125,17 +127,36 @@ class PostGenerator extends Component
             $extraImagePaths[] = $img->store('projects', 'public');
         }
 
+        // For custom templates, inject the template's ai_prompt and visual style
+        $customTemplatePrompt = null;
+        $customVisualStyle    = null;
+        $customTemplateName   = null;
+        if ($this->template === 'custom' && $this->customTemplateId) {
+            $ct = CustomTemplate::where('id', $this->customTemplateId)
+                                ->where('user_id', Auth::id())
+                                ->first();
+            if ($ct) {
+                $customTemplatePrompt = $ct->ai_prompt;
+                $customVisualStyle    = $ct->visual_style;
+                $customTemplateName   = $ct->name;
+            }
+        }
+
         $templateOptions = [
-            'tone'           => $this->tone,
-            'includeHashtags'=> $this->includeHashtags,
-            'clientName'     => $this->clientName ?: null,
-            'serviceType'    => $this->serviceType ?: null,
-            'workCategory'   => $this->workCategory ?: null,
-            'jobDuration'    => $this->jobDuration ?: null,
-            'faqCategory'    => $this->faqCategory ?: null,
-            'season'         => $this->season !== 'auto' ? $this->season : null,
-            'targetSlides'   => (int) $this->targetSlides,
-            'customNote'     => $this->customNote ?: null,
+            'tone'                   => $this->tone,
+            'includeHashtags'        => $this->includeHashtags,
+            'clientName'             => $this->clientName ?: null,
+            'serviceType'            => $this->serviceType ?: null,
+            'workCategory'           => $this->workCategory ?: null,
+            'jobDuration'            => $this->jobDuration ?: null,
+            'faqCategory'            => $this->faqCategory ?: null,
+            'season'                 => $this->season !== 'auto' ? $this->season : null,
+            'targetSlides'           => (int) $this->targetSlides,
+            'customNote'             => $this->customNote ?: null,
+            'custom_template_id'     => $this->customTemplateId ?: null,
+            'custom_template_prompt' => $customTemplatePrompt,
+            'custom_visual_style'    => $customVisualStyle,
+            'custom_template_name'   => $customTemplateName,
         ];
 
         $post = Post::create([
@@ -235,6 +256,10 @@ class PostGenerator extends Component
 
     public function render()
     {
-        return view('livewire.pages.post-generator');
+        $customTemplates = CustomTemplate::where('user_id', Auth::id())
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('livewire.pages.post-generator', compact('customTemplates'));
     }
 }

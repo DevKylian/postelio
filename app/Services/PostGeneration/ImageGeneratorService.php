@@ -31,6 +31,7 @@ class ImageGeneratorService
             'chantier_detail'   => $this->generateChantierDetail($post),
             'step_by_step'      => $this->generateStepByStep($post),
             'guide_pedagogique' => $this->generateGuidePedagogique($post),
+            'custom'            => $this->generateCustomTemplate($post),
             default             => $this->generateSingle($post),
         };
     }
@@ -102,6 +103,155 @@ class ImageGeneratorService
             $imageText = $this->extractImageText($post, 80);
             $image->fill($brandColor);
             $this->drawText($image, $imageText, 200, 880, 50);
+        }
+
+        $this->addLogo($image, $company->logo_path);
+
+        $fileName = 'posts/' . $post->id . '_generated.jpg';
+        Storage::disk('public')->put($fileName, $image->toJpeg(quality: 90));
+
+        return $fileName;
+    }
+
+    // -------------------------------------------------------------------------
+    // Custom (user-created) templates — 3 visual styles
+    // -------------------------------------------------------------------------
+
+    private function generateCustomTemplate(Post $post): string
+    {
+        $company     = $post->company;
+        $brandColor  = $company->brand_color ?? '#F59E0B';
+        $visualStyle = $post->template_options['custom_visual_style'] ?? 'dark_branded';
+
+        $image = $this->manager->create(1080, 1080);
+
+        if ($visualStyle === 'brand_color') {
+            // Full brand-color background — like Review template
+            $imageText = $this->extractImageText($post, 80);
+            $image->fill($brandColor);
+
+            // Subtle decorative circles
+            $image->drawEllipse(970, 130, function ($draw) {
+                $draw->size(400, 400);
+                $draw->background('rgba(0,0,0,0.08)');
+            });
+            $image->drawEllipse(110, 950, function ($draw) {
+                $draw->size(300, 300);
+                $draw->background('rgba(0,0,0,0.06)');
+            });
+
+            // Label
+            $data = json_decode($post->refined_content, true);
+            $templateName = $post->template_options['custom_template_name'] ?? 'MODÈLE PERSO';
+            $image->text(mb_strtoupper($this->cleanText($templateName)), 540, 260, function ($font) {
+                $font->filename($this->fontPath);
+                $font->size(30);
+                $font->color('rgba(255,255,255,0.7)');
+                $font->align('center');
+                $font->valign('middle');
+            });
+
+            // Separator
+            $image->drawRectangle(390, 298, function ($draw) {
+                $draw->size(300, 3);
+                $draw->background('rgba(255,255,255,0.3)');
+            });
+
+            // Main text
+            if ($imageText) {
+                $this->drawTextRaw($image, mb_strtoupper($imageText), 330, 900, 56, '#FFFFFF', 22);
+            }
+            $this->drawCompanyBadge($image, $company);
+
+        } elseif ($visualStyle === 'light_branded') {
+            // Light background — clean, editorial style
+            $imageText = $this->extractImageText($post, 80);
+            $image->fill('#F8FAFC');
+
+            // Brand top bar
+            $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
+                $draw->size(1080, 20);
+                $draw->background($brandColor);
+            });
+
+            // Accent line
+            $image->drawRectangle(100, 220, function ($draw) use ($brandColor) {
+                $draw->size(100, 8);
+                $draw->background($brandColor);
+            });
+
+            // Template label
+            $templateName = $post->template_options['custom_template_name'] ?? 'Modèle Perso';
+            $image->text(mb_strtoupper($this->cleanText($templateName)), 540, 290, function ($font) use ($brandColor) {
+                $font->filename($this->fontPath);
+                $font->size(30);
+                $font->color($brandColor);
+                $font->align('center');
+                $font->valign('middle');
+            });
+
+            // Separator
+            $image->drawRectangle(200, 323, function ($draw) use ($brandColor) {
+                $draw->size(680, 4);
+                $draw->background($brandColor);
+            });
+
+            if ($imageText) {
+                $this->drawTextRaw($image, mb_strtoupper($imageText), 360, 880, 52, '#1E293B', 22);
+            }
+
+            // Subtle dot texture
+            // Company name
+            $this->drawFaqCompanyName($image, $company, $brandColor);
+
+        } else {
+            // dark_branded (default) — deep navy, brand color accents — like Conseil Saisonnier
+            $imageText = $this->extractImageText($post, 80);
+            $image->fill('#0B1426');
+
+            // Ghost circle decoration
+            $image->drawEllipse(970, 130, function ($draw) {
+                $draw->size(400, 400);
+                $draw->background('rgba(255,255,255,0.03)');
+            });
+            $image->drawEllipse(970, 130, function ($draw) {
+                $draw->size(250, 250);
+                $draw->background('rgba(255,255,255,0.04)');
+            });
+
+            // Brand top bar
+            $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
+                $draw->size(1080, 20);
+                $draw->background($brandColor);
+            });
+
+            // Accent line
+            $image->drawRectangle(100, 220, function ($draw) use ($brandColor) {
+                $draw->size(100, 8);
+                $draw->background($brandColor);
+            });
+
+            // Template label
+            $templateName = $post->template_options['custom_template_name'] ?? 'Modèle Perso';
+            $image->text(mb_strtoupper($this->cleanText($templateName)), 540, 290, function ($font) use ($brandColor) {
+                $font->filename($this->fontPath);
+                $font->size(30);
+                $font->color($brandColor);
+                $font->align('center');
+                $font->valign('middle');
+            });
+
+            // Separator
+            $image->drawRectangle(200, 323, function ($draw) use ($brandColor) {
+                $draw->size(680, 4);
+                $draw->background($brandColor);
+            });
+
+            if ($imageText) {
+                $this->drawTextRaw($image, mb_strtoupper($imageText), 360, 880, 52, '#FFFFFF', 22);
+            }
+
+            $this->drawFaqCompanyName($image, $company, $brandColor);
         }
 
         $this->addLogo($image, $company->logo_path);

@@ -37,6 +37,17 @@ $selectTrade = function (string $trade) {
     $this->trade = $trade;
 };
 
+$updatedLogo = function () {
+    try {
+        $this->validateOnly('logo', [
+            'logo' => ['nullable', 'image', 'max:2048'],
+        ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        $this->logo = null;
+        throw $e;
+    }
+};
+
 $nextStep = function () {
     if ($this->step === 2) {
         $this->validate([

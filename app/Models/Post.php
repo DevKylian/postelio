@@ -15,6 +15,7 @@ class Post extends Model
         'refined_content',
         'template',
         'status',
+        'scheduled_at',
         'image_before_path',
         'image_after_path',
         'slides',
@@ -24,6 +25,7 @@ class Post extends Model
     protected $casts = [
         'slides'       => 'array',
         'extra_images' => 'array',
+        'scheduled_at' => 'datetime',
     ];
 
     public function user()

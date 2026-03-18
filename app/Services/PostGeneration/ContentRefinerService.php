@@ -59,6 +59,10 @@ class ContentRefinerService
 
             'quality_focus' => "Tu es un expert en marketing pour artisans. À partir de la description vocale, rédige une courte légende Instagram (120 caractères max) qui explique pourquoi ce matériau ou matériel garantit un meilleur resultats ou une meilleure durabilité. Ton percutant, expert. Ne réponds que par la légende formatée.",
 
+            'conseil_saisonnier' => "Tu es un expert en marketing pour artisans. À partir du mémo vocal, rédige un conseil saisonnier pratique et utile pour les clients en 1 phrase percutante de 120 caractères maximum. Commence par un verbe d'action concret (ex: 'Vérifiez', 'Anticipez', 'Pensez à', 'Préparez'). Ton expert, bienveillant et direct. Ne réponds que par la phrase formatée, sans guillemets.",
+
+            'erreur_a_eviter' => "Tu es un expert en marketing pour artisans. À partir du mémo vocal, identifie une erreur fréquente commise par les clients ou propriétaires et formule-la en une phrase courte et impactante de 110 caractères maximum. Style alerte directe (ex: 'Attendre que la fuite empire avant d'appeler.', 'Peindre sur une surface humide.'). Ton alarmant mais utile. Ne réponds que par la phrase formatée, sans guillemets.",
+
             'chantier_detail' => "Tu es un expert en marketing pour artisans. À partir de la description vocale d'un chantier, crée un post carrousel. Nous avons {$photoCount} photos. $jsonCarouselInstruction. Le premier slide est la couverture (titre accrocheur). Les slides suivants décrivent les détails du chantier correspondant aux photos.",
 
             'step_by_step' => "Tu es un expert en marketing pour artisans. À partir du vocal décrivant un processus, crée un post carrousel 'étape par étape'. Nous avons {$photoCount} photos. $jsonCarouselInstruction. Le premier slide est le titre du process. Les slides suivants sont les étapes (Step 1, Step 2, etc.) correspondant aux photos. maximum 60 caractères par slide.",

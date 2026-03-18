@@ -66,6 +66,10 @@ class ImageGeneratorService
             $this->drawProjectElements($image, $post, $company, $brandColor);
         } elseif ($template === 'quality_focus') {
             $this->drawQualityFocusElements($image, $post, $company, $brandColor, $content);
+        } elseif ($template === 'conseil_saisonnier') {
+            $this->drawConseilSaisonnierElements($image, $company, $brandColor, $content);
+        } elseif ($template === 'erreur_a_eviter') {
+            $this->drawErreurAEviterElements($image, $company, $brandColor, $content);
         } else {
             $image->fill($brandColor);
             $this->drawText($image, $content, 200, 880, 50);
@@ -539,6 +543,112 @@ class ImageGeneratorService
 
         // Unified bottom band (fixed 160px)
         $this->drawUnifiedBand($image, $company, $brandColor, mb_strtoupper($content));
+    }
+
+    /**
+     * Conseil Saisonnier: deep navy + concentric ghost circles (sun motif) + seasonal advice.
+     */
+    private function drawConseilSaisonnierElements($image, $company, string $brandColor, string $content): void
+    {
+        $image->fill('#0B1426');
+
+        // Ghost sun — concentric circles, top-right corner
+        $image->drawEllipse(970, 130, function ($draw) {
+            $draw->size(400, 400);
+            $draw->background('rgba(255,255,255,0.03)');
+        });
+        $image->drawEllipse(970, 130, function ($draw) {
+            $draw->size(260, 260);
+            $draw->background('rgba(255,255,255,0.04)');
+        });
+        $image->drawEllipse(970, 130, function ($draw) {
+            $draw->size(130, 130);
+            $draw->background('rgba(255,255,255,0.06)');
+        });
+
+        // Brand color top bar
+        $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
+            $draw->size(1080, 20);
+            $draw->background($brandColor);
+        });
+
+        // "CONSEIL SAISONNIER" label
+        $image->text('CONSEIL SAISONNIER', 540, 290, function ($font) use ($brandColor) {
+            $font->filename($this->fontPath);
+            $font->size(36);
+            $font->color($brandColor);
+            $font->align('center');
+            $font->valign('middle');
+        });
+
+        // Separator
+        $image->drawRectangle(200, 328, function ($draw) use ($brandColor) {
+            $draw->size(680, 4);
+            $draw->background($brandColor);
+        });
+
+        // Main advice text
+        $this->drawTextRaw($image, mb_strtoupper($content), 370, 840, 52, '#FFFFFF', 22);
+
+        // Company name
+        $this->drawFaqCompanyName($image, $company, $brandColor);
+    }
+
+    /**
+     * Erreur à Éviter: dark charcoal + ghost diagonal X + alert style text.
+     */
+    private function drawErreurAEviterElements($image, $company, string $brandColor, string $content): void
+    {
+        $image->fill('#111827');
+
+        // Ghost X — two diagonal polygon bars
+        $image->drawPolygon(function ($draw) {
+            $draw->point(70, 140);
+            $draw->point(140, 70);
+            $draw->point(1010, 940);
+            $draw->point(940, 1010);
+            $draw->background('rgba(255,255,255,0.045)');
+        });
+        $image->drawPolygon(function ($draw) {
+            $draw->point(940, 70);
+            $draw->point(1010, 140);
+            $draw->point(140, 1010);
+            $draw->point(70, 940);
+            $draw->background('rgba(255,255,255,0.045)');
+        });
+
+        // Brand color top bar
+        $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
+            $draw->size(1080, 20);
+            $draw->background($brandColor);
+        });
+
+        // Left accent bar
+        $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
+            $draw->size(12, 1080);
+            $draw->background($brandColor);
+        });
+
+        // "ERREUR A EVITER" label
+        $image->text('ERREUR A EVITER', 540, 290, function ($font) use ($brandColor) {
+            $font->filename($this->fontPath);
+            $font->size(36);
+            $font->color($brandColor);
+            $font->align('center');
+            $font->valign('middle');
+        });
+
+        // Separator
+        $image->drawRectangle(200, 328, function ($draw) use ($brandColor) {
+            $draw->size(680, 4);
+            $draw->background($brandColor);
+        });
+
+        // Main error text
+        $this->drawTextRaw($image, mb_strtoupper($content), 370, 840, 50, '#FFFFFF', 22);
+
+        // Company name
+        $this->drawFaqCompanyName($image, $company, $brandColor);
     }
 
     // -------------------------------------------------------------------------

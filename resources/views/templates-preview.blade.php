@@ -1,9 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1 class="font-bold text-2xl lg:text-3xl text-midnight tracking-tight">
-            {{ __('Gabarits de publications') }}
-        </h1>
-        <p class="text-gray-500 text-sm mt-1">Découvrez les styles visuels que Postelio peut créer pour vous.</p>
+        <div>
+            <h1 class="font-bold text-xl lg:text-2xl text-midnight tracking-tight leading-tight">
+                Gabarits de publications
+            </h1>
+            <p class="text-gray-400 text-sm mt-0.5">Découvrez les styles visuels que Postelio peut créer pour vous.</p>
+        </div>
     </x-slot>
 
     @php
@@ -15,26 +17,26 @@
         $hasLogo    = $company?->logo_path && Storage::disk('public')->exists($company->logo_path);
     @endphp
 
-    <div class="py-10 px-4 sm:px-6 lg:px-8">
+    <div class="py-8 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
 
             {{-- Banner si le branding n'est pas configuré --}}
             @if (!$company || !$company->name)
-            <div class="mb-8 flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-5 py-4 text-sm">
-                <svg class="w-5 h-5 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="mb-6 flex items-center gap-3 bg-amber-50 border border-amber-100 text-amber-800 rounded-xl px-4 py-3.5 text-sm">
+                <svg class="w-4 h-4 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span>
+                <span class="text-sm">
                     Les aperçus utilisent des valeurs par défaut.
-                    <a href="{{ route('post-settings') }}" wire:navigate class="font-semibold underline hover:text-amber-900">
+                    <a href="{{ route('post-settings') }}" wire:navigate class="font-semibold underline hover:text-amber-900 ml-1">
                         Configurez votre branding
                     </a>
-                    pour voir vos vraies couleurs et nom de société.
+                    pour voir vos vraies couleurs.
                 </span>
             </div>
             @endif
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                 {{-- ── Gabarit Avant/Après ── --}}
                 <div class="space-y-4 group">
@@ -256,6 +258,75 @@
                     <div>
                         <h4 class="font-bold text-midnight text-lg">Step-by-Step</h4>
                         <p class="text-gray-500 text-sm">Expliquez votre expertise étape par étape, didactique et rassurant.</p>
+                    </div>
+                </div>
+
+                {{-- ── Gabarit Conseil Saisonnier ── --}}
+                <div class="space-y-4 group">
+                    <div class="aspect-square rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2" style="background-color: #0B1426; border-top: 8px solid {{ $brandColor }}">
+                        {{-- Ghost sun — cercles concentriques top-right --}}
+                        <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none" style="background: rgba(255,255,255,0.03)"></div>
+                        <div class="absolute -top-5 -right-5 w-26 h-26 w-[104px] h-[104px] rounded-full pointer-events-none" style="background: rgba(255,255,255,0.04)"></div>
+                        <div class="absolute top-1 right-1 w-14 h-14 rounded-full pointer-events-none" style="background: rgba(255,255,255,0.05)"></div>
+
+                        {{-- Content --}}
+                        <div class="absolute inset-0 p-10 flex flex-col justify-center">
+                            <span class="inline-block w-12 h-1 mb-6" style="background-color: {{ $brandColor }}"></span>
+                            <h3 class="font-black uppercase tracking-widest text-sm mb-5 font-montserrat" style="color: {{ $brandColor }}">Conseil Saisonnier</h3>
+                            <p class="text-white font-black uppercase tracking-tight text-lg leading-snug font-montserrat">
+                                Vérifiez vos canalisations avant les premiers grands froids.
+                            </p>
+                        </div>
+
+                        {{-- Company badge --}}
+                        <div class="absolute bottom-0 inset-x-0 border-t px-10 py-4" style="border-color: rgba(255,255,255,0.1)">
+                            <div class="flex items-center gap-2">
+                                @if ($hasLogo)
+                                    <img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-5 w-5 object-contain rounded">
+                                @endif
+                                <p class="font-bold text-xs uppercase tracking-widest font-montserrat" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
+                            </div>
+                        </div>
+                        <div class="absolute inset-0 bg-midnight/0 group-hover:bg-midnight/10 transition-colors pointer-events-none"></div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-midnight text-lg">Conseil Saisonnier</h4>
+                        <p class="text-gray-500 text-sm">Anticipez les besoins de vos clients selon la saison.</p>
+                    </div>
+                </div>
+
+                {{-- ── Gabarit Erreur à Éviter ── --}}
+                <div class="space-y-4 group">
+                    <div class="aspect-square rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2" style="background-color: #111827; border-top: 8px solid {{ $brandColor }}; border-left: 5px solid {{ $brandColor }}">
+                        {{-- Ghost X diagonal lines --}}
+                        <div class="absolute inset-0 overflow-hidden pointer-events-none" style="opacity:0.045">
+                            <div class="absolute bg-white w-full h-3 top-1/2 left-0" style="transform: rotate(45deg) scaleX(1.6) translateY(-50%)"></div>
+                            <div class="absolute bg-white w-full h-3 top-1/2 left-0" style="transform: rotate(-45deg) scaleX(1.6) translateY(-50%)"></div>
+                        </div>
+
+                        {{-- Content --}}
+                        <div class="absolute inset-0 p-10 flex flex-col justify-center">
+                            <span class="inline-block w-12 h-1 mb-6" style="background-color: {{ $brandColor }}"></span>
+                            <h3 class="font-black uppercase tracking-widest text-sm mb-5 font-montserrat" style="color: {{ $brandColor }}">Erreur à Éviter</h3>
+                            <p class="text-white font-black uppercase tracking-tight text-lg leading-snug font-montserrat">
+                                Attendre que la fuite empire avant d'appeler un professionnel.
+                            </p>
+                        </div>
+
+                        {{-- Company badge --}}
+                        <div class="absolute bottom-0 inset-x-0 border-t px-10 py-4" style="border-color: rgba(255,255,255,0.1)">
+                            <div class="flex items-center gap-2">
+                                @if ($hasLogo)
+                                    <img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-5 w-5 object-contain rounded">
+                                @endif
+                                <p class="font-bold text-xs uppercase tracking-widest font-montserrat" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
+                            </div>
+                        </div>
+                        <div class="absolute inset-0 bg-midnight/0 group-hover:bg-midnight/10 transition-colors pointer-events-none"></div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-midnight text-lg">Erreur à Éviter</h4>
+                        <p class="text-gray-500 text-sm">Un format alerte très engageant pour éduquer vos clients.</p>
                     </div>
                 </div>
 

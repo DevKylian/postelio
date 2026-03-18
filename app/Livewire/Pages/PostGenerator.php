@@ -18,6 +18,8 @@ class PostGenerator extends Component
     public $imageAfter;
     public $extraImages = [];        // for chantier_detail & step_by_step (up to 5)
     public $template = 'review';
+    public $scheduleType = 'now';    // 'now' | 'scheduled'
+    public $scheduledAt  = '';       // datetime-local string
     public $status = 'idle';
     public $generatedPostId;
     public $previewImageUrl;
@@ -40,11 +42,13 @@ class PostGenerator extends Component
 
         return [
             'audio'         => 'required|max:10240',
-            'template'      => 'required|in:review,project,faq,lifestyle,quality_focus,chantier_detail,step_by_step,guide_pedagogique',
+            'template'      => 'required|in:review,project,faq,lifestyle,quality_focus,conseil_saisonnier,erreur_a_eviter,chantier_detail,step_by_step,guide_pedagogique',
             'imageBefore'   => ($needsPhoto && !$needsExtra) ? 'required|image|max:5120' : 'nullable|image|max:5120',
             'imageAfter'    => $needsAfter ? 'required|image|max:5120' : 'nullable',
             'extraImages'   => $needsExtra ? 'required|array|min:2|max:5' : 'nullable|array',
             'extraImages.*' => 'image|max:5120',
+            'scheduleType'  => 'required|in:now,scheduled',
+            'scheduledAt'   => $this->scheduleType === 'scheduled' ? 'required|date|after:now' : 'nullable',
         ];
     }
 
@@ -73,6 +77,9 @@ class PostGenerator extends Component
             'extra_images'      => count($extraImagePaths) ? $extraImagePaths : null,
             'template'          => $this->template,
             'status'            => 'pending',
+            'scheduled_at'      => ($this->scheduleType === 'scheduled' && $this->scheduledAt)
+                                    ? \Carbon\Carbon::parse($this->scheduledAt)
+                                    : null,
         ]);
 
         $this->generatedPostId = $post->id;

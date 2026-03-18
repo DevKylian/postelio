@@ -2,24 +2,147 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Custom base styles ─────────────────────────────────────── */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #CBD5E1;
+        border-radius: 99px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #94A3B8;
+    }
+
+    /* Sidebar scrollbar even thinner */
+    aside ::-webkit-scrollbar {
+        width: 3px;
+    }
+    aside ::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.15);
+    }
+}
+
+/* ── Component utilities ────────────────────────────────────── */
 @layer utilities {
     .font-premium {
-        font-family: 'Figtree', sans-serif;
+        font-family: 'Inter', 'Figtree', sans-serif;
         letter-spacing: -0.02em;
     }
 
+    /* Animations */
     .animate-scale-in {
         animation: scale-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
     }
+
+    .animate-fade-up {
+        animation: fade-up 0.5s ease both;
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.3s ease both;
+    }
+
+    /* Glass morphism */
+    .glass {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* Gradient text */
+    .text-gradient {
+        background: linear-gradient(135deg, #1E293B 0%, #475569 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .text-gradient-copper {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Card hover */
+    .card-hover {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    }
+
+    /* Stat card gradient backgrounds */
+    .stat-bg-blue {
+        background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    }
+    .stat-bg-copper {
+        background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+    }
+    .stat-bg-purple {
+        background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+    }
+    .stat-bg-green {
+        background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+    }
+
+    /* Input focus ring */
+    .input-ring {
+        @apply focus:ring-2 focus:ring-copper/30 focus:border-copper outline-none transition-all duration-200;
+    }
+
+    /* Section heading */
+    .section-label {
+        @apply text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400;
+    }
+
+    /* Badge */
+    .badge {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+    }
+    .badge-copper {
+        @apply badge bg-copper/10 text-copper;
+    }
+    .badge-green {
+        @apply badge bg-green-50 text-green-700;
+    }
+    .badge-blue {
+        @apply badge bg-blue-50 text-blue-700;
+    }
+    .badge-gray {
+        @apply badge bg-gray-100 text-gray-600;
+    }
 }
 
+/* ── Keyframes ──────────────────────────────────────────────── */
 @keyframes scale-in {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+    0% { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
+
+@keyframes fade-up {
+    0% { transform: translateY(12px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* ── Livewire loading indicator ─────────────────────────────── */
+[wire\:loading] { opacity: 0.6; pointer-events: none; }

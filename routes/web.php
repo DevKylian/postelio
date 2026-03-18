@@ -26,6 +26,10 @@ Route::view('templates-preview', 'templates-preview')
     ->middleware(['auth', 'verified'])
     ->name('templates-preview');
 
+Route::view('calendar', 'calendar')
+    ->middleware(['auth', 'verified'])
+    ->name('calendar');
+
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');

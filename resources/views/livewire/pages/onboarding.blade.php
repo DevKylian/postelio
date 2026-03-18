@@ -122,11 +122,11 @@ $complete = function () {
             </div>
 
             {{-- Step indicators --}}
-            <div class="px-8 pt-7 pb-2 flex items-center justify-between">
-                <div class="flex items-center gap-2">
+            <div class="px-4 sm:px-8 pt-6 pb-2 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
                     @foreach(range(1, 4) as $i)
-                        <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-300
+                        <div class="flex items-center gap-1.5 sm:gap-2">
+                            <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-300 flex-shrink-0
                                 {{ $step > $i ? 'bg-amber-400 text-white' : ($step === $i ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-400') }}">
                                 @if($step > $i)
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,15 +137,15 @@ $complete = function () {
                                 @endif
                             </div>
                             @if($i < 4)
-                                <div class="w-8 h-px {{ $step > $i ? 'bg-amber-400' : 'bg-gray-200' }} transition-colors duration-300"></div>
+                                <div class="w-4 sm:w-8 h-px {{ $step > $i ? 'bg-amber-400' : 'bg-gray-200' }} transition-colors duration-300 flex-shrink-0"></div>
                             @endif
                         </div>
                     @endforeach
                 </div>
-                <span class="text-xs text-gray-400 font-medium">Étape {{ $step }} / 4</span>
+                <span class="text-xs text-gray-400 font-medium whitespace-nowrap flex-shrink-0">Étape {{ $step }} / 4</span>
             </div>
 
-            <div class="px-8 pb-8 pt-4">
+            <div class="px-4 sm:px-8 pb-6 sm:pb-8 pt-4">
 
                 {{-- ===== STEP 1 : Votre métier ===== --}}
                 @if($step === 1)
@@ -464,10 +464,10 @@ $complete = function () {
                         <button wire:click="complete"
                                 wire:loading.attr="disabled"
                                 type="button"
-                                class="flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-sm bg-amber-400 text-slate-900 hover:bg-amber-500 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-60">
+                                class="flex items-center gap-2 px-5 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold text-sm bg-amber-400 text-slate-900 hover:bg-amber-500 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-60 whitespace-nowrap flex-shrink-0">
                             <span wire:loading.remove wire:target="complete">Accéder à mon espace</span>
                             <span wire:loading wire:target="complete">Enregistrement…</span>
-                            <svg wire:loading.remove wire:target="complete" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg wire:loading.remove wire:target="complete" class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                             </svg>
                         </button>

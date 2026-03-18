@@ -418,6 +418,69 @@
             </div>
             @endif
 
+            {{-- ── Planification ── --}}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 shrink-0">
+                        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-midnight text-base">Planification</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Publiez maintenant ou programmez pour plus tard.</p>
+                    </div>
+                </div>
+
+                <div class="p-6 space-y-4">
+                    {{-- Toggle now / scheduled --}}
+                    <div class="flex bg-gray-100 rounded-xl p-1 gap-1">
+                        <button type="button"
+                                wire:click="$set('scheduleType', 'now')"
+                                class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200
+                                    {{ $scheduleType === 'now' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Maintenant
+                        </button>
+                        <button type="button"
+                                wire:click="$set('scheduleType', 'scheduled')"
+                                class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200
+                                    {{ $scheduleType === 'scheduled' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Planifier
+                        </button>
+                    </div>
+
+                    @if($scheduleType === 'now')
+                        <div class="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3 text-sm text-gray-500">
+                            <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Le post sera généré et ajouté à vos créations immédiatement.
+                        </div>
+                    @else
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Date & heure de publication</label>
+                            <input type="datetime-local"
+                                   wire:model="scheduledAt"
+                                   min="{{ now()->addMinutes(5)->format('Y-m-d\TH:i') }}"
+                                   class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-copper focus:ring-2 focus:ring-copper/10 transition-all">
+                            @error('scheduledAt')
+                                <p class="text-red-500 text-xs font-medium flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    {{ $message }}
+                                </p>
+                            @enderror
+                            <p class="text-xs text-gray-400">Le post sera visible dans votre calendrier à la date choisie.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             {{-- ── Submit ── --}}
             <button type="submit"
                     wire:loading.attr="disabled"

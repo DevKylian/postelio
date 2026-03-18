@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Post;
 use App\Jobs\ProcessPostGeneration;
+use App\Jobs\PublishToInstagramJob;
 use Illuminate\Support\Facades\Auth;
 
 class PostGenerator extends Component
@@ -124,6 +125,11 @@ class PostGenerator extends Component
 
         if ($post && $post->user_id === Auth::id()) {
             $post->update(['status' => 'completed']);
+
+            $company = Auth::user()->company;
+            if ($company && $company->instagram_connected) {
+                PublishToInstagramJob::dispatch($post->id);
+            }
         }
 
         return redirect()->route('posts.index')->with('success', 'Votre post a été validé et ajouté à vos créations !');

@@ -47,10 +47,12 @@
                                 'project'           => 'Avant / Après',
                                 'faq'               => 'FAQ Artisan',
                                 'lifestyle'         => 'Lifestyle',
-                                'quality_focus'     => 'Focus Qualité',
-                                'chantier_detail'   => 'Chantier en Détail',
-                                'step_by_step'      => 'Step-by-Step',
-                                'guide_pedagogique' => 'Guide Pédagogique',
+                                'quality_focus'       => 'Focus Qualité',
+                                'conseil_saisonnier'  => 'Conseil Saisonnier',
+                                'erreur_a_eviter'     => 'Erreur à Éviter',
+                                'chantier_detail'     => 'Chantier en Détail',
+                                'step_by_step'        => 'Step-by-Step',
+                                'guide_pedagogique'   => 'Guide Pédagogique',
                             ];
                         @endphp
 

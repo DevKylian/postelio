@@ -44,6 +44,8 @@ $transcribeAudioRequest = function (
         \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
         $this->userRequest   = mb_substr(trim($transcript), 0, 300);
         $this->audioRequest  = null;
+        // Basculer l'onglet vers "Décrire" avec le texte retranscrit
+        $this->dispatch('modal-switch-to-text');
     } catch (\Throwable $e) {
         $this->errorMessage = 'La transcription a échoué. Réessayez ou utilisez le mode texte.';
         \Illuminate\Support\Facades\Log::error('TemplateModal transcription failed: ' . $e->getMessage());
@@ -615,7 +617,7 @@ $deleteTemplate = function (int $id) {
 
                 @if(!$generatedTemplate)
                 {{-- Étape 1 : Demande — 3 modes --}}
-                <div x-data="{ mode: 'text' }">
+                <div x-data="{ mode: 'text' }" @modal-switch-to-text.window="mode = 'text'">
                     <label class="block text-sm font-semibold text-midnight mb-3">Décrivez votre modèle</label>
 
                     {{-- Mode tabs --}}

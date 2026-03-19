@@ -1223,6 +1223,13 @@
         elapsed: 0,
         timer: null,
 
+        init() {
+            // Quand la transcription Livewire est prête, basculer vers l'onglet "Écrire"
+            window.addEventListener('switch-to-text-mode', () => {
+                this.mode = 'text';
+            });
+        },
+
         async startRecording() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });

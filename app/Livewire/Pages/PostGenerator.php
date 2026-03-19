@@ -66,11 +66,14 @@ class PostGenerator extends Component
             $transcriber = app(\App\Services\PostGeneration\TranscriptionService::class);
             $transcript = $transcriber->transcribe($path);
 
-            // 3. Extract fields
+            // 3. Pré-remplir le champ texte avec la transcription brute
+            $this->textContent = $transcript;
+
+            // 4. Extract fields
             $refiner = app(\App\Services\PostGeneration\ContentRefinerService::class);
             $extracted = $refiner->extractFields($transcript);
 
-            // 4. Update properties (only if not null)
+            // 5. Update properties (only if not null)
             if (!empty($extracted['clientName']))    $this->clientName    = $extracted['clientName'];
             if (!empty($extracted['serviceType']))   $this->serviceType   = $extracted['serviceType'];
             if (!empty($extracted['workCategory']))  $this->workCategory  = $extracted['workCategory'];
@@ -80,6 +83,9 @@ class PostGenerator extends Component
             if (!empty($extracted['tone']))          $this->tone          = $extracted['tone'];
 
             $this->analysisSuccess = true;
+
+            // 6. Basculer l'onglet vers "Écrire" avec le texte retranscrit
+            $this->dispatch('switch-to-text-mode');
 
             // Optional: cleanup temp file
             \Illuminate\Support\Facades\Storage::disk('public')->delete($path);

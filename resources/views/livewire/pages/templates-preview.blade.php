@@ -81,9 +81,7 @@ $saveTemplate = function () {
             'photo_mode' => $this->photoMode,
             'generated'  => $this->generatedTemplate,
         ]);
-        $this->errorMessage = config('app.debug')
-            ? '[DEBUG] ' . get_class($e) . ': ' . $e->getMessage()
-            : 'Impossible de sauvegarder le modèle. Réessayez.';
+        $this->errorMessage = 'Impossible de sauvegarder le modèle. Réessayez.';
     } finally {
         $this->isSaving = false;
     }

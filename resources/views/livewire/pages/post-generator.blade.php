@@ -853,10 +853,8 @@
                             x-data="{
                                 selDay: null,
                                 selHour: null,
-                                selMin: null,
                                 days: [],
                                 hours: [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],
-                                mins: [0,15,30,45],
                                 init() {
                                     const today = new Date();
                                     for (let i = 0; i < 14; i++) {
@@ -866,7 +864,6 @@
                                     }
                                     this.selDay  = this.days[0];
                                     this.selHour = 9;
-                                    this.selMin  = 0;
                                     this.sync();
                                 },
                                 dayLabel(d) {
@@ -892,7 +889,7 @@
                                 sync() {
                                     if (!this.selDay) return;
                                     const d = new Date(this.selDay);
-                                    d.setHours(this.selHour ?? 9, this.selMin ?? 0, 0, 0);
+                                    d.setHours(this.selHour ?? 9, 0, 0, 0);
                                     const fmt = d.getFullYear()+'-'+this.pad(d.getMonth()+1)+'-'+this.pad(d.getDate())+'T'+this.pad(d.getHours())+':'+this.pad(d.getMinutes());
                                     $wire.set('scheduledAt', fmt);
                                 },
@@ -900,7 +897,7 @@
                                     if (!this.selDay) return '';
                                     const dayNames = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
                                     const months   = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-                                    return dayNames[this.selDay.getDay()] + ' ' + this.selDay.getDate() + ' ' + months[this.selDay.getMonth()] + ' à ' + this.pad(this.selHour) + 'h' + this.pad(this.selMin);
+                                    return dayNames[this.selDay.getDay()] + ' ' + this.selDay.getDate() + ' ' + months[this.selDay.getMonth()] + ' à ' + this.pad(this.selHour) + 'h00';
                                 }
                             }"
                             class="space-y-4">
@@ -936,22 +933,6 @@
                                                     : 'bg-white text-gray-600 border-gray-200 hover:border-copper/40 hover:text-copper'"
                                                 class="w-10 h-8 rounded-lg border-2 text-xs font-semibold transition-all duration-150 cursor-pointer"
                                                 x-text="pad(h)+'h'"></button>
-                                    </template>
-                                </div>
-                            </div>
-
-                            {{-- Minute chips --}}
-                            <div>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Minutes</p>
-                                <div class="flex gap-2">
-                                    <template x-for="m in mins" :key="m">
-                                        <button type="button"
-                                                @click="selMin = m; sync()"
-                                                :class="selMin === m
-                                                    ? 'bg-copper text-white border-copper'
-                                                    : 'bg-white text-gray-600 border-gray-200 hover:border-copper/40 hover:text-copper'"
-                                                class="flex-1 h-9 rounded-xl border-2 text-sm font-bold transition-all duration-150 cursor-pointer"
-                                                x-text="':'+pad(m)"></button>
                                     </template>
                                 </div>
                             </div>

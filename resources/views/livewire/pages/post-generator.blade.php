@@ -269,7 +269,7 @@
                             @endphp
                             <button type="button"
                                     @if($isCustomTpl)
-                                        wire:click="$set('customTemplateId', {{ $tpl['custom_id'] }}); $set('template', 'custom')"
+                                        wire:click="selectCustomTemplate({{ $tpl['custom_id'] }})"
                                     @else
                                         wire:click="$set('template', '{{ $tpl['id'] }}'); $set('customTemplateId', null)"
                                     @endif

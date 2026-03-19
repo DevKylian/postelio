@@ -111,6 +111,12 @@ class PostGenerator extends Component
         ];
     }
 
+    public function selectCustomTemplate(int $id): void
+    {
+        $this->template         = 'custom';
+        $this->customTemplateId = $id;
+    }
+
     public function generate()
     {
         $this->validate();

@@ -250,7 +250,15 @@ class PostGenerator extends Component
 
             $company = Auth::user()->company;
             if ($company && $company->instagram_connected) {
-                PublishToInstagramJob::dispatch($post->id);
+                $scheduledAt = $post->scheduled_at;
+
+                if ($scheduledAt && $scheduledAt->isFuture()) {
+                    // Publication différée : on met en attente jusqu'à la date choisie
+                    PublishToInstagramJob::dispatch($post->id)->delay($scheduledAt);
+                } else {
+                    // Pas de date ou date passée : publication immédiate
+                    PublishToInstagramJob::dispatch($post->id);
+                }
             }
         }
 
@@ -304,8 +312,10 @@ class PostGenerator extends Component
         $hasLogo          = $company && $company->logo_path;
         $igProfilePicture = $company?->instagram_profile_picture_url;
 
-        // Lazy fetch pour les comptes connectés avant l'ajout de ce champ
-        if ($company?->instagram_connected && !$igProfilePicture) {
+        // Rafraîchit la photo de profil depuis l'API Instagram :
+        // - systématiquement quand le preview est affiché (les URLs CDN IG expirent)
+        // - une fois au premier passage si elle n'est pas encore enregistrée
+        if ($company?->instagram_connected && ($this->status === 'review_pending' || !$igProfilePicture)) {
             try {
                 $stats = app(\App\Services\InstagramService::class)
                     ->getAccountStats($company->instagram_access_token, $company->instagram_business_account_id);
@@ -314,7 +324,7 @@ class PostGenerator extends Component
                     $igProfilePicture = $stats['profile_picture_url'];
                 }
             } catch (\Throwable) {
-                // Non-critique, on continue sans
+                // Non-critique : on affiche le logo entreprise en fallback
             }
         }
 

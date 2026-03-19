@@ -63,7 +63,7 @@
                     Publié
                 </span>
                 <span class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-indigo-400 inline-block"></span>
+                    <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
                     Planifié
                 </span>
             </div>
@@ -145,7 +145,7 @@
                 @foreach($visible as $post)
                 <button wire:click="openPost({{ $post['id'] }})"
                         class="group relative rounded-lg overflow-hidden flex-shrink-0 text-left w-full cursor-pointer
-                            {{ $post['scheduled'] ? 'ring-1 ring-indigo-200 hover:ring-indigo-400' : 'ring-1 ring-copper/20 hover:ring-copper/50' }}
+                            {{ $post['scheduled'] ? 'ring-1 ring-amber-200 hover:ring-amber-400' : 'ring-1 ring-copper/20 hover:ring-copper/50' }}
                             transition-all"
                         title="{{ $post['caption'] ?? $post['template'] }}">
 
@@ -159,7 +159,7 @@
                             </span>
                         </div>
                         @if($post['scheduled'])
-                        <div class="absolute top-1 right-1 w-3.5 h-3.5 bg-indigo-500 rounded-full flex items-center justify-center">
+                        <div class="absolute top-1 right-1 w-3.5 h-3.5 bg-amber-500 rounded-full flex items-center justify-center">
                             <svg class="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 8v4l3 3" />
                             </svg>
@@ -167,9 +167,9 @@
                         @endif
                     @else
                         <div class="w-full flex items-center gap-1.5 px-2 py-1.5
-                            {{ $post['scheduled'] ? 'bg-indigo-50' : 'bg-amber-50' }}">
+                            {{ $post['scheduled'] ? 'bg-amber-50' : 'bg-amber-50' }}">
                             <span class="w-1.5 h-1.5 rounded-full shrink-0
-                                {{ $post['scheduled'] ? 'bg-indigo-400' : 'bg-copper' }}"></span>
+                                {{ $post['scheduled'] ? 'bg-amber-400' : 'bg-copper' }}"></span>
                             <span class="text-[10px] font-medium text-gray-600 truncate leading-tight">
                                 {{ $post['caption']
                                     ? \Illuminate\Support\Str::limit($post['caption'], 24)
@@ -184,7 +184,7 @@
                 @if($overflow > 0)
                 <button
                     @click="expandedDay = (expandedDay === {{ $day }}) ? null : {{ $day }}"
-                    class="text-[10px] font-bold text-indigo-400 hover:text-indigo-600 text-center py-0.5 w-full rounded transition-colors">
+                    class="text-[10px] font-bold text-amber-500 hover:text-amber-700 text-center py-0.5 w-full rounded transition-colors">
                     +{{ $overflow }} de plus
                 </button>
 
@@ -205,15 +205,15 @@
                     @foreach($dayPosts as $post)
                     <button wire:click="openPost({{ $post['id'] }})" @click="expandedDay = null"
                             class="group relative rounded-lg overflow-hidden text-left w-full
-                                {{ $post['scheduled'] ? 'ring-1 ring-indigo-200 hover:ring-indigo-400' : 'ring-1 ring-copper/20 hover:ring-copper/50' }}
+                                {{ $post['scheduled'] ? 'ring-1 ring-amber-200 hover:ring-amber-400' : 'ring-1 ring-copper/20 hover:ring-copper/50' }}
                                 transition-all">
                         @if($post['thumbnail'])
                             <img src="{{ $post['thumbnail'] }}" alt="Post" class="w-full h-12 object-cover">
                         @else
                             <div class="w-full flex items-center gap-1.5 px-2 py-2
-                                {{ $post['scheduled'] ? 'bg-indigo-50' : 'bg-amber-50' }}">
+                                {{ $post['scheduled'] ? 'bg-amber-50' : 'bg-amber-50' }}">
                                 <span class="w-1.5 h-1.5 rounded-full shrink-0
-                                    {{ $post['scheduled'] ? 'bg-indigo-400' : 'bg-copper' }}"></span>
+                                    {{ $post['scheduled'] ? 'bg-amber-400' : 'bg-copper' }}"></span>
                                 <span class="text-[10px] font-medium text-gray-600 truncate">
                                     {{ $post['caption']
                                         ? \Illuminate\Support\Str::limit($post['caption'], 28)
@@ -282,7 +282,7 @@
                 @foreach($wd['posts'] as $post)
                 <button wire:click="openPost({{ $post['id'] }})"
                         class="group relative rounded-xl overflow-hidden text-left w-full cursor-pointer flex-shrink-0
-                            {{ $post['scheduled'] ? 'ring-1 ring-indigo-200 hover:ring-indigo-400' : 'ring-1 ring-copper/20 hover:ring-copper/50' }}
+                            {{ $post['scheduled'] ? 'ring-1 ring-amber-200 hover:ring-amber-400' : 'ring-1 ring-copper/20 hover:ring-copper/50' }}
                             shadow-sm hover:shadow-md transition-all"
                         title="{{ $post['caption'] ?? $post['template'] }}">
 
@@ -292,12 +292,12 @@
                         <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     @endif
 
-                    <div class="px-2 py-2 {{ $post['thumbnail'] ? 'absolute bottom-0 left-0 right-0 text-white' : ($post['scheduled'] ? 'bg-indigo-50' : 'bg-amber-50') }}">
+                    <div class="px-2 py-2 {{ $post['thumbnail'] ? 'absolute bottom-0 left-0 right-0 text-white' : ($post['scheduled'] ? 'bg-amber-50' : 'bg-amber-50') }}">
                         <div class="flex items-center gap-1 mb-0.5">
                             <span class="w-1.5 h-1.5 rounded-full shrink-0
-                                {{ $post['scheduled'] ? 'bg-indigo-400' : 'bg-copper' }}
+                                {{ $post['scheduled'] ? 'bg-amber-400' : 'bg-copper' }}
                                 {{ $post['thumbnail'] ? 'opacity-0' : '' }}"></span>
-                            <span class="text-[10px] font-bold {{ $post['thumbnail'] ? 'text-white' : ($post['scheduled'] ? 'text-indigo-500' : 'text-amber-600') }}">
+                            <span class="text-[10px] font-bold {{ $post['thumbnail'] ? 'text-white' : ($post['scheduled'] ? 'text-amber-600' : 'text-amber-600') }}">
                                 {{ $post['scheduled'] ? 'Planifié' : 'Publié' }}
                                 @if($post['time'] !== '00:00')
                                     · {{ $post['time'] }}
@@ -375,7 +375,7 @@
                 {{-- Badge statut --}}
                 <div class="absolute top-3 left-3">
                     <span class="px-2.5 py-1 rounded-full text-[11px] font-bold
-                        {{ $selectedPost['scheduled'] ? 'bg-indigo-500 text-white' : 'bg-copper text-white' }}">
+                        {{ $selectedPost['scheduled'] ? 'bg-amber-500 text-white' : 'bg-copper text-white' }}">
                         {{ $selectedPost['scheduled'] ? 'Planifié' : 'Publié' }}
                     </span>
                 </div>
@@ -391,7 +391,7 @@
             {{-- Header sans image --}}
             <div class="flex items-center justify-between px-5 pt-5 pb-2">
                 <span class="px-2.5 py-1 rounded-full text-[11px] font-bold
-                    {{ $selectedPost['scheduled'] ? 'bg-indigo-100 text-indigo-600' : 'bg-amber-100 text-amber-600' }}">
+                    {{ $selectedPost['scheduled'] ? 'bg-amber-100 text-amber-700' : 'bg-amber-100 text-amber-600' }}">
                     {{ $selectedPost['scheduled'] ? 'Planifié' : 'Publié' }}
                 </span>
                 <button wire:click="closePost"

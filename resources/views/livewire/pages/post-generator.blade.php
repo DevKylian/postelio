@@ -425,13 +425,13 @@
                             $tones = [
                                 ['id' => 'professionnel', 'label' => 'Professionnel', 'desc' => 'Sérieux & direct', 'icon' => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', 'color' => 'blue'],
                                 ['id' => 'chaleureux',    'label' => 'Chaleureux',    'desc' => 'Humain & proche', 'icon' => 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z', 'color' => 'rose'],
-                                ['id' => 'expert',        'label' => 'Expert',        'desc' => 'Technique & précis', 'icon' => 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', 'color' => 'indigo'],
+                                ['id' => 'expert',        'label' => 'Expert',        'desc' => 'Technique & précis', 'icon' => 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', 'color' => 'teal'],
                                 ['id' => 'dynamique',     'label' => 'Dynamique',     'desc' => 'Vendeur & impact', 'icon' => 'M13 10V3L4 14h7v7l9-11h-7z', 'color' => 'amber'],
                             ];
                             $colorMap = [
                                 'blue'   => ['sel' => 'border-blue-400 bg-blue-50', 'icon' => 'bg-blue-100 text-blue-500', 'dot' => 'bg-blue-500', 'label' => 'text-blue-700'],
                                 'rose'   => ['sel' => 'border-rose-400 bg-rose-50', 'icon' => 'bg-rose-100 text-rose-500', 'dot' => 'bg-rose-500', 'label' => 'text-rose-700'],
-                                'indigo' => ['sel' => 'border-indigo-400 bg-indigo-50', 'icon' => 'bg-indigo-100 text-indigo-500', 'dot' => 'bg-indigo-500', 'label' => 'text-indigo-700'],
+                                'teal'   => ['sel' => 'border-teal-400 bg-teal-50', 'icon' => 'bg-teal-100 text-teal-500', 'dot' => 'bg-teal-500', 'label' => 'text-teal-700'],
                                 'amber'  => ['sel' => 'border-amber-400 bg-amber-50', 'icon' => 'bg-amber-100 text-amber-500', 'dot' => 'bg-amber-500', 'label' => 'text-amber-700'],
                             ];
                             @endphp
@@ -499,7 +499,7 @@
                                        wire:model.defer="clientName"
                                        placeholder="ex: Marie, Jean-Pierre..."
                                        @if($isAnalyzing) disabled @endif
-                                       class="w-full px-3.5 py-2.5 border rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all placeholder-gray-300
+                                       class="w-full px-3.5 py-2.5 border rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-copper focus:ring-2 focus:ring-amber-100 transition-all placeholder-gray-300
                                             {{ $isAnalyzing ? 'animate-pulse bg-copper/[0.03] border-copper/20' : 'border-gray-200' }}">
                             </div>
                             <div class="space-y-1.5">
@@ -508,7 +508,7 @@
                                        wire:model.defer="serviceType"
                                        placeholder="ex: pose de carrelage, peinture..."
                                        @if($isAnalyzing) disabled @endif
-                                       class="w-full px-3.5 py-2.5 border rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all placeholder-gray-300
+                                       class="w-full px-3.5 py-2.5 border rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-copper focus:ring-2 focus:ring-amber-100 transition-all placeholder-gray-300
                                             {{ $isAnalyzing ? 'animate-pulse bg-copper/[0.03] border-copper/20' : 'border-gray-200' }}">
                             </div>
                         </div>
@@ -524,7 +524,7 @@
                                 <label class="text-xs font-semibold text-gray-600 block">Type de travaux</label>
                                 <select wire:model.defer="workCategory"
                                         @if($isAnalyzing) disabled @endif
-                                        class="w-full px-3.5 py-2.5 border rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all
+                                        class="w-full px-3.5 py-2.5 border rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-copper focus:ring-2 focus:ring-amber-100 transition-all
                                             {{ $isAnalyzing ? 'animate-pulse bg-copper/[0.03] border-copper/20' : 'border-gray-200' }}">
                                     <option value="">Sélectionner...</option>
                                     <option value="Peinture">Peinture</option>
@@ -543,7 +543,7 @@
                                 <label class="text-xs font-semibold text-gray-600 block">Durée du chantier</label>
                                 <select wire:model.defer="jobDuration"
                                         @if($isAnalyzing) disabled @endif
-                                        class="w-full px-3.5 py-2.5 border rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all
+                                        class="w-full px-3.5 py-2.5 border rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-copper focus:ring-2 focus:ring-amber-100 transition-all
                                             {{ $isAnalyzing ? 'animate-pulse bg-copper/[0.03] border-copper/20' : 'border-gray-200' }}">
                                     <option value="">Sélectionner...</option>
                                     <option value="1 journée">1 journée</option>
@@ -575,11 +575,11 @@
                             <button type="button"
                                     wire:click="$set('faqCategory', '{{ $cat['id'] }}')"
                                     class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-center transition-all duration-200
-                                        {{ $faqCategory === $cat['id'] ? 'border-violet-400 bg-violet-50 shadow-sm' : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50' }}">
-                                <svg class="w-5 h-5 {{ $faqCategory === $cat['id'] ? 'text-violet-500' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        {{ $faqCategory === $cat['id'] ? 'border-copper bg-amber-50 shadow-sm' : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50' }}">
+                                <svg class="w-5 h-5 {{ $faqCategory === $cat['id'] ? 'text-copper' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $cat['icon'] }}" />
                                 </svg>
-                                <span class="text-xs font-semibold {{ $faqCategory === $cat['id'] ? 'text-violet-700' : 'text-gray-500' }} leading-tight">{{ $cat['label'] }}</span>
+                                <span class="text-xs font-semibold {{ $faqCategory === $cat['id'] ? 'text-amber-700' : 'text-gray-500' }} leading-tight">{{ $cat['label'] }}</span>
                             </button>
                             @endforeach
                         </div>
@@ -604,9 +604,9 @@
                             <button type="button"
                                     wire:click="$set('season', '{{ $s['id'] }}')"
                                     class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-center transition-all duration-200
-                                        {{ $season === $s['id'] ? 'border-violet-400 bg-violet-50 shadow-sm' : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50' }}">
+                                        {{ $season === $s['id'] ? 'border-copper bg-amber-50 shadow-sm' : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50' }}">
                                 <span class="text-2xl leading-none">{{ $s['emoji'] }}</span>
-                                <span class="text-[10px] font-semibold {{ $season === $s['id'] ? 'text-violet-700' : 'text-gray-500' }}">{{ $s['label'] }}</span>
+                                <span class="text-[10px] font-semibold {{ $season === $s['id'] ? 'text-amber-700' : 'text-gray-500' }}">{{ $s['label'] }}</span>
                             </button>
                             @endforeach
                         </div>
@@ -622,7 +622,7 @@
                             <button type="button"
                                     wire:click="$set('targetSlides', '{{ $n }}')"
                                     class="flex-1 py-2.5 rounded-xl border-2 text-sm font-bold transition-all duration-200
-                                        {{ $targetSlides == $n ? 'border-violet-400 bg-violet-50 text-violet-700 shadow-sm' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-gray-50' }}">
+                                        {{ $targetSlides == $n ? 'border-copper bg-amber-50 text-amber-700 shadow-sm' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-gray-50' }}">
                                 {{ $n }}
                             </button>
                             @endforeach
@@ -641,7 +641,7 @@
                                       placeholder="Précision pour l'IA — ex: 'Client dans le 16e Paris', 'Travaux urgence dégâts des eaux', 'Mettre en avant le label RGE'..."
                                       rows="2"
                                       maxlength="300"
-                                      class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all placeholder-gray-300 resize-none"></textarea>
+                                      class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-copper focus:ring-2 focus:ring-amber-100 transition-all placeholder-gray-300 resize-none"></textarea>
                             <span class="absolute bottom-2 right-3 text-[10px] text-gray-300 pointer-events-none">max 300 car.</span>
                         </div>
                         @error('customNote') <p class="text-red-500 text-xs font-medium">{{ $message }}</p> @enderror
@@ -962,19 +962,10 @@
                     wire:target="generate"
                     class="w-full relative group overflow-hidden bg-copper text-white font-bold text-sm py-5 rounded-2xl shadow-lg shadow-copper/25 hover:shadow-xl hover:shadow-copper/30 hover:bg-amber-500 transition-all duration-300 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed">
                 <div class="flex items-center justify-center gap-3">
-                    <span wire:loading.remove wire:target="generate" class="flex items-center gap-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        Lancer la génération
-                    </span>
-                    <span wire:loading wire:target="generate" class="flex items-center gap-3 animate-pulse">
-                        <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Analyse en cours...
-                    </span>
+                    <svg wire:loading.remove wire:target="generate" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <svg wire:loading wire:target="generate" class="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span wire:loading.remove wire:target="generate">Lancer la génération</span>
+                    <span wire:loading wire:target="generate">Analyse en cours...</span>
                 </div>
             </button>
 
@@ -1135,19 +1126,19 @@
                 {{-- Bouton principal : Valider (label adaptatif selon la planification) --}}
                 <button wire:click="validatePost" wire:loading.attr="disabled"
                         class="w-full max-w-[540px] flex items-center justify-center gap-2 bg-copper text-white font-semibold py-3.5 px-5 rounded-xl shadow-md shadow-copper/20 hover:bg-amber-500 hover:shadow-lg hover:shadow-copper/30 transition-all duration-200 active:scale-[0.99] disabled:opacity-60 text-sm">
-                    <span wire:loading.remove wire:target="validatePost" class="flex items-center gap-2">
-                        @if($scheduleType === 'scheduled' && $scheduledAt)
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            Planifier — {{ \Carbon\Carbon::parse($scheduledAt)->translatedFormat('d/m à H\hi') }}
-                        @else
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                            Valider et publier
-                        @endif
-                    </span>
-                    <span wire:loading wire:target="validatePost" class="flex items-center gap-2 animate-pulse">
-                        <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        Validation...
-                    </span>
+                    {{-- Icône : calendrier ou check, remplacée par spinner --}}
+                    @if($scheduleType === 'scheduled' && $scheduledAt)
+                        <svg wire:loading.remove wire:target="validatePost" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    @else
+                        <svg wire:loading.remove wire:target="validatePost" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    @endif
+                    <svg wire:loading wire:target="validatePost" class="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    {{-- Texte : toujours visible, ne cause pas de double-ligne --}}
+                    @if($scheduleType === 'scheduled' && $scheduledAt)
+                        <span>Planifier — {{ \Carbon\Carbon::parse($scheduledAt)->translatedFormat('d/m à H\hi') }}</span>
+                    @else
+                        <span>Valider et publier</span>
+                    @endif
                 </button>
 
                 {{-- Ligne secondaire : Régénérer · Version courte · Copier · Rejeter --}}
@@ -1156,27 +1147,19 @@
                     {{-- Régénérer le texte --}}
                     <button wire:click="regeneratePost(false)" wire:loading.attr="disabled"
                             class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-600 font-medium py-2 px-3.5 rounded-xl hover:border-copper hover:text-copper hover:bg-copper/5 transition-all duration-200 text-xs disabled:opacity-60">
-                        <span wire:loading.remove wire:target="regeneratePost(false)" class="flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                            Régénérer
-                        </span>
-                        <span wire:loading wire:target="regeneratePost(false)" class="flex items-center gap-1.5 animate-pulse">
-                            <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            En cours...
-                        </span>
+                        <svg wire:loading.remove wire:target="regeneratePost(false)" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        <svg wire:loading wire:target="regeneratePost(false)" class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span wire:loading.remove wire:target="regeneratePost(false)">Régénérer</span>
+                        <span wire:loading wire:target="regeneratePost(false)">En cours...</span>
                     </button>
 
                     {{-- Version courte --}}
                     <button wire:click="regeneratePost(true)" wire:loading.attr="disabled"
-                            class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-500 font-medium py-2 px-3.5 rounded-xl hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50/50 transition-all duration-200 text-xs disabled:opacity-60">
-                        <span wire:loading.remove wire:target="regeneratePost(true)" class="flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                            Version courte
-                        </span>
-                        <span wire:loading wire:target="regeneratePost(true)" class="flex items-center gap-1.5 animate-pulse">
-                            <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            En cours...
-                        </span>
+                            class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-500 font-medium py-2 px-3.5 rounded-xl hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50/50 transition-all duration-200 text-xs disabled:opacity-60">
+                        <svg wire:loading.remove wire:target="regeneratePost(true)" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <svg wire:loading wire:target="regeneratePost(true)" class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span wire:loading.remove wire:target="regeneratePost(true)">Version courte</span>
+                        <span wire:loading wire:target="regeneratePost(true)">En cours...</span>
                     </button>
 
                     {{-- Copier le texte --}}

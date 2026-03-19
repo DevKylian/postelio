@@ -236,12 +236,12 @@ new class extends Component {
             {{-- Avg comments --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group card-hover">
                 <div class="flex items-center justify-between mb-4">
-                    <div class="w-9 h-9 rounded-xl bg-violet-50 flex items-center justify-center text-violet-400 group-hover:bg-violet-500 group-hover:text-white transition-all duration-200">
+                    <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 group-hover:bg-amber-500 group-hover:text-white transition-all duration-200">
                         <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                     </div>
-                    <span class="text-[11px] font-bold text-violet-400 bg-violet-50 px-2 py-0.5 rounded-full">Moy.</span>
+                    <span class="text-[11px] font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded-full">Moy.</span>
                 </div>
                 <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Commentaires / post</p>
                 <p class="text-2xl font-bold text-midnight mt-1">{{ number_format($avgComments) }}</p>

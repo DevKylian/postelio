@@ -29,8 +29,13 @@ class ProcessPostGeneration implements ShouldQueue
         try {
             $this->post->update(['status' => 'processing']);
 
-            // 1. Transcription
-            $transcript = $transcriber->transcribe($this->post->audio_path);
+            // 1. Transcription (or use text_content directly when no audio)
+            $textContent = $this->post->template_options['text_content'] ?? null;
+            if (!$this->post->audio_path && $textContent) {
+                $transcript = $textContent;
+            } else {
+                $transcript = $transcriber->transcribe($this->post->audio_path);
+            }
             $this->post->update(['transcription' => $transcript]);
 
             // 2. AI content refinement

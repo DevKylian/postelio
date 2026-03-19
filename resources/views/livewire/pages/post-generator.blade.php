@@ -83,19 +83,29 @@
                     <div class="flex bg-gray-100 rounded-xl p-1 gap-1">
                         <button type="button" @click="mode = 'record'"
                                 :class="mode === 'record' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
-                                class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm transition-all duration-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm transition-all duration-200">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                             </svg>
-                            Enregistrer
+                            <span class="hidden sm:inline">Enregistrer</span>
+                            <span class="sm:hidden">Vocal</span>
                         </button>
                         <button type="button" @click="mode = 'upload'"
                                 :class="mode === 'upload' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
-                                class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm transition-all duration-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm transition-all duration-200">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                             </svg>
-                            Importer un fichier
+                            <span class="hidden sm:inline">Importer</span>
+                            <span class="sm:hidden">MP3</span>
+                        </button>
+                        <button type="button" @click="mode = 'text'"
+                                :class="mode === 'text' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
+                                class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm transition-all duration-200">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Écrire
                         </button>
                     </div>
 
@@ -223,12 +233,39 @@
                         </div>
                     </div>
 
+                    {{-- Text Mode --}}
+                    <div x-show="mode === 'text'" x-transition>
+                        <div class="space-y-2">
+                            <textarea
+                                wire:model.defer="textContent"
+                                placeholder="Décrivez votre projet en quelques mots — ex: 'Rénovation salle de bain chez Madame Dupont à Lyon, carrelage effet marbre, client très satisfait, travaux terminés en 3 jours'..."
+                                rows="5"
+                                maxlength="2000"
+                                class="w-full px-4 py-3.5 border border-gray-200 rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-copper focus:ring-2 focus:ring-copper/10 transition-all placeholder-gray-300 resize-none leading-relaxed"
+                            ></textarea>
+                            <div class="flex items-center justify-between">
+                                <p class="text-xs text-gray-400">L'IA utilisera ce texte pour générer votre post — plus vous êtes précis, meilleur sera le résultat.</p>
+                                <span class="text-[10px] text-gray-300 shrink-0 ml-3">max 2000 car.</span>
+                            </div>
+                        </div>
+                        @error('textContent')
+                            <p class="text-red-500 text-xs font-medium mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     @if($analysisSuccess)
                     <div class="flex items-center gap-2 text-xs font-semibold text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-100">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                         L'IA a pré-rempli les champs basés sur votre vocal.
                     </div>
                     @endif
+
+                    @error('audio')
+                        <p class="text-red-500 text-xs font-medium flex items-center gap-1.5">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            {{ $message }}
+                        </p>
+                    @enderror
                 </div>
             </div>
 
@@ -242,10 +279,38 @@
                     </div>
                 </div>
 
-                <div class="p-6 space-y-6">
+                <div class="p-6 space-y-3"
+                     x-data="{
+                         openGroups: {
+                             carousel: @js(in_array($template, ['chantier_detail','step_by_step','guide_pedagogique'])),
+                             custom:   @js($template === 'custom')
+                         }
+                     }">
                     @foreach($templateGroups as $group)
-                    <div>
-                        <div class="flex items-center gap-3 mb-3">
+                    @php $isCollapsible = in_array($group['key'], ['carousel', 'custom']); @endphp
+
+                    <div x-data="{}" {{ $isCollapsible ? '' : '' }}>
+                        {{-- Group header --}}
+                        @if($isCollapsible)
+                        <button type="button"
+                                @click="openGroups['{{ $group['key'] }}'] = !openGroups['{{ $group['key'] }}']"
+                                class="w-full flex items-center gap-3 py-2 px-1 rounded-lg hover:bg-gray-50 transition-colors group">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $group['category'] }}</span>
+                            @if($group['badge'])
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-copper bg-amber-50 px-2 py-0.5 rounded-full">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                                    {{ $group['badge'] }}
+                                </span>
+                            @endif
+                            <div class="flex-1 h-px bg-gray-100"></div>
+                            <svg class="w-4 h-4 text-gray-300 group-hover:text-copper transition-all duration-200 shrink-0"
+                                 :class="openGroups['{{ $group['key'] }}'] ? 'rotate-180' : ''"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        @else
+                        <div class="flex items-center gap-3 mb-3 px-1">
                             <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $group['category'] }}</span>
                             @if($group['badge'])
                                 <span class="inline-flex items-center gap-1 text-[10px] font-bold text-copper bg-amber-50 px-2 py-0.5 rounded-full">
@@ -255,17 +320,26 @@
                             @endif
                             <div class="flex-1 h-px bg-gray-100"></div>
                         </div>
+                        @endif
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 {{ $group['key'] === 'single' ? 'lg:grid-cols-3' : 'lg:grid-cols-3' }} gap-3">
+                        {{-- Templates grid --}}
+                        <div
+                            @if($isCollapsible)
+                            x-show="openGroups['{{ $group['key'] }}']"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 -translate-y-1"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 translate-y-0"
+                            x-transition:leave-end="opacity-0 -translate-y-1"
+                            @endif
+                            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 {{ $isCollapsible ? 'mt-3' : '' }}">
                             @foreach($group['templates'] as $tpl)
                             @php
                                 $isCustomTpl = $group['key'] === 'custom';
                                 $isSelected  = $isCustomTpl
                                     ? ($template === 'custom' && $customTemplateId == ($tpl['custom_id'] ?? null))
                                     : ($template === $tpl['id']);
-                                $clickAction = $isCustomTpl
-                                    ? "wire:\$dispatch('selectCustomTemplate', { id: {$tpl['custom_id']} })"
-                                    : "wire:click=\"\$set('template', '{$tpl['id']}')\"; \$wire.customTemplateId = null";
                             @endphp
                             <button type="button"
                                     @if($isCustomTpl)
@@ -774,19 +848,128 @@
                             Le post sera généré et ajouté à vos créations immédiatement.
                         </div>
                     @else
-                        <div class="space-y-2">
-                            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Date & heure de publication</label>
-                            <input type="datetime-local"
-                                   wire:model="scheduledAt"
-                                   min="{{ now()->addMinutes(5)->format('Y-m-d\TH:i') }}"
-                                   class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-copper focus:ring-2 focus:ring-copper/10 transition-all">
+                        {{-- Custom date/time picker --}}
+                        <div
+                            x-data="{
+                                selDay: null,
+                                selHour: null,
+                                selMin: null,
+                                days: [],
+                                hours: [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],
+                                mins: [0,15,30,45],
+                                init() {
+                                    const today = new Date();
+                                    for (let i = 0; i < 14; i++) {
+                                        const d = new Date(today);
+                                        d.setDate(today.getDate() + i);
+                                        this.days.push(d);
+                                    }
+                                    this.selDay  = this.days[0];
+                                    this.selHour = 9;
+                                    this.selMin  = 0;
+                                    this.sync();
+                                },
+                                dayLabel(d) {
+                                    const labels = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+                                    const today  = new Date();
+                                    today.setHours(0,0,0,0);
+                                    const dd = new Date(d);
+                                    dd.setHours(0,0,0,0);
+                                    const diff = Math.round((dd - today) / 86400000);
+                                    if (diff === 0) return 'Auj.';
+                                    if (diff === 1) return 'Dem.';
+                                    return labels[d.getDay()];
+                                },
+                                dayNum(d)   { return d.getDate(); },
+                                monthShort(d) {
+                                    return ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'][d.getMonth()];
+                                },
+                                isSameDay(a, b) {
+                                    if (!a || !b) return false;
+                                    return a.getDate()===b.getDate() && a.getMonth()===b.getMonth() && a.getFullYear()===b.getFullYear();
+                                },
+                                pad(n) { return String(n).padStart(2,'0'); },
+                                sync() {
+                                    if (!this.selDay) return;
+                                    const d = new Date(this.selDay);
+                                    d.setHours(this.selHour ?? 9, this.selMin ?? 0, 0, 0);
+                                    const fmt = d.getFullYear()+'-'+this.pad(d.getMonth()+1)+'-'+this.pad(d.getDate())+'T'+this.pad(d.getHours())+':'+this.pad(d.getMinutes());
+                                    $wire.set('scheduledAt', fmt);
+                                },
+                                summary() {
+                                    if (!this.selDay) return '';
+                                    const dayNames = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+                                    const months   = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+                                    return dayNames[this.selDay.getDay()] + ' ' + this.selDay.getDate() + ' ' + months[this.selDay.getMonth()] + ' à ' + this.pad(this.selHour) + 'h' + this.pad(this.selMin);
+                                }
+                            }"
+                            class="space-y-4">
+
+                            {{-- Day chips --}}
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Jour</p>
+                                <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x">
+                                    <template x-for="(d, i) in days" :key="i">
+                                        <button type="button"
+                                                @click="selDay = d; sync()"
+                                                :class="isSameDay(selDay, d)
+                                                    ? 'bg-copper text-white border-copper shadow-sm shadow-copper/20'
+                                                    : 'bg-white text-gray-600 border-gray-200 hover:border-copper/40 hover:text-copper'"
+                                                class="flex flex-col items-center justify-center min-w-[52px] h-[62px] rounded-xl border-2 transition-all duration-150 snap-start shrink-0 cursor-pointer">
+                                            <span class="text-[10px] font-bold uppercase tracking-wide leading-none" x-text="dayLabel(d)"></span>
+                                            <span class="text-lg font-black leading-tight mt-0.5" x-text="dayNum(d)"></span>
+                                            <span class="text-[9px] leading-none opacity-70" x-text="monthShort(d)"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            {{-- Hour chips --}}
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Heure</p>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <template x-for="h in hours" :key="h">
+                                        <button type="button"
+                                                @click="selHour = h; sync()"
+                                                :class="selHour === h
+                                                    ? 'bg-copper text-white border-copper'
+                                                    : 'bg-white text-gray-600 border-gray-200 hover:border-copper/40 hover:text-copper'"
+                                                class="w-10 h-8 rounded-lg border-2 text-xs font-semibold transition-all duration-150 cursor-pointer"
+                                                x-text="pad(h)+'h'"></button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            {{-- Minute chips --}}
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Minutes</p>
+                                <div class="flex gap-2">
+                                    <template x-for="m in mins" :key="m">
+                                        <button type="button"
+                                                @click="selMin = m; sync()"
+                                                :class="selMin === m
+                                                    ? 'bg-copper text-white border-copper'
+                                                    : 'bg-white text-gray-600 border-gray-200 hover:border-copper/40 hover:text-copper'"
+                                                class="flex-1 h-9 rounded-xl border-2 text-sm font-bold transition-all duration-150 cursor-pointer"
+                                                x-text="':'+pad(m)"></button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            {{-- Summary --}}
+                            <div class="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3">
+                                <svg class="w-4 h-4 text-copper shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <p class="text-sm font-semibold text-copper" x-text="summary()"></p>
+                            </div>
+
                             @error('scheduledAt')
                                 <p class="text-red-500 text-xs font-medium flex items-center gap-1.5">
                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     {{ $message }}
                                 </p>
                             @enderror
-                            <p class="text-xs text-gray-400">Le post sera visible dans votre calendrier à la date choisie.</p>
                         </div>
                     @endif
                 </div>

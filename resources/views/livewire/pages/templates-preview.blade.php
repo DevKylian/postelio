@@ -5,7 +5,8 @@ use App\Services\TemplateGeneratorService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-use function Livewire\Volt\{state};
+use function Livewire\Volt\{state, uses};
+uses(\Livewire\WithFileUploads::class);
 
 state([
     'showModal'         => false,
@@ -15,6 +16,8 @@ state([
     'isSaving'          => false,
     'generatedTemplate' => null,
     'errorMessage'      => null,
+    'audioRequest'      => null,
+    'isTranscribing'    => false,
 ]);
 
 $openModal = function () {
@@ -23,6 +26,30 @@ $openModal = function () {
     $this->photoMode         = 'none';
     $this->generatedTemplate = null;
     $this->errorMessage      = null;
+    $this->audioRequest      = null;
+    $this->isTranscribing    = false;
+};
+
+$transcribeAudioRequest = function (
+    \App\Services\PostGeneration\TranscriptionService $transcriber
+) {
+    if (!$this->audioRequest) return;
+
+    $this->isTranscribing = true;
+    $this->errorMessage   = null;
+
+    try {
+        $path = $this->audioRequest->store('temp_memos', 'public');
+        $transcript = $transcriber->transcribe($path);
+        \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+        $this->userRequest   = mb_substr(trim($transcript), 0, 300);
+        $this->audioRequest  = null;
+    } catch (\Throwable $e) {
+        $this->errorMessage = 'La transcription a échoué. Réessayez ou utilisez le mode texte.';
+        \Illuminate\Support\Facades\Log::error('TemplateModal transcription failed: ' . $e->getMessage());
+    } finally {
+        $this->isTranscribing = false;
+    }
 };
 
 $closeModal = function () {
@@ -33,6 +60,8 @@ $closeModal = function () {
     $this->errorMessage      = null;
     $this->isGenerating      = false;
     $this->isSaving          = false;
+    $this->audioRequest      = null;
+    $this->isTranscribing    = false;
 };
 
 $generateTemplate = function () {
@@ -445,21 +474,156 @@ $deleteTemplate = function (int $id) {
             <div class="p-6 space-y-5">
 
                 @if(!$generatedTemplate)
-                {{-- Étape 1 : Demande --}}
-                <div>
-                    <label class="block text-sm font-semibold text-midnight mb-2">Décrivez votre modèle</label>
-                    <textarea wire:model="userRequest"
-                              placeholder="Ex: Je veux un modèle pour annoncer des promotions saisonnières, présenter un nouveau membre de mon équipe, partager une astuce technique..."
-                              rows="4"
-                              class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-copper focus:border-transparent resize-none transition-all"
-                              maxlength="300"></textarea>
-                    <div class="flex items-center justify-between mt-1.5">
-                        @error('userRequest')
-                            <p class="text-xs text-red-500">{{ $message }}</p>
-                        @else
-                            <p class="text-xs text-gray-400">Soyez précis — l'IA s'adaptera à votre description.</p>
-                        @enderror
-                        <span class="text-xs text-gray-400 tabular-nums">{{ strlen($userRequest) }}/300</span>
+                {{-- Étape 1 : Demande — 3 modes --}}
+                <div x-data="{ mode: 'text' }">
+                    <label class="block text-sm font-semibold text-midnight mb-3">Décrivez votre modèle</label>
+
+                    {{-- Mode tabs --}}
+                    <div class="flex bg-gray-100 rounded-xl p-1 gap-1 mb-3">
+                        <button type="button" @click="mode = 'text'"
+                                :class="mode === 'text' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
+                                class="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            Décrire
+                        </button>
+                        <button type="button" @click="mode = 'record'"
+                                :class="mode === 'record' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
+                                class="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                            Enregistrer
+                        </button>
+                        <button type="button" @click="mode = 'import'"
+                                :class="mode === 'import' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
+                                class="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                            Importer
+                        </button>
+                    </div>
+
+                    {{-- Text mode --}}
+                    <div x-show="mode === 'text'" x-transition>
+                        <textarea wire:model="userRequest"
+                                  placeholder="Ex: Je veux un modèle pour annoncer des promotions saisonnières, présenter un nouveau membre de mon équipe, partager une astuce technique..."
+                                  rows="4"
+                                  class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-copper focus:border-transparent resize-none transition-all"
+                                  maxlength="300"></textarea>
+                        <div class="flex items-center justify-between mt-1.5">
+                            @error('userRequest')
+                                <p class="text-xs text-red-500">{{ $message }}</p>
+                            @else
+                                <p class="text-xs text-gray-400">Soyez précis — l'IA s'adaptera à votre description.</p>
+                            @enderror
+                            <span class="text-xs text-gray-400 tabular-nums shrink-0 ml-2">{{ strlen($userRequest) }}/300</span>
+                        </div>
+                    </div>
+
+                    {{-- Record mode --}}
+                    <div x-show="mode === 'record'" x-transition
+                         x-data="{
+                             recording: false, stream: null, recorder: null, chunks: [],
+                             startRec() {
+                                 navigator.mediaDevices.getUserMedia({ audio: true }).then(s => {
+                                     this.stream = s;
+                                     this.recorder = new MediaRecorder(s);
+                                     this.chunks = [];
+                                     this.recorder.ondataavailable = e => this.chunks.push(e.data);
+                                     this.recorder.onstop = () => {
+                                         const blob = new Blob(this.chunks, { type: 'audio/webm' });
+                                         const file = new File([blob], 'memo.webm', { type: 'audio/webm' });
+                                         const dt = new DataTransfer();
+                                         dt.items.add(file);
+                                         const input = document.getElementById('modalAudioUpload');
+                                         input.files = dt.files;
+                                         input.dispatchEvent(new Event('change'));
+                                     };
+                                     this.recorder.start();
+                                     this.recording = true;
+                                 });
+                             },
+                             stopRec() {
+                                 this.recorder?.stop();
+                                 this.stream?.getTracks().forEach(t => t.stop());
+                                 this.recording = false;
+                             }
+                         }">
+                        <div class="flex flex-col items-center gap-4 py-4">
+                            <button type="button"
+                                    @click="recording ? stopRec() : startRec()"
+                                    :class="recording ? 'bg-red-500 hover:bg-red-600 shadow-red-200' : 'bg-copper hover:bg-amber-500 shadow-copper/20'"
+                                    class="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg transition-all duration-200 active:scale-95">
+                                <template x-if="!recording">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                                </template>
+                                <template x-if="recording">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+                                </template>
+                            </button>
+                            <p class="text-sm text-gray-500 text-center" x-text="recording ? 'Enregistrement... Cliquez pour arrêter' : 'Cliquez pour enregistrer votre description'"></p>
+                            <div x-show="recording" class="flex gap-1">
+                                <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce" style="animation-delay:0ms"></span>
+                                <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce" style="animation-delay:150ms"></span>
+                                <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce" style="animation-delay:300ms"></span>
+                            </div>
+                        </div>
+                        <input type="file" id="modalAudioUpload" wire:model="audioRequest" accept="audio/*" class="hidden">
+                        @if($isTranscribing)
+                            <div class="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-copper font-medium">
+                                <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                                Transcription en cours...
+                            </div>
+                        @elseif($audioRequest && !$isTranscribing)
+                            <div class="flex items-center gap-3 mt-2">
+                                <div class="flex-1 flex items-center gap-2 bg-green-50 border border-green-100 rounded-xl px-3 py-2 text-xs text-green-700 font-medium">
+                                    <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    Audio prêt
+                                </div>
+                                <button type="button" wire:click="transcribeAudioRequest"
+                                        class="px-4 py-2 bg-copper text-white text-xs font-bold rounded-xl hover:bg-amber-500 transition-colors">
+                                    Transcrire
+                                </button>
+                            </div>
+                        @elseif($userRequest && !$isTranscribing)
+                            <div class="flex items-center gap-2 mt-2 bg-green-50 border border-green-100 rounded-xl px-3 py-2 text-xs text-green-700 font-medium">
+                                <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Transcription prête — passez en mode "Décrire" pour modifier.
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Import mode --}}
+                    <div x-show="mode === 'import'" x-transition>
+                        <label class="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-200 rounded-xl px-6 py-8 cursor-pointer hover:border-copper/40 hover:bg-amber-50/30 transition-all group">
+                            <svg class="w-8 h-8 text-gray-300 group-hover:text-copper transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                            <div class="text-center">
+                                <p class="text-sm font-semibold text-gray-600 group-hover:text-copper transition-colors">Glissez un fichier audio</p>
+                                <p class="text-xs text-gray-400 mt-0.5">MP3, M4A, WAV, WebM — max 10 Mo</p>
+                            </div>
+                            <input type="file" wire:model="audioRequest" accept="audio/*" class="hidden">
+                        </label>
+                        @if($isTranscribing)
+                            <div class="flex items-center gap-2 mt-3 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-copper font-medium">
+                                <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                                Transcription en cours...
+                            </div>
+                        @elseif($audioRequest && !$isTranscribing)
+                            <div class="flex items-center gap-3 mt-3">
+                                <div class="flex-1 flex items-center gap-2 bg-green-50 border border-green-100 rounded-xl px-3 py-2 text-xs text-green-700 font-medium">
+                                    <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    Fichier chargé
+                                </div>
+                                <button type="button" wire:click="transcribeAudioRequest"
+                                        class="px-4 py-2 bg-copper text-white text-xs font-bold rounded-xl hover:bg-amber-500 transition-colors">
+                                    Transcrire
+                                </button>
+                            </div>
+                        @elseif($userRequest && !$isTranscribing)
+                            <div class="flex items-center gap-2 mt-3 bg-green-50 border border-green-100 rounded-xl px-3 py-2 text-xs text-green-700 font-medium">
+                                <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Transcription prête — passez en mode "Décrire" pour modifier.
+                            </div>
+                        @endif
                     </div>
                 </div>
 

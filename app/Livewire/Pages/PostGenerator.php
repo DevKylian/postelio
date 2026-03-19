@@ -40,6 +40,7 @@ class PostGenerator extends Component
     public $targetSlides  = '5';   // guide_pedagogique: desired slide count
     public $customNote      = '';    // any template: free-form extra context for AI
     public $customTemplateId = null; // ID of the selected CustomTemplate when template='custom'
+    public $textContent     = '';    // Free-text alternative to audio
     public $isAnalyzing     = false;
     public $analysisSuccess  = false;
 
@@ -106,8 +107,11 @@ class PostGenerator extends Component
             $needsExtra = $photoMode === 'carousel';
         }
 
+        $hasInput = $this->audio || !empty(trim($this->textContent));
+
         return [
-            'audio'         => 'required|max:10240',
+            'audio'         => (!$hasInput || $this->audio) ? 'nullable|max:10240' : 'nullable',
+            'textContent'   => (!$this->audio) ? 'required_without:audio|string|max:2000' : 'nullable|string|max:2000',
             'template'      => 'required|in:review,project,faq,lifestyle,quality_focus,conseil_saisonnier,erreur_a_eviter,chantier_detail,step_by_step,guide_pedagogique,custom',
             'imageBefore'   => ($needsPhoto && !$needsExtra) ? 'required|image|max:5120' : 'nullable|image|max:5120',
             'imageAfter'    => $needsAfter ? 'required|image|max:5120' : 'nullable',
@@ -130,10 +134,16 @@ class PostGenerator extends Component
     {
         $this->validate();
 
+        // Require at least audio OR text
+        if (!$this->audio && empty(trim($this->textContent))) {
+            $this->addError('audio', 'Enregistrez un mémo, importez un fichier audio, ou saisissez votre texte.');
+            return;
+        }
+
         $this->status = 'processing';
 
         // Store files
-        $audioPath       = $this->audio->store('memos', 'public');
+        $audioPath       = $this->audio ? $this->audio->store('memos', 'public') : null;
         $imageBeforePath = $this->imageBefore ? $this->imageBefore->store('projects', 'public') : null;
         $imageAfterPath  = $this->imageAfter  ? $this->imageAfter->store('projects', 'public')  : null;
 
@@ -175,6 +185,7 @@ class PostGenerator extends Component
             'custom_visual_style'    => $customVisualStyle,
             'custom_template_name'   => $customTemplateName,
             'custom_photo_mode'      => $customPhotoModeOpt,
+            'text_content'           => (!$this->audio && !empty(trim($this->textContent))) ? trim($this->textContent) : null,
         ];
 
         $post = Post::create([

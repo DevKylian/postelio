@@ -311,24 +311,27 @@ class PostGenerator extends Component
     {
         $post = Post::find($this->generatedPostId);
 
-        if ($post && $post->user_id === Auth::id()) {
-            $post->update(['status' => 'completed']);
+        if (!$post || $post->user_id !== Auth::id()) return;
 
-            $company = Auth::user()->company;
-            if ($company && $company->instagram_connected) {
-                $scheduledAt = $post->scheduled_at;
+        $post->update(['status' => 'completed']);
 
-                if ($scheduledAt && $scheduledAt->isFuture()) {
-                    // Publication différée : on met en attente jusqu'à la date choisie
-                    PublishToInstagramJob::dispatch($post->id)->delay($scheduledAt);
-                } else {
-                    // Pas de date ou date passée : publication immédiate
-                    PublishToInstagramJob::dispatch($post->id);
-                }
+        $company    = Auth::user()->company;
+        $scheduledAt = $post->scheduled_at;
+
+        if ($company && $company->instagram_connected) {
+            // Ne dispatcher QUE si publication immédiate (pas de date future)
+            if (!$scheduledAt || !$scheduledAt->isFuture()) {
+                PublishToInstagramJob::dispatch($post->id);
             }
+            // Pour les posts programmés dans le futur : le scheduler Laravel
+            // (routes/console.php) dispatche le job au bon moment.
         }
 
-        return redirect()->route('posts.index')->with('success', 'Votre post a été validé et ajouté à vos créations !');
+        $message = ($scheduledAt && $scheduledAt->isFuture())
+            ? 'Post planifié pour le ' . $scheduledAt->translatedFormat('d/m/Y à H\hi') . ' !'
+            : 'Votre post a été validé et ajouté à vos créations !';
+
+        return redirect()->route('posts.index')->with('success', $message);
     }
 
     public function discardPost()

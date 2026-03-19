@@ -1016,21 +1016,42 @@
                 </div>
             </div>
 
-            {{-- Preview grid --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+            {{-- Instagram Post Preview --}}
+            <div class="flex justify-center">
+                <div class="w-full max-w-[430px] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
 
-                {{-- Image --}}
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    {{-- Header Instagram --}}
+                    <div class="flex items-center justify-between px-3.5 py-3">
+                        <div class="flex items-center gap-2.5">
+                            {{-- Avatar --}}
+                            <div class="w-9 h-9 rounded-full overflow-hidden shrink-0 ring-2 ring-offset-1" style="ring-color: {{ $brandColor }}; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px {{ $brandColor }}">
+                                @if($hasLogo)
+                                    <img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="w-full h-full object-cover">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center text-white font-bold text-sm"
+                                         style="background: linear-gradient(135deg, {{ $brandColor }}, {{ $brandColor }}bb)">
+                                        {{ strtoupper(substr($company?->name ?? 'E', 0, 1)) }}
+                                    </div>
+                                @endif
+                            </div>
+                            <div>
+                                <p class="text-[13px] font-semibold text-black leading-none">{{ $igUsername }}</p>
+                                <p class="text-[11px] text-gray-500 leading-none mt-0.5">{{ $igCity }}</p>
+                            </div>
+                        </div>
+                        {{-- Kebab menu --}}
+                        <svg class="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24">
+                            <circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>
+                        </svg>
+                    </div>
+
+                    {{-- Image / Carousel --}}
                     @if(count($previewSlides) > 1)
                         <div x-data="{ current: 0, total: {{ count($previewSlides) }} }"
-                             class="relative aspect-square select-none">
+                             class="relative aspect-square select-none bg-black">
                             <div class="relative w-full h-full overflow-hidden"
                                  x-on:touchstart="$el._tx = $event.changedTouches[0].clientX"
-                                 x-on:touchend="
-                                    let dx = $event.changedTouches[0].clientX - $el._tx;
-                                    if (dx < -40 && current < total - 1) current++;
-                                    if (dx >  40 && current > 0) current--;
-                                 ">
+                                 x-on:touchend="let dx=$event.changedTouches[0].clientX-$el._tx; if(dx<-40&&current<total-1)current++; if(dx>40&&current>0)current--;">
                                 @foreach($previewSlides as $idx => $slideUrl)
                                 <div x-show="current === {{ $idx }}"
                                      x-transition:enter="transition-opacity duration-200"
@@ -1041,41 +1062,67 @@
                                 </div>
                                 @endforeach
                             </div>
-
                             <button x-show="current > 0" @click="current--"
-                                    class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors z-10 backdrop-blur-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
+                                    class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center z-10 backdrop-blur-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                             </button>
                             <button x-show="current < total - 1" @click="current++"
-                                    class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors z-10 backdrop-blur-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center z-10 backdrop-blur-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                             </button>
-
-                            <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10">
+                            {{-- Dots Instagram --}}
+                            <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1 z-10">
                                 @foreach($previewSlides as $idx => $slideUrl)
-                                <button @click="current = {{ $idx }}"
-                                        :class="current === {{ $idx }} ? 'bg-white w-5' : 'bg-white/40 w-2'"
-                                        class="h-1.5 rounded-full transition-all duration-300"></button>
+                                <div :class="current === {{ $idx }} ? 'w-2 h-2 bg-[#3897f0]' : 'w-1.5 h-1.5 bg-white/50'"
+                                     class="rounded-full transition-all duration-200"></div>
                                 @endforeach
                             </div>
-
-                            <div class="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-full z-10"
-                                 x-text="(current + 1) + ' / ' + total"></div>
+                            <div class="absolute top-3 right-3 bg-black/40 backdrop-blur-sm text-white text-[11px] font-bold px-2 py-0.5 rounded-full z-10"
+                                 x-text="(current + 1) + '/' + total"></div>
                         </div>
                     @elseif($previewImageUrl)
-                        <img src="{{ $previewImageUrl }}" alt="Post généré" class="w-full aspect-square object-cover">
-                    @endif
-                </div>
-
-                {{-- Caption --}}
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
-                    <div>
-                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Texte du post</p>
-                        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100 min-h-[200px] max-h-[320px] overflow-y-auto">
-                            <p class="text-midnight text-sm leading-relaxed whitespace-pre-line">{{ $previewContent }}</p>
+                        <div class="aspect-square bg-black">
+                            <img src="{{ $previewImageUrl }}" alt="Post généré" class="w-full h-full object-cover">
                         </div>
+                    @endif
+
+                    {{-- Actions Instagram --}}
+                    <div class="px-3.5 pt-3 pb-5 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                {{-- Like --}}
+                                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                                {{-- Comment --}}
+                                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                </svg>
+                                {{-- Share --}}
+                                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                                </svg>
+                            </div>
+                            {{-- Bookmark --}}
+                            <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                            </svg>
+                        </div>
+
+                        {{-- Likes --}}
+                        <p class="text-[13px] font-semibold text-black">247 J'aime</p>
+
+                        {{-- Caption avec expand --}}
+                        <div x-data="{ exp: false }" class="text-[13px] text-black leading-snug">
+                            <span class="font-semibold">{{ $igUsername }}</span>
+                            <span x-show="!exp" class="ml-1">{{ Str::limit($previewContent ?? '', 130) }}@if(strlen($previewContent ?? '') > 130)<button @click="exp = true" class="text-gray-400 font-medium ml-0.5">... plus</button>@endif</span>
+                            <span x-show="exp" x-cloak class="ml-1 whitespace-pre-line">{{ $previewContent }}</span>
+                        </div>
+
+                        {{-- Date --}}
+                        <p class="text-[11px] text-gray-400 uppercase tracking-wide pt-0.5">Il y a 2 jours</p>
                     </div>
-                    <p class="text-xs text-gray-400 leading-relaxed">Copiez ce texte pour le modifier selon vos envies avant de le poster sur vos réseaux.</p>
+
                 </div>
             </div>
 

@@ -92,10 +92,19 @@ class PostGenerator extends Component
 
     protected function rules()
     {
-        $isCarousel     = in_array($this->template, self::CAROUSEL_TEMPLATES);
-        $needsPhoto     = in_array($this->template, self::PHOTO_TEMPLATES);
-        $needsAfter     = in_array($this->template, self::BEFORE_AFTER_TEMPLATES);
-        $needsExtra     = in_array($this->template, ['chantier_detail', 'step_by_step']);
+        $needsPhoto = in_array($this->template, self::PHOTO_TEMPLATES);
+        $needsAfter = in_array($this->template, self::BEFORE_AFTER_TEMPLATES);
+        $needsExtra = in_array($this->template, ['chantier_detail', 'step_by_step']);
+
+        // For custom templates, derive photo requirements from the saved photo_mode
+        if ($this->template === 'custom' && $this->customTemplateId) {
+            $ct = CustomTemplate::where('id', $this->customTemplateId)
+                                ->where('user_id', Auth::id())
+                                ->first();
+            $photoMode = $ct?->photo_mode ?? 'none';
+            $needsPhoto = $photoMode === 'single';
+            $needsExtra = $photoMode === 'carousel';
+        }
 
         return [
             'audio'         => 'required|max:10240',
@@ -266,6 +275,12 @@ class PostGenerator extends Component
             ->orderByDesc('created_at')
             ->get();
 
-        return view('livewire.pages.post-generator', compact('customTemplates'));
+        $customPhotoMode = 'none';
+        if ($this->template === 'custom' && $this->customTemplateId) {
+            $ct = $customTemplates->firstWhere('id', $this->customTemplateId);
+            $customPhotoMode = $ct?->photo_mode ?? 'none';
+        }
+
+        return view('livewire.pages.post-generator', compact('customTemplates', 'customPhotoMode'));
     }
 }

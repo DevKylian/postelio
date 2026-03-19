@@ -582,13 +582,13 @@
             {{-- REMOVED OLD STEP 2 POSITION --}}
 
             {{-- ── STEP 4 : Photos (conditionnel) ── --}}
-            @if(in_array($template, ['project', 'lifestyle', 'quality_focus']))
+            @if(in_array($template, ['project', 'lifestyle', 'quality_focus']) || ($template === 'custom' && $customPhotoMode === 'single'))
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
                     <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>
                     <div>
                         <h3 class="font-semibold text-midnight text-base">
-                            {{ $template === 'project' ? 'Photos Avant & Après' : ($template === 'quality_focus' ? 'Photo du matériel' : 'Photo Lifestyle') }}
+                            {{ $template === 'project' ? 'Photos Avant & Après' : ($template === 'quality_focus' ? 'Photo du matériel' : ($template === 'custom' ? 'Photo requise' : 'Photo Lifestyle')) }}
                         </h3>
                         <p class="text-xs text-gray-400 mt-0.5">
                             {{ $template === 'project' ? 'Uploadez les deux photos pour le split Avant / Après.' : 'Uploadez la photo principale du post.' }}
@@ -667,7 +667,7 @@
             @endif
 
             {{-- ── STEP 4 : Photos carrousel ── --}}
-            @if(in_array($template, ['chantier_detail', 'step_by_step']))
+            @if(in_array($template, ['chantier_detail', 'step_by_step']) || ($template === 'custom' && $customPhotoMode === 'carousel'))
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
                     <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>

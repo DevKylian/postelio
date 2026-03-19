@@ -10,6 +10,7 @@ use function Livewire\Volt\{state, mount};
 state([
     'showModal'         => false,
     'userRequest'       => '',
+    'photoMode'         => 'none',   // none | single | carousel
     'isGenerating'      => false,
     'isSaving'          => false,
     'generatedTemplate' => null,
@@ -34,6 +35,7 @@ $openModal = function () {
 $closeModal = function () {
     $this->showModal         = false;
     $this->userRequest       = '';
+    $this->photoMode         = 'none';
     $this->generatedTemplate = null;
     $this->errorMessage      = null;
     $this->isGenerating      = false;
@@ -74,6 +76,7 @@ $saveTemplate = function () {
             'description'  => $this->generatedTemplate['description'],
             'ai_prompt'    => $this->generatedTemplate['ai_prompt'],
             'visual_style' => $this->generatedTemplate['visual_style'],
+            'photo_mode'   => $this->photoMode,
         ]);
 
         $this->customTemplates = CustomTemplate::where('user_id', Auth::id())
@@ -441,6 +444,28 @@ $deleteTemplate = function (int $id) {
                             <p class="text-xs text-gray-400">Soyez précis — l'IA s'adaptera à votre description.</p>
                         @enderror
                         <span class="text-xs text-gray-400 tabular-nums">{{ strlen($userRequest) }}/300</span>
+                    </div>
+                </div>
+
+                {{-- Photo mode --}}
+                <div>
+                    <label class="block text-sm font-semibold text-midnight mb-2">Ce modèle nécessite des photos ?</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        @foreach([
+                            ['value' => 'none',     'label' => 'Aucune photo',     'icon' => 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636', 'desc' => 'Post 100% textuel'],
+                            ['value' => 'single',   'label' => '1 photo',          'icon' => 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z', 'desc' => 'Photo simple'],
+                            ['value' => 'carousel', 'label' => 'Carrousel',        'icon' => 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', 'desc' => '2 à 5 photos'],
+                        ] as $pm)
+                        <button type="button" wire:click="$set('photoMode', '{{ $pm['value'] }}')"
+                                class="flex flex-col items-center gap-2 p-3 rounded-xl border-2 text-center transition-all duration-150
+                                    {{ $photoMode === $pm['value'] ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white hover:border-gray-300' }}">
+                            <svg class="w-5 h-5 {{ $photoMode === $pm['value'] ? 'text-indigo-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $pm['icon'] }}"/>
+                            </svg>
+                            <span class="text-xs font-bold {{ $photoMode === $pm['value'] ? 'text-indigo-700' : 'text-gray-600' }}">{{ $pm['label'] }}</span>
+                            <span class="text-[10px] text-gray-400">{{ $pm['desc'] }}</span>
+                        </button>
+                        @endforeach
                     </div>
                 </div>
 

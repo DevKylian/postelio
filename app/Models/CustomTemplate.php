@@ -13,6 +13,7 @@ class CustomTemplate extends Model
         'description',
         'ai_prompt',
         'visual_style',
+        'photo_mode',
     ];
 
     public function user()

@@ -17,11 +17,28 @@ class ContentRefinerService
     public function refine(string $transcript, string $template, int $photoCount = 0, array $options = []): string
     {
         $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique']);
+
+        // ── Règle fondamentale anti-invention — s'applique à TOUS les templates ──
+        $noHallucinateGlobal = "RÈGLE FONDAMENTALE — Anti-invention (priorité absolue) :\n"
+            . "Utilise UNIQUEMENT les informations explicitement présentes dans la transcription fournie.\n"
+            . "N'invente jamais de noms, prénoms, chiffres, dates, réalisations ou détails absents du vocal.\n"
+            . "Si le mémo est court ou vague, génère un post court et sobre qui reste dans ce cadre — "
+            . "ne complète JAMAIS avec du contenu inventé pour le rendre plus complet.\n"
+            . "Adapte la longueur et la richesse de la légende à la richesse du mémo vocal : mémo court = légende courte.\n\n";
+
         $noMarkdownPrefix = "RÈGLE DE FORMAT STRICTE :\n"
             . "- Jamais de Markdown : aucun **, aucun *, aucun _, aucun #. Instagram n'en supporte pas.\n"
             . "- Structure la légende avec de vrais sauts de ligne entre chaque idée/paragraphe (retour à la ligne simple entre deux phrases liées, ligne vide entre deux blocs distincts).\n"
             . "- Exemple de structure attendue : accroche sur une ligne, ligne vide, corps espacé point par point, ligne vide, call-to-action, ligne vide, hashtags.\n\n";
-        $prompt = $noMarkdownPrefix . $this->getPromptForTemplate($template, $photoCount, $options);
+
+        $prompt = $noHallucinateGlobal . $noMarkdownPrefix . $this->getPromptForTemplate($template, $photoCount, $options);
+
+        // ── Simplification à la demande ──────────────────────────────────────────
+        if (!empty($options['simplified'])) {
+            $prompt .= "\n\nSIMPLIFICATION DEMANDÉE : Génère une légende TRÈS COURTE (80-130 caractères maximum). "
+                . "Va à l'essentiel : une phrase principale + 2-3 hashtags. Pas de storytelling. Pas de liste.";
+        }
+
         $maxTokens = $isCarousel ? 1200 : 600;
 
         $response = OpenAI::chat()->create([
@@ -31,7 +48,7 @@ class ContentRefinerService
                 ['role' => 'user', 'content' => "Voici le contenu à transformer : " . $transcript . "\n\nRAPPEL : n'utilise aucun formatage Markdown (**gras**, *italique*, _souligné_, # titres). Texte brut uniquement."],
             ],
             'max_tokens' => $maxTokens,
-            'temperature' => 0.7,
+            'temperature' => 0.4,
             'response_format' => ['type' => 'json_object'],
         ]);
 
@@ -193,8 +210,7 @@ IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponct
                 'custom' => (function () use ($options, $noRefuseRule, $toneInstruction, $hashtagInstruction, $extraNote, $includeHashtags) {
                 $customPrompt = $options['custom_template_prompt'] ?? null;
                 if ($customPrompt) {
-                    $noHallucinate = "RÈGLE CRITIQUE — Anti-hallucination : Base-toi STRICTEMENT et UNIQUEMENT sur les informations contenues dans le mémo vocal. N'invente jamais de noms, prénoms, chiffres, réalisations ou détails absents de la transcription. Si le mémo est court ou générique (une seule phrase, peu de détails), génère un post court et sobre qui reste dans ce cadre — ne complète JAMAIS avec du contenu inventé. Adapte la longueur de la légende à la richesse du mémo : un mémo court = légende courte. Ne jamais supposer des compétences, des personnes ou des réalisations non mentionnées.";
-                    return "{$noRefuseRule}\n{$noHallucinate}\n\n{$customPrompt}"
+                    return "{$customPrompt}"
                         . "\n\n{$toneInstruction}"
                         . "\n" . ($includeHashtags ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende." : "N'ajoute aucun hashtag.")
                         . ($extraNote ? "\n{$extraNote}" : "");

@@ -1115,11 +1115,25 @@
                         {{-- Likes --}}
                         <p class="text-[13px] font-semibold text-black">247 J'aime</p>
 
-                        {{-- Caption avec expand --}}
-                        <div x-data="{ exp: false }" class="text-[13px] text-black leading-relaxed">
-                            <p class="font-semibold leading-tight mb-1">{{ $igUsername }}</p>
+                        {{-- Caption avec expand + bouton copier --}}
+                        <div x-data="{ exp: false, copied: false }" class="text-[13px] text-black leading-relaxed">
+                            <div class="flex items-center justify-between mb-1">
+                                <p class="font-semibold leading-tight">{{ $igUsername }}</p>
+                                {{-- Bouton copier le texte --}}
+                                <button
+                                    @click="navigator.clipboard.writeText($refs.captionFull.innerText).then(() => { copied = true; setTimeout(() => copied = false, 2000) })"
+                                    class="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg border transition-all duration-200"
+                                    :class="copied ? 'border-green-300 text-green-600 bg-green-50' : 'border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-600'">
+                                    <svg x-show="!copied" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                    <svg x-show="copied" x-cloak class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    <span x-text="copied ? 'Copié !' : 'Copier'"></span>
+                                </button>
+                            </div>
+                            {{-- Texte visible (tronqué ou complet) --}}
                             <div x-show="!exp" class="whitespace-pre-line">{{ Str::limit($previewContent ?? '', 200) }}@if(strlen($previewContent ?? '') > 200) <button @click="exp = true" class="text-gray-400 font-medium">... plus</button>@endif</div>
                             <div x-show="exp" x-cloak class="whitespace-pre-line">{{ $previewContent }}</div>
+                            {{-- Texte complet caché pour la copie --}}
+                            <span x-ref="captionFull" class="hidden">{{ $previewContent }}</span>
                         </div>
 
                         {{-- Date --}}
@@ -1153,6 +1167,37 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                         Rejeter
+                    </button>
+                </div>
+
+                {{-- Régénération --}}
+                <div class="flex flex-col sm:flex-row gap-2 w-full max-w-[540px] mt-1">
+                    {{-- Régénérer --}}
+                    <button wire:click="regeneratePost(false)" wire:loading.attr="disabled"
+                            wire:loading.class="opacity-60 cursor-not-allowed"
+                            class="flex-1 flex items-center justify-center gap-2 border border-gray-200 bg-white text-gray-600 font-medium py-2.5 px-4 rounded-xl hover:border-copper hover:text-copper hover:bg-copper/5 transition-all duration-200 text-sm disabled:opacity-60">
+                        <span wire:loading.remove wire:target="regeneratePost(false)" class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            Régénérer le texte
+                        </span>
+                        <span wire:loading wire:target="regeneratePost(false)" class="flex items-center gap-2 animate-pulse">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            Génération...
+                        </span>
+                    </button>
+
+                    {{-- Régénérer en simplifiant --}}
+                    <button wire:click="regeneratePost(true)" wire:loading.attr="disabled"
+                            wire:loading.class="opacity-60 cursor-not-allowed"
+                            class="flex-1 flex items-center justify-center gap-2 border border-gray-200 bg-white text-gray-500 font-medium py-2.5 px-4 rounded-xl hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50/50 transition-all duration-200 text-sm disabled:opacity-60">
+                        <span wire:loading.remove wire:target="regeneratePost(true)" class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            Version courte
+                        </span>
+                        <span wire:loading wire:target="regeneratePost(true)" class="flex items-center gap-2 animate-pulse">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            Génération...
+                        </span>
                     </button>
                 </div>
             </div>

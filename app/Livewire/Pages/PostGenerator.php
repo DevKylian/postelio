@@ -250,6 +250,63 @@ class PostGenerator extends Component
         }
     }
 
+    public function regeneratePost(bool $simplified = false): void
+    {
+        $post = Post::where('id', $this->generatedPostId)
+                    ->where('user_id', Auth::id())
+                    ->first();
+
+        if (!$post || !$post->transcription) return;
+
+        $this->status = 'processing';
+        $post->update(['status' => 'processing']);
+
+        try {
+            $refiner   = app(\App\Services\PostGeneration\ContentRefinerService::class);
+            $generator = app(\App\Services\PostGeneration\ImageGeneratorService::class);
+
+            $photoCount      = count($post->extra_images ?? []);
+            $templateOptions = $post->template_options ?? [];
+            if ($simplified) {
+                $templateOptions['simplified'] = true;
+            }
+
+            $refined = $refiner->refine($post->transcription, $post->template, $photoCount, $templateOptions);
+            $post->update(['refined_content' => $refined]);
+
+            $result = $generator->generate($post->fresh());
+
+            if (is_array($result)) {
+                $post->update(['image_path' => $result[0], 'slides' => $result, 'status' => 'review_pending']);
+            } else {
+                $post->update(['image_path' => $result, 'status' => 'review_pending']);
+            }
+
+            $post->refresh();
+            $this->previewContent = $post->caption;
+
+            if ($post->slides && count($post->slides) > 0) {
+                $this->previewSlides  = array_map(
+                    fn($p) => \Illuminate\Support\Facades\Storage::url($p),
+                    $post->slides
+                );
+                $this->previewImageUrl = $this->previewSlides[0];
+            } else {
+                $this->previewImageUrl = $post->image_path
+                    ? \Illuminate\Support\Facades\Storage::url($post->image_path)
+                    : null;
+                $this->previewSlides = [];
+            }
+
+            $this->status = 'review_pending';
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('regeneratePost failed', ['error' => $e->getMessage()]);
+            $this->errorMessage = $e->getMessage();
+            $this->status = 'failed';
+            $post->update(['status' => 'failed']);
+        }
+    }
+
     public function validatePost()
     {
         $post = Post::find($this->generatedPostId);

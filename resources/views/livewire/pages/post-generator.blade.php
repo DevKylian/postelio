@@ -248,7 +248,7 @@
                         <div class="flex items-center gap-3 mb-3">
                             <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $group['category'] }}</span>
                             @if($group['badge'])
-                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full">
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-copper bg-amber-50 px-2 py-0.5 rounded-full">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
                                     {{ $group['badge'] }}
                                 </span>
@@ -275,23 +275,20 @@
                                     @endif
                                     class="group relative flex flex-col gap-3 p-4 rounded-xl border-2 text-left transition-all duration-200
                                         {{ $isSelected
-                                            ? ($isCustomTpl ? 'border-indigo-500 bg-indigo-50/50 shadow-sm' : 'border-copper bg-copper/[0.04] shadow-sm')
+                                            ? 'border-copper bg-copper/[0.04] shadow-sm'
                                             : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/50' }}">
 
                                 <div class="flex items-start justify-between">
                                     <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200
                                         {{ $isSelected
-                                            ? ($isCustomTpl ? 'text-white' : 'bg-copper text-white')
-                                            : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}"
-                                         @if($isCustomTpl && $isSelected) style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)"
-                                         @elseif($isCustomTpl && !$isSelected) style="" @endif>
+                                            ? 'bg-copper text-white'
+                                            : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $tpl['icon'] }}" />
                                         </svg>
                                     </div>
                                     @if($isSelected)
-                                    <div class="w-5 h-5 rounded-full flex items-center justify-center {{ $isCustomTpl ? '' : 'bg-copper' }}"
-                                         @if($isCustomTpl) style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)" @endif>
+                                    <div class="w-5 h-5 rounded-full bg-copper flex items-center justify-center">
                                         <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                                         </svg>
@@ -301,11 +298,11 @@
 
                                 <div>
                                     <div class="flex items-center gap-1.5">
-                                        <p class="font-semibold text-sm leading-tight {{ $isSelected ? ($isCustomTpl ? 'text-indigo-600' : 'text-copper') : 'text-midnight' }}">
+                                        <p class="font-semibold text-sm leading-tight {{ $isSelected ? 'text-copper' : 'text-midnight' }}">
                                             {{ $tpl['label'] }}
                                         </p>
                                         @if($isCustomTpl)
-                                            <span class="text-[9px] font-bold text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded-full leading-none">IA</span>
+                                            <span class="text-[9px] font-bold text-copper bg-amber-50 px-1.5 py-0.5 rounded-full leading-none">IA</span>
                                         @endif
                                     </div>
                                     <p class="text-xs text-gray-400 mt-1 leading-relaxed">{{ $tpl['desc'] }}</p>

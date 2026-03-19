@@ -161,6 +161,7 @@ class PostGenerator extends Component
         // For custom templates, inject the template's ai_prompt, visual style and photo_mode
         $customTemplatePrompt = null;
         $customVisualStyle    = null;
+        $customLayoutType     = 'standard';
         $customTemplateName   = null;
         $customPhotoModeOpt   = 'none';
         if ($this->template === 'custom' && $this->customTemplateId) {
@@ -170,6 +171,7 @@ class PostGenerator extends Component
             if ($ct) {
                 $customTemplatePrompt = $ct->ai_prompt;
                 $customVisualStyle    = $ct->visual_style;
+                $customLayoutType     = $ct->layout_type ?? 'standard';
                 $customTemplateName   = $ct->name;
                 $customPhotoModeOpt   = $ct->photo_mode ?? 'none';
             }
@@ -189,6 +191,7 @@ class PostGenerator extends Component
             'custom_template_id'     => $this->customTemplateId ?: null,
             'custom_template_prompt' => $customTemplatePrompt,
             'custom_visual_style'    => $customVisualStyle,
+            'custom_layout_type'     => $customLayoutType,
             'custom_template_name'   => $customTemplateName,
             'custom_photo_mode'      => $customPhotoModeOpt,
             'text_content'           => (!$this->audio && !empty(trim($this->textContent))) ? trim($this->textContent) : null,

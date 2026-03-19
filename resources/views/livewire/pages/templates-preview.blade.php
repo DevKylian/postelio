@@ -100,6 +100,7 @@ $saveTemplate = function () {
             'description'  => $this->generatedTemplate['description'],
             'ai_prompt'    => $this->generatedTemplate['ai_prompt'],
             'visual_style' => $this->generatedTemplate['visual_style'],
+            'layout_type'  => $this->generatedTemplate['layout_type'] ?? 'standard',
             'photo_mode'   => $this->photoMode,
         ]);
 

@@ -123,6 +123,7 @@ class ImageGeneratorService
         $brandColor  = $company->brand_color ?? '#F59E0B';
         $photoMode   = $post->template_options['custom_photo_mode'] ?? 'none';
         $visualStyle = $post->template_options['custom_visual_style'] ?? 'dark_branded';
+        $layoutType  = $post->template_options['custom_layout_type']  ?? 'standard';
 
         $templateName = $post->template_options['custom_template_name'] ?? '';
 
@@ -225,11 +226,39 @@ class ImageGeneratorService
             return $slides ?: $this->generateCustomNoPhoto($post, $company, $brandColor, $visualStyle);
         }
 
-        // ── No photo — existing branded background logic ───────────────────────
-        return $this->generateCustomNoPhoto($post, $company, $brandColor, $visualStyle);
+        // ── No photo — branded background with chosen layout ─────────────────
+        return $this->generateCustomNoPhoto($post, $company, $brandColor, $visualStyle, $layoutType);
     }
 
-    private function generateCustomNoPhoto(Post $post, $company, string $brandColor, string $visualStyle): string
+    private function generateCustomNoPhoto(Post $post, $company, string $brandColor, string $visualStyle, string $layoutType = 'standard'): string
+    {
+        // Dispatch to the appropriate layout renderer
+        $fileName = 'posts/' . $post->id . '_generated.jpg';
+
+        return match ($layoutType) {
+            'centered'   => $this->renderLayoutCentered($post, $company, $brandColor, $visualStyle, $fileName),
+            'quote'      => $this->renderLayoutQuote($post, $company, $brandColor, $visualStyle, $fileName),
+            'bold_title' => $this->renderLayoutBoldTitle($post, $company, $brandColor, $visualStyle, $fileName),
+            'split'      => $this->renderLayoutSplit($post, $company, $brandColor, $visualStyle, $fileName),
+            'minimal'    => $this->renderLayoutMinimal($post, $company, $brandColor, $fileName),
+            default      => $this->renderLayoutStandard($post, $company, $brandColor, $visualStyle, $fileName),
+        };
+    }
+
+    // ── Helper: resolve colors for a given visual_style ──────────────────────
+
+    private function styleColors(string $visualStyle, string $brandColor): array
+    {
+        return match ($visualStyle) {
+            'light_branded' => ['bg' => '#F8FAFC', 'title' => $brandColor,           'text' => '#1E293B', 'label' => $brandColor,           'sep' => 'rgba(0,0,0,0.08)'],
+            'brand_color'   => ['bg' => $brandColor, 'title' => 'rgba(255,255,255,0.90)', 'text' => '#FFFFFF',  'label' => 'rgba(255,255,255,0.80)', 'sep' => 'rgba(0,0,0,0.20)'],
+            default         => ['bg' => '#0B1426',   'title' => $brandColor,           'text' => '#FFFFFF',  'label' => $brandColor,           'sep' => 'rgba(255,255,255,0.10)'],
+        };
+    }
+
+    // ── Layout: standard (original left-aligned layout) ──────────────────────
+
+    private function renderLayoutStandard(Post $post, $company, string $brandColor, string $visualStyle, string $fileName): string
     {
         $image        = $this->manager->create(1080, 1080);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
@@ -398,9 +427,285 @@ class ImageGeneratorService
 
         $this->addLogo($image, $company->logo_path);
 
-        $fileName = 'posts/' . $post->id . '_generated.jpg';
         Storage::disk('public')->put($fileName, $image->toJpeg(quality: 90));
 
+        return $fileName;
+    }
+
+    // ── Layout: centered — everything centered, short impactful content ───────
+
+    private function renderLayoutCentered(Post $post, $company, string $brandColor, string $visualStyle, string $fileName): string
+    {
+        $colors       = $this->styleColors($visualStyle, $brandColor);
+        $image        = $this->manager->create(1080, 1080);
+        $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
+        $imageText    = $this->extractImageText($post, 110);
+
+        $image->fill($colors['bg']);
+
+        // Ghost circles for dark_branded only
+        if ($visualStyle === 'dark_branded') {
+            $image->drawEllipse(970, 130, fn($d) => $d->size(400, 400)->background('rgba(255,255,255,0.03)'));
+            $image->drawEllipse(70, 1010, fn($d) => $d->size(320, 320)->background('rgba(0,0,0,0.30)'));
+        }
+
+        // Top brand bar
+        $image->drawRectangle(0, 0, fn($d) => $d->size(1080, 16)->background($brandColor));
+
+        // Template name — centered
+        $image->text($templateName, 540, 400, function ($font) use ($brandColor) {
+            $font->filename($this->fontPath);
+            $font->size(38);
+            $font->color($brandColor);
+            $font->align('center');
+            $font->valign('middle');
+        });
+
+        // Centered accent line under title
+        $image->drawRectangle(440, 420, fn($d) => $d->size(200, 5)->background($brandColor));
+
+        // Image text — centered with wrap
+        if ($imageText) {
+            $this->drawTextRaw($image, mb_strtoupper($imageText), 460, 890, 30, $colors['text'], 24);
+        }
+
+        // Bottom separator + company centered
+        $image->drawRectangle(0, 920, fn($d) => $d->size(1080, 1)->background($colors['sep']));
+        $image->text($this->companyLabel($company), 540, 966, function ($font) use ($colors) {
+            $font->filename($this->fontPath);
+            $font->size(26);
+            $font->color($colors['label']);
+            $font->align('center');
+            $font->valign('middle');
+        });
+
+        $this->addLogo($image, $company->logo_path);
+        Storage::disk('public')->put($fileName, $image->toJpeg(quality: 90));
+        return $fileName;
+    }
+
+    // ── Layout: quote — large decorative guillemets, anecdotes/citations ──────
+
+    private function renderLayoutQuote(Post $post, $company, string $brandColor, string $visualStyle, string $fileName): string
+    {
+        $colors       = $this->styleColors($visualStyle, $brandColor);
+        $image        = $this->manager->create(1080, 1080);
+        $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
+        $imageText    = $this->extractImageText($post, 120);
+
+        $image->fill($colors['bg']);
+
+        // Subtle ghost circles for depth
+        $image->drawEllipse(970, 200, fn($d) => $d->size(500, 500)->background('rgba(255,255,255,0.02)'));
+
+        // Top brand bar
+        $image->drawRectangle(0, 0, fn($d) => $d->size(1080, 16)->background($brandColor));
+
+        // Opening large decorative quote mark — brand color at ~19% opacity
+        $image->text('"', 80, 210, function ($font) use ($brandColor) {
+            $font->filename($this->fontPath);
+            $font->size(220);
+            $font->color($brandColor . '30');
+            $font->align('left');
+            $font->valign('middle');
+        });
+
+        // Template name (category label) — small, top-left, brand color
+        $image->text($templateName, 100, 66, function ($font) use ($brandColor) {
+            $font->filename($this->fontPath);
+            $font->size(24);
+            $font->color($brandColor);
+            $font->align('left');
+            $font->valign('middle');
+        });
+
+        // Thin accent line
+        $image->drawRectangle(100, 80, fn($d) => $d->size(80, 4)->background($brandColor));
+
+        // Quote text — centered, larger
+        if ($imageText) {
+            $this->drawTextRaw($image, mb_strtoupper($imageText), 280, 860, 32, $colors['text'], 22);
+        }
+
+        // Closing quote mark — bottom right
+        $image->text('"', 980, 870, function ($font) use ($brandColor) {
+            $font->filename($this->fontPath);
+            $font->size(180);
+            $font->color($brandColor . '30');
+            $font->align('right');
+            $font->valign('middle');
+        });
+
+        // Bottom separator + company
+        $image->drawRectangle(0, 920, fn($d) => $d->size(1080, 1)->background($colors['sep']));
+        $image->text($this->companyLabel($company), 100, 966, function ($font) use ($colors) {
+            $font->filename($this->fontPath);
+            $font->size(26);
+            $font->color($colors['label']);
+            $font->align('left');
+            $font->valign('middle');
+        });
+
+        $this->addLogo($image, $company->logo_path);
+        Storage::disk('public')->put($fileName, $image->toJpeg(quality: 90));
+        return $fileName;
+    }
+
+    // ── Layout: bold_title — giant template name, series/thematic posts ───────
+
+    private function renderLayoutBoldTitle(Post $post, $company, string $brandColor, string $visualStyle, string $fileName): string
+    {
+        $colors       = $this->styleColors($visualStyle, $brandColor);
+        $image        = $this->manager->create(1080, 1080);
+        $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
+        $imageText    = $this->extractImageText($post, 120);
+
+        $image->fill($colors['bg']);
+
+        if ($visualStyle === 'dark_branded') {
+            $image->drawEllipse(970, 130, fn($d) => $d->size(400, 400)->background('rgba(255,255,255,0.03)'));
+        }
+
+        // Large brand color block as decorative background for title
+        $image->drawRectangle(0, 0, fn($d) => $d->size(1080, 340)->background($brandColor));
+
+        // Template name — centered in top block, very large
+        $image->text($templateName, 540, 180, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(62);
+            $font->color('#FFFFFF');
+            $font->align('center');
+            $font->valign('middle');
+        });
+
+        // Subtitle label under big title
+        $image->drawRectangle(340, 260, fn($d) => $d->size(400, 2)->background('rgba(255,255,255,0.40)'));
+
+        // Image text — in lower part, left-aligned
+        if ($imageText) {
+            $this->drawTextLeftAligned($image, mb_strtoupper($imageText), 100, 390, 26, $colors['text'], 28);
+        }
+
+        // Bottom separator + company
+        $image->drawRectangle(0, 920, fn($d) => $d->size(1080, 1)->background($colors['sep']));
+        $image->text($this->companyLabel($company), 100, 966, function ($font) use ($colors) {
+            $font->filename($this->fontPath);
+            $font->size(26);
+            $font->color($colors['label']);
+            $font->align('left');
+            $font->valign('middle');
+        });
+
+        $this->addLogo($image, $company->logo_path);
+        Storage::disk('public')->put($fileName, $image->toJpeg(quality: 90));
+        return $fileName;
+    }
+
+    // ── Layout: split — top half brand color / bottom half contrasted ─────────
+
+    private function renderLayoutSplit(Post $post, $company, string $brandColor, string $visualStyle, string $fileName): string
+    {
+        $image        = $this->manager->create(1080, 1080);
+        $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
+        $imageText    = $this->extractImageText($post, 120);
+
+        $bottomBg    = ($visualStyle === 'light_branded') ? '#F8FAFC' : '#0B1426';
+        $bottomText  = ($visualStyle === 'light_branded') ? '#1E293B' : '#FFFFFF';
+        $bottomLabel = ($visualStyle === 'light_branded') ? $brandColor : $brandColor;
+
+        // Top half — brand color
+        $image->fill($brandColor);
+        // Ghost circles in top half
+        $image->drawEllipse(1000, 100, fn($d) => $d->size(380, 380)->background('rgba(0,0,0,0.08)'));
+        $image->drawEllipse(80, 400, fn($d) => $d->size(200, 200)->background('rgba(0,0,0,0.06)'));
+
+        // Bottom half — dark or light
+        $image->drawRectangle(0, 490, fn($d) => $d->size(1080, 590)->background($bottomBg));
+
+        // Diagonal accent stripe at the split
+        $image->drawRectangle(0, 483, fn($d) => $d->size(1080, 14)->background('rgba(0,0,0,0.15)'));
+
+        // Template name — top half centered
+        $image->text($templateName, 540, 280, function ($font) {
+            $font->filename($this->fontPath);
+            $font->size(44);
+            $font->color('#FFFFFF');
+            $font->align('center');
+            $font->valign('middle');
+        });
+
+        // Decorative line in top half
+        $image->drawRectangle(340, 320, fn($d) => $d->size(400, 3)->background('rgba(255,255,255,0.40)'));
+
+        // Accent line in bottom half
+        $image->drawRectangle(100, 530, fn($d) => $d->size(80, 5)->background($brandColor));
+
+        // Image text — bottom half, left-aligned
+        if ($imageText) {
+            $this->drawTextLeftAligned($image, mb_strtoupper($imageText), 100, 560, 24, $bottomText, 26);
+        }
+
+        // Bottom separator + company
+        $image->drawRectangle(0, 920, fn($d) => $d->size(1080, 1)->background('rgba(128,128,128,0.15)'));
+        $image->text($this->companyLabel($company), 100, 966, function ($font) use ($bottomLabel) {
+            $font->filename($this->fontPath);
+            $font->size(26);
+            $font->color($bottomLabel);
+            $font->align('left');
+            $font->valign('middle');
+        });
+
+        $this->addLogo($image, $company->logo_path);
+        Storage::disk('public')->put($fileName, $image->toJpeg(quality: 90));
+        return $fileName;
+    }
+
+    // ── Layout: minimal — white bg, left brand stripe, very clean ────────────
+
+    private function renderLayoutMinimal(Post $post, $company, string $brandColor, string $fileName): string
+    {
+        $image        = $this->manager->create(1080, 1080);
+        $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
+        $imageText    = $this->extractImageText($post, 130);
+
+        // White background
+        $image->fill('#FFFFFF');
+
+        // Left vertical brand stripe
+        $image->drawRectangle(0, 0, fn($d) => $d->size(14, 1080)->background($brandColor));
+
+        // Very subtle top bar
+        $image->drawRectangle(14, 0, fn($d) => $d->size(1066, 8)->background('#F1F5F9'));
+
+        // Template name — left-aligned, brand color
+        $image->text($templateName, 80, 420, function ($font) use ($brandColor) {
+            $font->filename($this->fontPath);
+            $font->size(36);
+            $font->color($brandColor);
+            $font->align('left');
+            $font->valign('middle');
+        });
+
+        // Thin separator under title
+        $image->drawRectangle(80, 445, fn($d) => $d->size(900, 2)->background('#E2E8F0'));
+
+        // Image text — left-aligned, dark slate
+        if ($imageText) {
+            $this->drawTextLeftAligned($image, mb_strtoupper($imageText), 80, 470, 26, '#334155', 30);
+        }
+
+        // Bottom: thin line + company label in muted gray
+        $image->drawRectangle(80, 940, fn($d) => $d->size(900, 1)->background('#CBD5E1'));
+        $image->text($this->companyLabel($company), 80, 974, function ($font) use ($brandColor) {
+            $font->filename($this->fontPath);
+            $font->size(24);
+            $font->color($brandColor);
+            $font->align('left');
+            $font->valign('middle');
+        });
+
+        $this->addLogo($image, $company->logo_path);
+        Storage::disk('public')->put($fileName, $image->toJpeg(quality: 90));
         return $fileName;
     }
 

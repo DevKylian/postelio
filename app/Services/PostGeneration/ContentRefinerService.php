@@ -17,14 +17,15 @@ class ContentRefinerService
     public function refine(string $transcript, string $template, int $photoCount = 0, array $options = []): string
     {
         $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique']);
-        $prompt = $this->getPromptForTemplate($template, $photoCount, $options);
+        $noMarkdownPrefix = "RÈGLE DE FORMAT STRICTE : N'utilise JAMAIS de formatage Markdown dans les textes générés. Aucun **, aucun *, aucun _, aucun #. Instagram ne supporte pas le Markdown — texte brut uniquement.\n\n";
+        $prompt = $noMarkdownPrefix . $this->getPromptForTemplate($template, $photoCount, $options);
         $maxTokens = $isCarousel ? 1200 : 600;
 
         $response = OpenAI::chat()->create([
             'model' => 'gpt-4o',
             'messages' => [
                 ['role' => 'system', 'content' => $prompt],
-                ['role' => 'user', 'content' => "Voici le contenu à transformer : " . $transcript],
+                ['role' => 'user', 'content' => "Voici le contenu à transformer : " . $transcript . "\n\nRAPPEL : n'utilise aucun formatage Markdown (**gras**, *italique*, _souligné_, # titres). Texte brut uniquement."],
             ],
             'max_tokens' => $maxTokens,
             'temperature' => 0.7,

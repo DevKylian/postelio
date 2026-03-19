@@ -127,8 +127,7 @@ $deleteTemplate = function (int $id) {
                     @endif
                 </div>
                 <button wire:click="openModal"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90 hover:-translate-y-0.5 shrink-0"
-                        style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)">
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-copper shadow-sm shadow-copper/25 transition-all hover:bg-amber-500 hover:-translate-y-0.5 shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -141,7 +140,7 @@ $deleteTemplate = function (int $id) {
             <div class="mb-10">
                 <div class="flex items-center gap-3 mb-5">
                     <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)">
+                        <div class="w-6 h-6 rounded-lg flex items-center justify-center bg-copper">
                             <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                             </svg>
@@ -170,8 +169,7 @@ $deleteTemplate = function (int $id) {
 
                             {{-- Badge Personnalisé --}}
                             <div class="absolute top-4 left-4 z-10">
-                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm"
-                                      style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); color: #fff;">
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm bg-copper text-white">
                                     <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                                     </svg>
@@ -220,7 +218,7 @@ $deleteTemplate = function (int $id) {
                         <div>
                             <div class="flex items-center gap-2">
                                 <h4 class="font-bold text-midnight text-lg">{{ $ct['name'] }}</h4>
-                                <span class="text-[10px] font-bold text-indigo-500 bg-indigo-50 px-2 py-0.5 rounded-full">IA</span>
+                                <span class="text-[10px] font-bold text-copper bg-amber-50 px-2 py-0.5 rounded-full">IA</span>
                             </div>
                             <p class="text-gray-500 text-sm">{{ $ct['description'] ?? 'Modèle personnalisé généré par IA.' }}</p>
                         </div>
@@ -395,8 +393,7 @@ $deleteTemplate = function (int $id) {
             {{-- Header --}}
             <div class="flex items-start justify-between p-6 border-b border-gray-100">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                         style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-copper">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                         </svg>
@@ -422,7 +419,7 @@ $deleteTemplate = function (int $id) {
                     <textarea wire:model="userRequest"
                               placeholder="Ex: Je veux un modèle pour annoncer des promotions saisonnières, présenter un nouveau membre de mon équipe, partager une astuce technique..."
                               rows="4"
-                              class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-indigo-400 focus:border-transparent resize-none transition-all"
+                              class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-copper focus:border-transparent resize-none transition-all"
                               maxlength="300"></textarea>
                     <div class="flex items-center justify-between mt-1.5">
                         @error('userRequest')
@@ -445,11 +442,11 @@ $deleteTemplate = function (int $id) {
                         ] as $pm)
                         <button type="button" wire:click="$set('photoMode', '{{ $pm['value'] }}')"
                                 class="flex flex-col items-center gap-2 p-3 rounded-xl border-2 text-center transition-all duration-150
-                                    {{ $photoMode === $pm['value'] ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white hover:border-gray-300' }}">
-                            <svg class="w-5 h-5 {{ $photoMode === $pm['value'] ? 'text-indigo-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    {{ $photoMode === $pm['value'] ? 'border-copper bg-amber-50' : 'border-gray-200 bg-white hover:border-gray-300' }}">
+                            <svg class="w-5 h-5 {{ $photoMode === $pm['value'] ? 'text-copper' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $pm['icon'] }}"/>
                             </svg>
-                            <span class="text-xs font-bold {{ $photoMode === $pm['value'] ? 'text-indigo-700' : 'text-gray-600' }}">{{ $pm['label'] }}</span>
+                            <span class="text-xs font-bold {{ $photoMode === $pm['value'] ? 'text-amber-700' : 'text-gray-600' }}">{{ $pm['label'] }}</span>
                             <span class="text-[10px] text-gray-400">{{ $pm['desc'] }}</span>
                         </button>
                         @endforeach
@@ -463,7 +460,7 @@ $deleteTemplate = function (int $id) {
                         @foreach(['Promotion saisonnière', 'Nouveau membre d\'équipe', 'Astuce technique du jour', 'Offre parrainage', 'Présentation d\'un outil', 'Chiffre clé de l\'entreprise'] as $example)
                         <button type="button"
                                 wire:click="$set('userRequest', 'Modèle pour : {{ $example }}')"
-                                class="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
+                                class="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-amber-50 hover:text-copper transition-colors">
                             {{ $example }}
                         </button>
                         @endforeach
@@ -479,8 +476,7 @@ $deleteTemplate = function (int $id) {
 
                 <button wire:click="generateTemplate"
                         wire:loading.attr="disabled"
-                        class="w-full py-3 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center justify-center gap-2 shadow-lg"
-                        style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)">
+                        class="w-full py-3 rounded-xl text-sm font-bold text-white bg-copper transition-all hover:bg-amber-500 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center justify-center gap-2 shadow-lg shadow-copper/25">
                     <span wire:loading.remove wire:target="generateTemplate">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     </span>
@@ -550,8 +546,7 @@ $deleteTemplate = function (int $id) {
                         </button>
                         <button wire:click="saveTemplate"
                                 wire:loading.attr="disabled"
-                                class="flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md"
-                                style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)">
+                                class="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-copper transition-all hover:bg-amber-500 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md shadow-copper/25">
                             <svg wire:loading.remove wire:target="saveTemplate" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                             <svg wire:loading wire:target="saveTemplate" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                             <span wire:loading.remove wire:target="saveTemplate">Sauvegarder ce modèle</span>

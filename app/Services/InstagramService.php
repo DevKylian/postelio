@@ -135,13 +135,14 @@ class InstagramService
     private function resolveIgAccount(string $igId, string $accessToken): array
     {
         $ig = Http::get(self::GRAPH_BASE . "/{$igId}", [
-            'fields'       => 'id,username',
+            'fields'       => 'id,username,profile_picture_url',
             'access_token' => $accessToken,
         ])->json();
 
         return [
-            'id'       => $igId,
-            'username' => $ig['username'] ?? '',
+            'id'                  => $igId,
+            'username'            => $ig['username'] ?? '',
+            'profile_picture_url' => $ig['profile_picture_url'] ?? null,
         ];
     }
 

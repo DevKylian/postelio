@@ -46,10 +46,11 @@ class InstagramController extends Controller
             $igAccount = $this->instagram->getInstagramBusinessAccount($accessToken);
 
             Auth::user()->company->update([
-                'instagram_access_token'        => $accessToken,
-                'instagram_business_account_id' => $igAccount['id'],
-                'instagram_username'            => $igAccount['username'],
-                'instagram_token_expires_at'    => $expiresAt,
+                'instagram_access_token'           => $accessToken,
+                'instagram_business_account_id'    => $igAccount['id'],
+                'instagram_username'               => $igAccount['username'],
+                'instagram_profile_picture_url'    => $igAccount['profile_picture_url'] ?? null,
+                'instagram_token_expires_at'       => $expiresAt,
             ]);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Instagram OAuth failed', [
@@ -73,6 +74,7 @@ class InstagramController extends Controller
             'instagram_access_token'        => null,
             'instagram_business_account_id' => null,
             'instagram_username'            => null,
+            'instagram_profile_picture_url' => null,
             'instagram_token_expires_at'    => null,
         ]);
 

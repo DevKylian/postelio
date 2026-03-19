@@ -16,6 +16,7 @@ class Company extends Model
         'instagram_access_token',
         'instagram_business_account_id',
         'instagram_username',
+        'instagram_profile_picture_url',
         'instagram_token_expires_at',
     ];
 

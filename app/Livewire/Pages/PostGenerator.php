@@ -295,17 +295,18 @@ class PostGenerator extends Component
             $customPhotoMode = $ct?->photo_mode ?? 'none';
         }
 
-        $company     = Auth::user()->company;
-        $brandColor  = $company?->brand_color ?? '#D97706';
-        $igUsername  = $company?->instagram_username
+        $company          = Auth::user()->company;
+        $brandColor       = $company?->brand_color ?? '#D97706';
+        $igUsername       = $company?->instagram_username
             ? $company->instagram_username
             : strtolower(preg_replace('/\s+/', '_', $company?->name ?? 'votre_entreprise'));
-        $igCity      = $company?->city ?? 'France';
-        $hasLogo     = $company && $company->logo_path;
+        $igCity           = $company?->city ?? 'France';
+        $hasLogo          = $company && $company->logo_path;
+        $igProfilePicture = $company?->instagram_profile_picture_url;
 
         return view('livewire.pages.post-generator', compact(
             'customTemplates', 'customPhotoMode',
-            'company', 'brandColor', 'igUsername', 'igCity', 'hasLogo'
+            'company', 'brandColor', 'igUsername', 'igCity', 'hasLogo', 'igProfilePicture'
         ));
     }
 }

@@ -1018,14 +1018,17 @@
 
             {{-- Instagram Post Preview --}}
             <div class="flex justify-center">
-                <div class="w-full max-w-[430px] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
+                <div class="w-full max-w-[540px] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
 
                     {{-- Header Instagram --}}
-                    <div class="flex items-center justify-between px-3.5 py-3">
-                        <div class="flex items-center gap-2.5">
-                            {{-- Avatar --}}
-                            <div class="w-9 h-9 rounded-full overflow-hidden shrink-0 ring-2 ring-offset-1" style="ring-color: {{ $brandColor }}; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px {{ $brandColor }}">
-                                @if($hasLogo)
+                    <div class="flex items-center justify-between px-4 py-3">
+                        <div class="flex items-center gap-3">
+                            {{-- Avatar : photo profil IG > logo > initiale --}}
+                            <div class="w-10 h-10 rounded-full overflow-hidden shrink-0"
+                                 style="box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px {{ $brandColor }}">
+                                @if($igProfilePicture)
+                                    <img src="{{ $igProfilePicture }}" alt="Profil Instagram" class="w-full h-full object-cover">
+                                @elseif($hasLogo)
                                     <img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-white font-bold text-sm"
@@ -1127,29 +1130,31 @@
             </div>
 
             {{-- Actions --}}
-            <div class="flex flex-col sm:flex-row gap-3">
-                <button wire:click="validatePost" wire:loading.attr="disabled"
-                        class="flex-1 flex items-center justify-center gap-2.5 bg-copper text-white font-bold py-4 rounded-2xl shadow-lg shadow-copper/20 hover:bg-amber-500 hover:shadow-xl hover:shadow-copper/30 transition-all duration-200 active:scale-[0.99] disabled:opacity-60 text-sm">
-                    <span wire:loading.remove wire:target="validatePost" class="flex items-center gap-2.5">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                        </svg>
-                        Valider et publier
-                    </span>
-                    <span wire:loading wire:target="validatePost" class="flex items-center gap-2.5 animate-pulse">
-                        <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        Validation...
-                    </span>
-                </button>
+            <div class="flex justify-center">
+                <div class="flex flex-col sm:flex-row gap-2.5 w-full max-w-[540px]">
+                    <button wire:click="validatePost" wire:loading.attr="disabled"
+                            class="flex-1 flex items-center justify-center gap-2 bg-copper text-white font-semibold py-3 px-5 rounded-xl shadow-md shadow-copper/20 hover:bg-amber-500 hover:shadow-lg hover:shadow-copper/30 transition-all duration-200 active:scale-[0.99] disabled:opacity-60 text-sm">
+                        <span wire:loading.remove wire:target="validatePost" class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Valider et publier
+                        </span>
+                        <span wire:loading wire:target="validatePost" class="flex items-center gap-2 animate-pulse">
+                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            Validation...
+                        </span>
+                    </button>
 
-                <button wire:click="discardPost" wire:loading.attr="disabled"
-                        wire:confirm="Ce post sera supprimé définitivement. Recommencer depuis zéro ?"
-                        class="sm:w-auto flex items-center justify-center gap-2.5 border-2 border-gray-200 text-gray-500 font-semibold py-4 px-7 rounded-2xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 bg-white transition-all duration-200 text-sm disabled:opacity-60">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Rejeter et recommencer
-                </button>
+                    <button wire:click="discardPost" wire:loading.attr="disabled"
+                            wire:confirm="Ce post sera supprimé définitivement. Recommencer depuis zéro ?"
+                            class="sm:w-auto flex items-center justify-center gap-2 border border-gray-200 text-gray-500 font-medium py-3 px-5 rounded-xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 bg-white transition-all duration-200 text-sm disabled:opacity-60">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Rejeter
+                    </button>
+                </div>
             </div>
         </div>
 

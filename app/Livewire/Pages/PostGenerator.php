@@ -304,6 +304,20 @@ class PostGenerator extends Component
         $hasLogo          = $company && $company->logo_path;
         $igProfilePicture = $company?->instagram_profile_picture_url;
 
+        // Lazy fetch pour les comptes connectés avant l'ajout de ce champ
+        if ($company?->instagram_connected && !$igProfilePicture) {
+            try {
+                $stats = app(\App\Services\InstagramService::class)
+                    ->getAccountStats($company->instagram_access_token, $company->instagram_business_account_id);
+                if (!empty($stats['profile_picture_url'])) {
+                    $company->update(['instagram_profile_picture_url' => $stats['profile_picture_url']]);
+                    $igProfilePicture = $stats['profile_picture_url'];
+                }
+            } catch (\Throwable) {
+                // Non-critique, on continue sans
+            }
+        }
+
         return view('livewire.pages.post-generator', compact(
             'customTemplates', 'customPhotoMode',
             'company', 'brandColor', 'igUsername', 'igCity', 'hasLogo', 'igProfilePicture'

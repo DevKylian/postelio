@@ -1116,10 +1116,10 @@
                         <p class="text-[13px] font-semibold text-black">247 J'aime</p>
 
                         {{-- Caption avec expand --}}
-                        <div x-data="{ exp: false }" class="text-[13px] text-black leading-snug">
-                            <span class="font-semibold">{{ $igUsername }}</span>
-                            <span x-show="!exp" class="ml-1">{{ Str::limit($previewContent ?? '', 130) }}@if(strlen($previewContent ?? '') > 130)<button @click="exp = true" class="text-gray-400 font-medium ml-0.5">... plus</button>@endif</span>
-                            <span x-show="exp" x-cloak class="ml-1 whitespace-pre-line">{{ $previewContent }}</span>
+                        <div x-data="{ exp: false }" class="text-[13px] text-black leading-relaxed">
+                            <p class="font-semibold leading-tight mb-1">{{ $igUsername }}</p>
+                            <div x-show="!exp" class="whitespace-pre-line">{{ Str::limit($previewContent ?? '', 200) }}@if(strlen($previewContent ?? '') > 200) <button @click="exp = true" class="text-gray-400 font-medium">... plus</button>@endif</div>
+                            <div x-show="exp" x-cloak class="whitespace-pre-line">{{ $previewContent }}</div>
                         </div>
 
                         {{-- Date --}}

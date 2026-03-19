@@ -17,7 +17,10 @@ class ContentRefinerService
     public function refine(string $transcript, string $template, int $photoCount = 0, array $options = []): string
     {
         $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique']);
-        $noMarkdownPrefix = "RÈGLE DE FORMAT STRICTE : N'utilise JAMAIS de formatage Markdown dans les textes générés. Aucun **, aucun *, aucun _, aucun #. Instagram ne supporte pas le Markdown — texte brut uniquement.\n\n";
+        $noMarkdownPrefix = "RÈGLE DE FORMAT STRICTE :\n"
+            . "- Jamais de Markdown : aucun **, aucun *, aucun _, aucun #. Instagram n'en supporte pas.\n"
+            . "- Structure la légende avec de vrais sauts de ligne entre chaque idée/paragraphe (retour à la ligne simple entre deux phrases liées, ligne vide entre deux blocs distincts).\n"
+            . "- Exemple de structure attendue : accroche sur une ligne, ligne vide, corps espacé point par point, ligne vide, call-to-action, ligne vide, hashtags.\n\n";
         $prompt = $noMarkdownPrefix . $this->getPromptForTemplate($template, $photoCount, $options);
         $maxTokens = $isCarousel ? 1200 : 600;
 

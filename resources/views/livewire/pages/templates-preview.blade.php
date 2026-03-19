@@ -221,8 +221,53 @@ $deleteTemplate = function (int $id) {
                             </button>
 
                             {{-- Contenu central --}}
-                            @if(($ct['photo_mode'] ?? 'none') !== 'none')
-                            {{-- Avec photo : nom du template en haut + icône caméra au centre --}}
+                            @if(($ct['photo_mode'] ?? '') === 'carousel')
+                            {{-- Carousel : frames empilées + dots --}}
+                            <div class="absolute inset-0 flex flex-col pt-14 pb-16">
+                                <div class="px-8">
+                                    <span class="inline-block w-10 h-1 mb-4 rounded-full"
+                                          style="background-color: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.5)' : $brandColor }}"></span>
+                                    <p class="font-black uppercase tracking-widest text-sm font-montserrat"
+                                       style="color: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.85)' : $brandColor }}">
+                                        {{ strtoupper($ct['name']) }}
+                                    </p>
+                                </div>
+                                <div class="flex-1 flex flex-col items-center justify-center gap-3 select-none pointer-events-none">
+                                    @php $frameColor = $ct['visual_style'] === 'light_branded' ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.28)'; @endphp
+                                    {{-- Stacked frames --}}
+                                    <div class="relative w-32 h-24">
+                                        <div class="absolute right-0 bottom-0 w-24 h-18 rounded-xl border-2 flex items-center justify-center"
+                                             style="border-color: {{ $frameColor }}; width:88px; height:66px;">
+                                        </div>
+                                        <div class="absolute right-4 bottom-3 w-24 h-18 rounded-xl border-2 flex items-center justify-center"
+                                             style="border-color: {{ $frameColor }}; opacity:0.65; width:88px; height:66px;">
+                                        </div>
+                                        <div class="absolute right-8 bottom-6 w-24 rounded-xl border-2 flex items-center justify-center"
+                                             style="border-color: {{ $frameColor }}; opacity:0.35; width:88px; height:66px;">
+                                        </div>
+                                        {{-- Camera icon on front frame --}}
+                                        <div class="absolute right-0 bottom-0 flex items-center justify-center"
+                                             style="width:88px; height:66px; color: {{ $frameColor }}">
+                                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    {{-- Dots --}}
+                                    <div class="flex items-center gap-1.5"
+                                         style="color: {{ $ct['visual_style'] === 'light_branded' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.4)' }}">
+                                        <div class="w-2 h-2 rounded-full" style="background: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.9)' : $brandColor }}"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full bg-current opacity-40"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full bg-current opacity-40"></div>
+                                        <div class="w-1.5 h-1.5 rounded-full bg-current opacity-25"></div>
+                                    </div>
+                                    <p class="text-[10px] font-bold uppercase tracking-widest"
+                                       style="color: {{ $ct['visual_style'] === 'light_branded' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.45)' }}">Carrousel · vos photos</p>
+                                </div>
+                            </div>
+                            @elseif(($ct['photo_mode'] ?? '') === 'single')
+                            {{-- Photo unique --}}
                             <div class="absolute inset-0 flex flex-col pt-14 pb-16">
                                 <div class="px-8">
                                     <span class="inline-block w-10 h-1 mb-4 rounded-full"
@@ -239,9 +284,7 @@ $deleteTemplate = function (int $id) {
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
-                                        <p class="text-xs font-bold uppercase tracking-widest">
-                                            {{ ($ct['photo_mode'] ?? '') === 'carousel' ? 'Vos photos' : 'Votre photo' }}
-                                        </p>
+                                        <p class="text-xs font-bold uppercase tracking-widest">Votre photo</p>
                                     </div>
                                 </div>
                             </div>

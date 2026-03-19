@@ -45,7 +45,7 @@ $generateTemplate = function () {
     try {
         $company = Auth::user()->company;
         $service = app(TemplateGeneratorService::class);
-        $this->generatedTemplate = $service->generate($this->userRequest, $company?->trade ?? '');
+        $this->generatedTemplate = $service->generate($this->userRequest, $company?->trade ?? '', $this->photoMode);
     } catch (\Throwable $e) {
         $this->errorMessage = 'Une erreur est survenue lors de la génération. Réessayez.';
         \Illuminate\Support\Facades\Log::error('TemplateGenerator failed: ' . $e->getMessage());
@@ -76,7 +76,14 @@ $saveTemplate = function () {
         $this->userRequest       = '';
         $this->generatedTemplate = null;
     } catch (\Throwable $e) {
-        $this->errorMessage = 'Impossible de sauvegarder le modèle. Réessayez.';
+        \Illuminate\Support\Facades\Log::error('CustomTemplate save failed: ' . $e->getMessage(), [
+            'trace'      => $e->getTraceAsString(),
+            'photo_mode' => $this->photoMode,
+            'generated'  => $this->generatedTemplate,
+        ]);
+        $this->errorMessage = config('app.debug')
+            ? '[DEBUG] ' . get_class($e) . ': ' . $e->getMessage()
+            : 'Impossible de sauvegarder le modèle. Réessayez.';
     } finally {
         $this->isSaving = false;
     }

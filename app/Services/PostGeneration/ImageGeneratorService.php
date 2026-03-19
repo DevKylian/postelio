@@ -144,25 +144,25 @@ class ImageGeneratorService
                 $draw->background('rgba(0,0,0,0.55)');
             });
 
-            // Brand color accent line at top (matches gabarit style)
+            // Brand color top bar
             $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
-                $draw->size(1080, 6);
+                $draw->size(1080, 16);
                 $draw->background($brandColor);
             });
 
-            // Short accent line left (matches light/dark_branded style)
-            $image->drawRectangle(60, 55, function ($draw) use ($brandColor) {
-                $draw->size(60, 5);
-                $draw->background($brandColor);
+            // Short accent line left-aligned (mirrors card layout)
+            $image->drawRectangle(100, 55, function ($draw) use ($brandColor) {
+                $draw->size(80, 6);
+                $draw->background('rgba(255,255,255,0.60)');
             });
 
-            // Template name label
+            // Template name label — left-aligned to match card
             if ($templateName) {
-                $image->text(mb_strtoupper($this->cleanText($templateName)), 540, 95, function ($font) use ($brandColor) {
+                $image->text(mb_strtoupper($this->cleanText($templateName)), 100, 105, function ($font) use ($brandColor) {
                     $font->filename($this->fontPath);
-                    $font->size(32);
+                    $font->size(30);
                     $font->color($brandColor);
-                    $font->align('center');
+                    $font->align('left');
                     $font->valign('middle');
                 });
             }
@@ -197,15 +197,19 @@ class ImageGeneratorService
                     $draw->background('rgba(0,0,0,0.55)');
                 });
                 $slideImage->drawRectangle(0, 0, function ($draw) use ($brandColor) {
-                    $draw->size(1080, 6);
+                    $draw->size(1080, 16);
                     $draw->background($brandColor);
                 });
+                $slideImage->drawRectangle(100, 55, function ($draw) use ($brandColor) {
+                    $draw->size(80, 6);
+                    $draw->background('rgba(255,255,255,0.60)');
+                });
                 if ($templateName) {
-                    $slideImage->text(mb_strtoupper($this->cleanText($templateName)), 540, 95, function ($font) use ($brandColor) {
+                    $slideImage->text(mb_strtoupper($this->cleanText($templateName)), 100, 105, function ($font) use ($brandColor) {
                         $font->filename($this->fontPath);
-                        $font->size(32);
+                        $font->size(30);
                         $font->color($brandColor);
-                        $font->align('center');
+                        $font->align('left');
                         $font->valign('middle');
                     });
                 }
@@ -227,135 +231,169 @@ class ImageGeneratorService
 
     private function generateCustomNoPhoto(Post $post, $company, string $brandColor, string $visualStyle): string
     {
-        $image = $this->manager->create(1080, 1080);
+        $image        = $this->manager->create(1080, 1080);
+        $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
+        $imageText    = $this->extractImageText($post, 100);
+
+        // Layout constants — mirrors the card HTML (px-8 ≈ 100px, pt-14 ≈ 270px)
+        $left    = 100;   // left margin
+        $barH    = 16;    // top bar height
+        $accentY = 270;   // accent line top-y
+        $labelY  = 336;   // template name center-y
+        $textTop = 420;   // description text top-y
+        $sepY    = 920;   // bottom separator y
+        $badgeY  = 966;   // company label center-y
 
         if ($visualStyle === 'brand_color') {
-            // Full brand-color background — like Review template
-            $imageText = $this->extractImageText($post, 80);
             $image->fill($brandColor);
 
-            // Subtle decorative circles
+            // Ghost circles: upper-right + lower-left (mirrors card)
             $image->drawEllipse(970, 130, function ($draw) {
                 $draw->size(400, 400);
+                $draw->background('rgba(0,0,0,0.10)');
+            });
+            $image->drawEllipse(70, 1010, function ($draw) {
+                $draw->size(300, 300);
                 $draw->background('rgba(0,0,0,0.08)');
             });
-            $image->drawEllipse(110, 950, function ($draw) {
-                $draw->size(300, 300);
-                $draw->background('rgba(0,0,0,0.06)');
+
+            // Top bar (slightly darkened tint on brand color)
+            $image->drawRectangle(0, 0, function ($draw) use ($barH) {
+                $draw->size(1080, $barH);
+                $draw->background('rgba(0,0,0,0.15)');
             });
 
-            // Label
-            $data = json_decode($post->refined_content, true);
-            $templateName = $post->template_options['custom_template_name'] ?? 'MODÈLE PERSO';
-            $image->text(mb_strtoupper($this->cleanText($templateName)), 540, 260, function ($font) {
+            // Accent line — left-aligned
+            $image->drawRectangle($left, $accentY, function ($draw) {
+                $draw->size(120, 8);
+                $draw->background('rgba(255,255,255,0.50)');
+            });
+
+            // Template name — left-aligned
+            $image->text($templateName, $left, $labelY, function ($font) {
                 $font->filename($this->fontPath);
-                $font->size(30);
-                $font->color('rgba(255,255,255,0.7)');
-                $font->align('center');
+                $font->size(34);
+                $font->color('rgba(255,255,255,0.85)');
+                $font->align('left');
                 $font->valign('middle');
             });
 
-            // Separator
-            $image->drawRectangle(390, 298, function ($draw) {
-                $draw->size(300, 3);
-                $draw->background('rgba(255,255,255,0.3)');
+            // Description text — left-aligned
+            if ($imageText) {
+                $this->drawTextLeftAligned($image, mb_strtoupper($imageText), $left, $textTop, 54, '#FFFFFF', 22);
+            }
+
+            // Bottom: separator + company label
+            $image->drawRectangle(0, $sepY, function ($draw) {
+                $draw->size(1080, 2);
+                $draw->background('rgba(0,0,0,0.20)');
+            });
+            $image->text($this->companyLabel($company), $left, $badgeY, function ($font) {
+                $font->filename($this->fontPath);
+                $font->size(26);
+                $font->color('rgba(255,255,255,0.80)');
+                $font->align('left');
+                $font->valign('middle');
             });
 
-            // Main text
-            if ($imageText) {
-                $this->drawTextRaw($image, mb_strtoupper($imageText), 330, 900, 56, '#FFFFFF', 22);
-            }
-            $this->drawCompanyBadge($image, $company);
-
         } elseif ($visualStyle === 'light_branded') {
-            // Light background — clean, editorial style
-            $imageText = $this->extractImageText($post, 80);
             $image->fill('#F8FAFC');
 
             // Brand top bar
-            $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
-                $draw->size(1080, 20);
+            $image->drawRectangle(0, 0, function ($draw) use ($brandColor, $barH) {
+                $draw->size(1080, $barH);
                 $draw->background($brandColor);
             });
 
-            // Accent line
-            $image->drawRectangle(100, 220, function ($draw) use ($brandColor) {
-                $draw->size(100, 8);
+            // Accent line — left-aligned
+            $image->drawRectangle($left, $accentY, function ($draw) use ($brandColor) {
+                $draw->size(120, 8);
                 $draw->background($brandColor);
             });
 
-            // Template label
-            $templateName = $post->template_options['custom_template_name'] ?? 'Modèle Perso';
-            $image->text(mb_strtoupper($this->cleanText($templateName)), 540, 290, function ($font) use ($brandColor) {
+            // Template name — left-aligned
+            $image->text($templateName, $left, $labelY, function ($font) use ($brandColor) {
                 $font->filename($this->fontPath);
-                $font->size(30);
+                $font->size(34);
                 $font->color($brandColor);
-                $font->align('center');
+                $font->align('left');
                 $font->valign('middle');
             });
 
-            // Separator
-            $image->drawRectangle(200, 323, function ($draw) use ($brandColor) {
-                $draw->size(680, 4);
-                $draw->background($brandColor);
-            });
-
+            // Description text — left-aligned
             if ($imageText) {
-                $this->drawTextRaw($image, mb_strtoupper($imageText), 360, 880, 52, '#1E293B', 22);
+                $this->drawTextLeftAligned($image, mb_strtoupper($imageText), $left, $textTop, 54, '#1E293B', 22);
             }
 
-            // Subtle dot texture
-            // Company name
-            $this->drawFaqCompanyName($image, $company, $brandColor);
+            // Bottom: separator + company label
+            $image->drawRectangle(0, $sepY, function ($draw) {
+                $draw->size(1080, 1);
+                $draw->background('rgba(0,0,0,0.08)');
+            });
+            $image->text($this->companyLabel($company), $left, $badgeY, function ($font) use ($brandColor) {
+                $font->filename($this->fontPath);
+                $font->size(26);
+                $font->color($brandColor);
+                $font->align('left');
+                $font->valign('middle');
+            });
 
         } else {
-            // dark_branded (default) — deep navy, brand color accents — like Conseil Saisonnier
-            $imageText = $this->extractImageText($post, 80);
+            // dark_branded (default) — deep navy, brand color accents
             $image->fill('#0B1426');
 
-            // Ghost circle decoration
+            // Ghost circles: upper-right (outer + inner) + lower-left
             $image->drawEllipse(970, 130, function ($draw) {
                 $draw->size(400, 400);
                 $draw->background('rgba(255,255,255,0.03)');
             });
             $image->drawEllipse(970, 130, function ($draw) {
-                $draw->size(250, 250);
+                $draw->size(260, 260);
                 $draw->background('rgba(255,255,255,0.04)');
+            });
+            $image->drawEllipse(70, 1010, function ($draw) {
+                $draw->size(320, 320);
+                $draw->background('rgba(0,0,0,0.30)');
             });
 
             // Brand top bar
-            $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
-                $draw->size(1080, 20);
+            $image->drawRectangle(0, 0, function ($draw) use ($brandColor, $barH) {
+                $draw->size(1080, $barH);
                 $draw->background($brandColor);
             });
 
-            // Accent line
-            $image->drawRectangle(100, 220, function ($draw) use ($brandColor) {
-                $draw->size(100, 8);
+            // Accent line — left-aligned
+            $image->drawRectangle($left, $accentY, function ($draw) use ($brandColor) {
+                $draw->size(120, 8);
                 $draw->background($brandColor);
             });
 
-            // Template label
-            $templateName = $post->template_options['custom_template_name'] ?? 'Modèle Perso';
-            $image->text(mb_strtoupper($this->cleanText($templateName)), 540, 290, function ($font) use ($brandColor) {
+            // Template name — left-aligned
+            $image->text($templateName, $left, $labelY, function ($font) use ($brandColor) {
                 $font->filename($this->fontPath);
-                $font->size(30);
+                $font->size(34);
                 $font->color($brandColor);
-                $font->align('center');
+                $font->align('left');
                 $font->valign('middle');
             });
 
-            // Separator
-            $image->drawRectangle(200, 323, function ($draw) use ($brandColor) {
-                $draw->size(680, 4);
-                $draw->background($brandColor);
-            });
-
+            // Description text — left-aligned
             if ($imageText) {
-                $this->drawTextRaw($image, mb_strtoupper($imageText), 360, 880, 52, '#FFFFFF', 22);
+                $this->drawTextLeftAligned($image, mb_strtoupper($imageText), $left, $textTop, 54, '#FFFFFF', 22);
             }
 
-            $this->drawFaqCompanyName($image, $company, $brandColor);
+            // Bottom: separator + company label
+            $image->drawRectangle(0, $sepY, function ($draw) {
+                $draw->size(1080, 1);
+                $draw->background('rgba(255,255,255,0.10)');
+            });
+            $image->text($this->companyLabel($company), $left, $badgeY, function ($font) use ($brandColor) {
+                $font->filename($this->fontPath);
+                $font->size(26);
+                $font->color($brandColor);
+                $font->align('left');
+                $font->valign('middle');
+            });
         }
 
         $this->addLogo($image, $company->logo_path);
@@ -1153,6 +1191,44 @@ class ImageGeneratorService
                 }
                 $font->color($color);
                 $font->align('center');
+                $font->valign('middle');
+            });
+            $y += $lineHeight;
+        }
+    }
+
+    /**
+     * Draw text left-aligned with word-wrap, starting at ($xLeft, $yTop).
+     * Mirrors drawTextRaw() but uses left alignment instead of centered.
+     */
+    private function drawTextLeftAligned($image, string $text, int $xLeft, int $yTop, int $fontSize, string $color = '#FFFFFF', int $maxChars = 22): void
+    {
+        $words   = explode(' ', $text);
+        $lines   = [];
+        $current = '';
+
+        foreach ($words as $word) {
+            $candidate = $current ? $current . ' ' . $word : $word;
+            if (mb_strlen($candidate) <= $maxChars) {
+                $current = $candidate;
+            } else {
+                if ($current !== '') $lines[] = $current;
+                $current = $word;
+            }
+        }
+        if ($current !== '') $lines[] = $current;
+
+        $lineHeight = intval($fontSize * 1.35);
+        $y          = $yTop + intval($lineHeight / 2);
+
+        foreach ($lines as $line) {
+            $image->text($line, $xLeft, $y, function ($font) use ($fontSize, $color) {
+                if (file_exists($this->fontPath)) {
+                    $font->filename($this->fontPath);
+                    $font->size($fontSize);
+                }
+                $font->color($color);
+                $font->align('left');
                 $font->valign('middle');
             });
             $y += $lineHeight;

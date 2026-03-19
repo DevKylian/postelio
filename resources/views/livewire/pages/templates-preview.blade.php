@@ -5,7 +5,7 @@ use App\Services\TemplateGeneratorService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-use function Livewire\Volt\{state, mount};
+use function Livewire\Volt\{state};
 
 state([
     'showModal'         => false,
@@ -14,20 +14,13 @@ state([
     'isGenerating'      => false,
     'isSaving'          => false,
     'generatedTemplate' => null,
-    'customTemplates'   => [],
     'errorMessage'      => null,
 ]);
-
-mount(function () {
-    $this->customTemplates = CustomTemplate::where('user_id', Auth::id())
-        ->orderByDesc('created_at')
-        ->get()
-        ->toArray();
-});
 
 $openModal = function () {
     $this->showModal         = true;
     $this->userRequest       = '';
+    $this->photoMode         = 'none';
     $this->generatedTemplate = null;
     $this->errorMessage      = null;
 };
@@ -79,11 +72,6 @@ $saveTemplate = function () {
             'photo_mode'   => $this->photoMode,
         ]);
 
-        $this->customTemplates = CustomTemplate::where('user_id', Auth::id())
-            ->orderByDesc('created_at')
-            ->get()
-            ->toArray();
-
         $this->showModal         = false;
         $this->userRequest       = '';
         $this->generatedTemplate = null;
@@ -99,11 +87,6 @@ $deleteTemplate = function (int $id) {
     if ($template && $template->user_id === Auth::id()) {
         $template->delete();
     }
-
-    $this->customTemplates = CustomTemplate::where('user_id', Auth::id())
-        ->orderByDesc('created_at')
-        ->get()
-        ->toArray();
 };
 
 ?>
@@ -111,12 +94,16 @@ $deleteTemplate = function (int $id) {
 <div>
 
     @php
-        $company      = auth()->user()->company;
-        $brandColor   = $company?->brand_color ?? '#F59E0B';
-        $companyName  = $company?->name ?? 'Votre Société';
-        $companyCity  = $company?->city ?? '';
-        $companyLabel = $companyName . ($companyCity ? '  ·  ' . strtoupper($companyCity) : '');
-        $hasLogo      = $company?->logo_path && Storage::disk('public')->exists($company->logo_path);
+        $company         = auth()->user()->company;
+        $brandColor      = $company?->brand_color ?? '#F59E0B';
+        $companyName     = $company?->name ?? 'Votre Société';
+        $companyCity     = $company?->city ?? '';
+        $companyLabel    = $companyName . ($companyCity ? '  ·  ' . strtoupper($companyCity) : '');
+        $hasLogo         = $company?->logo_path && Storage::disk('public')->exists($company->logo_path);
+        $customTemplates = \App\Models\CustomTemplate::where('user_id', auth()->id())
+                            ->orderByDesc('created_at')
+                            ->get()
+                            ->toArray();
     @endphp
 
     <div class="py-8 px-4 sm:px-6 lg:px-8">

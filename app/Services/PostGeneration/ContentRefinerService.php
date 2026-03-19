@@ -189,7 +189,8 @@ IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponct
                 'custom' => (function () use ($options, $noRefuseRule, $toneInstruction, $hashtagInstruction, $extraNote, $includeHashtags) {
                 $customPrompt = $options['custom_template_prompt'] ?? null;
                 if ($customPrompt) {
-                    return $customPrompt
+                    $noHallucinate = "RÈGLE CRITIQUE — Anti-hallucination : Base-toi STRICTEMENT et UNIQUEMENT sur les informations contenues dans le mémo vocal. N'invente jamais de noms, prénoms, chiffres, réalisations ou détails absents de la transcription. Si le mémo est court, travaille uniquement avec ce qui y est dit.";
+                    return "{$noRefuseRule}\n{$noHallucinate}\n\n{$customPrompt}"
                         . "\n\n{$toneInstruction}"
                         . "\n" . ($includeHashtags ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende." : "N'ajoute aucun hashtag.")
                         . ($extraNote ? "\n{$extraNote}" : "");

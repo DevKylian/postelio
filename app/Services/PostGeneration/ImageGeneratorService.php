@@ -124,6 +124,8 @@ class ImageGeneratorService
         $photoMode   = $post->template_options['custom_photo_mode'] ?? 'none';
         $visualStyle = $post->template_options['custom_visual_style'] ?? 'dark_branded';
 
+        $templateName = $post->template_options['custom_template_name'] ?? '';
+
         // ── Photo as background (single) ──────────────────────────────────────
         if ($photoMode === 'single') {
             $image = $this->manager->create(1080, 1080);
@@ -134,6 +136,35 @@ class ImageGeneratorService
                 $image->place($photo, 'top-left', 0, 0);
             } else {
                 $image->fill('#1E293B');
+            }
+
+            // Semi-transparent header area so template label is readable
+            $image->drawRectangle(0, 0, function ($draw) {
+                $draw->size(1080, 140);
+                $draw->background('rgba(0,0,0,0.55)');
+            });
+
+            // Brand color accent line at top (matches gabarit style)
+            $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
+                $draw->size(1080, 6);
+                $draw->background($brandColor);
+            });
+
+            // Short accent line left (matches light/dark_branded style)
+            $image->drawRectangle(60, 55, function ($draw) use ($brandColor) {
+                $draw->size(60, 5);
+                $draw->background($brandColor);
+            });
+
+            // Template name label
+            if ($templateName) {
+                $image->text(mb_strtoupper($this->cleanText($templateName)), 540, 95, function ($font) use ($brandColor) {
+                    $font->filename($this->fontPath);
+                    $font->size(32);
+                    $font->color($brandColor);
+                    $font->align('center');
+                    $font->valign('middle');
+                });
             }
 
             $this->drawUnifiedBand($image, $company, $brandColor);
@@ -158,6 +189,25 @@ class ImageGeneratorService
                     $slideImage->place($photo, 'top-left', 0, 0);
                 } else {
                     $slideImage->fill('#1E293B');
+                }
+
+                // Same header overlay for consistency across slides
+                $slideImage->drawRectangle(0, 0, function ($draw) {
+                    $draw->size(1080, 140);
+                    $draw->background('rgba(0,0,0,0.55)');
+                });
+                $slideImage->drawRectangle(0, 0, function ($draw) use ($brandColor) {
+                    $draw->size(1080, 6);
+                    $draw->background($brandColor);
+                });
+                if ($templateName) {
+                    $slideImage->text(mb_strtoupper($this->cleanText($templateName)), 540, 95, function ($font) use ($brandColor) {
+                        $font->filename($this->fontPath);
+                        $font->size(32);
+                        $font->color($brandColor);
+                        $font->align('center');
+                        $font->valign('middle');
+                    });
                 }
 
                 $this->drawUnifiedBand($slideImage, $company, $brandColor);

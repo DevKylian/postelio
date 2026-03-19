@@ -117,12 +117,66 @@ class ImageGeneratorService
     // Custom (user-created) templates — 3 visual styles
     // -------------------------------------------------------------------------
 
-    private function generateCustomTemplate(Post $post): string
+    private function generateCustomTemplate(Post $post): string|array
     {
         $company     = $post->company;
         $brandColor  = $company->brand_color ?? '#F59E0B';
+        $photoMode   = $post->template_options['custom_photo_mode'] ?? 'none';
         $visualStyle = $post->template_options['custom_visual_style'] ?? 'dark_branded';
 
+        // ── Photo as background (single) ──────────────────────────────────────
+        if ($photoMode === 'single') {
+            $image = $this->manager->create(1080, 1080);
+
+            if ($post->image_before_path && Storage::disk('public')->exists($post->image_before_path)) {
+                $photo = $this->manager->read(Storage::disk('public')->get($post->image_before_path));
+                $photo->cover(1080, 1080);
+                $image->place($photo, 'top-left', 0, 0);
+            } else {
+                $image->fill('#1E293B');
+            }
+
+            $this->drawUnifiedBand($image, $company, $brandColor);
+            $this->addLogo($image, $company->logo_path);
+
+            $fileName = 'posts/' . $post->id . '_generated.jpg';
+            Storage::disk('public')->put($fileName, $image->toJpeg(quality: 90));
+            return $fileName;
+        }
+
+        // ── Photos as carousel backgrounds ────────────────────────────────────
+        if ($photoMode === 'carousel') {
+            $photos = $post->extra_images ?? [];
+            $slides = [];
+
+            foreach ($photos as $idx => $photoPath) {
+                $slideImage = $this->manager->create(1080, 1080);
+
+                if (Storage::disk('public')->exists($photoPath)) {
+                    $photo = $this->manager->read(Storage::disk('public')->get($photoPath));
+                    $photo->cover(1080, 1080);
+                    $slideImage->place($photo, 'top-left', 0, 0);
+                } else {
+                    $slideImage->fill('#1E293B');
+                }
+
+                $this->drawUnifiedBand($slideImage, $company, $brandColor);
+                $this->addLogo($slideImage, $company->logo_path);
+
+                $path = 'posts/' . $post->id . '_slide_' . ($idx + 1) . '.jpg';
+                Storage::disk('public')->put($path, $slideImage->toJpeg(quality: 90));
+                $slides[] = $path;
+            }
+
+            return $slides ?: $this->generateCustomNoPhoto($post, $company, $brandColor, $visualStyle);
+        }
+
+        // ── No photo — existing branded background logic ───────────────────────
+        return $this->generateCustomNoPhoto($post, $company, $brandColor, $visualStyle);
+    }
+
+    private function generateCustomNoPhoto(Post $post, $company, string $brandColor, string $visualStyle): string
+    {
         $image = $this->manager->create(1080, 1080);
 
         if ($visualStyle === 'brand_color') {

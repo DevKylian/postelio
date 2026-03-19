@@ -142,10 +142,11 @@ class PostGenerator extends Component
             $extraImagePaths[] = $img->store('projects', 'public');
         }
 
-        // For custom templates, inject the template's ai_prompt and visual style
+        // For custom templates, inject the template's ai_prompt, visual style and photo_mode
         $customTemplatePrompt = null;
         $customVisualStyle    = null;
         $customTemplateName   = null;
+        $customPhotoModeOpt   = 'none';
         if ($this->template === 'custom' && $this->customTemplateId) {
             $ct = CustomTemplate::where('id', $this->customTemplateId)
                                 ->where('user_id', Auth::id())
@@ -154,6 +155,7 @@ class PostGenerator extends Component
                 $customTemplatePrompt = $ct->ai_prompt;
                 $customVisualStyle    = $ct->visual_style;
                 $customTemplateName   = $ct->name;
+                $customPhotoModeOpt   = $ct->photo_mode ?? 'none';
             }
         }
 
@@ -172,6 +174,7 @@ class PostGenerator extends Component
             'custom_template_prompt' => $customTemplatePrompt,
             'custom_visual_style'    => $customVisualStyle,
             'custom_template_name'   => $customTemplateName,
+            'custom_photo_mode'      => $customPhotoModeOpt,
         ];
 
         $post = Post::create([

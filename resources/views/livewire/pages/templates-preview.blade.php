@@ -187,137 +187,234 @@ $deleteTemplate = function (int $id) {
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($customTemplates as $ct)
-                    <div class="space-y-4 group relative">
-                        <div class="aspect-square rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2"
-                            style="
-                                @if($ct['visual_style'] === 'brand_color') background-color: {{ $brandColor }};
-                                @elseif($ct['visual_style'] === 'light_branded') background-color: #F8FAFC;
-                                @else background-color: #0B1426;
-                                @endif
-                                border-top: 8px solid {{ $brandColor }};
-                            ">
-                            @if($ct['visual_style'] !== 'light_branded')
-                            <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none" style="background: rgba(255,255,255,0.04)"></div>
-                            <div class="absolute -bottom-10 -left-10 w-32 h-32 rounded-full pointer-events-none" style="background: rgba(0,0,0,0.15)"></div>
-                            @endif
+                    @php
+                        $ctIsCarousel = ($ct['photo_mode'] ?? '') === 'carousel';
+                        $ctIsSingle   = ($ct['photo_mode'] ?? '') === 'single';
+                    @endphp
+                    <div class="space-y-4 group relative"
+                         @if($ctIsCarousel) x-data="{ slide: 0 }" @endif>
 
-                            {{-- Badge Personnalisé --}}
+                        {{-- ── Carte visuelle ── --}}
+                        @if($ctIsCarousel)
+                        {{-- CAROUSEL : vrai slider avec flèches --}}
+                        <div class="aspect-square bg-slate-800 rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2">
+
+                            {{-- Slide 1 : photo principale avec titre template --}}
+                            <div class="absolute inset-0" x-show="slide === 0">
+                                <div class="w-full h-full bg-slate-600 flex items-center justify-center">
+                                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Photo principale</p>
+                                </div>
+                                <div class="absolute inset-x-0 bottom-10 px-6 pb-2">
+                                    <div class="w-8 h-0.5 mb-3 rounded-full" style="background-color: {{ $brandColor }}"></div>
+                                    <p class="text-white font-black text-sm uppercase leading-tight font-montserrat">{{ $ct['name'] }}</p>
+                                </div>
+                            </div>
+
+                            {{-- Slide 2 --}}
+                            <div class="absolute inset-0" x-show="slide === 1">
+                                <div class="w-full h-full bg-slate-500 flex items-center justify-center">
+                                    <p class="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Détail · photo 2</p>
+                                </div>
+                            </div>
+
+                            {{-- Slide 3 --}}
+                            <div class="absolute inset-0" x-show="slide === 2">
+                                <div class="w-full h-full bg-slate-400 flex items-center justify-center">
+                                    <p class="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Détail · photo 3</p>
+                                </div>
+                            </div>
+
+                            {{-- Footer marque --}}
+                            <div class="absolute inset-x-0 bottom-0 py-2.5 px-6 flex items-center justify-center" style="background-color: rgba(0,0,0,0.8)">
+                                @if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-4 w-4 object-contain rounded absolute right-6">@endif
+                                <p class="text-white font-bold uppercase tracking-widest text-[10px] font-montserrat">{{ $companyLabel }}</p>
+                            </div>
+
+                            {{-- Badge perso --}}
                             <div class="absolute top-4 left-4 z-10">
                                 <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm bg-copper text-white">
-                                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
+                                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                                     Personnalisé
                                 </span>
                             </div>
 
-                            {{-- Bouton supprimer --}}
-                            <button wire:click="deleteTemplate({{ $ct['id'] }})"
-                                    wire:confirm="Supprimer ce modèle personnalisé ?"
+                            {{-- Supprimer --}}
+                            <button wire:click="deleteTemplate({{ $ct['id'] }})" wire:confirm="Supprimer ce modèle personnalisé ?"
                                     class="absolute top-4 right-4 z-10 w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm text-white/70 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                             </button>
 
-                            {{-- Contenu central --}}
-                            @if(($ct['photo_mode'] ?? '') === 'carousel')
-                            {{-- Carousel : frames empilées + dots --}}
-                            <div class="absolute inset-0 flex flex-col pt-14 pb-16">
-                                <div class="px-8">
-                                    <span class="inline-block w-10 h-1 mb-4 rounded-full"
-                                          style="background-color: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.5)' : $brandColor }}"></span>
-                                    <p class="font-black uppercase tracking-widest text-sm font-montserrat"
-                                       style="color: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.85)' : $brandColor }}">
-                                        {{ strtoupper($ct['name']) }}
-                                    </p>
-                                </div>
-                                <div class="flex-1 flex flex-col items-center justify-center gap-3 select-none pointer-events-none">
-                                    @php $frameColor = $ct['visual_style'] === 'light_branded' ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.28)'; @endphp
-                                    {{-- Stacked frames --}}
-                                    <div class="relative w-32 h-24">
-                                        <div class="absolute right-0 bottom-0 w-24 h-18 rounded-xl border-2 flex items-center justify-center"
-                                             style="border-color: {{ $frameColor }}; width:88px; height:66px;">
-                                        </div>
-                                        <div class="absolute right-4 bottom-3 w-24 h-18 rounded-xl border-2 flex items-center justify-center"
-                                             style="border-color: {{ $frameColor }}; opacity:0.65; width:88px; height:66px;">
-                                        </div>
-                                        <div class="absolute right-8 bottom-6 w-24 rounded-xl border-2 flex items-center justify-center"
-                                             style="border-color: {{ $frameColor }}; opacity:0.35; width:88px; height:66px;">
-                                        </div>
-                                        {{-- Camera icon on front frame --}}
-                                        <div class="absolute right-0 bottom-0 flex items-center justify-center"
-                                             style="width:88px; height:66px; color: {{ $frameColor }}">
-                                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    {{-- Dots --}}
-                                    <div class="flex items-center gap-1.5"
-                                         style="color: {{ $ct['visual_style'] === 'light_branded' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.4)' }}">
-                                        <div class="w-2 h-2 rounded-full" style="background: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.9)' : $brandColor }}"></div>
-                                        <div class="w-1.5 h-1.5 rounded-full bg-current opacity-40"></div>
-                                        <div class="w-1.5 h-1.5 rounded-full bg-current opacity-40"></div>
-                                        <div class="w-1.5 h-1.5 rounded-full bg-current opacity-25"></div>
-                                    </div>
-                                    <p class="text-[10px] font-bold uppercase tracking-widest"
-                                       style="color: {{ $ct['visual_style'] === 'light_branded' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.45)' }}">Carrousel · vos photos</p>
-                                </div>
+                            {{-- Flèches navigation --}}
+                            <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity" style="margin-bottom: 2.5rem">
+                                <button @click="slide = (slide - 1 + 3) % 3" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                                <button @click="slide = (slide + 1) % 3" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
                             </div>
-                            @elseif(($ct['photo_mode'] ?? '') === 'single')
-                            {{-- Photo unique --}}
-                            <div class="absolute inset-0 flex flex-col pt-14 pb-16">
-                                <div class="px-8">
-                                    <span class="inline-block w-10 h-1 mb-4 rounded-full"
-                                          style="background-color: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.5)' : $brandColor }}"></span>
-                                    <p class="font-black uppercase tracking-widest text-sm font-montserrat"
-                                       style="color: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.85)' : $brandColor }}">
-                                        {{ strtoupper($ct['name']) }}
-                                    </p>
-                                </div>
-                                <div class="flex-1 flex items-center justify-center select-none pointer-events-none">
-                                    <div class="text-center"
-                                         style="color: {{ $ct['visual_style'] === 'light_branded' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.35)' }}">
-                                        <svg class="w-14 h-14 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        <p class="text-xs font-bold uppercase tracking-widest">Votre photo</p>
-                                    </div>
-                                </div>
-                            </div>
-                            @else
-                            {{-- Sans photo : layout texte classique --}}
-                            <div class="absolute inset-0 flex flex-col justify-center px-8 pt-14 pb-16">
-                                <span class="inline-block w-10 h-1 mb-5 rounded-full"
-                                      style="background-color: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.5)' : $brandColor }}"></span>
-                                <p class="font-black uppercase tracking-widest text-sm mb-3 font-montserrat"
-                                   style="color: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.85)' : $brandColor }}">
-                                    {{ strtoupper($ct['name']) }}
-                                </p>
-                                <p class="font-black uppercase tracking-tight text-base leading-snug font-montserrat"
-                                   style="color: {{ $ct['visual_style'] === 'light_branded' ? '#1E293B' : '#FFFFFF' }}">
-                                    {{ $ct['description'] ?? 'Modèle généré par IA.' }}
-                                </p>
-                            </div>
-                            @endif
 
-                            {{-- Company badge --}}
-                            <div class="absolute bottom-0 inset-x-0 border-t px-8 py-3"
-                                 style="border-color: {{ $ct['visual_style'] === 'light_branded' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.1)' }}">
-                                <div class="flex items-center gap-2">
-                                    @if ($hasLogo)
-                                        <img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-4 w-4 object-contain rounded">
-                                    @endif
-                                    <p class="font-bold text-[10px] uppercase tracking-widest font-montserrat"
-                                       style="color: {{ $ct['visual_style'] === 'light_branded' ? $brandColor : ($ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.7)' : $brandColor) }}">
-                                        {{ $companyLabel }}
-                                    </p>
+                            {{-- Compteur --}}
+                            <div class="absolute top-4 right-12 bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-lg" x-text="(slide + 1) + ' / 3'"></div>
+                        </div>
+
+                        @elseif($ctIsSingle)
+                        {{-- PHOTO UNIQUE : photo plein cadre + overlay bas --}}
+                        @php
+                            $singleBg = match($ct['visual_style']) {
+                                'light_branded' => '#E2E8F0',
+                                'brand_color'   => $brandColor,
+                                default         => '#1E293B',
+                            };
+                        @endphp
+                        <div class="aspect-square rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2"
+                             style="background-color: {{ $singleBg }}">
+                            {{-- Photo placeholder --}}
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center select-none pointer-events-none"
+                                     style="color: {{ $ct['visual_style'] === 'light_branded' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.3)' }}">
+                                    <svg class="w-14 h-14 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <p class="text-xs font-bold uppercase tracking-widest">Votre photo</p>
                                 </div>
                             </div>
+                            {{-- Overlay bas avec nom template --}}
+                            <div class="absolute inset-x-0 bottom-0 pt-12 pb-10 px-6"
+                                 style="background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%)">
+                                <div class="w-8 h-0.5 mb-2 rounded-full" style="background-color: {{ $brandColor }}"></div>
+                                <p class="text-white font-black text-sm uppercase tracking-wide font-montserrat">{{ $ct['name'] }}</p>
+                            </div>
+                            {{-- Footer --}}
+                            <div class="absolute inset-x-0 bottom-0 py-2.5 px-6 flex items-center gap-2" style="background-color: rgba(0,0,0,0.75)">
+                                @if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-4 w-4 object-contain rounded shrink-0">@endif
+                                <p class="text-white font-bold uppercase tracking-widest text-[10px] font-montserrat">{{ $companyLabel }}</p>
+                            </div>
+                            {{-- Badge + supprimer --}}
+                            <div class="absolute top-4 left-4 z-10">
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-copper text-white">
+                                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    Personnalisé
+                                </span>
+                            </div>
+                            <button wire:click="deleteTemplate({{ $ct['id'] }})" wire:confirm="Supprimer ce modèle personnalisé ?"
+                                    class="absolute top-4 right-4 z-10 w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm text-white/70 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
                         </div>
+
+                        @else
+                        {{-- TEXTE SEUL : 3 layouts distincts selon visual_style --}}
+
+                        @if($ct['visual_style'] === 'dark_branded')
+                        {{-- DARK BRANDED : fond marine foncé, accent vertical gauche, typographie large --}}
+                        <div class="aspect-square rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2"
+                             style="background-color: #0B1426">
+                            <div class="absolute -top-16 -right-16 w-56 h-56 rounded-full pointer-events-none" style="background: rgba(255,255,255,0.03)"></div>
+                            {{-- Barre verticale gauche --}}
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5" style="background-color: {{ $brandColor }}"></div>
+                            {{-- Contenu --}}
+                            <div class="absolute inset-0 flex flex-col justify-between px-8 pl-10 py-8">
+                                <div>
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.25em] mb-6" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
+                                    <p class="font-black text-white uppercase leading-none font-montserrat"
+                                       style="font-size: clamp(1.1rem, 3.5vw, 1.35rem); line-height:1.15; letter-spacing:-0.01em">
+                                        {{ $ct['name'] }}
+                                    </p>
+                                    <div class="w-10 h-0.5 mt-4 rounded-full" style="background-color: {{ $brandColor }}; opacity:0.6"></div>
+                                    <p class="text-white/50 text-xs mt-3 leading-relaxed">{{ Str::limit($ct['description'] ?? '', 70) }}</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    @if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-5 w-5 object-contain rounded shrink-0">@endif
+                                    <span class="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-copper text-white">
+                                        <svg class="w-2 h-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                        IA
+                                    </span>
+                                </div>
+                            </div>
+                            {{-- Supprimer --}}
+                            <button wire:click="deleteTemplate({{ $ct['id'] }})" wire:confirm="Supprimer ce modèle personnalisé ?"
+                                    class="absolute top-4 right-4 z-10 w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm text-white/70 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+
+                        @elseif($ct['visual_style'] === 'light_branded')
+                        {{-- LIGHT BRANDED : fond blanc, style éditorial centré --}}
+                        <div class="aspect-square rounded-2xl shadow-lg ring-1 ring-gray-200 overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2"
+                             style="background-color: #FFFFFF">
+                            {{-- Bande colorée bas --}}
+                            <div class="absolute bottom-0 inset-x-0 h-1.5" style="background-color: {{ $brandColor }}"></div>
+                            {{-- Contenu centré --}}
+                            <div class="absolute inset-0 flex flex-col items-center justify-center px-8 pb-6 text-center">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.3em] mb-5" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
+                                <div class="flex items-center gap-3 mb-5 w-full">
+                                    <div class="flex-1 h-px" style="background-color: {{ $brandColor }}; opacity:0.2"></div>
+                                    <div class="w-1.5 h-1.5 rounded-full" style="background-color: {{ $brandColor }}"></div>
+                                    <div class="flex-1 h-px" style="background-color: {{ $brandColor }}; opacity:0.2"></div>
+                                </div>
+                                <p class="font-black uppercase text-slate-900 leading-tight font-montserrat mb-4"
+                                   style="font-size: clamp(1rem, 3vw, 1.25rem); letter-spacing:-0.01em">
+                                    {{ $ct['name'] }}
+                                </p>
+                                <p class="text-slate-400 text-xs leading-relaxed">{{ Str::limit($ct['description'] ?? '', 65) }}</p>
+                            </div>
+                            {{-- Badge + supprimer --}}
+                            <div class="absolute top-4 left-4 z-10">
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-copper text-white shadow-sm">
+                                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    Personnalisé
+                                </span>
+                            </div>
+                            <button wire:click="deleteTemplate({{ $ct['id'] }})" wire:confirm="Supprimer ce modèle personnalisé ?"
+                                    class="absolute top-4 right-4 z-10 w-7 h-7 rounded-full bg-black/10 text-slate-400 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+
+                        @else
+                        {{-- BRAND COLOR : fond couleur plein, style impact / bold --}}
+                        <div class="aspect-square rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2"
+                             style="background-color: {{ $brandColor }}">
+                            {{-- Cercle géométrique décoratif --}}
+                            <div class="absolute -bottom-12 -right-12 w-48 h-48 rounded-full border-2 pointer-events-none" style="border-color: rgba(255,255,255,0.15)"></div>
+                            <div class="absolute -bottom-6 -right-6 w-28 h-28 rounded-full border-2 pointer-events-none" style="border-color: rgba(255,255,255,0.1)"></div>
+                            {{-- Contenu --}}
+                            <div class="absolute inset-0 flex flex-col justify-between px-8 py-8">
+                                <div>
+                                    <p class="text-white/60 text-[10px] font-bold uppercase tracking-[0.25em] mb-8">{{ $companyLabel }}</p>
+                                    <p class="font-black text-white uppercase leading-none font-montserrat"
+                                       style="font-size: clamp(1.2rem, 4vw, 1.5rem); line-height:1.1; letter-spacing:-0.02em; text-shadow: 0 2px 12px rgba(0,0,0,0.2)">
+                                        {{ $ct['name'] }}
+                                    </p>
+                                    <p class="text-white/70 text-xs mt-4 leading-relaxed">{{ Str::limit($ct['description'] ?? '', 65) }}</p>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        @if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-5 w-5 object-contain rounded shrink-0">@endif
+                                        <span class="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/20 text-white">
+                                            <svg class="w-2 h-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                            IA
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {{-- Badge + supprimer --}}
+                            <div class="absolute top-4 left-4 z-10">
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-white/20 text-white backdrop-blur-sm">
+                                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    Personnalisé
+                                </span>
+                            </div>
+                            <button wire:click="deleteTemplate({{ $ct['id'] }})" wire:confirm="Supprimer ce modèle personnalisé ?"
+                                    class="absolute top-4 right-4 z-10 w-7 h-7 rounded-full bg-white/20 text-white hover:bg-red-500 transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                        @endif
+
+                        @endif {{-- end photo_mode --}}
 
                         <div>
                             <div class="flex items-center gap-2">

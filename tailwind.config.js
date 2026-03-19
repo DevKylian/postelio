@@ -13,6 +13,7 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Inter', 'Figtree', ...defaultTheme.fontFamily.sans],
+                display: ['Outfit', 'Inter', 'Figtree', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 midnight: '#1E293B',

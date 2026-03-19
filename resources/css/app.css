@@ -2,12 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
 /* ── Custom base styles ─────────────────────────────────────── */
 @layer base {
-    html {
+    html, body {
         scroll-behavior: smooth;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+        max-width: 100%;
     }
 
     /* Custom scrollbar */
@@ -64,17 +68,11 @@
 
     /* Gradient text */
     .text-gradient {
-        background: linear-gradient(135deg, #1E293B 0%, #475569 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        @apply bg-clip-text text-transparent bg-gradient-to-b from-slate-900 to-slate-600;
     }
 
     .text-gradient-copper {
-        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600;
     }
 
     /* Card hover */
@@ -110,21 +108,37 @@
         @apply text-[11px] font-bold uppercase tracking-[0.12em] text-gray-400;
     }
 
-    /* Badge */
+    /* Landing page specifics */
+    .glass-card {
+        @apply bg-white/60 border border-white/80 backdrop-blur-xl rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:bg-white/80 transition-all duration-500;
+    }
+
+    .btn-primary {
+        @apply px-6 py-3 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-medium transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_8px_20px_-6px_rgba(15,23,42,0.3)];
+    }
+
+    .btn-secondary {
+        @apply px-6 py-3 rounded-full bg-white border border-slate-200/80 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm;
+    }
+
     .badge {
-        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+        @apply inline-flex px-3 py-1 rounded-full text-xs font-medium tracking-wide items-center;
     }
+
     .badge-copper {
-        @apply badge bg-copper/10 text-copper;
+        @apply text-amber-700 bg-amber-50/80 border border-amber-200/50 backdrop-blur-sm;
     }
-    .badge-green {
-        @apply badge bg-green-50 text-green-700;
+
+    .badge-white {
+        @apply bg-white/90 text-midnight border border-white/50 backdrop-blur-md;
     }
-    .badge-blue {
-        @apply badge bg-blue-50 text-blue-700;
+
+    .badge-midnight {
+        @apply bg-slate-900 text-white border border-slate-800 backdrop-blur-md;
     }
-    .badge-gray {
-        @apply badge bg-gray-100 text-gray-600;
+
+    .font-display {
+        font-family: 'Outfit', sans-serif;
     }
 }
 

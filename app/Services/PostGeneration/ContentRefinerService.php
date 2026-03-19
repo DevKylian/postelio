@@ -189,7 +189,7 @@ IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponct
                 'custom' => (function () use ($options, $noRefuseRule, $toneInstruction, $hashtagInstruction, $extraNote, $includeHashtags) {
                 $customPrompt = $options['custom_template_prompt'] ?? null;
                 if ($customPrompt) {
-                    $noHallucinate = "RÈGLE CRITIQUE — Anti-hallucination : Base-toi STRICTEMENT et UNIQUEMENT sur les informations contenues dans le mémo vocal. N'invente jamais de noms, prénoms, chiffres, réalisations ou détails absents de la transcription. Si le mémo est court, travaille uniquement avec ce qui y est dit.";
+                    $noHallucinate = "RÈGLE CRITIQUE — Anti-hallucination : Base-toi STRICTEMENT et UNIQUEMENT sur les informations contenues dans le mémo vocal. N'invente jamais de noms, prénoms, chiffres, réalisations ou détails absents de la transcription. Si le mémo est court ou générique (une seule phrase, peu de détails), génère un post court et sobre qui reste dans ce cadre — ne complète JAMAIS avec du contenu inventé. Adapte la longueur de la légende à la richesse du mémo : un mémo court = légende courte. Ne jamais supposer des compétences, des personnes ou des réalisations non mentionnées.";
                     return "{$noRefuseRule}\n{$noHallucinate}\n\n{$customPrompt}"
                         . "\n\n{$toneInstruction}"
                         . "\n" . ($includeHashtags ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende." : "N'ajoute aucun hashtag.")

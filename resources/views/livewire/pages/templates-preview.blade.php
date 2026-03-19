@@ -192,6 +192,32 @@ $deleteTemplate = function (int $id) {
                             </button>
 
                             {{-- Contenu central --}}
+                            @if(($ct['photo_mode'] ?? 'none') !== 'none')
+                            {{-- Avec photo : nom du template en haut + icône caméra au centre --}}
+                            <div class="absolute inset-0 flex flex-col pt-14 pb-16">
+                                <div class="px-8">
+                                    <span class="inline-block w-10 h-1 mb-4 rounded-full"
+                                          style="background-color: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.5)' : $brandColor }}"></span>
+                                    <p class="font-black uppercase tracking-widest text-sm font-montserrat"
+                                       style="color: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.85)' : $brandColor }}">
+                                        {{ strtoupper($ct['name']) }}
+                                    </p>
+                                </div>
+                                <div class="flex-1 flex items-center justify-center select-none pointer-events-none">
+                                    <div class="text-center"
+                                         style="color: {{ $ct['visual_style'] === 'light_branded' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.35)' }}">
+                                        <svg class="w-14 h-14 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <p class="text-xs font-bold uppercase tracking-widest">
+                                            {{ ($ct['photo_mode'] ?? '') === 'carousel' ? 'Vos photos' : 'Votre photo' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            @else
+                            {{-- Sans photo : layout texte classique --}}
                             <div class="absolute inset-0 flex flex-col justify-center px-8 pt-14 pb-16">
                                 <span class="inline-block w-10 h-1 mb-5 rounded-full"
                                       style="background-color: {{ $ct['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.5)' : $brandColor }}"></span>
@@ -204,6 +230,7 @@ $deleteTemplate = function (int $id) {
                                     {{ $ct['description'] ?? 'Modèle généré par IA.' }}
                                 </p>
                             </div>
+                            @endif
 
                             {{-- Company badge --}}
                             <div class="absolute bottom-0 inset-x-0 border-t px-8 py-3"

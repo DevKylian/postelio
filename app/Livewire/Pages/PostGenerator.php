@@ -271,7 +271,7 @@ class PostGenerator extends Component
         $post = Post::find($this->generatedPostId);
         if (!$post) return;
 
-        if ($post->status === 'completed') {
+        if ($post->status === 'completed' || $post->status === 'review_pending') {
             $this->status = 'completed';
         } elseif ($post->status === 'failed') {
             $this->status = 'failed';

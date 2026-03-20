@@ -58,9 +58,9 @@ class FacebookService
         foreach ($slides as $slide) {
             $imageUrl = $this->getPublicUrl($slide);
 
-            $response = Http::timeout(120)->post(self::GRAPH_BASE . "/{$pageId}/photos", [
+            $response = Http::timeout(120)->asForm()->post(self::GRAPH_BASE . "/{$pageId}/photos", [
                 'url'          => $imageUrl,
-                'published'    => false,
+                'published'    => 'false',
                 'access_token' => $accessToken,
             ]);
 
@@ -71,19 +71,17 @@ class FacebookService
             $photoIds[] = $response->json('id');
         }
 
-        // Publish the multi-photo post
-        $attachedMedia = [];
-        foreach ($photoIds as $id) {
-            $attachedMedia[] = ['media_fbid' => $id];
-        }
-
+        // Publish the multi-photo post with form-encoded attached_media
         $params = [
-            'message'        => $caption,
-            'access_token'   => $accessToken,
-            'attached_media' => $attachedMedia,
+            'message'      => $caption,
+            'access_token' => $accessToken,
         ];
 
-        $response = Http::timeout(120)->post(self::GRAPH_BASE . "/{$pageId}/feed", $params);
+        foreach ($photoIds as $i => $id) {
+            $params["attached_media[$i]"] = json_encode(['media_fbid' => $id]);
+        }
+
+        $response = Http::timeout(120)->asForm()->post(self::GRAPH_BASE . "/{$pageId}/feed", $params);
 
         if (!$response->successful()) {
             throw new \RuntimeException('Facebook carousel publish failed: ' . $response->body());

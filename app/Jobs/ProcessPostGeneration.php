@@ -11,8 +11,6 @@ use App\Services\PostGeneration\ContentRefinerService;
 use App\Services\PostGeneration\ImageGeneratorService;
 use Exception;
 use Illuminate\Support\Facades\Log;
-use App\Jobs\PublishToInstagramJob;
-use App\Jobs\PublishToFacebookJob;
 
 class ProcessPostGeneration implements ShouldQueue
 {
@@ -99,22 +97,6 @@ class ProcessPostGeneration implements ShouldQueue
             }
 
             Log::info("ProcessPostGeneration handle completed successfully");
-
-            // 5. Auto-publish if requested (default to true for this flow)
-            $this->post->update(['status' => 'completed']);
-            $this->post->refresh();
-
-            $company = $this->post->company;
-            if ($company) {
-                if (in_array('instagram', $platforms) && $company->instagram_connected) {
-                    PublishToInstagramJob::dispatch($this->post->id);
-                    Log::info("Auto-published to Instagram queue");
-                }
-                if (in_array('facebook', $platforms) && $company->facebook_connected) {
-                    PublishToFacebookJob::dispatch($this->post->id);
-                    Log::info("Auto-published to Facebook queue");
-                }
-            }
 
         } catch (\Throwable $e) {
             $errorMsg = "Post Generation Failed: " . $e->getMessage();

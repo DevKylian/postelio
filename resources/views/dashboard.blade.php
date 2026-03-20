@@ -37,8 +37,9 @@
         // Onboarding checklist
         $hasCompany   = $company && $company->name;
         $hasInstagram = $company && $company->instagram_connected;
+        $hasFacebook  = $company && $company->facebook_connected;
         $hasPost      = $totalPosts > 0;
-        $onboardingComplete = $hasCompany && $hasInstagram && $hasPost;
+        $onboardingComplete = $hasCompany && $hasInstagram && $hasFacebook && $hasPost;
 
         // Month-over-month trend
         $trend = $lastMonth > 0 ? round((($thisMonth - $lastMonth) / $lastMonth) * 100) : null;
@@ -67,16 +68,17 @@
                         <p class="text-xs text-gray-400 mt-0.5">Complétez votre configuration pour générer des posts professionnels</p>
                     </div>
                     @php
-                        $steps = [$hasCompany, $hasInstagram, $hasPost];
+                        $steps = [$hasCompany, $hasInstagram, $hasFacebook, $hasPost];
                         $done  = count(array_filter($steps));
                     @endphp
-                    <span class="text-xs font-bold text-copper bg-copper/10 px-2.5 py-1 rounded-full">{{ $done }}/3</span>
+                    <span class="text-xs font-bold text-copper bg-copper/10 px-2.5 py-1 rounded-full">{{ $done }}/4</span>
                 </div>
-                <div class="px-6 py-4 grid grid-cols-3 gap-3">
+                <div class="px-6 py-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
                     @php
                         $checklist = [
                             ['done' => $hasCompany,   'label' => 'Nom de société',    'href' => route('post-settings')],
                             ['done' => $hasInstagram, 'label' => 'Instagram lié',     'href' => route('post-settings')],
+                            ['done' => $hasFacebook,  'label' => 'Facebook lié',      'href' => route('post-settings')],
                             ['done' => $hasPost,      'label' => 'Premier post créé', 'href' => route('generate-post')],
                         ];
                     @endphp
@@ -100,7 +102,7 @@
             @endif
 
             {{-- ── Stats Row ── --}}
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
 
                 {{-- Total Posts --}}
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group card-hover">
@@ -178,6 +180,25 @@
                     </p>
                 </div>
 
+                {{-- Facebook --}}
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-[#1877F2]">
+                            <svg class="w-[18px] h-[18px] text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </div>
+                        @if($hasFacebook)
+                            <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Connecté</span>
+                        @else
+                            <span class="text-[11px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Non lié</span>
+                        @endif
+                    </div>
+                    <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Facebook</p>
+                    <p class="text-sm font-bold text-midnight mt-1 truncate">
+                        {{ $company?->facebook_page_name ?? 'Non connecté' }}
+                    </p>
+                </div>
             </div>
 
             {{-- ── Main Grid ── --}}
@@ -266,6 +287,37 @@
                                 </svg>
                                 Nouveau post
                             </a>
+                        </div>
+                    </div>
+
+                    {{-- Quota Card --}}
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group relative overflow-hidden">
+                        <div class="absolute -right-6 -top-6 w-16 h-16 bg-copper/5 rounded-full blur-xl"></div>
+                        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-copper animate-pulse"></div>
+                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-none">Usage Quota</p>
+                            </div>
+                            <span class="text-[13px] font-bold text-midnight tabular-nums leading-none">
+                                {{ auth()->user()->remaining_credits }} <span class="text-gray-400 font-medium">/ {{ auth()->user()->total_credits }}</span>
+                            </span>
+                        </div>
+                        
+                        <div class="h-2 w-full bg-gray-50 rounded-full overflow-hidden shadow-inner flex">
+                            @php
+                                $remaining = auth()->user()->remaining_credits;
+                                $total = max(1, auth()->user()->total_credits);
+                                $percentage = min(100, ($remaining / $total) * 100);
+                                $colorClass = $percentage < 15 ? 'from-red-500 to-rose-600' : ($percentage < 40 ? 'from-orange-400 to-amber-500' : 'from-amber-400 to-copper');
+                            @endphp
+                            <div class="h-full bg-gradient-to-r {{ $colorClass }} transition-all duration-1000 rounded-full"
+                                 style="width: {{ $percentage }}%">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3 flex items-center justify-between">
+                            <p class="text-[10px] text-gray-400 font-medium">Réinitialisation mensuelle</p>
+                            <span class="text-[10px] font-bold text-copper">{{ round($percentage) }}% restant</span>
                         </div>
                     </div>
 

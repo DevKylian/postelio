@@ -87,6 +87,7 @@ $logout = function (Logout $logout) {
                 <span>Gabarits</span>
             </x-sidebar-link>
 
+
             <x-sidebar-link :href="route('statistics')" :active="request()->routeIs('statistics')" wire:navigate>
                 <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -108,6 +109,41 @@ $logout = function (Logout $logout) {
             </x-sidebar-link>
 
         </nav>
+
+        <!-- Quota Progress Bar -->
+        <div class="px-3 py-4 border-t border-white/[0.04]">
+            <div class="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4 shadow-sm relative overflow-hidden group">
+                <!-- Background decoration -->
+                <div class="absolute -right-4 -top-8 w-16 h-16 bg-copper/10 blur-2xl rounded-full"></div>
+                
+                <div class="flex items-center justify-between mb-3 relative z-10">
+                    <div class="flex items-center gap-2">
+                        <div class="w-1.5 h-1.5 rounded-full bg-copper shadow-[0_0_8px_rgba(184,115,51,0.4)]"></div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Quota Mensuel</span>
+                    </div>
+                    <span class="text-[12px] font-bold text-slate-200 tabular-nums">
+                        {{ auth()->user()->remaining_credits }} <span class="text-slate-500 font-medium">/ {{ auth()->user()->total_credits }}</span>
+                    </span>
+                </div>
+
+                <div class="h-1.5 w-full bg-white/[0.05] rounded-full overflow-hidden shadow-inner relative z-10">
+                    @php
+                        $remaining = auth()->user()->remaining_credits;
+                        $total = max(1, auth()->user()->total_credits);
+                        $percentage = min(100, ($remaining / $total) * 100);
+                        $colorClass = $percentage < 15 ? 'from-rose-500 to-red-600' : ($percentage < 40 ? 'from-orange-500 to-amber-500' : 'from-amber-400 to-copper');
+                    @endphp
+                    <div class="h-full bg-gradient-to-r {{ $colorClass }} transition-all duration-1000 rounded-full relative"
+                         style="width: {{ $percentage }}%">
+                        <div class="absolute inset-0 bg-white/20 opacity-50 group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                    </div>
+                </div>
+
+                <div class="mt-3 flex items-center gap-1.5 relative z-10">
+                    <p class="text-[10px] text-slate-500 font-medium">Réinitialisation automatique dans le mois</p>
+                </div>
+            </div>
+        </div>
 
         <!-- Footer / Profile -->
         <div class="shrink-0 p-3 border-t border-white/[0.06]">

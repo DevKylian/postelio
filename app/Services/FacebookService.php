@@ -37,7 +37,7 @@ class FacebookService
 
         $imageUrl = $this->getPublicUrl($imagePath);
 
-        $response = Http::post(self::GRAPH_BASE . "/{$pageId}/photos", [
+        $response = Http::timeout(120)->post(self::GRAPH_BASE . "/{$pageId}/photos", [
             'url'          => $imageUrl,
             'message'      => $caption,
             'access_token' => $accessToken,
@@ -58,7 +58,7 @@ class FacebookService
         foreach ($slides as $slide) {
             $imageUrl = $this->getPublicUrl($slide);
 
-            $response = Http::post(self::GRAPH_BASE . "/{$pageId}/photos", [
+            $response = Http::timeout(120)->post(self::GRAPH_BASE . "/{$pageId}/photos", [
                 'url'          => $imageUrl,
                 'published'    => false,
                 'access_token' => $accessToken,
@@ -72,15 +72,18 @@ class FacebookService
         }
 
         // Publish the multi-photo post
-        $params = [
-            'message'      => $caption,
-            'access_token' => $accessToken,
-        ];
-        foreach ($photoIds as $i => $id) {
-            $params["attached_media[{$i}]"] = json_encode(['media_fbid' => $id]);
+        $attachedMedia = [];
+        foreach ($photoIds as $id) {
+            $attachedMedia[] = ['media_fbid' => $id];
         }
 
-        $response = Http::post(self::GRAPH_BASE . "/{$pageId}/feed", $params);
+        $params = [
+            'message'        => $caption,
+            'access_token'   => $accessToken,
+            'attached_media' => $attachedMedia,
+        ];
+
+        $response = Http::timeout(120)->post(self::GRAPH_BASE . "/{$pageId}/feed", $params);
 
         if (!$response->successful()) {
             throw new \RuntimeException('Facebook carousel publish failed: ' . $response->body());
@@ -94,7 +97,7 @@ class FacebookService
      */
     public function getPageStats(string $accessToken, string $pageId): array
     {
-        $response = Http::get(self::GRAPH_BASE . "/{$pageId}", [
+        $response = Http::timeout(120)->get(self::GRAPH_BASE . "/{$pageId}", [
             'fields'       => 'name,followers_count,fan_count,picture{url},about,website,category',
             'access_token' => $accessToken,
         ]);
@@ -120,7 +123,7 @@ class FacebookService
      */
     public function getRecentPosts(string $accessToken, string $pageId, int $limit = 24): array
     {
-        $response = Http::get(self::GRAPH_BASE . "/{$pageId}/posts", [
+        $response = Http::timeout(120)->get(self::GRAPH_BASE . "/{$pageId}/posts", [
             'fields'       => 'message,created_time,full_picture,likes.summary(true),comments.summary(true),shares',
             'limit'        => $limit,
             'access_token' => $accessToken,
@@ -155,7 +158,7 @@ class FacebookService
 
         try {
             $imageData = Storage::disk('public')->get($path);
-            $response  = Http::asForm()->post('https://api.imgbb.com/1/upload?key=' . urlencode($imgbbKey), [
+            $response  = Http::timeout(120)->asForm()->post('https://api.imgbb.com/1/upload?key=' . urlencode($imgbbKey), [
                 'image'      => base64_encode($imageData),
                 'expiration' => 600,
             ])->json();

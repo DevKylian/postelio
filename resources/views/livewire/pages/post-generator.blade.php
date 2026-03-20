@@ -1055,7 +1055,7 @@
 
     {{-- ── PROCESSING ── --}}
     @elseif($status === 'processing')
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm py-24 flex flex-col items-center justify-center text-center space-y-6">
+        <div wire:poll.2s="checkProcessingStatus" class="bg-white rounded-2xl border border-gray-100 shadow-sm py-24 flex flex-col items-center justify-center text-center space-y-6">
             <div class="relative">
                 <div class="w-20 h-20 border-4 border-gray-100 border-t-copper rounded-full animate-spin"></div>
                 <div class="absolute inset-0 flex items-center justify-center">
@@ -1065,10 +1065,10 @@
                 </div>
             </div>
             <div>
-                <h3 class="text-xl font-bold text-midnight">Génération en cours...</h3>
-                <p class="text-gray-400 mt-1.5 text-sm">Whisper transcrit, GPT-4 rédige, l'image est en cours de création.</p>
+                <h3 class="text-xl font-bold text-midnight">Création de votre post...</h3>
+                <p class="text-gray-400 mt-1.5 text-sm">Postelio prépare votre visuel et votre légende sur-mesure.</p>
             </div>
-            <p class="text-xs text-gray-300">Cela prend généralement 30 à 60 secondes.</p>
+            <p class="text-xs text-gray-300">Cela prend généralement moins d'une minute.</p>
         </div>
 
     {{-- ── REVIEW PENDING ── --}}
@@ -1299,8 +1299,8 @@
                 </svg>
             </div>
             <div>
-                <h3 class="text-xl font-bold text-midnight">Post créé avec succès !</h3>
-                <p class="text-gray-400 mt-1.5 text-sm">Votre visuel a été généré et ajouté à vos créations.</p>
+                <h3 class="text-xl font-bold text-midnight">Post généré et envoyé en publication !</h3>
+                <p class="text-gray-400 mt-1.5 text-sm">Votre post est en cours de mise en ligne sur vos réseaux sociaux.</p>
             </div>
             <div class="flex flex-col sm:flex-row gap-3">
                 <a href="{{ route('posts.index') }}" wire:navigate

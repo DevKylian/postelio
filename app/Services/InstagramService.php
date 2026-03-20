@@ -44,7 +44,7 @@ class InstagramService
      */
     public function exchangeCodeForLongLivedToken(string $code): array
     {
-        $short = Http::get(self::GRAPH_BASE . '/oauth/access_token', [
+        $short = Http::timeout(120)->get(self::GRAPH_BASE . '/oauth/access_token', [
             'client_id'     => $this->appId,
             'client_secret' => $this->appSecret,
             'redirect_uri'  => $this->callbackUrl,
@@ -55,7 +55,7 @@ class InstagramService
             throw new \RuntimeException('Token exchange failed: ' . json_encode($short));
         }
 
-        $long = Http::get(self::GRAPH_BASE . '/oauth/access_token', [
+        $long = Http::timeout(120)->get(self::GRAPH_BASE . '/oauth/access_token', [
             'grant_type'        => 'fb_exchange_token',
             'client_id'         => $this->appId,
             'client_secret'     => $this->appSecret,
@@ -75,16 +75,16 @@ class InstagramService
      */
     public function getInstagramBusinessAccount(string $accessToken): array
     {
-        $me = Http::get(self::GRAPH_BASE . '/me', [
+        $me = Http::timeout(120)->get(self::GRAPH_BASE . '/me', [
             'access_token' => $accessToken,
             'fields'       => 'id,name',
         ])->json();
 
-        $permissions = Http::get(self::GRAPH_BASE . '/me/permissions', [
+        $permissions = Http::timeout(120)->get(self::GRAPH_BASE . '/me/permissions', [
             'access_token' => $accessToken,
         ])->json();
 
-        $response = Http::get(self::GRAPH_BASE . '/me/accounts', [
+        $response = Http::timeout(120)->get(self::GRAPH_BASE . '/me/accounts', [
             'access_token' => $accessToken,
             'fields'       => 'id,name,instagram_business_account',
         ])->json();
@@ -99,13 +99,13 @@ class InstagramService
         }
 
         // Fallback: pages managed via Business Manager
-        $businesses = Http::get(self::GRAPH_BASE . '/me/businesses', [
+        $businesses = Http::timeout(120)->get(self::GRAPH_BASE . '/me/businesses', [
             'access_token' => $accessToken,
             'fields'       => 'id,name',
         ])->json()['data'] ?? [];
 
         foreach ($businesses as $business) {
-            $bizPages = Http::get(self::GRAPH_BASE . '/' . $business['id'] . '/owned_pages', [
+            $bizPages = Http::timeout(120)->get(self::GRAPH_BASE . '/' . $business['id'] . '/owned_pages', [
                 'access_token' => $accessToken,
                 'fields'       => 'id,name,instagram_business_account',
             ])->json()['data'] ?? [];
@@ -134,7 +134,7 @@ class InstagramService
 
     private function resolveIgAccount(string $igId, string $accessToken): array
     {
-        $ig = Http::get(self::GRAPH_BASE . "/{$igId}", [
+        $ig = Http::timeout(120)->get(self::GRAPH_BASE . "/{$igId}", [
             'fields'       => 'id,username,profile_picture_url',
             'access_token' => $accessToken,
         ])->json();
@@ -172,7 +172,7 @@ class InstagramService
 
     private function publishSingleImage(string $igId, string $token, string $imageUrl, string $caption): string
     {
-        $container = Http::post(self::GRAPH_BASE . "/{$igId}/media", [
+        $container = Http::timeout(120)->post(self::GRAPH_BASE . "/{$igId}/media", [
             'image_url'    => $imageUrl,
             'caption'      => $caption,
             'access_token' => $token,
@@ -185,7 +185,7 @@ class InstagramService
         // Wait for media to be ready
         $this->pollContainerStatus($container['id'], $token);
 
-        $result = Http::post(self::GRAPH_BASE . "/{$igId}/media_publish", [
+        $result = Http::timeout(120)->post(self::GRAPH_BASE . "/{$igId}/media_publish", [
             'creation_id'  => $container['id'],
             'access_token' => $token,
         ])->json();
@@ -202,7 +202,7 @@ class InstagramService
         // Step 1 — upload each slide as a carousel item (no caption)
         $itemIds = [];
         foreach ($slides as $slidePath) {
-            $item = Http::post(self::GRAPH_BASE . "/{$igId}/media", [
+            $item = Http::timeout(120)->post(self::GRAPH_BASE . "/{$igId}/media", [
                 'image_url'        => $this->publicUrl($slidePath),
                 'is_carousel_item' => true,
                 'access_token'     => $token,
@@ -219,7 +219,7 @@ class InstagramService
         }
 
         // Step 2 — create carousel container with caption
-        $container = Http::post(self::GRAPH_BASE . "/{$igId}/media", [
+        $container = Http::timeout(120)->post(self::GRAPH_BASE . "/{$igId}/media", [
             'media_type'   => 'CAROUSEL',
             'children'     => implode(',', $itemIds),
             'caption'      => $caption,
@@ -234,7 +234,7 @@ class InstagramService
         $this->pollContainerStatus($container['id'], $token);
 
         // Step 3 — publish
-        $result = Http::post(self::GRAPH_BASE . "/{$igId}/media_publish", [
+        $result = Http::timeout(120)->post(self::GRAPH_BASE . "/{$igId}/media_publish", [
             'creation_id'  => $container['id'],
             'access_token' => $token,
         ])->json();
@@ -252,7 +252,7 @@ class InstagramService
     private function pollContainerStatus(string $containerId, string $token, int $maxAttempts = 15, int $interval = 3): void
     {
         for ($i = 0; $i < $maxAttempts; $i++) {
-            $response = Http::get(self::GRAPH_BASE . "/{$containerId}", [
+            $response = Http::timeout(120)->get(self::GRAPH_BASE . "/{$containerId}", [
                 'fields'       => 'status_code',
                 'access_token' => $token,
             ])->json();
@@ -278,7 +278,7 @@ class InstagramService
      */
     public function getAccountStats(string $accessToken, string $igId): array
     {
-        $response = Http::get(self::GRAPH_BASE . "/{$igId}", [
+        $response = Http::timeout(120)->get(self::GRAPH_BASE . "/{$igId}", [
             'fields'       => 'id,username,name,biography,followers_count,follows_count,media_count,profile_picture_url,website',
             'access_token' => $accessToken,
         ])->json();
@@ -295,7 +295,7 @@ class InstagramService
      */
     public function getRecentMedia(string $accessToken, string $igId, int $limit = 12): array
     {
-        $response = Http::get(self::GRAPH_BASE . "/{$igId}/media", [
+        $response = Http::timeout(120)->get(self::GRAPH_BASE . "/{$igId}/media", [
             'fields'       => 'id,caption,media_type,media_url,thumbnail_url,timestamp,like_count,comments_count',
             'limit'        => $limit,
             'access_token' => $accessToken,
@@ -320,7 +320,7 @@ class InstagramService
 
         try {
             $imageData = Storage::disk('public')->get($storagePath);
-            $response  = Http::asForm()->post('https://api.imgbb.com/1/upload?key=' . urlencode($imgbbKey), [
+            $response  = Http::timeout(120)->asForm()->post('https://api.imgbb.com/1/upload?key=' . urlencode($imgbbKey), [
                 'image'      => base64_encode($imageData),
                 'expiration' => 600,
             ])->json();

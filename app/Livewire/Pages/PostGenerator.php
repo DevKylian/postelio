@@ -140,7 +140,31 @@ class PostGenerator extends Component
 
     public function generate()
     {
+        $user = Auth::user();
+        $user->checkAndResetQuota();
+
         $this->validate();
+
+        // Calculate cost
+        $imageCount = 1;
+        if (in_array($this->template, ['chantier_detail', 'step_by_step'])) {
+            $imageCount = count($this->extraImages);
+        } elseif ($this->template === 'guide_pedagogique') {
+            $imageCount = (int) $this->targetSlides;
+        } elseif ($this->template === 'custom' && $this->customTemplateId) {
+            $ct = CustomTemplate::find($this->customTemplateId);
+            if ($ct && ($ct->photo_mode ?? 'none') === 'carousel') {
+                $imageCount = count($this->extraImages);
+            }
+        }
+
+        $platformCount = count($this->platforms) ?: 1;
+        $cost = $imageCount * $platformCount * 2;
+
+        if (!$user->hasCredits($cost)) {
+            $this->addError('quota', "Vous n'avez pas assez de crédits pour cette génération (Coût : {$cost} crédits, Restant : {$user->remaining_credits}).");
+            return;
+        }
 
         // Require at least audio OR text
         if (!$this->audio && empty(trim($this->textContent))) {
@@ -218,41 +242,40 @@ class PostGenerator extends Component
                                     : null,
         ]);
 
+        $user->deductCredits($cost);
+
         $this->generatedPostId = $post->id;
 
         try {
-            ProcessPostGeneration::dispatchSync($post);
+            ProcessPostGeneration::dispatch($post);
+            $this->status = 'processing';
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PostGenerator: job failed', [
+            \Illuminate\Support\Facades\Log::error('PostGenerator: dispatch failed', [
                 'post_id' => $post->id,
                 'error'   => $e->getMessage(),
             ]);
             $this->errorMessage = $e->getMessage();
             $this->status = 'failed';
+        }
+    }
+
+    /**
+     * Periodically called via wire:poll while status is 'processing'
+     */
+    public function checkProcessingStatus(): void
+    {
+        if ($this->status !== 'processing' || !$this->generatedPostId) {
             return;
         }
 
-        $post->refresh();
+        $post = Post::find($this->generatedPostId);
+        if (!$post) return;
 
-        if ($post->status === 'review_pending') {
-            $this->previewContent = $post->caption;
-
-            if ($post->slides && count($post->slides) > 0) {
-                $this->previewSlides  = array_map(
-                    fn($p) => \Illuminate\Support\Facades\Storage::url($p),
-                    $post->slides
-                );
-                $this->previewImageUrl = $this->previewSlides[0];
-            } else {
-                $this->previewImageUrl = $post->image_path
-                    ? \Illuminate\Support\Facades\Storage::url($post->image_path)
-                    : null;
-                $this->previewSlides = [];
-            }
-
-            $this->status = 'review_pending';
-        } else {
+        if ($post->status === 'completed') {
+            $this->status = 'completed';
+        } elseif ($post->status === 'failed') {
             $this->status = 'failed';
+            $this->errorMessage = "La génération a échoué. Veuillez réessayer.";
         }
     }
 
@@ -265,48 +288,21 @@ class PostGenerator extends Component
         if (!$post || !$post->transcription) return;
 
         $this->status = 'processing';
-        $post->update(['status' => 'processing']);
+        
+        $templateOptions = $post->template_options ?? [];
+        if ($simplified) {
+            $templateOptions['simplified'] = true;
+        }
+
+        $post->update([
+            'status' => 'processing',
+            'template_options' => $templateOptions,
+        ]);
 
         try {
-            $refiner   = app(\App\Services\PostGeneration\ContentRefinerService::class);
-            $generator = app(\App\Services\PostGeneration\ImageGeneratorService::class);
-
-            $photoCount      = count($post->extra_images ?? []);
-            $templateOptions = $post->template_options ?? [];
-            if ($simplified) {
-                $templateOptions['simplified'] = true;
-            }
-
-            $refined = $refiner->refine($post->transcription, $post->template, $photoCount, $templateOptions);
-            $post->update(['refined_content' => $refined]);
-
-            $result = $generator->generate($post->fresh());
-
-            if (is_array($result)) {
-                $post->update(['image_path' => $result[0], 'slides' => $result, 'status' => 'review_pending']);
-            } else {
-                $post->update(['image_path' => $result, 'slides' => [$result], 'status' => 'review_pending']);
-            }
-
-            $post->refresh();
-            $this->previewContent = $post->caption;
-
-            if ($post->slides && count($post->slides) > 0) {
-                $this->previewSlides  = array_map(
-                    fn($p) => \Illuminate\Support\Facades\Storage::url($p),
-                    $post->slides
-                );
-                $this->previewImageUrl = $this->previewSlides[0];
-            } else {
-                $this->previewImageUrl = $post->image_path
-                    ? \Illuminate\Support\Facades\Storage::url($post->image_path)
-                    : null;
-                $this->previewSlides = [];
-            }
-
-            $this->status = 'review_pending';
+            ProcessPostGeneration::dispatch($post);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('regeneratePost failed', ['error' => $e->getMessage()]);
+            \Illuminate\Support\Facades\Log::error('regeneratePost dispatch failed', ['error' => $e->getMessage()]);
             $this->errorMessage = $e->getMessage();
             $this->status = 'failed';
             $post->update(['status' => 'failed']);
@@ -377,6 +373,8 @@ class PostGenerator extends Component
 
     public function render()
     {
+        Auth::user()->checkAndResetQuota();
+
         $customTemplates = CustomTemplate::where('user_id', Auth::id())
             ->orderByDesc('created_at')
             ->get();

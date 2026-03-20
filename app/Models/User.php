@@ -23,6 +23,9 @@ class User extends Authenticatable
         'email',
         'password',
         'onboarding_completed',
+        'total_credits',
+        'used_credits',
+        'last_quota_reset_at',
     ];
 
     /**
@@ -46,7 +49,40 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'onboarding_completed' => 'boolean',
+            'last_quota_reset_at' => 'datetime',
+            'total_credits' => 'integer',
+            'used_credits' => 'integer',
         ];
+    }
+
+    /**
+     * Check if user needs a quota reset (monthly)
+     */
+    public function checkAndResetQuota(): void
+    {
+        $now = now();
+        
+        if (!$this->last_quota_reset_at || $this->last_quota_reset_at->addMonth()->isPast()) {
+            $this->update([
+                'used_credits' => 0,
+                'last_quota_reset_at' => $now,
+            ]);
+        }
+    }
+
+    public function getRemainingCreditsAttribute(): int
+    {
+        return max(0, $this->total_credits - $this->used_credits);
+    }
+
+    public function hasCredits(int $amount): bool
+    {
+        return $this->remaining_credits >= $amount;
+    }
+
+    public function deductCredits(int $amount): void
+    {
+        $this->increment('used_credits', $amount);
     }
 
     public function company()

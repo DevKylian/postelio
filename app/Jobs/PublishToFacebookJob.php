@@ -12,10 +12,13 @@ class PublishToFacebookJob implements ShouldQueue
 {
     use Queueable;
 
+    public $timeout = 300;
+
     public function __construct(public int $postId) {}
 
     public function handle(FacebookService $facebook): void
     {
+        set_time_limit(300);
         $post = Post::with('company')->find($this->postId);
 
         if (!$post) {

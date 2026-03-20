@@ -3,15 +3,34 @@
 use App\Http\Controllers\FacebookController;
 use App\Http\Controllers\InstagramController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::view('/', 'welcome');
 
+// Stripe webhooks (no CSRF verification)
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])
+    ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class)
+    ->name('cashier.webhook');
+
 // Onboarding (auth required, but NOT onboarding middleware)
 Volt::route('onboarding', 'pages.onboarding')
     ->middleware(['auth', 'verified'])
     ->name('onboarding');
+
+// Subscription routes (auth required, but no subscription check)
+Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
+    Route::get('/subscription/plans', [SubscriptionController::class, 'plans'])->name('subscription.plans');
+    Route::post('/subscription/checkout', [SubscriptionController::class, 'checkout'])->name('subscription.checkout');
+    Route::get('/subscription/success', [SubscriptionController::class, 'success'])->name('subscription.success');
+    Route::get('/subscription/billing', [SubscriptionController::class, 'billing'])->name('subscription.billing');
+    Route::post('/subscription/portal', [SubscriptionController::class, 'portal'])->name('subscription.portal');
+    Route::post('/subscription/resume', [SubscriptionController::class, 'resume'])->name('subscription.resume');
+    Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    Route::post('/subscription/change-plan', [SubscriptionController::class, 'changePlan'])->name('subscription.change-plan');
+});
 
 // App routes (require auth + verified + onboarding completed)
 Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {

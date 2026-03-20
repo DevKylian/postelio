@@ -108,6 +108,13 @@ $logout = function (Logout $logout) {
                 <span>Paramètres</span>
             </x-sidebar-link>
 
+            <x-sidebar-link :href="route('subscription.billing')" :active="request()->routeIs('subscription.*')" wire:navigate>
+                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                <span>Abonnement</span>
+            </x-sidebar-link>
+
         </nav>
 
         <!-- Quota Progress Bar -->
@@ -139,8 +146,17 @@ $logout = function (Logout $logout) {
                     </div>
                 </div>
 
-                <div class="mt-3 flex items-center gap-1.5 relative z-10">
-                    <p class="text-[10px] text-slate-500 font-medium">Réinitialisation automatique dans le mois</p>
+                <div class="mt-3 flex items-center justify-between relative z-10">
+                    @if(auth()->user()->hasActiveSubscription())
+                        <p class="text-[10px] text-slate-500 font-medium">
+                            Plan {{ ucfirst(auth()->user()->currentPlanKey() ?? 'gratuit') }}
+                        </p>
+                    @else
+                        <a href="{{ route('subscription.plans') }}" wire:navigate
+                           class="text-[10px] text-copper font-semibold hover:text-amber-400 transition-colors">
+                            Upgrader
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>

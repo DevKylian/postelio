@@ -7,11 +7,12 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Cashier\Billable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, Billable;
 
     /**
      * The attributes that are mass assignable.
@@ -83,6 +84,50 @@ class User extends Authenticatable
     public function deductCredits(int $amount): void
     {
         $this->increment('used_credits', $amount);
+    }
+
+    /**
+     * Get the user's current subscription plan key (starter, pro, business) or null.
+     */
+    public function currentPlanKey(): ?string
+    {
+        $subscription = $this->subscription('default');
+
+        if (!$subscription || !$subscription->valid()) {
+            return null;
+        }
+
+        $plans = config('subscription.plans');
+
+        foreach ($plans as $key => $plan) {
+            if ($plan['stripe_price_id'] && $subscription->hasPrice($plan['stripe_price_id'])) {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get credits allowed by the current plan.
+     */
+    public function planCredits(): int
+    {
+        $planKey = $this->currentPlanKey();
+
+        if (!$planKey) {
+            return config('subscription.free_credits', 3);
+        }
+
+        return config("subscription.plans.{$planKey}.credits", 0);
+    }
+
+    /**
+     * Whether the user has an active paid subscription.
+     */
+    public function hasActiveSubscription(): bool
+    {
+        return $this->subscribed('default');
     }
 
     public function company()

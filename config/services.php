@@ -41,6 +41,12 @@ return [
         'redirect'      => env('INSTAGRAM_CALLBACK_URL'),
     ],
 
+    'facebook' => [
+        'client_id'     => env('FACEBOOK_APP_ID'),
+        'client_secret' => env('FACEBOOK_APP_SECRET'),
+        'redirect'      => env('FACEBOOK_CALLBACK_URL'),
+    ],
+
     'imgbb' => [
         'api_key' => env('IMGBB_API_KEY'),
     ],

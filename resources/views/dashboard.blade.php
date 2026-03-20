@@ -36,10 +36,9 @@
 
         // Onboarding checklist
         $hasCompany   = $company && $company->name;
-        $hasLogo      = $company && $company->logo_path;
         $hasInstagram = $company && $company->instagram_connected;
         $hasPost      = $totalPosts > 0;
-        $onboardingComplete = $hasCompany && $hasLogo && $hasInstagram && $hasPost;
+        $onboardingComplete = $hasCompany && $hasInstagram && $hasPost;
 
         // Month-over-month trend
         $trend = $lastMonth > 0 ? round((($thisMonth - $lastMonth) / $lastMonth) * 100) : null;
@@ -68,16 +67,15 @@
                         <p class="text-xs text-gray-400 mt-0.5">Complétez votre configuration pour générer des posts professionnels</p>
                     </div>
                     @php
-                        $steps = [$hasCompany, $hasLogo, $hasInstagram, $hasPost];
+                        $steps = [$hasCompany, $hasInstagram, $hasPost];
                         $done  = count(array_filter($steps));
                     @endphp
-                    <span class="text-xs font-bold text-copper bg-copper/10 px-2.5 py-1 rounded-full">{{ $done }}/4</span>
+                    <span class="text-xs font-bold text-copper bg-copper/10 px-2.5 py-1 rounded-full">{{ $done }}/3</span>
                 </div>
-                <div class="px-6 py-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="px-6 py-4 grid grid-cols-3 gap-3">
                     @php
                         $checklist = [
                             ['done' => $hasCompany,   'label' => 'Nom de société',    'href' => route('post-settings')],
-                            ['done' => $hasLogo,      'label' => 'Logo uploadé',      'href' => route('post-settings')],
                             ['done' => $hasInstagram, 'label' => 'Instagram lié',     'href' => route('post-settings')],
                             ['done' => $hasPost,      'label' => 'Premier post créé', 'href' => route('generate-post')],
                         ];

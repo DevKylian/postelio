@@ -2,12 +2,10 @@
 
 use App\Models\Company;
 use Illuminate\Support\Facades\Auth;
-use Livewire\WithFileUploads;
 
-use function Livewire\Volt\{layout, state, uses};
+use function Livewire\Volt\{layout, state};
 
 layout('layouts.onboarding');
-uses([WithFileUploads::class]);
 
 state([
     'step'        => 1,
@@ -15,7 +13,6 @@ state([
     'name'        => '',
     'city'        => '',
     'brand_color' => '#F59E0B',
-    'logo'        => null,
     'trades'      => [
         ['key' => 'plombier',      'label' => 'Plombier',       'icon' => '🔧'],
         ['key' => 'electricien',   'label' => 'Électricien',    'icon' => '⚡'],
@@ -37,17 +34,6 @@ $selectTrade = function (string $trade) {
     $this->trade = $trade;
 };
 
-$updatedLogo = function () {
-    try {
-        $this->validateOnly('logo', [
-            'logo' => ['nullable', 'image', 'max:10240'],
-        ]);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        $this->logo = null;
-        throw $e;
-    }
-};
-
 $nextStep = function () {
     if ($this->step === 2) {
         $this->validate([
@@ -59,7 +45,6 @@ $nextStep = function () {
     if ($this->step === 3) {
         $this->validate([
             'brand_color' => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
-            'logo'        => ['nullable', 'image', 'max:10240'],
         ]);
     }
 
@@ -85,10 +70,6 @@ $complete = function () {
         'trade'       => $this->trade,
         'brand_color' => $this->brand_color,
     ];
-
-    if ($this->logo) {
-        $data['logo_path'] = $this->logo->store('logos', 'public');
-    }
 
     if ($company) {
         $company->update($data);
@@ -269,7 +250,7 @@ $complete = function () {
                 <div>
                     <div class="mb-6">
                         <h1 class="text-2xl font-bold text-slate-800">Identité visuelle</h1>
-                        <p class="text-gray-500 mt-1 text-sm">Choisissez votre couleur et ajoutez votre logo pour personnaliser vos visuels.</p>
+                        <p class="text-gray-500 mt-1 text-sm">Choisissez votre couleur pour personnaliser vos visuels. Votre logo sera récupéré depuis votre compte Instagram.</p>
                     </div>
 
                     <div class="space-y-6">
@@ -306,56 +287,13 @@ $complete = function () {
                             @enderror
                         </div>
 
-                        {{-- Logo --}}
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-3">
-                                Logo <span class="text-gray-400 font-normal">(optionnel — PNG, JPG, max 10 Mo)</span>
-                            </label>
-
-                            @if($logo)
-                                <div class="flex items-center gap-4 p-4 rounded-2xl bg-green-50 border border-green-200">
-                                    <img src="{{ $logo->temporaryUrl() }}" class="h-14 w-14 rounded-xl object-contain border border-gray-200 bg-white p-1 shadow-sm" />
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-semibold text-green-700">Logo sélectionné ✓</p>
-                                        <p class="text-xs text-green-600 truncate">{{ $logo->getClientOriginalName() }}</p>
-                                    </div>
-                                    <button wire:click="$set('logo', null)" type="button" class="text-gray-400 hover:text-red-500 transition-colors p-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            @else
-                                <label class="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 cursor-pointer hover:border-amber-400 hover:bg-amber-50 transition-all duration-200 group">
-                                    <div class="w-12 h-12 rounded-2xl bg-gray-100 group-hover:bg-amber-100 flex items-center justify-center transition-colors duration-200">
-                                        <svg class="w-6 h-6 text-gray-400 group-hover:text-amber-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="text-center">
-                                        <p class="text-sm font-semibold text-gray-600 group-hover:text-amber-700 transition-colors">Cliquez pour uploader votre logo</p>
-                                        <p class="text-xs text-gray-400 mt-0.5">PNG, JPG, SVG — Max 10 Mo</p>
-                                    </div>
-                                    <input wire:model="logo" type="file" accept="image/*" class="hidden" />
-                                </label>
-                            @endif
-
-                            @error('logo')
-                                <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $message }}</p>
-                            @enderror
-                        </div>
-
                         {{-- Aperçu --}}
                         <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
                             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Aperçu de votre marque</p>
                             <div class="flex items-center gap-3">
                                 <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0 shadow-sm overflow-hidden transition-all duration-300"
                                      style="background-color: {{ $brand_color }}">
-                                    @if($logo)
-                                        <img src="{{ $logo->temporaryUrl() }}" class="w-full h-full object-contain p-1" />
-                                    @else
-                                        {{ $name ? strtoupper(substr($name, 0, 1)) : '?' }}
-                                    @endif
+                                    {{ $name ? strtoupper(substr($name, 0, 1)) : '?' }}
                                 </div>
                                 <div>
                                     <p class="font-bold text-slate-800 text-sm">{{ $name ?: 'Votre entreprise' }}</p>
@@ -407,11 +345,7 @@ $complete = function () {
                         <div class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100">
                             <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-xl flex-shrink-0 shadow-sm overflow-hidden"
                                  style="background-color: {{ $brand_color }}">
-                                @if($logo)
-                                    <img src="{{ $logo->temporaryUrl() }}" class="w-full h-full object-contain p-1" />
-                                @else
-                                    {{ $name ? strtoupper(substr($name, 0, 1)) : '?' }}
-                                @endif
+                                {{ $name ? strtoupper(substr($name, 0, 1)) : '?' }}
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="font-bold text-slate-800 text-sm">{{ $name }}</p>

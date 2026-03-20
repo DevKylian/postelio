@@ -124,6 +124,62 @@
                             @endif
                         </div>
                     </div>
+
+                    {{-- Facebook Status Card --}}
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div class="px-5 py-4 border-b border-gray-50 flex items-center gap-3">
+                            <div class="w-7 h-7 rounded-lg bg-[#1877F2] flex items-center justify-center shrink-0">
+                                <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-midnight leading-none">Facebook</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Publication automatique</p>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            @if($company->facebook_connected)
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="w-2 h-2 rounded-full bg-green-400 shrink-0"></span>
+                                    <span class="text-sm font-semibold text-midnight">Connecté</span>
+                                    @if($company->facebook_page_name)
+                                        <span class="text-xs text-gray-400">· {{ $company->facebook_page_name }}</span>
+                                    @endif
+                                </div>
+                                <p class="text-xs text-gray-400 mb-4 leading-relaxed">
+                                    Vos posts validés seront également publiés sur votre Page Facebook.
+                                </p>
+                                <form method="POST" action="{{ route('facebook.disconnect') }}"
+                                      onsubmit="return confirm('Déconnecter Facebook ?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="w-full py-2 text-sm font-semibold text-red-500 border border-red-100 rounded-lg hover:bg-red-50 transition-colors">
+                                        Déconnecter
+                                    </button>
+                                </form>
+                            @else
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="w-2 h-2 rounded-full bg-gray-300 shrink-0"></span>
+                                    <span class="text-sm text-gray-500">Non connecté</span>
+                                </div>
+                                <p class="text-xs text-gray-400 mb-4 leading-relaxed">
+                                    Connectez une Page Facebook pour publier automatiquement.
+                                </p>
+                                <a href="{{ route('facebook.connect') }}"
+                                   class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-[#1877F2] transition-opacity hover:opacity-90">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                    </svg>
+                                    Connecter Facebook
+                                </a>
+                                <p class="text-[11px] text-gray-400 mt-2.5 text-center leading-relaxed">
+                                    Nécessite une Page Facebook dont vous êtes administrateur.
+                                </p>
+                            @endif
+                        </div>
+                    </div>
                     @endif
                 </div>
 

@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Models\CustomTemplate;
 use App\Jobs\ProcessPostGeneration;
 use App\Jobs\PublishToInstagramJob;
+use App\Jobs\PublishToFacebookJob;
 use Illuminate\Support\Facades\Auth;
 
 class PostGenerator extends Component
@@ -19,6 +20,7 @@ class PostGenerator extends Component
     public $imageAfter;
     public $extraImages = [];        // for chantier_detail & step_by_step (up to 5)
     public $template = 'review';
+    public $platforms = [];           // ['instagram', 'facebook']
     public $scheduleType = 'now';    // 'now' | 'scheduled'
     public $scheduledAt  = '';       // datetime-local string
     public $status = 'idle';
@@ -197,6 +199,9 @@ class PostGenerator extends Component
             'text_content'           => (!$this->audio && !empty(trim($this->textContent))) ? trim($this->textContent) : null,
         ];
 
+        // Default to instagram if nothing selected
+        $selectedPlatforms = !empty($this->platforms) ? $this->platforms : ['instagram'];
+
         $post = Post::create([
             'user_id'           => Auth::id(),
             'company_id'        => Auth::user()->company->id,
@@ -206,6 +211,7 @@ class PostGenerator extends Component
             'extra_images'      => count($extraImagePaths) ? $extraImagePaths : null,
             'template'          => $this->template,
             'template_options'  => $templateOptions,
+            'platforms'         => $selectedPlatforms,
             'status'            => 'pending',
             'scheduled_at'      => ($this->scheduleType === 'scheduled' && $this->scheduledAt)
                                     ? \Carbon\Carbon::parse($this->scheduledAt)
@@ -315,21 +321,29 @@ class PostGenerator extends Component
 
         $post->update(['status' => 'completed']);
 
-        $company    = Auth::user()->company;
+        $company     = Auth::user()->company;
         $scheduledAt = $post->scheduled_at;
+        $platforms   = $post->platforms ?? ['instagram'];
+        $isImmediate = !$scheduledAt || !$scheduledAt->isFuture();
 
-        if ($company && $company->instagram_connected) {
-            // Ne dispatcher QUE si publication immédiate (pas de date future)
-            if (!$scheduledAt || !$scheduledAt->isFuture()) {
-                PublishToInstagramJob::dispatch($post->id);
-            }
-            // Pour les posts programmés dans le futur : le scheduler Laravel
-            // (routes/console.php) dispatche le job au bon moment.
+        // Publish to Instagram
+        if (in_array('instagram', $platforms) && $company && $company->instagram_connected && $isImmediate) {
+            PublishToInstagramJob::dispatch($post->id);
         }
 
+        // Publish to Facebook
+        if (in_array('facebook', $platforms) && $company && $company->facebook_connected && $isImmediate) {
+            PublishToFacebookJob::dispatch($post->id);
+        }
+
+        $platformNames = [];
+        if (in_array('instagram', $platforms)) $platformNames[] = 'Instagram';
+        if (in_array('facebook', $platforms))  $platformNames[] = 'Facebook';
+        $platformLabel = implode(' et ', $platformNames);
+
         $message = ($scheduledAt && $scheduledAt->isFuture())
-            ? 'Post planifié pour le ' . $scheduledAt->translatedFormat('d/m/Y à H\hi') . ' !'
-            : 'Votre post a été validé et ajouté à vos créations !';
+            ? 'Post planifié pour le ' . $scheduledAt->translatedFormat('d/m/Y à H\hi') . " sur {$platformLabel} !"
+            : "Votre post a été validé et publié sur {$platformLabel} !";
 
         return redirect()->route('posts.index')->with('success', $message);
     }
@@ -380,6 +394,8 @@ class PostGenerator extends Component
         $igCity           = $company?->city ?? 'France';
         $hasLogo          = $company && $company->logo_path;
         $igProfilePicture = $company?->instagram_profile_picture_url;
+        $igConnected      = $company?->instagram_connected ?? false;
+        $fbConnected      = $company?->facebook_connected ?? false;
 
         // Rafraîchit la photo de profil depuis l'API Instagram :
         // - systématiquement quand le preview est affiché (les URLs CDN IG expirent)
@@ -399,7 +415,8 @@ class PostGenerator extends Component
 
         return view('livewire.pages.post-generator', compact(
             'customTemplates', 'customPhotoMode',
-            'company', 'brandColor', 'igUsername', 'igCity', 'hasLogo', 'igProfilePicture'
+            'company', 'brandColor', 'igUsername', 'igCity', 'hasLogo', 'igProfilePicture',
+            'igConnected', 'fbConnected'
         ));
     }
 }

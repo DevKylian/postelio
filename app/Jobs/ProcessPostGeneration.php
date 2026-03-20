@@ -44,22 +44,36 @@ class ProcessPostGeneration implements ShouldQueue
             $refined = $refiner->refine($transcript, $this->post->template, $photoCount, $templateOptions);
             $this->post->update(['refined_content' => $refined]);
 
-            // 3. Image generation (single or carousel array)
+            // 3. Image generation — Instagram dimensions (1080×1080)
             $result = $generator->generate($this->post);
 
+            $updateData = ['status' => 'review_pending'];
+
             if (is_array($result)) {
-                // Carousel: store all slides, use first as thumbnail
-                $this->post->update([
-                    'image_path' => $result[0],
-                    'slides'     => $result,
-                    'status'     => 'review_pending',
-                ]);
+                $updateData['image_path'] = $result[0];
+                $updateData['slides']     = $result;
             } else {
-                // Single image
-                $this->post->update([
-                    'image_path' => $result,
-                    'status'     => 'review_pending',
-                ]);
+                $updateData['image_path'] = $result;
+            }
+
+            $this->post->update($updateData);
+
+            // 4. Facebook dimensions (1200×630 single / 1200×1200 carousel)
+            $platforms = $this->post->platforms ?? ['instagram'];
+            if (in_array('facebook', $platforms)) {
+                $this->post->refresh();
+                $fbResult = $generator->generateForFacebook($this->post);
+
+                if (is_array($fbResult)) {
+                    $this->post->update([
+                        'facebook_image_path' => $fbResult[0],
+                        'facebook_slides'     => $fbResult,
+                    ]);
+                } else {
+                    $this->post->update([
+                        'facebook_image_path' => $fbResult,
+                    ]);
+                }
             }
 
         } catch (Exception $e) {

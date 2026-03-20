@@ -36,6 +36,76 @@ class ImageGeneratorService
         };
     }
 
+    /**
+     * Generate Facebook-optimised images from the existing Instagram images.
+     * Single posts → 1200×630 (landscape link-style).
+     * Carousels → 1200×1200 (square album-style).
+     *
+     * Expects the Instagram images to already exist on disk.
+     */
+    public function generateForFacebook(Post $post): string|array
+    {
+        $igSlides = $post->slides ?? [];
+
+        // Carousel
+        if (count($igSlides) > 1) {
+            $fbSlides = [];
+            foreach ($igSlides as $i => $igPath) {
+                $fbSlides[] = $this->resizeForFacebook($igPath, $post->id, $i, true);
+            }
+            return $fbSlides;
+        }
+
+        // Single image
+        $igPath = $post->image_path;
+        if (!$igPath) {
+            return $this->generate($post); // fallback
+        }
+
+        return $this->resizeForFacebook($igPath, $post->id, 0, false);
+    }
+
+    /**
+     * Read an existing Instagram image and produce a Facebook-sized version.
+     * - Single posts: 1200×630 (centered with brand-color letterbox)
+     * - Carousels: 1200×1200 (square, same as IG but higher res)
+     */
+    private function resizeForFacebook(string $igPath, int $postId, int $index, bool $isCarousel): string
+    {
+        $disk = Storage::disk('public');
+
+        if (!$disk->exists($igPath)) {
+            throw new \RuntimeException("Source image not found: {$igPath}");
+        }
+
+        $source = $this->manager->read($disk->get($igPath));
+
+        if ($isCarousel) {
+            // Square 1200×1200 — scale up from 1080
+            $source->scale(width: 1200);
+            $fileName = "posts/{$postId}_fb_{$index}.jpg";
+        } else {
+            // Landscape 1200×630 — place the square image centered on a landscape canvas
+            $company    = \App\Models\Post::find($postId)?->company;
+            $brandColor = $company?->brand_color ?? '#F59E0B';
+
+            $canvas = $this->manager->create(1200, 630);
+            $canvas->fill($brandColor);
+
+            // Scale source to fit height (630px)
+            $source->scale(height: 630);
+            $offsetX = (int) round((1200 - $source->width()) / 2);
+            $canvas->place($source, 'top-left', $offsetX, 0);
+
+            $source = $canvas;
+            $fileName = "posts/{$postId}_fb.jpg";
+        }
+
+        $disk->put($fileName, $source->toJpeg(quality: 90));
+
+        return $fileName;
+    }
+
     // -------------------------------------------------------------------------
     // Single-image templates
     // -------------------------------------------------------------------------

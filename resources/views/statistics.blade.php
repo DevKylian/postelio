@@ -1,0 +1,55 @@
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h1 class="font-bold text-xl lg:text-2xl text-midnight tracking-tight leading-tight">
+                    Statistiques
+                </h1>
+                <p class="text-gray-400 text-sm mt-0.5">
+                    Analyse de vos performances sur vos réseaux sociaux
+                </p>
+            </div>
+        </div>
+    </x-slot>
+
+    <div x-data="{ activeTab: 'instagram' }">
+        {{-- Tab Navigation --}}
+        <div class="border-b border-gray-100 bg-white/60 backdrop-blur-sm sticky top-0 z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex gap-1 py-2">
+                    <button @click="activeTab = 'instagram'"
+                            :class="activeTab === 'instagram' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
+                            class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200">
+                        <div class="w-5 h-5 rounded flex items-center justify-center shrink-0"
+                             style="background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)">
+                            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/>
+                            </svg>
+                        </div>
+                        Instagram
+                    </button>
+                    <button @click="activeTab = 'facebook'"
+                            :class="activeTab === 'facebook' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
+                            class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200">
+                        <div class="w-5 h-5 rounded bg-[#1877F2] flex items-center justify-center shrink-0">
+                            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </div>
+                        Facebook
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {{-- Instagram Tab --}}
+        <div x-show="activeTab === 'instagram'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+            <livewire:pages.instagram-stats />
+        </div>
+
+        {{-- Facebook Tab --}}
+        <div x-show="activeTab === 'facebook'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" style="display: none;">
+            <livewire:pages.facebook-stats />
+        </div>
+    </div>
+</x-app-layout>

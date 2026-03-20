@@ -11,22 +11,27 @@ class Post extends Model
         'company_id',
         'audio_path',
         'image_path',
+        'facebook_image_path',
         'transcription',
         'refined_content',
         'template',
         'template_options',
+        'platforms',
         'status',
         'scheduled_at',
         'image_before_path',
         'image_after_path',
         'slides',
+        'facebook_slides',
         'extra_images',
     ];
 
     protected $casts = [
         'slides'           => 'array',
+        'facebook_slides'  => 'array',
         'extra_images'     => 'array',
         'template_options' => 'array',
+        'platforms'        => 'array',
         'scheduled_at'     => 'datetime',
     ];
 

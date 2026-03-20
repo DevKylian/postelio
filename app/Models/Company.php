@@ -18,6 +18,10 @@ class Company extends Model
         'instagram_username',
         'instagram_profile_picture_url',
         'instagram_token_expires_at',
+        'facebook_access_token',
+        'facebook_page_id',
+        'facebook_page_name',
+        'facebook_page_picture_url',
     ];
 
     protected $casts = [
@@ -28,6 +32,12 @@ class Company extends Model
     {
         return !empty($this->instagram_access_token)
             && !empty($this->instagram_business_account_id);
+    }
+
+    public function getFacebookConnectedAttribute(): bool
+    {
+        return !empty($this->facebook_access_token)
+            && !empty($this->facebook_page_id);
     }
 
     public function user()

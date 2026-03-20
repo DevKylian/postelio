@@ -7,8 +7,6 @@ use Livewire\WithFileUploads;
 use App\Models\Post;
 use App\Models\CustomTemplate;
 use App\Jobs\ProcessPostGeneration;
-use App\Jobs\PublishToInstagramJob;
-use App\Jobs\PublishToFacebookJob;
 use Illuminate\Support\Facades\Auth;
 
 class PostGenerator extends Component
@@ -271,7 +269,7 @@ class PostGenerator extends Component
         $post = Post::find($this->generatedPostId);
         if (!$post) return;
 
-        if ($post->status === 'completed' || $post->status === 'review_pending') {
+        if ($post->status === 'completed') {
             $this->status = 'completed';
         } elseif ($post->status === 'failed') {
             $this->status = 'failed';
@@ -315,22 +313,11 @@ class PostGenerator extends Component
 
         if (!$post || $post->user_id !== Auth::id()) return;
 
+        // Mark as completed (publishing is already handled by ProcessPostGeneration)
         $post->update(['status' => 'completed']);
 
-        $company     = Auth::user()->company;
-        $scheduledAt = $post->scheduled_at;
         $platforms   = $post->platforms ?? ['instagram'];
-        $isImmediate = !$scheduledAt || !$scheduledAt->isFuture();
-
-        // Publish to Instagram
-        if (in_array('instagram', $platforms) && $company && $company->instagram_connected && $isImmediate) {
-            PublishToInstagramJob::dispatch($post->id);
-        }
-
-        // Publish to Facebook
-        if (in_array('facebook', $platforms) && $company && $company->facebook_connected && $isImmediate) {
-            PublishToFacebookJob::dispatch($post->id);
-        }
+        $scheduledAt = $post->scheduled_at;
 
         $platformNames = [];
         if (in_array('instagram', $platforms)) $platformNames[] = 'Instagram';

@@ -345,7 +345,8 @@ class PostGenerator extends Component
             ? 'Post planifié pour le ' . $scheduledAt->translatedFormat('d/m/Y à H\hi') . " sur {$platformLabel} !"
             : "Votre post a été validé et publié sur {$platformLabel} !";
 
-        return redirect()->route('posts.index')->with('success', $message);
+        session()->flash('success', $message);
+        $this->redirect(route('posts.index'));
     }
 
     public function discardPost()

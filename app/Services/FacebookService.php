@@ -145,6 +145,28 @@ class FacebookService
 
     private function getPublicUrl(string $path): string
     {
-        return url(Storage::url($path));
+        $localUrl = url(Storage::url($path));
+
+        $imgbbKey = config('services.imgbb.api_key');
+
+        if (!$imgbbKey) {
+            return $localUrl;
+        }
+
+        try {
+            $imageData = Storage::disk('public')->get($path);
+            $response  = Http::asForm()->post('https://api.imgbb.com/1/upload?key=' . urlencode($imgbbKey), [
+                'image'      => base64_encode($imageData),
+                'expiration' => 600,
+            ])->json();
+
+            if (!empty($response['data']['url'])) {
+                return $response['data']['url'];
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('imgbb upload failed for Facebook, falling back to local URL', ['error' => $e->getMessage()]);
+        }
+
+        return $localUrl;
     }
 }

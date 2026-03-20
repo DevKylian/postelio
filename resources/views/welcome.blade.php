@@ -11,7 +11,8 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         
-        <!-- Alpine.js -->
+        <!-- Alpine.js Collapse Plugin + Alpine.js -->
+        <script defer src="https://unpkg.com/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
         <!-- Lucide Icons -->
@@ -42,7 +43,7 @@
              :class="scrolled ? 'bg-white/95 shadow-lg' : 'bg-white/70 shadow-sm'">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-[0_2px_10px_rgba(245,158,11,0.2)]">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hammer"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-1.31-2.1l-.65-1.22c-.22-.44-.66-.73-1.15-.73H13.5c-.5 0-.93.3-1.15.73l-.65 1.22c-.38.7-.71 1.5-1.31 2.1l-1.25 1.25a2 2 0 0 0 0 2.83l1.25 1.25c.6.6 1.4.93 2.1 1.31l1.22.65c.44.22.73.66.73 1.15V19.5c0 .5.3.93.73 1.15l1.22.65c.7.38 1.5.71 2.1 1.31l1.25 1.25a2 2 0 0 0 2.83 0l1.25-1.25a2 2 0 0 0 0-2.83L22 13.5c-.6-.6-1.5-.93-2.1-1.31l-1.22-.65c-.44-.22-.73-.66-.73-1.15V9.5c0-.5-.3-.93-.73-1.15l-1.22-.65c-.7-.38-1.5-.71-2.1-1.31l-1.25-1.25a2 2 0 0 0-2.83 0l-1.25 1.25a2 2 0 0 0 0 2.83l1.25 1.25c.6.6.93 1.4 1.31 2.1l.65 1.22c.22.44.66.73 1.15.73H17.5c.5 0 .93-.3 1.15-.73l.65-1.22c.38-.7.71-1.5 1.31-2.1l1.25-1.25a2 2 0 0 0 0-2.83l-1.25-1.25a2 2 0 0 0-2.83 0l-1.25 1.25a2 2 0 0 0 0 2.83l1.25 1.25c.6.6.93 1.4 1.31 2.1l.65 1.22c.22.44.66.73 1.15.73V15.5c0 .5-.3.93-.73 1.15l-1.22.65c-.7.38-1.5.71-2.1 1.31l-1.25 1.25a2 2 0 0 0-2.83 0l-1.25-1.25a2 2 0 0 0 0-2.83l1.25-1.25a2 2 0 0 0 0-2.83l-1.25-1.25a2 2 0 0 0-2.83 0l-1.25 1.25a2 2 0 0 0 0 2.83l1.25 1.25c.6.6.93 1.4 1.31 2.1l.65 1.22c.22.44.66.73 1.15.73h1.36c.49 0 .93-.3 1.15-.73l.65-1.22c.38-.7.71-1.5 1.31-2.1l1.25-1.25a2 2 0 0 0 0-2.83l-1.25-1.25a2 2 0 0 0-2.83 0l-1.25 1.25a2 2 0 0 0 0 2.83l1.25 1.25c.6.6 1.4.93 2.1 1.31l1.22.65c.44.22.73.66.73 1.15V13.5Z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-1.11a2 2 0 0 0-.59-1.42L15 2.54"/><path d="m14 4 .71.71a2 2 0 0 1 .59 1.42v1.11c0 .85.33 1.65.93 2.25L18 11.25"/></svg>
             </div>
              <span class="font-display font-semibold text-xl tracking-tight text-midnight">Postelio</span>
           </div>
@@ -136,10 +137,22 @@
                   Découvrir la méthode
                 </a>
               </div>
-              <div class="flex flex-wrap justify-center items-center gap-4 mt-10 text-xs font-medium text-slate-400 uppercase tracking-widest">
-                <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-copper"></i> 14 jours d'essai</span>
-                <span class="hidden sm:block">•</span>
-                <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-copper"></i> Sans CB</span>
+              <div class="flex flex-col items-center gap-6 mt-10">
+                <div class="flex items-center gap-3">
+                  <div class="flex -space-x-2">
+                    @foreach(['plumber', 'painter', 'carpenter', 'electrician'] as $avatar)
+                      <img src="https://picsum.photos/seed/{{ $avatar }}/100/100" alt="" class="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm">
+                    @endforeach
+                  </div>
+                  <div class="text-sm text-slate-600">
+                    <span class="font-semibold text-midnight">+200 artisans</span> nous font confiance
+                  </div>
+                </div>
+                <div class="flex flex-wrap justify-center items-center gap-4 text-xs font-medium text-slate-400 uppercase tracking-widest">
+                  <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-copper"></i> 14 jours d'essai</span>
+                  <span class="hidden sm:block">&bull;</span>
+                  <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-copper"></i> Sans CB</span>
+                </div>
               </div>
             </div>
           </div>
@@ -163,7 +176,7 @@
                 <span class="text-[10px] sm:text-sm font-semibold text-slate-700 uppercase tracking-wider">1. Photo</span>
               </div>
 
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 sm:w-8 sm:h-8 flex-shrink-0"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              <i data-lucide="arrow-right" class="w-4 h-4 sm:w-8 sm:h-8 text-slate-300 flex-shrink-0"></i>
 
               <!-- Step 2: Vocal -->
               <div class="flex-1 flex flex-col items-center gap-3 sm:gap-4">
@@ -213,8 +226,8 @@
               <!-- Left: Text & Audio Transcript -->
               <div class="flex-1 text-center lg:text-left">
                 <div class="badge badge-copper inline-flex items-center mb-6 shadow-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-amber-500"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364-.707.707M6.343 17.657l-.707.707m12.728 0-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>
-                  Pour les artisans qui veulent évoluer
+                  <i data-lucide="wand-2" class="w-3.5 h-3.5 mr-2 text-amber-500"></i>
+                  L'IA qui rédige pour vous
                 </div>
                 <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">
                   Un rendu <span class="text-gradient-copper italic pr-2 pb-1">impeccable</span>, à chaque fois.
@@ -443,31 +456,13 @@
           </div>
         </section>
 
-        <!-- CTAs -->
-        <section class="py-32 text-center px-4 relative">
-          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-300/10 blur-[120px] rounded-full pointer-events-none"></div>
-          <div class="max-w-4xl mx-auto relative z-10">
-            <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Rentrez chez vous, et laissez vos chantiers continuer à vous trouver des clients.</h2>
-            <p class="text-xl font-light text-slate-600 mb-10">Prêt à transformer vos réalisations en aimants à clients premium ?</p>
-            @auth
-                <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
-                  Démarrer maintenant <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                </a>
-            @else
-                <a href="{{ route('register') }}" wire:navigate class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
-                  Démarrer mon essai gratuit <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                </a>
-            @endauth
-          </div>
-        </section>
-
         <!-- Testimonials -->
         <section class="py-24">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-20">
               <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Ils ont choisi <span class="text-gradient-copper italic">leurs clients.</span></h2>
             </div>
-            
+
             <div class="grid md:grid-cols-3 gap-6">
               @php
                 $testimonials = [
@@ -494,6 +489,24 @@
                 </div>
               @endforeach
             </div>
+          </div>
+        </section>
+
+        <!-- CTAs -->
+        <section class="py-32 text-center px-4 relative">
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-300/10 blur-[120px] rounded-full pointer-events-none"></div>
+          <div class="max-w-4xl mx-auto relative z-10">
+            <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Rentrez chez vous, et laissez vos chantiers continuer à vous trouver des clients.</h2>
+            <p class="text-xl font-light text-slate-600 mb-10">Prêt à transformer vos réalisations en aimants à clients premium ?</p>
+            @auth
+                <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
+                  Démarrer maintenant <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </a>
+            @else
+                <a href="{{ route('register') }}" wire:navigate class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
+                  Démarrer mon essai gratuit <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </a>
+            @endauth
           </div>
         </section>
 
@@ -593,14 +606,14 @@
       </div>
 
       <!-- Footer -->
-      <footer class="bg-white text-slate-500 pt-20 pb-12 border-t border-slate-100 relative z-10">
+      <footer class="bg-white text-slate-500 pt-20 pb-28 md:pb-12 border-t border-slate-100 relative z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
             <!-- Col 1: Brand -->
             <div class="col-span-2 md:col-span-1">
               <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center shadow-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/></svg>
+                <div class="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-[0_2px_10px_rgba(245,158,11,0.2)]">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-1.11a2 2 0 0 0-.59-1.42L15 2.54"/><path d="m14 4 .71.71a2 2 0 0 1 .59 1.42v1.11c0 .85.33 1.65.93 2.25L18 11.25"/></svg>
                 </div>
                 <span class="font-display font-bold text-2xl text-midnight tracking-tight">Postelio</span>
               </div>
@@ -654,7 +667,7 @@
             <div class="text-xs font-light text-slate-400 whitespace-nowrap">
               &copy; {{ date('Y') }} Postelio. Un outil pensé pour les artisans passionnés.
             </div>
-            <div class="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-slate-400 bg-slate-50 px-4 py-2 rounded-full border border-slate-100 uppercase">
+            <div class="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-slate-400 bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
               <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
               Système 100% opérationnel
             </div>

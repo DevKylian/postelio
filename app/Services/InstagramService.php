@@ -182,6 +182,9 @@ class InstagramService
             throw new \RuntimeException('Création du container échouée : ' . json_encode($container));
         }
 
+        // Wait for media to be ready
+        $this->pollContainerStatus($container['id'], $token);
+
         $result = Http::post(self::GRAPH_BASE . "/{$igId}/media_publish", [
             'creation_id'  => $container['id'],
             'access_token' => $token,
@@ -209,6 +212,9 @@ class InstagramService
                 throw new \RuntimeException('Carousel item échoué : ' . json_encode($item));
             }
 
+            // Wait for item to be ready
+            $this->pollContainerStatus($item['id'], $token);
+
             $itemIds[] = $item['id'];
         }
 
@@ -224,6 +230,9 @@ class InstagramService
             throw new \RuntimeException('Carousel container échoué : ' . json_encode($container));
         }
 
+        // Wait for carousel container to be ready
+        $this->pollContainerStatus($container['id'], $token);
+
         // Step 3 — publish
         $result = Http::post(self::GRAPH_BASE . "/{$igId}/media_publish", [
             'creation_id'  => $container['id'],
@@ -235,6 +244,33 @@ class InstagramService
         }
 
         return $result['id'];
+    }
+
+    /**
+     * Wait for a media container to be processed by Instagram.
+     */
+    private function pollContainerStatus(string $containerId, string $token, int $maxAttempts = 15, int $interval = 3): void
+    {
+        for ($i = 0; $i < $maxAttempts; $i++) {
+            $response = Http::get(self::GRAPH_BASE . "/{$containerId}", [
+                'fields'       => 'status_code',
+                'access_token' => $token,
+            ])->json();
+
+            $status = $response['status_code'] ?? null;
+
+            if ($status === 'FINISHED') {
+                return;
+            }
+
+            if ($status === 'ERROR') {
+                throw new \RuntimeException('Media container error: ' . ($response['status_message'] ?? 'Unknown error'));
+            }
+
+            sleep($interval);
+        }
+
+        throw new \RuntimeException('Media container processing timed out for container ' . $containerId);
     }
 
     /**

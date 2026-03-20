@@ -20,7 +20,7 @@ class PostGenerator extends Component
     public $imageAfter;
     public $extraImages = [];        // for chantier_detail & step_by_step (up to 5)
     public $template = 'review';
-    public $platforms = [];           // ['instagram', 'facebook']
+    public $platforms = ['instagram', 'facebook'];           // ['instagram', 'facebook']
     public $scheduleType = 'now';    // 'now' | 'scheduled'
     public $scheduledAt  = '';       // datetime-local string
     public $status = 'idle';
@@ -285,7 +285,7 @@ class PostGenerator extends Component
             if (is_array($result)) {
                 $post->update(['image_path' => $result[0], 'slides' => $result, 'status' => 'review_pending']);
             } else {
-                $post->update(['image_path' => $result, 'status' => 'review_pending']);
+                $post->update(['image_path' => $result, 'slides' => [$result], 'status' => 'review_pending']);
             }
 
             $post->refresh();

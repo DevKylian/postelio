@@ -857,7 +857,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold {{ in_array('facebook', $platforms) ? 'text-midnight' : 'text-gray-600' }}">Facebook</p>
-                                <p class="text-[11px] text-gray-400">1200 × 630 px</p>
+                                <p class="text-[11px] text-gray-400">1080 × 1080 px</p>
                             </div>
                             @if(in_array('facebook', $platforms))
                                 <div class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center shrink-0">

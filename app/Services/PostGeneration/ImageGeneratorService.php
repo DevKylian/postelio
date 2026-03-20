@@ -23,16 +23,16 @@ class ImageGeneratorService
      * Returns a single path (string) for single-image templates,
      * or an array of paths for carousel templates.
      */
-    public function generate(Post $post): string|array
+    public function generate(Post $post, int $width = 1080, int $height = 1080): string|array
     {
         $template = $post->template;
 
         return match ($template) {
-            'chantier_detail'   => $this->generateChantierDetail($post),
-            'step_by_step'      => $this->generateStepByStep($post),
-            'guide_pedagogique' => $this->generateGuidePedagogique($post),
-            'custom'            => $this->generateCustomTemplate($post),
-            default             => $this->generateSingle($post),
+            'chantier_detail'   => $this->generateChantierDetail($post, $width, $height),
+            'step_by_step'      => $this->generateStepByStep($post, $width, $height),
+            'guide_pedagogique' => $this->generateGuidePedagogique($post, $width, $height),
+            'custom'            => $this->generateCustomTemplate($post, $width, $height),
+            default             => $this->generateSingle($post, $width, $height),
         };
     }
 
@@ -47,7 +47,10 @@ class ImageGeneratorService
     {
         $igSlides = $post->slides ?? [];
 
-        // Carousel
+        // If we want a separate file for Facebook (e.g. for tracking or different filenames), 
+        // we can still call generate with 1080x1080. 
+        // Or simply resize the existing ones without scaling up.
+        
         if (count($igSlides) > 1) {
             $fbSlides = [];
             foreach ($igSlides as $i => $igPath) {
@@ -56,13 +59,7 @@ class ImageGeneratorService
             return $fbSlides;
         }
 
-        // Single image
-        $igPath = $post->image_path;
-        if (!$igPath) {
-            return $this->generate($post); // fallback
-        }
-
-        return $this->resizeForFacebook($igPath, $post->id, 0, false);
+        return $this->generate($post, 1080, 1080);
     }
 
     /**
@@ -80,27 +77,12 @@ class ImageGeneratorService
 
         $source = $this->manager->read($disk->get($igPath));
 
-        if ($isCarousel) {
-            // Square 1200×1200 — scale up from 1080
-            $source->scale(width: 1200);
-            $fileName = "posts/{$postId}_fb_{$index}.jpg";
-        } else {
-            // Landscape 1200×630 — place the square image centered on a landscape canvas
-            $company    = \App\Models\Post::find($postId)?->company;
-            $brandColor = $company?->brand_color ?? '#F59E0B';
-
-            $canvas = $this->manager->create(1200, 630);
-            $canvas->fill($brandColor);
-
-            // Scale source to fit height (630px)
-            $source->scale(height: 630);
-            $offsetX = (int) round((1200 - $source->width()) / 2);
-            $canvas->place($source, 'top-left', $offsetX, 0);
-
-            $source = $canvas;
-            $fileName = "posts/{$postId}_fb.jpg";
+        // Just ensure it's 1080x1080 (already should be)
+        if ($source->width() !== 1080 || $source->height() !== 1080) {
+            $source->cover(1080, 1080);
         }
 
+        $fileName = $isCarousel ? "posts/{$postId}_fb_{$index}.jpg" : "posts/{$postId}_fb.jpg";
         $disk->put($fileName, $source->toJpeg(quality: 90));
 
         return $fileName;
@@ -134,13 +116,13 @@ class ImageGeneratorService
         return $this->cleanText(mb_substr(trim($raw), 0, $maxChars));
     }
 
-    private function generateSingle(Post $post): string
+    private function generateSingle(Post $post, int $width = 1080, int $height = 1080): string
     {
         $company    = $post->company;
         $template   = $post->template;
         $brandColor = $company->brand_color ?? '#F59E0B';
 
-        $image = $this->manager->create(1080, 1080);
+        $image = $this->manager->create($width, $height);
 
         if ($template === 'review') {
             $imageText = $this->extractImageText($post, 70);
@@ -187,7 +169,7 @@ class ImageGeneratorService
     // Custom (user-created) templates — 3 visual styles
     // -------------------------------------------------------------------------
 
-    private function generateCustomTemplate(Post $post): string|array
+    private function generateCustomTemplate(Post $post, int $width = 1080, int $height = 1080): string|array
     {
         $company     = $post->company;
         $brandColor  = $company->brand_color ?? '#F59E0B';
@@ -199,30 +181,30 @@ class ImageGeneratorService
 
         // ── Photo as background (single) ──────────────────────────────────────
         if ($photoMode === 'single') {
-            $image = $this->manager->create(1080, 1080);
+            $image = $this->manager->create($width, $height);
 
             if ($post->image_before_path && Storage::disk('public')->exists($post->image_before_path)) {
                 $photo = $this->manager->read(Storage::disk('public')->get($post->image_before_path));
-                $photo->cover(1080, 1080);
+                $photo->cover($width, $height);
                 $image->place($photo, 'top-left', 0, 0);
             } else {
                 $image->fill('#1E293B');
             }
 
             // Semi-transparent header area so template label is readable
-            $image->drawRectangle(0, 0, function ($draw) {
-                $draw->size(1080, 140);
+            $image->drawRectangle(0, 0, function ($draw) use ($width) {
+                $draw->size($width, 140);
                 $draw->background('rgba(0,0,0,0.55)');
             });
 
             // Brand color top bar
-            $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
-                $draw->size(1080, 16);
+            $image->drawRectangle(0, 0, function ($draw) use ($brandColor, $width) {
+                $draw->size($width, 16);
                 $draw->background($brandColor);
             });
 
             // Short accent line left-aligned (mirrors card layout)
-            $image->drawRectangle(100, 55, function ($draw) use ($brandColor) {
+            $image->drawRectangle(100, 55, function ($draw) {
                 $draw->size(80, 6);
                 $draw->background('rgba(255,255,255,0.60)');
             });
@@ -252,33 +234,33 @@ class ImageGeneratorService
             $slides = [];
 
             foreach ($photos as $idx => $photoPath) {
-                $slideImage = $this->manager->create(1080, 1080);
+                $slideImage = $this->manager->create($width, $height);
 
                 if (Storage::disk('public')->exists($photoPath)) {
                     $photo = $this->manager->read(Storage::disk('public')->get($photoPath));
-                    $photo->cover(1080, 1080);
+                    $photo->cover($width, $height);
                     $slideImage->place($photo, 'top-left', 0, 0);
                 } else {
                     $slideImage->fill('#1E293B');
                 }
 
-                // Same header overlay for consistency across slides
-                $slideImage->drawRectangle(0, 0, function ($draw) {
-                    $draw->size(1080, 140);
+                // Header overlay
+                $slideImage->drawRectangle(0, 0, function ($draw) use ($width, $height) {
+                    $draw->size($width, (int)($height * 0.13));
                     $draw->background('rgba(0,0,0,0.55)');
                 });
-                $slideImage->drawRectangle(0, 0, function ($draw) use ($brandColor) {
-                    $draw->size(1080, 16);
+                $slideImage->drawRectangle(0, 0, function ($draw) use ($brandColor, $width, $height) {
+                    $draw->size($width, (int)($height * 0.015));
                     $draw->background($brandColor);
                 });
-                $slideImage->drawRectangle(100, 55, function ($draw) use ($brandColor) {
-                    $draw->size(80, 6);
+                $slideImage->drawRectangle((int)($width * 0.092), (int)($height * 0.051), function ($draw) use ($width, $height) {
+                    $draw->size((int)($width * 0.074), (int)($height * 0.005));
                     $draw->background('rgba(255,255,255,0.60)');
                 });
                 if ($templateName) {
-                    $slideImage->text(mb_strtoupper($this->cleanText($templateName)), 100, 105, function ($font) use ($brandColor) {
+                    $slideImage->text(mb_strtoupper($this->cleanText($templateName)), (int)($width * 0.092), (int)($height * 0.097), function ($font) use ($brandColor, $height) {
                         $font->filename($this->fontPath);
-                        $font->size(30);
+                        $font->size((int)($height * 0.028));
                         $font->color($brandColor);
                         $font->align('left');
                         $font->valign('middle');
@@ -293,25 +275,25 @@ class ImageGeneratorService
                 $slides[] = $path;
             }
 
-            return $slides ?: $this->generateCustomNoPhoto($post, $company, $brandColor, $visualStyle);
+            return $slides ?: $this->generateCustomNoPhoto($post, $company, $brandColor, $visualStyle, 'standard', $width, $height);
         }
 
         // ── No photo — branded background with chosen layout ─────────────────
-        return $this->generateCustomNoPhoto($post, $company, $brandColor, $visualStyle, $layoutType);
+        return $this->generateCustomNoPhoto($post, $company, $brandColor, $visualStyle, $layoutType, $width, $height);
     }
 
-    private function generateCustomNoPhoto(Post $post, $company, string $brandColor, string $visualStyle, string $layoutType = 'standard'): string
+    private function generateCustomNoPhoto(Post $post, $company, string $brandColor, string $visualStyle, string $layoutType = 'standard', int $width = 1080, int $height = 1080): string
     {
         // Dispatch to the appropriate layout renderer
         $fileName = 'posts/' . $post->id . '_generated.jpg';
 
         return match ($layoutType) {
-            'centered'   => $this->renderLayoutCentered($post, $company, $brandColor, $visualStyle, $fileName),
-            'quote'      => $this->renderLayoutQuote($post, $company, $brandColor, $visualStyle, $fileName),
-            'bold_title' => $this->renderLayoutBoldTitle($post, $company, $brandColor, $visualStyle, $fileName),
-            'split'      => $this->renderLayoutSplit($post, $company, $brandColor, $visualStyle, $fileName),
-            'minimal'    => $this->renderLayoutMinimal($post, $company, $brandColor, $fileName),
-            default      => $this->renderLayoutStandard($post, $company, $brandColor, $visualStyle, $fileName),
+            'centered'   => $this->renderLayoutCentered($post, $company, $brandColor, $visualStyle, $fileName, $width, $height),
+            'quote'      => $this->renderLayoutQuote($post, $company, $brandColor, $visualStyle, $fileName, $width, $height),
+            'bold_title' => $this->renderLayoutBoldTitle($post, $company, $brandColor, $visualStyle, $fileName, $width, $height),
+            'split'      => $this->renderLayoutSplit($post, $company, $brandColor, $visualStyle, $fileName, $width, $height),
+            'minimal'    => $this->renderLayoutMinimal($post, $company, $brandColor, $fileName, $width, $height),
+            default      => $this->renderLayoutStandard($post, $company, $brandColor, $visualStyle, $fileName, $width, $height),
         };
     }
 
@@ -328,37 +310,37 @@ class ImageGeneratorService
 
     // ── Layout: standard (original left-aligned layout) ──────────────────────
 
-    private function renderLayoutStandard(Post $post, $company, string $brandColor, string $visualStyle, string $fileName): string
+    private function renderLayoutStandard(Post $post, $company, string $brandColor, string $visualStyle, string $fileName, int $width = 1080, int $height = 1080): string
     {
-        $image        = $this->manager->create(1080, 1080);
+        $image        = $this->manager->create($width, $height);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
         $imageText    = $this->extractImageText($post, 100);
 
-        // Layout constants — mirrors the card HTML (px-8 ≈ 100px, pt-14 ≈ 270px)
-        $left    = 100;   // left margin
-        $barH    = 16;    // top bar height
-        $accentY = 270;   // accent line top-y
-        $labelY  = 336;   // template name center-y
-        $textTop = 420;   // description text top-y
-        $sepY    = 920;   // bottom separator y
-        $badgeY  = 966;   // company label center-y
+        // Layout constants — proportionally scaled
+        $left    = (int) ($width * (100 / 1080)); 
+        $barH    = (int) ($height * (16 / 1080));
+        $accentY = (int) ($height * (270 / 1080));
+        $labelY  = (int) ($height * (336 / 1080));
+        $textTop = (int) ($height * (420 / 1080));
+        $sepY    = (int) ($height * (920 / 1080));
+        $badgeY  = (int) ($height * (966 / 1080));
 
         if ($visualStyle === 'brand_color') {
             $image->fill($brandColor);
 
-            // Ghost circles: upper-right + lower-left (mirrors card)
-            $image->drawEllipse(970, 130, function ($draw) {
-                $draw->size(400, 400);
+            // Ghost circles: upper-right + lower-left
+            $image->drawEllipse((int)($width * 0.9), (int)($height * 0.12), function ($draw) use ($width) {
+                $draw->size((int)($width * 0.37), (int)($width * 0.37));
                 $draw->background('rgba(0,0,0,0.10)');
             });
-            $image->drawEllipse(70, 1010, function ($draw) {
-                $draw->size(300, 300);
+            $image->drawEllipse((int)($width * 0.06), (int)($height * 0.93), function ($draw) use ($width) {
+                $draw->size((int)($width * 0.28), (int)($width * 0.28));
                 $draw->background('rgba(0,0,0,0.08)');
             });
 
-            // Top bar (slightly darkened tint on brand color)
-            $image->drawRectangle(0, 0, function ($draw) use ($barH) {
-                $draw->size(1080, $barH);
+            // Top bar
+            $image->drawRectangle(0, 0, function ($draw) use ($width, $barH) {
+                $draw->size($width, $barH);
                 $draw->background('rgba(0,0,0,0.15)');
             });
 
@@ -383,8 +365,8 @@ class ImageGeneratorService
             }
 
             // Bottom: separator + company label
-            $image->drawRectangle(0, $sepY, function ($draw) {
-                $draw->size(1080, 2);
+            $image->drawRectangle(0, $sepY, function ($draw) use ($width) {
+                $draw->size($width, 2);
                 $draw->background('rgba(0,0,0,0.20)');
             });
             $image->text($this->companyLabel($company), $left, $badgeY, function ($font) {
@@ -425,8 +407,8 @@ class ImageGeneratorService
             }
 
             // Bottom: separator + company label
-            $image->drawRectangle(0, $sepY, function ($draw) {
-                $draw->size(1080, 1);
+            $image->drawRectangle(0, $sepY, function ($draw) use ($width) {
+                $draw->size($width, 1);
                 $draw->background('rgba(0,0,0,0.08)');
             });
             $image->text($this->companyLabel($company), $left, $badgeY, function ($font) use ($brandColor) {
@@ -441,17 +423,17 @@ class ImageGeneratorService
             // dark_branded (default) — deep navy, brand color accents
             $image->fill('#0B1426');
 
-            // Ghost circles: upper-right (outer + inner) + lower-left
-            $image->drawEllipse(970, 130, function ($draw) {
-                $draw->size(400, 400);
+            // Ghost circles
+            $image->drawEllipse((int)($width * 0.9), (int)($height * 0.12), function ($draw) use ($width) {
+                $draw->size((int)($width * 0.37), (int)($width * 0.37));
                 $draw->background('rgba(255,255,255,0.03)');
             });
-            $image->drawEllipse(970, 130, function ($draw) {
-                $draw->size(260, 260);
+            $image->drawEllipse((int)($width * 0.9), (int)($height * 0.12), function ($draw) use ($width) {
+                $draw->size((int)($width * 0.24), (int)($width * 0.24));
                 $draw->background('rgba(255,255,255,0.04)');
             });
-            $image->drawEllipse(70, 1010, function ($draw) {
-                $draw->size(320, 320);
+            $image->drawEllipse((int)($width * 0.06), (int)($height * 0.93), function ($draw) use ($width) {
+                $draw->size((int)($width * 0.3), (int)($width * 0.3));
                 $draw->background('rgba(0,0,0,0.30)');
             });
 
@@ -482,8 +464,8 @@ class ImageGeneratorService
             }
 
             // Bottom: separator + company label
-            $image->drawRectangle(0, $sepY, function ($draw) {
-                $draw->size(1080, 1);
+            $image->drawRectangle(0, $sepY, function ($draw) use ($width) {
+                $draw->size($width, 1);
                 $draw->background('rgba(255,255,255,0.10)');
             });
             $image->text($this->companyLabel($company), $left, $badgeY, function ($font) use ($brandColor) {
@@ -504,10 +486,10 @@ class ImageGeneratorService
 
     // ── Layout: centered — everything centered, short impactful content ───────
 
-    private function renderLayoutCentered(Post $post, $company, string $brandColor, string $visualStyle, string $fileName): string
+    private function renderLayoutCentered(Post $post, $company, string $brandColor, string $visualStyle, string $fileName, int $width = 1080, int $height = 1080): string
     {
         $colors       = $this->styleColors($visualStyle, $brandColor);
-        $image        = $this->manager->create(1080, 1080);
+        $image        = $this->manager->create($width, $height);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
         $imageText    = $this->extractImageText($post, 110);
 
@@ -515,35 +497,37 @@ class ImageGeneratorService
 
         // Ghost circles for dark_branded only
         if ($visualStyle === 'dark_branded') {
-            $image->drawEllipse(970, 130, fn($d) => $d->size(400, 400)->background('rgba(255,255,255,0.03)'));
-            $image->drawEllipse(70, 1010, fn($d) => $d->size(320, 320)->background('rgba(0,0,0,0.30)'));
+            $image->drawEllipse((int)($width * 0.9), (int)($height * 0.12), fn($d) => $d->size((int)($width * 0.37), (int)($width * 0.37))->background('rgba(255,255,255,0.03)'));
+            $image->drawEllipse((int)($width * 0.06), (int)($height * 0.93), fn($d) => $d->size((int)($width * 0.3), (int)($width * 0.3))->background('rgba(0,0,0,0.30)'));
         }
 
         // Top brand bar
-        $image->drawRectangle(0, 0, fn($d) => $d->size(1080, 16)->background($brandColor));
+        $image->drawRectangle(0, 0, fn($d) => $d->size($width, (int)($height * 0.015))->background($brandColor));
+
+        $centerX = (int)($width / 2);
 
         // Template name — centered
-        $image->text($templateName, 540, 400, function ($font) use ($brandColor) {
+        $image->text($templateName, $centerX, (int)($height * 0.37), function ($font) use ($brandColor, $height) {
             $font->filename($this->fontPath);
-            $font->size(38);
+            $font->size((int)($height * 0.035));
             $font->color($brandColor);
             $font->align('center');
             $font->valign('middle');
         });
 
         // Centered accent line under title
-        $image->drawRectangle(440, 420, fn($d) => $d->size(200, 5)->background($brandColor));
+        $image->drawRectangle($centerX - (int)($width * 0.09), (int)($height * 0.39), fn($d) => $d->size((int)($width * 0.18), (int)($height * 0.005))->background($brandColor));
 
         // Image text — centered with wrap
         if ($imageText) {
-            $this->drawTextRaw($image, mb_strtoupper($imageText), 460, 890, 30, $colors['text'], 24);
+            $this->drawTextRaw($image, mb_strtoupper($imageText), (int)($height * 0.42), (int)($height * 0.82), (int)($height * 0.028), $colors['text'], 24);
         }
 
         // Bottom separator + company centered
-        $image->drawRectangle(0, 920, fn($d) => $d->size(1080, 1)->background($colors['sep']));
-        $image->text($this->companyLabel($company), 540, 966, function ($font) use ($colors) {
+        $image->drawRectangle(0, (int)($height * 0.85), fn($d) => $d->size($width, 1)->background($colors['sep']));
+        $image->text($this->companyLabel($company), $centerX, (int)($height * 0.89), function ($font) use ($colors, $height) {
             $font->filename($this->fontPath);
-            $font->size(26);
+            $font->size((int)($height * 0.024));
             $font->color($colors['label']);
             $font->align('center');
             $font->valign('middle');
@@ -556,61 +540,61 @@ class ImageGeneratorService
 
     // ── Layout: quote — large decorative guillemets, anecdotes/citations ──────
 
-    private function renderLayoutQuote(Post $post, $company, string $brandColor, string $visualStyle, string $fileName): string
+    private function renderLayoutQuote(Post $post, $company, string $brandColor, string $visualStyle, string $fileName, int $width = 1080, int $height = 1080): string
     {
         $colors       = $this->styleColors($visualStyle, $brandColor);
-        $image        = $this->manager->create(1080, 1080);
+        $image        = $this->manager->create($width, $height);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
         $imageText    = $this->extractImageText($post, 120);
 
         $image->fill($colors['bg']);
 
         // Subtle ghost circles for depth
-        $image->drawEllipse(970, 200, fn($d) => $d->size(500, 500)->background('rgba(255,255,255,0.02)'));
+        $image->drawEllipse((int)($width * 0.9), (int)($height * 0.18), fn($d) => $d->size((int)($width * 0.46), (int)($width * 0.46))->background('rgba(255,255,255,0.02)'));
 
         // Top brand bar
-        $image->drawRectangle(0, 0, fn($d) => $d->size(1080, 16)->background($brandColor));
+        $image->drawRectangle(0, 0, fn($d) => $d->size($width, (int)($height * 0.015))->background($brandColor));
 
-        // Opening large decorative quote mark — brand color at ~19% opacity
-        $image->text('"', 80, 210, function ($font) use ($brandColor) {
+        // Opening large decorative quote mark
+        $image->text('"', (int)($width * 0.074), (int)($height * 0.2), function ($font) use ($brandColor, $height) {
             $font->filename($this->fontPath);
-            $font->size(220);
+            $font->size((int)($height * 0.2));
             $font->color($brandColor . '30');
             $font->align('left');
             $font->valign('middle');
         });
 
         // Template name (category label) — small, top-left, brand color
-        $image->text($templateName, 100, 66, function ($font) use ($brandColor) {
+        $image->text($templateName, (int)($width * 0.092), (int)($height * 0.06), function ($font) use ($brandColor, $height) {
             $font->filename($this->fontPath);
-            $font->size(24);
+            $font->size((int)($height * 0.022));
             $font->color($brandColor);
             $font->align('left');
             $font->valign('middle');
         });
 
         // Thin accent line
-        $image->drawRectangle(100, 80, fn($d) => $d->size(80, 4)->background($brandColor));
+        $image->drawRectangle((int)($width * 0.092), (int)($height * 0.074), fn($d) => $d->size((int)($width * 0.074), (int)($height * 0.004))->background($brandColor));
 
-        // Quote text — centered, larger
+        // Quote text — centered
         if ($imageText) {
-            $this->drawTextRaw($image, mb_strtoupper($imageText), 280, 860, 32, $colors['text'], 22);
+            $this->drawTextRaw($image, mb_strtoupper($imageText), (int)($height * 0.26), (int)($height * 0.8), (int)($height * 0.03), $colors['text'], 22);
         }
 
         // Closing quote mark — bottom right
-        $image->text('"', 980, 870, function ($font) use ($brandColor) {
+        $image->text('"', (int)($width * 0.9), (int)($height * 0.8), function ($font) use ($brandColor, $height) {
             $font->filename($this->fontPath);
-            $font->size(180);
+            $font->size((int)($height * 0.17));
             $font->color($brandColor . '30');
             $font->align('right');
             $font->valign('middle');
         });
 
         // Bottom separator + company
-        $image->drawRectangle(0, 920, fn($d) => $d->size(1080, 1)->background($colors['sep']));
-        $image->text($this->companyLabel($company), 100, 966, function ($font) use ($colors) {
+        $image->drawRectangle(0, (int)($height * 0.85), fn($d) => $d->size($width, 1)->background($colors['sep']));
+        $image->text($this->companyLabel($company), (int)($width * 0.092), (int)($height * 0.89), function ($font) use ($colors, $height) {
             $font->filename($this->fontPath);
-            $font->size(26);
+            $font->size((int)($height * 0.024));
             $font->color($colors['label']);
             $font->align('left');
             $font->valign('middle');
@@ -623,44 +607,46 @@ class ImageGeneratorService
 
     // ── Layout: bold_title — giant template name, series/thematic posts ───────
 
-    private function renderLayoutBoldTitle(Post $post, $company, string $brandColor, string $visualStyle, string $fileName): string
+    private function renderLayoutBoldTitle(Post $post, $company, string $brandColor, string $visualStyle, string $fileName, int $width = 1080, int $height = 1080): string
     {
         $colors       = $this->styleColors($visualStyle, $brandColor);
-        $image        = $this->manager->create(1080, 1080);
+        $image        = $this->manager->create($width, $height);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
         $imageText    = $this->extractImageText($post, 120);
 
         $image->fill($colors['bg']);
 
         if ($visualStyle === 'dark_branded') {
-            $image->drawEllipse(970, 130, fn($d) => $d->size(400, 400)->background('rgba(255,255,255,0.03)'));
+            $image->drawEllipse((int)($width * 0.9), (int)($height * 0.12), fn($d) => $d->size((int)($width * 0.37), (int)($width * 0.37))->background('rgba(255,255,255,0.03)'));
         }
 
-        // Large brand color block as decorative background for title
-        $image->drawRectangle(0, 0, fn($d) => $d->size(1080, 340)->background($brandColor));
+        // Large brand color block
+        $image->drawRectangle(0, 0, fn($d) => $d->size($width, (int)($height * 0.31))->background($brandColor));
 
-        // Template name — centered in top block, very large
-        $image->text($templateName, 540, 180, function ($font) {
+        $centerX = (int)($width / 2);
+
+        // Template name — very large
+        $image->text($templateName, $centerX, (int)($height * 0.17), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(62);
+            $font->size((int)($height * 0.057));
             $font->color('#FFFFFF');
             $font->align('center');
             $font->valign('middle');
         });
 
-        // Subtitle label under big title
-        $image->drawRectangle(340, 260, fn($d) => $d->size(400, 2)->background('rgba(255,255,255,0.40)'));
+        // Subtitle line
+        $image->drawRectangle($centerX - (int)($width * 0.185), (int)($height * 0.24), fn($d) => $d->size((int)($width * 0.37), (int)($height * 0.002))->background('rgba(255,255,255,0.40)'));
 
-        // Image text — in lower part, left-aligned
+        // Image text — left-aligned
         if ($imageText) {
-            $this->drawTextLeftAligned($image, mb_strtoupper($imageText), 100, 390, 26, $colors['text'], 28);
+            $this->drawTextLeftAligned($image, mb_strtoupper($imageText), (int)($width * 0.092), (int)($height * 0.36), (int)($height * 0.024), $colors['text'], 28);
         }
 
         // Bottom separator + company
-        $image->drawRectangle(0, 920, fn($d) => $d->size(1080, 1)->background($colors['sep']));
-        $image->text($this->companyLabel($company), 100, 966, function ($font) use ($colors) {
+        $image->drawRectangle(0, (int)($height * 0.85), fn($d) => $d->size($width, 1)->background($colors['sep']));
+        $image->text($this->companyLabel($company), (int)($width * 0.092), (int)($height * 0.89), function ($font) use ($colors, $height) {
             $font->filename($this->fontPath);
-            $font->size(26);
+            $font->size((int)($height * 0.024));
             $font->color($colors['label']);
             $font->align('left');
             $font->valign('middle');
@@ -673,9 +659,9 @@ class ImageGeneratorService
 
     // ── Layout: split — top half brand color / bottom half contrasted ─────────
 
-    private function renderLayoutSplit(Post $post, $company, string $brandColor, string $visualStyle, string $fileName): string
+    private function renderLayoutSplit(Post $post, $company, string $brandColor, string $visualStyle, string $fileName, int $width = 1080, int $height = 1080): string
     {
-        $image        = $this->manager->create(1080, 1080);
+        $image        = $this->manager->create($width, $height);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
         $imageText    = $this->extractImageText($post, 120);
 
@@ -683,43 +669,47 @@ class ImageGeneratorService
         $bottomText  = ($visualStyle === 'light_branded') ? '#1E293B' : '#FFFFFF';
         $bottomLabel = ($visualStyle === 'light_branded') ? $brandColor : $brandColor;
 
+        $splitY = (int)($height * 0.45);
+
         // Top half — brand color
         $image->fill($brandColor);
-        // Ghost circles in top half
-        $image->drawEllipse(1000, 100, fn($d) => $d->size(380, 380)->background('rgba(0,0,0,0.08)'));
-        $image->drawEllipse(80, 400, fn($d) => $d->size(200, 200)->background('rgba(0,0,0,0.06)'));
+        // Ghost circles
+        $image->drawEllipse((int)($width * 0.925), (int)($height * 0.09), fn($d) => $d->size((int)($width * 0.35), (int)($width * 0.35))->background('rgba(0,0,0,0.08)'));
+        $image->drawEllipse((int)($width * 0.074), (int)($height * 0.37), fn($d) => $d->size((int)($width * 0.185), (int)($width * 0.185))->background('rgba(0,0,0,0.06)'));
 
-        // Bottom half — dark or light
-        $image->drawRectangle(0, 490, fn($d) => $d->size(1080, 590)->background($bottomBg));
+        // Bottom half
+        $image->drawRectangle(0, $splitY, fn($d) => $d->size($width, $height - $splitY)->background($bottomBg));
 
-        // Diagonal accent stripe at the split
-        $image->drawRectangle(0, 483, fn($d) => $d->size(1080, 14)->background('rgba(0,0,0,0.15)'));
+        // Diagonal accent stripe
+        $image->drawRectangle(0, $splitY - (int)($height * 0.006), fn($d) => $d->size($width, (int)($height * 0.013))->background('rgba(0,0,0,0.15)'));
 
-        // Template name — top half centered
-        $image->text($templateName, 540, 280, function ($font) {
+        $centerX = (int)($width / 2);
+
+        // Template name — top half
+        $image->text($templateName, $centerX, (int)($splitY * 0.57), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(44);
+            $font->size((int)($height * 0.04));
             $font->color('#FFFFFF');
             $font->align('center');
             $font->valign('middle');
         });
 
-        // Decorative line in top half
-        $image->drawRectangle(340, 320, fn($d) => $d->size(400, 3)->background('rgba(255,255,255,0.40)'));
+        // Decorative line
+        $image->drawRectangle($centerX - (int)($width * 0.185), (int)($splitY * 0.65), fn($d) => $d->size((int)($width * 0.37), (int)($height * 0.003))->background('rgba(255,255,255,0.40)'));
 
         // Accent line in bottom half
-        $image->drawRectangle(100, 530, fn($d) => $d->size(80, 5)->background($brandColor));
+        $image->drawRectangle((int)($width * 0.092), $splitY + (int)($height * 0.037), fn($d) => $d->size((int)($width * 0.074), (int)($height * 0.005))->background($brandColor));
 
-        // Image text — bottom half, left-aligned
+        // Image text — bottom half
         if ($imageText) {
-            $this->drawTextLeftAligned($image, mb_strtoupper($imageText), 100, 560, 24, $bottomText, 26);
+            $this->drawTextLeftAligned($image, mb_strtoupper($imageText), (int)($width * 0.092), $splitY + (int)($height * 0.065), (int)($height * 0.022), $bottomText, 26);
         }
 
         // Bottom separator + company
-        $image->drawRectangle(0, 920, fn($d) => $d->size(1080, 1)->background('rgba(128,128,128,0.15)'));
-        $image->text($this->companyLabel($company), 100, 966, function ($font) use ($bottomLabel) {
+        $image->drawRectangle(0, (int)($height * 0.85), fn($d) => $d->size($width, 1)->background('rgba(128,128,128,0.15)'));
+        $image->text($this->companyLabel($company), (int)($width * 0.092), (int)($height * 0.89), function ($font) use ($bottomLabel, $height) {
             $font->filename($this->fontPath);
-            $font->size(26);
+            $font->size((int)($height * 0.024));
             $font->color($bottomLabel);
             $font->align('left');
             $font->valign('middle');
@@ -732,9 +722,9 @@ class ImageGeneratorService
 
     // ── Layout: minimal — white bg, left brand stripe, very clean ────────────
 
-    private function renderLayoutMinimal(Post $post, $company, string $brandColor, string $fileName): string
+    private function renderLayoutMinimal(Post $post, $company, string $brandColor, string $fileName, int $width = 1080, int $height = 1080): string
     {
-        $image        = $this->manager->create(1080, 1080);
+        $image        = $this->manager->create($width, $height);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
         $imageText    = $this->extractImageText($post, 130);
 
@@ -742,33 +732,30 @@ class ImageGeneratorService
         $image->fill('#FFFFFF');
 
         // Left vertical brand stripe
-        $image->drawRectangle(0, 0, fn($d) => $d->size(14, 1080)->background($brandColor));
+        $image->drawRectangle(0, 0, fn($d) => $d->size((int)($width * 0.013), $height)->background($brandColor));
 
-        // Very subtle top bar
-        $image->drawRectangle(14, 0, fn($d) => $d->size(1066, 8)->background('#F1F5F9'));
-
-        // Template name — left-aligned, brand color
-        $image->text($templateName, 80, 420, function ($font) use ($brandColor) {
+        // Template name
+        $image->text($templateName, (int)($width * 0.074), (int)($height * 0.39), function ($font) use ($brandColor, $height) {
             $font->filename($this->fontPath);
-            $font->size(36);
+            $font->size((int)($height * 0.033));
             $font->color($brandColor);
             $font->align('left');
             $font->valign('middle');
         });
 
         // Thin separator under title
-        $image->drawRectangle(80, 445, fn($d) => $d->size(900, 2)->background('#E2E8F0'));
+        $image->drawRectangle((int)($width * 0.074), (int)($height * 0.41), fn($d) => $d->size((int)($width * 0.83), (int)($height * 0.002))->background('#E2E8F0'));
 
-        // Image text — left-aligned, dark slate
+        // Image text — left-aligned
         if ($imageText) {
-            $this->drawTextLeftAligned($image, mb_strtoupper($imageText), 80, 470, 26, '#334155', 30);
+            $this->drawTextLeftAligned($image, mb_strtoupper($imageText), (int)($width * 0.074), (int)($height * 0.435), (int)($height * 0.024), '#334155', 30);
         }
 
-        // Bottom: thin line + company label in muted gray
-        $image->drawRectangle(80, 940, fn($d) => $d->size(900, 1)->background('#CBD5E1'));
-        $image->text($this->companyLabel($company), 80, 974, function ($font) use ($brandColor) {
+        // Bottom: thin line + company label
+        $image->drawRectangle((int)($width * 0.074), (int)($height * 0.87), fn($d) => $d->size((int)($width * 0.83), 1)->background('#CBD5E1'));
+        $image->text($this->companyLabel($company), (int)($width * 0.074), (int)($height * 0.9), function ($font) use ($brandColor, $height) {
             $font->filename($this->fontPath);
-            $font->size(24);
+            $font->size((int)($height * 0.022));
             $font->color($brandColor);
             $font->align('left');
             $font->valign('middle');
@@ -795,7 +782,7 @@ class ImageGeneratorService
         ];
     }
 
-    private function generateChantierDetail(Post $post): array
+    private function generateChantierDetail(Post $post, int $width = 1080, int $height = 1080): array
     {
         $company    = $post->company;
         $decoded    = $this->parseStructuredContent($post->refined_content);
@@ -804,16 +791,16 @@ class ImageGeneratorService
         $slides     = [];
 
         // Slide 1 – Cover
-        $coverImage = $this->manager->create(1080, 1080);
+        $coverImage = $this->manager->create($width, $height);
         if (!empty($photos[0]) && Storage::disk('public')->exists($photos[0])) {
             $photo = $this->manager->read(Storage::disk('public')->get($photos[0]));
-            $photo->cover(1080, 1080);
+            $photo->cover($width, $height);
             $coverImage->place($photo, 'top-left', 0, 0);
         } else {
             $coverImage->fill('#1E293B');
         }
-        $coverImage->drawRectangle(0, 540, function ($draw) {
-            $draw->size(1080, 540);
+        $coverImage->drawRectangle(0, (int)($height / 2), function ($draw) use ($width, $height) {
+            $draw->size($width, (int)($height / 2));
             $draw->background('rgba(0,0,0,0.6)');
         });
         
@@ -821,7 +808,7 @@ class ImageGeneratorService
             ? $this->cleanText($decoded['slides'][0]) 
             : $this->cleanText(mb_substr($decoded['caption'], 0, 60));
 
-        $this->drawTextRaw($coverImage, strtoupper($titleText), 540, 780, 56, '#FFFFFF', 24);
+        $this->drawTextRaw($coverImage, strtoupper($titleText), (int)($height * 0.5), (int)($height * 0.72), (int)($height * 0.052), '#FFFFFF', 24);
         $this->drawBottomBand($coverImage, $company, $brandColor);
         $this->addLogo($coverImage, $company->logo_path);
         $path = 'posts/' . $post->id . '_slide_1.jpg';
@@ -830,10 +817,10 @@ class ImageGeneratorService
 
         // Slides 2..N – detail photos
         foreach (array_slice($photos, 1, 4) as $i => $photoPath) {
-            $slideImage = $this->manager->create(1080, 1080);
+            $slideImage = $this->manager->create($width, $height);
             if (Storage::disk('public')->exists($photoPath)) {
                 $photo = $this->manager->read(Storage::disk('public')->get($photoPath));
-                $photo->cover(1080, 1080);
+                $photo->cover($width, $height);
                 $slideImage->place($photo, 'top-left', 0, 0);
             } else {
                 $slideImage->fill('#1E293B');
@@ -853,7 +840,7 @@ class ImageGeneratorService
         return $slides;
     }
 
-    private function generateStepByStep(Post $post): array
+    private function generateStepByStep(Post $post, int $width = 1080, int $height = 1080): array
     {
         $company    = $post->company;
         $decoded    = $this->parseStructuredContent($post->refined_content);
@@ -862,22 +849,22 @@ class ImageGeneratorService
         $slides     = [];
 
         // Slide 1 – Cover
-        $coverImage = $this->manager->create(1080, 1080);
+        $coverImage = $this->manager->create($width, $height);
         $coverImage->fill($brandColor);
-        $coverImage->drawRectangle(0, 0, function ($draw) {
-            $draw->size(12, 1080);
+        $coverImage->drawRectangle(0, 0, function ($draw) use ($height) {
+            $draw->size((int)($height * 0.011), $height);
             $draw->background('rgba(0,0,0,0.25)');
         });
-        $coverImage->text('ÉTAPE', 540, 380, function ($font) {
+        $coverImage->text('ÉTAPE', (int)($width / 2), (int)($height * 0.35), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(60);
+            $font->size((int)($height * 0.055));
             $font->color('rgba(255,255,255,0.25)');
             $font->align('center');
             $font->valign('middle');
         });
-        $coverImage->text('PAR ÉTAPE', 540, 460, function ($font) {
+        $coverImage->text('PAR ÉTAPE', (int)($width / 2), (int)($height * 0.42), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(60);
+            $font->size((int)($height * 0.055));
             $font->color('rgba(255,255,255,0.25)');
             $font->align('center');
             $font->valign('middle');
@@ -887,7 +874,7 @@ class ImageGeneratorService
             ? strtoupper($this->cleanText($decoded['slides'][0])) 
             : 'NOS ÉTAPES DE TRAVAIL';
 
-        $this->drawTextRaw($coverImage, $titleText, 540, 700, 56, '#FFFFFF', 24);
+        $this->drawTextRaw($coverImage, $titleText, (int)($height * 0.5), (int)($height * 0.65), (int)($height * 0.052), '#FFFFFF', 24);
         $this->drawBottomBand($coverImage, $company, '#000000');
         $this->addLogo($coverImage, $company->logo_path);
         $path = 'posts/' . $post->id . '_slide_1.jpg';
@@ -896,10 +883,10 @@ class ImageGeneratorService
 
         // Slides 2..N – one per photo/step
         foreach ($photos as $idx => $photoPath) {
-            $slideImage = $this->manager->create(1080, 1080);
+            $slideImage = $this->manager->create($width, $height);
             if (Storage::disk('public')->exists($photoPath)) {
                 $photo = $this->manager->read(Storage::disk('public')->get($photoPath));
-                $photo->cover(1080, 1080);
+                $photo->cover($width, $height);
                 $slideImage->place($photo, 'top-left', 0, 0);
             } else {
                 $slideImage->fill('#1E293B');
@@ -928,7 +915,7 @@ class ImageGeneratorService
         return $slides;
     }
 
-    private function generateGuidePedagogique(Post $post): array
+    private function generateGuidePedagogique(Post $post, int $width = 1080, int $height = 1080): array
     {
         $company    = $post->company;
         $decoded    = $this->parseStructuredContent($post->refined_content);
@@ -938,18 +925,18 @@ class ImageGeneratorService
         $aiSlides = !empty($decoded['slides']) ? $decoded['slides'] : [];
 
         // --- Slide 1: Accroche ---
-        $slide1 = $this->manager->create(1080, 1080);
+        $slide1 = $this->manager->create($width, $height);
         $slide1->fill($brandColor);
 
         $question = !empty($aiSlides[0]) 
             ? strtoupper($this->cleanText($aiSlides[0])) 
             : 'CONSEIL D\'EXPERT';
             
-        $this->drawTextRaw($slide1, $question, 540, 540, 68, '#FFFFFF', 20);
+        $this->drawTextRaw($slide1, $question, (int)($height * 0.5), (int)($height * 0.5), (int)($height * 0.063), '#FFFFFF', 20);
 
-        $slide1->text('CONSEIL D\'EXPERT', 540, 220, function ($font) {
+        $slide1->text('CONSEIL D\'EXPERT', (int)($width * 0.5), (int)($height * 0.2), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(32);
+            $font->size((int)($height * 0.03));
             $font->color('rgba(255,255,255,0.7)');
             $font->align('center');
             $font->valign('middle');
@@ -967,25 +954,25 @@ class ImageGeneratorService
         }
 
         foreach ($middleSlides as $ci => $slideContent) {
-            $slide = $this->manager->create(1080, 1080);
+            $slide = $this->manager->create($width, $height);
             $slide->fill('#F8FAFC');
-            $slide->drawRectangle(0, 0, function ($draw) use ($brandColor) {
-                $draw->size(1080, 12);
+            $slide->drawRectangle(0, 0, function ($draw) use ($width, $height, $brandColor) {
+                $draw->size($width, (int)($height * 0.011));
                 $draw->background($brandColor);
             });
             $slideNum = $ci + 2;
-            $slide->drawRectangle(80, 120, function ($draw) use ($brandColor) {
-                $draw->size(60, 60);
+            $slide->drawRectangle((int)($width * 0.074), (int)($height * 0.11), function ($draw) use ($height, $brandColor) {
+                $draw->size((int)($height * 0.055), (int)($height * 0.055));
                 $draw->background($brandColor);
             });
-            $slide->text((string)$slideNum, 110, 150, function ($font) {
+            $slide->text((string)$slideNum, (int)($width * 0.074 + ($height * 0.027)), (int)($height * 0.11 + ($height * 0.027)), function ($font) use ($height) {
                 $font->filename($this->fontPath);
-                $font->size(32);
+                $font->size((int)($height * 0.03));
                 $font->color('#FFFFFF');
                 $font->align('center');
                 $font->valign('middle');
             });
-            $this->drawTextRaw($slide, strtoupper($this->cleanText($slideContent)), 540, 540, 52, '#1E293B', 24);
+            $this->drawTextRaw($slide, strtoupper($this->cleanText($slideContent)), (int)($height * 0.5), (int)($height * 0.5), (int)($height * 0.048), '#1E293B', 24);
             $this->drawBottomBand($slide, $company, '#1E293B');
             $this->addLogo($slide, $company->logo_path);
 
@@ -996,38 +983,38 @@ class ImageGeneratorService
 
         // --- Last slide: CTA ---
         $lastSlideNum = count($slides) + 1;
-        $cta = $this->manager->create(1080, 1080);
+        $cta = $this->manager->create($width, $height);
         $cta->fill('#1E293B');
-        $cta->drawRectangle(0, 0, function ($draw) use ($brandColor) {
-            $draw->size(1080, 16);
+        $cta->drawRectangle(0, 0, function ($draw) use ($width, $height, $brandColor) {
+            $draw->size($width, (int)($height * 0.015));
             $draw->background($brandColor);
         });
-        $cta->drawRectangle(0, 1064, function ($draw) use ($brandColor) {
-            $draw->size(1080, 16);
+        $cta->drawRectangle(0, $height - (int)($height * 0.015), function ($draw) use ($width, $height, $brandColor) {
+            $draw->size($width, (int)($height * 0.015));
             $draw->background($brandColor);
         });
         if ($company->logo_path && Storage::disk('public')->exists($company->logo_path)) {
             $logo = $this->manager->read(Storage::disk('public')->get($company->logo_path));
-            $logo->scale(width: 200);
-            $cta->place($logo, 'center', 0, -80);
+            $logo->scale(width: (int)($width * 0.185));
+            $cta->place($logo, 'center', 0, -(int)($height * 0.074));
         }
-        $cta->text('UN PROJET EN TÊTE ?', 540, 620, function ($font) {
+        $cta->text('UN PROJET EN TÊTE ?', (int)($width * 0.5), (int)($height * 0.57), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(48);
+            $font->size((int)($height * 0.044));
             $font->color('#FFFFFF');
             $font->align('center');
             $font->valign('middle');
         });
-        $cta->text('Contactez-nous pour un devis gratuit', 540, 700, function ($font) {
+        $cta->text('Contactez-nous pour un devis gratuit', (int)($width * 0.5), (int)($height * 0.65), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(30);
+            $font->size((int)($height * 0.028));
             $font->color('rgba(255,255,255,0.7)');
             $font->align('center');
             $font->valign('middle');
         });
-        $cta->text($this->companyLabel($company), 540, 820, function ($font) {
+        $cta->text($this->companyLabel($company), (int)($width * 0.5), (int)($height * 0.76), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(26);
+            $font->size((int)($height * 0.024));
             $font->color('#F59E0B');
             $font->align('center');
             $font->valign('middle');
@@ -1045,27 +1032,34 @@ class ImageGeneratorService
 
     private function drawReviewElements($image): void
     {
-        $starY       = 230;
-        $starSpacing = 90;
-        $startX      = 540 - (($starSpacing * 4) / 2);
+        $width  = $image->width();
+        $height = $image->height();
+        $starY       = (int)($height * 0.213);
+        $starSpacing = (int)($width * 0.083);
+        $startX      = (int)($width * 0.5) - (($starSpacing * 4) / 2);
 
         for ($i = 0; $i < 5; $i++) {
-            $this->drawStar($image, $startX + ($i * $starSpacing), $starY, 35, 15, '#FACC15');
+            $this->drawStar($image, $startX + ($i * $starSpacing), $starY, (int)($height * 0.032), (int)($height * 0.014), '#FACC15');
         }
     }
 
     private function drawCompanyBadge($image, $company): void
     {
-        $image->drawRectangle(0, 960, function ($draw) {
-            $draw->size(1080, 120);
+        $width  = $image->width();
+        $height = $image->height();
+        $badgeH = (int)($height * 0.111);
+        $badgeY = $height - $badgeH;
+
+        $image->drawRectangle(0, $badgeY, function ($draw) use ($width, $badgeH) {
+            $draw->size($width, $badgeH);
             $draw->background('rgba(0, 0, 0, 0.35)');
         });
 
         $label = $this->companyLabel($company);
 
-        $image->text($label, 540, 1020, function ($font) {
+        $image->text($label, (int)($width * 0.5), $badgeY + (int)($badgeH * 0.5), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(30);
+            $font->size((int)($height * 0.028));
             $font->color('#FFFFFF');
             $font->align('center');
             $font->valign('middle');
@@ -1074,9 +1068,11 @@ class ImageGeneratorService
 
     private function drawProjectElements($image, Post $post, $company, string $brandColor): void
     {
-        $bannerHeight = 150;
-        $imageHeight  = 1080 - $bannerHeight;
-        $halfWidth    = 540;
+        $width        = $image->width();
+        $height       = $image->height();
+        $bannerHeight = (int)($height * 0.139);
+        $imageHeight  = $height - $bannerHeight;
+        $halfWidth    = (int)($width / 2);
 
         if ($post->image_before_path && Storage::disk('public')->exists($post->image_before_path)) {
             $before = $this->manager->read(Storage::disk('public')->get($post->image_before_path));
@@ -1095,24 +1091,24 @@ class ImageGeneratorService
             $draw->background('#FFFFFF');
         });
 
-        $image->drawRectangle(0, $imageHeight, function ($draw) use ($bannerHeight, $brandColor) {
-            $draw->size(1080, $bannerHeight);
+        $image->drawRectangle(0, $imageHeight, function ($draw) use ($width, $bannerHeight, $brandColor) {
+            $draw->size($width, $bannerHeight);
             $draw->background($brandColor);
         });
 
         $labelY = $imageHeight + intval($bannerHeight * 0.62);
 
-        $image->text('AVANT', 162, $labelY, function ($font) {
+        $image->text('AVANT', (int)($width * 0.15), $labelY, function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(36);
+            $font->size((int)($height * 0.033));
             $font->color('#FFFFFF');
             $font->align('center');
             $font->valign('middle');
         });
 
-        $image->text('APRÈS', 918, $labelY, function ($font) {
+        $image->text('APRÈS', (int)($width * 0.85), $labelY, function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(36);
+            $font->size((int)($height * 0.033));
             $font->color('#FFFFFF');
             $font->align('center');
             $font->valign('middle');
@@ -1121,9 +1117,9 @@ class ImageGeneratorService
         $companyY = $imageHeight + intval($bannerHeight * 0.28);
         $label    = $this->companyLabel($company);
 
-        $image->text($label, 540, $companyY, function ($font) {
+        $image->text($label, (int)($width * 0.5), $companyY, function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(22);
+            $font->size((int)($height * 0.02));
             $font->color('rgba(255, 255, 255, 0.85)');
             $font->align('center');
             $font->valign('middle');
@@ -1132,34 +1128,37 @@ class ImageGeneratorService
 
     private function drawFaqElements($image, string $brandColor): void
     {
-        $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
-            $draw->size(1080, 20);
+        $width  = $image->width();
+        $height = $image->height();
+
+        $image->drawRectangle(0, 0, function ($draw) use ($width, $height, $brandColor) {
+            $draw->size($width, (int)($height * 0.018));
             $draw->background($brandColor);
         });
 
-        $image->drawRectangle(490, 250, function ($draw) use ($brandColor) {
-            $draw->size(100, 10);
+        $image->drawRectangle((int)($width * 0.45), (int)($height * 0.23), function ($draw) use ($width, $height, $brandColor) {
+            $draw->size((int)($width * 0.092), (int)($height * 0.009));
             $draw->background($brandColor);
         });
 
-        $image->text('FAQ ARTISAN', 540, 320, function ($font) use ($brandColor) {
+        $image->text('FAQ ARTISAN', (int)($width * 0.5), (int)($height * 0.29), function ($font) use ($brandColor, $height) {
             $font->filename($this->fontPath);
-            $font->size(35);
+            $font->size((int)($height * 0.032));
             $font->color($brandColor);
             $font->align('center');
             $font->valign('middle');
         });
 
-        $image->text('?', 950, 950, function ($font) {
+        $image->text('?', (int)($width * 0.88), (int)($height * 0.88), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(300);
+            $font->size((int)($height * 0.27));
             $font->color('rgba(255, 255, 255, 0.05)');
             $font->align('center');
             $font->valign('middle');
         });
 
-        $image->drawRectangle(100, 900, function ($draw) {
-            $draw->size(880, 1);
+        $image->drawRectangle((int)($width * 0.092), (int)($height * 0.83), function ($draw) use ($width) {
+            $draw->size((int)($width * 0.81), 1);
             $draw->background('rgba(255, 255, 255, 0.1)');
         });
     }
@@ -1168,9 +1167,9 @@ class ImageGeneratorService
     {
         $label = $this->companyLabel($company);
 
-        $image->text($label, 540, 960, function ($font) use ($brandColor) {
+        $image->text($label, (int)($image->width() * 0.5), (int)($image->height() * 0.89), function ($font) use ($brandColor, $image) {
             $font->filename($this->fontPath);
-            $font->size(26);
+            $font->size((int)($image->height() * 0.024));
             $font->color($brandColor);
             $font->align('center');
             $font->valign('middle');
@@ -1181,28 +1180,33 @@ class ImageGeneratorService
     {
         if ($post->image_before_path && Storage::disk('public')->exists($post->image_before_path)) {
             $photo = $this->manager->read(Storage::disk('public')->get($post->image_before_path));
-            $photo->cover(1080, 1080);
+            $photo->cover($image->width(), $image->height());
             $image->place($photo, 'top-left', 0, 0);
         }
     }
 
     private function drawLifestyleOverlay($image, $company, string $brandColor): void
     {
-        $image->drawRectangle(0, 968, function ($draw) {
-            $draw->size(1080, 112);
+        $width  = $image->width();
+        $height = $image->height();
+        $overlayH = (int)($height * 0.104);
+        $overlayY = $height - $overlayH;
+
+        $image->drawRectangle(0, $overlayY, function ($draw) use ($width, $overlayH) {
+            $draw->size($width, $overlayH);
             $draw->background('rgba(0, 0, 0, 0.55)');
         });
 
-        $image->drawRectangle(0, 966, function ($draw) use ($brandColor) {
-            $draw->size(1080, 4);
+        $image->drawRectangle(0, $overlayY - 2, function ($draw) use ($width, $brandColor) {
+            $draw->size($width, 4);
             $draw->background($brandColor);
         });
 
         $label = $this->companyLabel($company);
 
-        $image->text($label, 540, 1024, function ($font) {
+        $image->text($label, (int)($width * 0.5), $overlayY + (int)($overlayH * 0.5), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(30);
+            $font->size((int)($height * 0.028));
             $font->color('#FFFFFF');
             $font->align('center');
             $font->valign('middle');
@@ -1214,30 +1218,35 @@ class ImageGeneratorService
      */
     private function drawQualityFocusElements($image, Post $post, $company, string $brandColor, string $content): void
     {
+        $width  = $image->width();
+        $height = $image->height();
+
         // Full-bleed photo
         $photoPath = $post->image_before_path;
         if ($photoPath && Storage::disk('public')->exists($photoPath)) {
             $photo = $this->manager->read(Storage::disk('public')->get($photoPath));
-            $photo->cover(1080, 1080);
+            $photo->cover($width, $height);
             $image->place($photo, 'top-left', 0, 0);
         } else {
             $image->fill('#1E293B');
         }
 
         // "SÉLECTION PRO" badge top-right
-        $image->drawRectangle(780, 40, function ($draw) use ($brandColor) {
-            $draw->size(260, 60);
+        $badgeW = (int)($width * 0.24);
+        $badgeH = (int)($height * 0.055);
+        $image->drawRectangle($width - $badgeW - (int)($width * 0.037), (int)($height * 0.037), function ($draw) use ($badgeW, $badgeH, $brandColor) {
+            $draw->size($badgeW, $badgeH);
             $draw->background($brandColor);
         });
-        $image->text('SÉLECTION PRO', 910, 70, function ($font) {
+        $image->text('SÉLECTION PRO', $width - (int)($badgeW / 2) - (int)($width * 0.037), (int)($height * 0.037) + (int)($badgeH / 2), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(22);
+            $font->size((int)($height * 0.02));
             $font->color('#FFFFFF');
             $font->align('center');
             $font->valign('middle');
         });
 
-        // Unified bottom band (fixed 160px)
+        // Unified bottom band
         $this->drawUnifiedBand($image, $company, $brandColor, mb_strtoupper($content));
     }
 
@@ -1246,45 +1255,44 @@ class ImageGeneratorService
      */
     private function drawConseilSaisonnierElements($image, $company, string $brandColor, string $content): void
     {
+        $width  = $image->width();
+        $height = $image->height();
+
         $image->fill('#0B1426');
 
-        // Ghost sun — concentric circles, top-right corner
-        $image->drawEllipse(970, 130, function ($draw) {
-            $draw->size(400, 400);
+        // Ghost sun
+        $image->drawEllipse((int)($width * 0.9), (int)($height * 0.12), function ($draw) use ($width) {
+            $draw->size((int)($width * 0.37), (int)($width * 0.37));
             $draw->background('rgba(255,255,255,0.03)');
         });
-        $image->drawEllipse(970, 130, function ($draw) {
-            $draw->size(260, 260);
+        $image->drawEllipse((int)($width * 0.9), (int)($height * 0.12), function ($draw) use ($width) {
+            $draw->size((int)($width * 0.24), (int)($width * 0.24));
             $draw->background('rgba(255,255,255,0.04)');
-        });
-        $image->drawEllipse(970, 130, function ($draw) {
-            $draw->size(130, 130);
-            $draw->background('rgba(255,255,255,0.06)');
         });
 
         // Brand color top bar
-        $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
-            $draw->size(1080, 20);
+        $image->drawRectangle(0, 0, function ($draw) use ($width, $height, $brandColor) {
+            $draw->size($width, (int)($height * 0.018));
             $draw->background($brandColor);
         });
 
         // "CONSEIL SAISONNIER" label
-        $image->text('CONSEIL SAISONNIER', 540, 290, function ($font) use ($brandColor) {
+        $image->text('CONSEIL SAISONNIER', (int)($width * 0.5), (int)($height * 0.27), function ($font) use ($brandColor, $height) {
             $font->filename($this->fontPath);
-            $font->size(36);
+            $font->size((int)($height * 0.033));
             $font->color($brandColor);
             $font->align('center');
             $font->valign('middle');
         });
 
         // Separator
-        $image->drawRectangle(200, 328, function ($draw) use ($brandColor) {
-            $draw->size(680, 4);
+        $image->drawRectangle((int)($width * 0.185), (int)($height * 0.30), function ($draw) use ($width, $brandColor) {
+            $draw->size((int)($width * 0.63), 4);
             $draw->background($brandColor);
         });
 
         // Main advice text
-        $this->drawTextRaw($image, mb_strtoupper($content), 370, 840, 52, '#FFFFFF', 22);
+        $this->drawTextRaw($image, mb_strtoupper($content), (int)($height * 0.34), (int)($height * 0.78), (int)($height * 0.048), '#FFFFFF', 22);
 
         // Company name
         $this->drawFaqCompanyName($image, $company, $brandColor);
@@ -1295,53 +1303,49 @@ class ImageGeneratorService
      */
     private function drawErreurAEviterElements($image, $company, string $brandColor, string $content): void
     {
+        $width  = $image->width();
+        $height = $image->height();
+
         $image->fill('#111827');
 
-        // Ghost X — two diagonal polygon bars
-        $image->drawPolygon(function ($draw) {
-            $draw->point(70, 140);
-            $draw->point(140, 70);
-            $draw->point(1010, 940);
-            $draw->point(940, 1010);
-            $draw->background('rgba(255,255,255,0.045)');
-        });
-        $image->drawPolygon(function ($draw) {
-            $draw->point(940, 70);
-            $draw->point(1010, 140);
-            $draw->point(140, 1010);
-            $draw->point(70, 940);
+        // Ghost X
+        $image->drawPolygon(function ($draw) use ($width, $height) {
+            $draw->point((int)($width * 0.065), (int)($height * 0.13));
+            $draw->point((int)($width * 0.13), (int)($height * 0.065));
+            $draw->point((int)($width * 0.935), (int)($height * 0.87));
+            $draw->point((int)($width * 0.87), (int)($height * 0.935));
             $draw->background('rgba(255,255,255,0.045)');
         });
 
         // Brand color top bar
-        $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
-            $draw->size(1080, 20);
+        $image->drawRectangle(0, 0, function ($draw) use ($width, $height, $brandColor) {
+            $draw->size($width, (int)($height * 0.018));
             $draw->background($brandColor);
         });
 
         // Left accent bar
-        $image->drawRectangle(0, 0, function ($draw) use ($brandColor) {
-            $draw->size(12, 1080);
+        $image->drawRectangle(0, 0, function ($draw) use ($height, $brandColor) {
+            $draw->size(12, $height);
             $draw->background($brandColor);
         });
 
         // "ERREUR A EVITER" label
-        $image->text('ERREUR A EVITER', 540, 290, function ($font) use ($brandColor) {
+        $image->text('ERREUR A EVITER', (int)($width * 0.5), (int)($height * 0.27), function ($font) use ($brandColor, $height) {
             $font->filename($this->fontPath);
-            $font->size(36);
+            $font->size((int)($height * 0.033));
             $font->color($brandColor);
             $font->align('center');
             $font->valign('middle');
         });
 
         // Separator
-        $image->drawRectangle(200, 328, function ($draw) use ($brandColor) {
-            $draw->size(680, 4);
+        $image->drawRectangle((int)($width * 0.185), (int)($height * 0.30), function ($draw) use ($width, $brandColor) {
+            $draw->size((int)($width * 0.63), 4);
             $draw->background($brandColor);
         });
 
         // Main error text
-        $this->drawTextRaw($image, mb_strtoupper($content), 370, 840, 50, '#FFFFFF', 22);
+        $this->drawTextRaw($image, mb_strtoupper($content), (int)($height * 0.34), (int)($height * 0.78), (int)($height * 0.046), '#FFFFFF', 22);
 
         // Company name
         $this->drawFaqCompanyName($image, $company, $brandColor);
@@ -1356,13 +1360,18 @@ class ImageGeneratorService
      */
     private function drawBottomBand($image, $company, string $bgColor = '#000000'): void
     {
-        $image->drawRectangle(0, 960, function ($draw) use ($bgColor) {
-            $draw->size(1080, 120);
+        $width  = $image->width();
+        $height = $image->height();
+        $bandH  = (int)($height * (120 / 1080));
+        $bandY  = $height - $bandH;
+
+        $image->drawRectangle(0, $bandY, function ($draw) use ($width, $bandH, $bgColor) {
+            $draw->size($width, $bandH);
             $draw->background($bgColor === '#000000' ? 'rgba(0,0,0,0.85)' : $bgColor);
         });
-        $image->text($this->companyLabel($company), 540, 1020, function ($font) {
+        $image->text($this->companyLabel($company), (int)($width / 2), $bandY + (int)($bandH * 0.5), function ($font) use ($height) {
             $font->filename($this->fontPath);
-            $font->size(28);
+            $font->size((int)($height * 0.026));
             $font->color('rgba(255,255,255,0.7)');
             $font->align('center');
             $font->valign('middle');
@@ -1375,32 +1384,37 @@ class ImageGeneratorService
      */
     private function drawUnifiedBand($image, $company, string $brandColor, ?string $primaryText = null): void
     {
-        $bandY = 920; // 1080 - 160 = fixed 160px height
+        $width  = $image->width();
+        $height = $image->height();
+        $bandH  = (int)($height * (160 / 1080));
+        $bandY  = $height - $bandH;
 
-        $image->drawRectangle(0, $bandY, function ($draw) {
-            $draw->size(1080, 160);
+        $image->drawRectangle(0, $bandY, function ($draw) use ($width, $bandH) {
+            $draw->size($width, $bandH);
             $draw->background('rgba(0,0,0,0.80)');
         });
 
-        // Brand accent line at top of band
-        $image->drawRectangle(0, $bandY, function ($draw) use ($brandColor) {
-            $draw->size(1080, 3);
+        // Brand accent line
+        $image->drawRectangle(0, $bandY, function ($draw) use ($width, $brandColor) {
+            $draw->size($width, 3);
             $draw->background($brandColor);
         });
 
+        $centerX = (int)($width / 2);
+
         if ($primaryText !== null && $primaryText !== '') {
-            $this->drawTextRaw($image, $primaryText, $bandY + 8, $bandY + 112, 30, '#FFFFFF', 34);
-            $image->text($this->companyLabel($company), 540, $bandY + 138, function ($font) {
+            $this->drawTextRaw($image, $primaryText, $bandY + (int)($bandH * 0.05), $bandY + (int)($bandH * 0.7), (int)($height * 0.028), '#FFFFFF', 34);
+            $image->text($this->companyLabel($company), $centerX, $bandY + (int)($bandH * 0.86), function ($font) use ($height) {
                 $font->filename($this->fontPath);
-                $font->size(20);
+                $font->size((int)($height * 0.0185));
                 $font->color('rgba(255,255,255,0.60)');
                 $font->align('center');
                 $font->valign('middle');
             });
         } else {
-            $image->text($this->companyLabel($company), 540, $bandY + 80, function ($font) {
+            $image->text($this->companyLabel($company), $centerX, $bandY + (int)($bandH * 0.5), function ($font) use ($height) {
                 $font->filename($this->fontPath);
-                $font->size(26);
+                $font->size((int)($height * 0.024));
                 $font->color('rgba(255,255,255,0.70)');
                 $font->align('center');
                 $font->valign('middle');
@@ -1497,6 +1511,14 @@ class ImageGeneratorService
      */
     private function drawText($image, $text, $topBound = 420, $bottomBound = 880, $fontSize = 50): void
     {
+        $width  = $image->width();
+        $height = $image->height();
+
+        // Scale bounds if they are standard 1080 constants
+        if ($topBound > 1) $topBound = $height * ($topBound / 1080);
+        if ($bottomBound > 1) $bottomBound = $height * ($bottomBound / 1080);
+        if ($fontSize > 0) $fontSize = $height * ($fontSize / 1080);
+
         $text    = '"' . mb_strtoupper(trim($text, '"')) . '"';
         $words   = explode(' ', $text);
         $lines   = [];
@@ -1513,17 +1535,18 @@ class ImageGeneratorService
         }
         $lines[] = $current;
 
-        $lineHeight      = 70;
+        $lineHeight      = (int)($fontSize * 1.4);
         $totalTextHeight = count($lines) * $lineHeight;
         $availableHeight = $bottomBound - $topBound;
         $startY          = $topBound + ($availableHeight - $totalTextHeight) / 2 + ($lineHeight / 2);
 
+        $centerX = (int)($width / 2);
         $y = $startY;
         foreach ($lines as $line) {
-            $image->text($line, 540, $y, function ($font) use ($fontSize) {
+            $image->text($line, $centerX, (int)$y, function ($font) use ($fontSize) {
                 if (file_exists($this->fontPath)) {
                     $font->filename($this->fontPath);
-                    $font->size($fontSize);
+                    $font->size((int)$fontSize);
                 }
                 $font->color('#FFFFFF');
                 $font->align('center');
@@ -1538,6 +1561,14 @@ class ImageGeneratorService
      */
     private function drawTextRaw($image, string $text, int $topBound, int $bottomBound, int $fontSize, string $color = '#FFFFFF', int $maxChars = 24): void
     {
+        $width  = $image->width();
+        $height = $image->height();
+
+        // Scale bounds if they are standard 1080 constants
+        if ($topBound > 1) $topBound = $height * ($topBound / 1080);
+        if ($bottomBound > 1) $bottomBound = $height * ($bottomBound / 1080);
+        if ($fontSize > 0) $fontSize = $height * ($fontSize / 1080);
+
         $words   = explode(' ', $text);
         $lines   = [];
         $current = '';
@@ -1557,12 +1588,13 @@ class ImageGeneratorService
         $availableHeight = $bottomBound - $topBound;
         $startY          = $topBound + ($availableHeight - $totalTextHeight) / 2 + ($lineHeight / 2);
 
+        $centerX = (int)($width / 2);
         $y = $startY;
         foreach ($lines as $line) {
-            $image->text($line, 540, (int)$y, function ($font) use ($fontSize, $color) {
+            $image->text($line, $centerX, (int)$y, function ($font) use ($fontSize, $color) {
                 if (file_exists($this->fontPath)) {
                     $font->filename($this->fontPath);
-                    $font->size($fontSize);
+                    $font->size((int)$fontSize);
                 }
                 $font->color($color);
                 $font->align('center');
@@ -1578,6 +1610,14 @@ class ImageGeneratorService
      */
     private function drawTextLeftAligned($image, string $text, int $xLeft, int $yTop, int $fontSize, string $color = '#FFFFFF', int $maxChars = 22): void
     {
+        $width  = $image->width();
+        $height = $image->height();
+
+        // Scale bounds if they are standard 1080 constants
+        if ($yTop > 1) $yTop = $height * ($yTop / 1080);
+        if ($fontSize > 0) $fontSize = $height * ($fontSize / 1080);
+        if ($xLeft > 1) $xLeft = $width * ($xLeft / 1080);
+
         $words   = explode(' ', $text);
         $lines   = [];
         $current = '';
@@ -1597,10 +1637,10 @@ class ImageGeneratorService
         $y          = $yTop + intval($lineHeight / 2);
 
         foreach ($lines as $line) {
-            $image->text($line, $xLeft, $y, function ($font) use ($fontSize, $color) {
+            $image->text($line, (int)$xLeft, (int)$y, function ($font) use ($fontSize, $color) {
                 if (file_exists($this->fontPath)) {
                     $font->filename($this->fontPath);
-                    $font->size($fontSize);
+                    $font->size((int)$fontSize);
                 }
                 $font->color($color);
                 $font->align('left');
@@ -1635,8 +1675,8 @@ class ImageGeneratorService
     {
         if ($logoPath && Storage::disk('public')->exists($logoPath)) {
             $logo = $this->manager->read(Storage::disk('public')->get($logoPath));
-            $logo->scale(width: 130);
-            $image->place($logo, 'bottom-right', 40, 40);
+            $logo->scale(width: (int)($image->width() * 0.12));
+            $image->place($logo, 'bottom-right', (int)($image->width() * 0.037), (int)($image->height() * 0.037));
         }
     }
 

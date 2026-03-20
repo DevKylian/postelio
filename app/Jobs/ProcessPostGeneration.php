@@ -54,6 +54,7 @@ class ProcessPostGeneration implements ShouldQueue
                 $updateData['slides']     = $result;
             } else {
                 $updateData['image_path'] = $result;
+                $updateData['slides']     = [$result];
             }
 
             $this->post->update($updateData);
@@ -72,6 +73,7 @@ class ProcessPostGeneration implements ShouldQueue
                 } else {
                     $this->post->update([
                         'facebook_image_path' => $fbResult,
+                        'facebook_slides'     => [$fbResult],
                     ]);
                 }
             }

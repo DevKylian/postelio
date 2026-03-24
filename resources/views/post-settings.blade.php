@@ -60,6 +60,7 @@
                     </div>
                     @endif
 
+
                     {{-- Instagram Status Card --}}
                     @if(auth()->user()->company)
                     @php $company = auth()->user()->company; @endphp
@@ -76,8 +77,21 @@
                                 <p class="text-xs text-gray-400 mt-0.5">Publication automatique</p>
                             </div>
                         </div>
-                        <div class="p-5">
-                            @if($company->instagram_connected)
+                        <div class="p-6">
+                            @if(!auth()->user()->canPublishToSocialMedia())
+                                <div class="bg-gray-50/50 rounded-2xl p-6 border border-dashed border-gray-200 text-center">
+                                    <div class="w-10 h-10 bg-amber-50 text-copper rounded-xl flex items-center justify-center mx-auto mb-4">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-sm font-bold text-midnight uppercase tracking-wider mb-2">Option Premium</h4>
+                                    <p class="text-xs text-gray-500 leading-relaxed mb-6 max-w-[200px] mx-auto">L'automatisation Instagram est réservée aux abonnés Premium.</p>
+                                    <x-primary-button href="{{ route('subscription.plans') }}" wire:navigate class="w-full justify-center !text-[11px] !py-3">
+                                        Débloquer maintenant
+                                    </x-primary-button>
+                                </div>
+                            @elseif($company->instagram_connected)
                                 <div class="flex items-center gap-2 mb-3">
                                     <span class="w-2 h-2 rounded-full bg-green-400 shrink-0"></span>
                                     <span class="text-sm font-semibold text-midnight">Connecté</span>
@@ -138,8 +152,21 @@
                                 <p class="text-xs text-gray-400 mt-0.5">Publication automatique</p>
                             </div>
                         </div>
-                        <div class="p-5">
-                            @if($company->facebook_connected)
+                        <div class="p-6">
+                            @if(!auth()->user()->canPublishToSocialMedia())
+                                <div class="bg-gray-50/50 rounded-2xl p-6 border border-dashed border-gray-200 text-center">
+                                    <div class="w-10 h-10 bg-[#1877F2]/10 text-[#1877F2] rounded-xl flex items-center justify-center mx-auto mb-4">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-sm font-bold text-midnight uppercase tracking-wider mb-2">Option Premium</h4>
+                                    <p class="text-xs text-gray-500 leading-relaxed mb-6 max-w-[200px] mx-auto">L'automatisation Facebook est réservée aux abonnés Premium.</p>
+                                    <x-primary-button href="{{ route('subscription.plans') }}" wire:navigate class="w-full justify-center !text-[11px] !py-3">
+                                        Débloquer maintenant
+                                    </x-primary-button>
+                                </div>
+                            @elseif($company->facebook_connected)
                                 <div class="flex items-center gap-2 mb-3">
                                     <span class="w-2 h-2 rounded-full bg-green-400 shrink-0"></span>
                                     <span class="text-sm font-semibold text-midnight">Connecté</span>

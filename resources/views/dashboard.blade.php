@@ -28,6 +28,9 @@
                           ->whereMonth('created_at', now()->month)
                           ->whereYear('created_at', now()->year)
                           ->count();
+        $thisWeek   = $user->posts()->where('status', 'completed')
+                          ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+                          ->count();
         $lastMonth  = $user->posts()->where('status', 'completed')
                           ->whereMonth('created_at', now()->subMonth()->month)
                           ->whereYear('created_at', now()->subMonth()->year)
@@ -54,6 +57,9 @@
             'step_by_step'      => 'Étapes',
             'guide_pedagogique' => 'Guide',
         ];
+        $steps = [$hasCompany, $hasInstagram, $hasFacebook, $hasPost];
+        $done  = count(array_filter($steps));
+        $onboardingComplete = ($done === 4);
     @endphp
 
     <div class="py-8 px-4 sm:px-6 lg:px-8">
@@ -61,16 +67,12 @@
 
             {{-- ── Onboarding Banner ── --}}
             @if (!$onboardingComplete)
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="glass-panel rounded-2xl overflow-hidden">
                 <div class="px-6 py-5 flex items-center justify-between border-b border-gray-50">
                     <div>
                         <h3 class="font-semibold text-midnight text-sm">Démarrez avec Postelio</h3>
                         <p class="text-xs text-gray-400 mt-0.5">Complétez votre configuration pour générer des posts professionnels</p>
                     </div>
-                    @php
-                        $steps = [$hasCompany, $hasInstagram, $hasFacebook, $hasPost];
-                        $done  = count(array_filter($steps));
-                    @endphp
                     <span class="text-xs font-bold text-copper bg-copper/10 px-2.5 py-1 rounded-full">{{ $done }}/4</span>
                 </div>
                 <div class="px-6 py-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -105,7 +107,7 @@
             <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
 
                 {{-- Total Posts --}}
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group card-hover">
+                <div class="glass-panel rounded-2xl p-5 group card-hover">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all duration-200">
                             <svg class="w-4.5 h-4.5 w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,7 +123,7 @@
                 </div>
 
                 {{-- Ce mois --}}
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group card-hover">
+                <div class="glass-panel rounded-2xl p-5 group card-hover">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-9 h-9 rounded-xl bg-copper/10 flex items-center justify-center text-copper group-hover:bg-copper group-hover:text-white transition-all duration-200">
                             <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,29 +140,34 @@
                     <p class="text-2xl font-bold text-midnight mt-1">{{ $thisMonth }}</p>
                 </div>
 
-                {{-- Branding --}}
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group card-hover">
+                {{-- Objectif Hebdomadaire --}}
+                <div class="glass-panel rounded-2xl p-5 group card-hover">
                     <div class="flex items-center justify-between mb-4">
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0"
-                             style="background-color: {{ $company?->brand_color ? $company->brand_color . '20' : '#F59E0B20' }}">
-                            @if($company?->logo_path)
-                                <img src="{{ Storage::url($company->logo_path) }}" class="w-5 h-5 object-contain rounded" alt="">
-                            @else
-                                <div class="w-5 h-5 rounded" style="background-color: {{ $company?->brand_color ?? '#F59E0B' }}"></div>
-                            @endif
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 shrink-0 bg-amber-50 text-amber-500 group-hover:bg-amber-500 group-hover:text-white">
+                            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
                         </div>
-                        @if($hasCompany)
-                            <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Configuré</span>
+                        @php $weeklyGoal = $company?->weekly_posts_goal ?? 3; @endphp
+                        @if($weeklyGoal > 0)
+                            @if($thisWeek >= $weeklyGoal)
+                                <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Atteint 🎉</span>
+                            @else
+                                <span class="text-[11px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">En cours</span>
+                            @endif
                         @else
-                            <span class="text-[11px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">À faire</span>
+                            <span class="text-[11px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Non défini</span>
                         @endif
                     </div>
-                    <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Branding</p>
-                    <p class="text-sm font-bold text-midnight mt-1 truncate">{{ $company?->name ?? 'Non configuré' }}</p>
+                    <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Objectif hebdo</p>
+                    <div class="flex items-baseline gap-1 mt-1">
+                        <p class="text-2xl font-bold text-midnight">{{ $thisWeek }}</p>
+                        <p class="text-sm font-semibold text-gray-400">/ {{ $weeklyGoal }}</p>
+                    </div>
                 </div>
 
                 {{-- Instagram --}}
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group card-hover">
+                <div class="glass-panel rounded-2xl p-5 group card-hover">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center"
                              style="background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)">
@@ -181,7 +188,7 @@
                 </div>
 
                 {{-- Facebook --}}
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group card-hover">
+                <div class="glass-panel rounded-2xl p-5 group card-hover">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-[#1877F2]">
                             <svg class="w-[18px] h-[18px] text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -206,7 +213,7 @@
 
                 {{-- Recent Creations (2/3) --}}
                 <div class="lg:col-span-2">
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="glass-panel rounded-2xl overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
                             <h3 class="font-semibold text-midnight text-sm">Dernières créations</h3>
                             @if($totalPosts > 0)
@@ -271,7 +278,7 @@
                 {{-- Quick Actions (1/3) --}}
                 <div class="space-y-4">
                     {{-- Welcome --}}
-                    <div class="bg-midnight rounded-2xl p-5 relative overflow-hidden">
+                    <div class="glass-panel-dark rounded-2xl p-5 relative overflow-hidden">
                         <div class="absolute -top-6 -right-6 w-24 h-24 bg-copper/10 rounded-full blur-2xl"></div>
                         <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-white/5 rounded-full blur-xl"></div>
                         <div class="relative">
@@ -280,49 +287,48 @@
                             <p class="text-white/40 text-xs mt-2 leading-relaxed">
                                 Prêt à créer du contenu qui attire de nouveaux clients ?
                             </p>
-                            <a href="{{ route('generate-post') }}" wire:navigate
-                               class="mt-4 inline-flex items-center gap-2 bg-copper hover:bg-amber-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-copper/20">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                </svg>
-                                Nouveau post
-                            </a>
                         </div>
                     </div>
 
                     {{-- Quota Card --}}
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group relative overflow-hidden">
+                    <div class="glass-panel rounded-2xl p-5 group relative overflow-hidden">
                         <div class="absolute -right-6 -top-6 w-16 h-16 bg-copper/5 rounded-full blur-xl"></div>
                         <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                             <div class="flex items-center gap-2">
                                 <div class="w-2 h-2 rounded-full bg-copper animate-pulse"></div>
                                 <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-none">Usage Quota</p>
                             </div>
-                            <span class="text-[13px] font-bold text-midnight tabular-nums leading-none">
-                                {{ auth()->user()->remaining_credits }} <span class="text-gray-400 font-medium">/ {{ auth()->user()->total_credits }}</span>
+                            <span class="text-[13px] font-bold text-midnight tabular-nums leading-none flex items-center">
+                                @if(auth()->user()->is_admin || auth()->user()->is_premium)
+                                    <span class="text-lg leading-none">∞</span>
+                                @else
+                                    {{ auth()->user()->remaining_credits }} <span class="text-gray-400 font-medium ml-1">/ {{ auth()->user()->total_credits }}</span>
+                                @endif
                             </span>
                         </div>
                         
-                        <div class="h-2 w-full bg-gray-50 rounded-full overflow-hidden shadow-inner flex">
+                        <div class="h-2 w-full bg-slate-100/50 rounded-full shadow-inner flex relative">
                             @php
                                 $remaining = auth()->user()->remaining_credits;
                                 $total = max(1, auth()->user()->total_credits);
-                                $percentage = min(100, ($remaining / $total) * 100);
-                                $colorClass = $percentage < 15 ? 'from-red-500 to-rose-600' : ($percentage < 40 ? 'from-orange-400 to-amber-500' : 'from-amber-400 to-copper');
+                                $isUnlimited = auth()->user()->is_admin || auth()->user()->is_premium;
+                                $percentage = $isUnlimited ? 100 : min(100, ($remaining / $total) * 100);
+                                $colorClass = $isUnlimited ? 'from-amber-400 to-copper' : ($percentage < 15 ? 'from-red-500 to-rose-600' : ($percentage < 40 ? 'from-orange-400 to-amber-500' : 'from-amber-400 to-copper'));
+                                $shadowColor = $percentage < 15 ? 'rgba(239,68,68,0.4)' : 'rgba(245,158,11,0.4)';
                             @endphp
-                            <div class="h-full bg-gradient-to-r {{ $colorClass }} transition-all duration-1000 rounded-full"
-                                 style="width: {{ $percentage }}%">
+                            <div class="absolute h-full bg-gradient-to-r {{ $colorClass }} transition-all duration-1000 rounded-full"
+                                 style="width: {{ $percentage }}%; box-shadow: 0 0 10px {{ $shadowColor }};">
                             </div>
                         </div>
                         
                         <div class="mt-3 flex items-center justify-between">
-                            <p class="text-[10px] text-gray-400 font-medium">Réinitialisation mensuelle</p>
-                            <span class="text-[10px] font-bold text-copper">{{ round($percentage) }}% restant</span>
+                            <p class="text-[10px] text-gray-400 font-medium">Usage mensuel</p>
+                            <span class="text-[10px] font-bold text-copper">{{ isset($isUnlimited) && $isUnlimited ? 'Génération illimitée' : round($percentage) . '% restant' }}</span>
                         </div>
                     </div>
 
                     {{-- Quick Nav --}}
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="glass-panel rounded-2xl overflow-hidden">
                         <div class="px-5 py-3.5 border-b border-gray-50">
                             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Accès rapide</p>
                         </div>
@@ -377,6 +383,7 @@
                             </a>
                         </div>
                     </div>
+
                 </div>
 
             </div>

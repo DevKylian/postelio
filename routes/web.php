@@ -41,23 +41,41 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
     Route::view('calendar', 'calendar')->name('calendar');
     Route::view('post-settings', 'post-settings')->name('post-settings');
     Route::view('statistics', 'statistics')->name('statistics');
+    Route::view('changelog', 'changelog')->name('changelog');
 
     Route::get('posts', [PostController::class, 'index'])->name('posts.index');
     Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
-    // Instagram OAuth
-    Route::get('/auth/instagram', [InstagramController::class, 'connect'])->name('instagram.connect');
-    Route::get('/auth/instagram/callback', [InstagramController::class, 'callback'])->name('instagram.callback');
-    Route::delete('/auth/instagram', [InstagramController::class, 'disconnect'])->name('instagram.disconnect');
+    // Admin routes
+    Route::middleware(['admin'])->group(function () {
+        Route::get('/admin/dashboard', \App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');
+        Route::get('/admin/users', \App\Livewire\Admin\Users\UserList::class)->name('admin.users.index');
+        Route::get('/admin/users/{user}', \App\Livewire\Admin\Users\UserShow::class)->name('admin.users.show');
+        Route::get('/admin/templates', \App\Livewire\Admin\Templates\TemplateManager::class)->name('admin.templates.index');
+        Route::get('/admin/changelog', \App\Livewire\Admin\Changelog\ChangelogManager::class)->name('admin.changelog.index');
+    });
 
-    // Facebook OAuth
-    Route::get('/auth/facebook', [FacebookController::class, 'connect'])->name('facebook.connect');
-    Route::get('/auth/facebook/callback', [FacebookController::class, 'callback'])->name('facebook.callback');
-    Route::delete('/auth/facebook', [FacebookController::class, 'disconnect'])->name('facebook.disconnect');
+    // Social & Sync routes (Premium only)
+    Route::middleware(['subscribed'])->group(function () {
+        // Instagram OAuth
+        Route::get('/auth/instagram', [InstagramController::class, 'connect'])->name('instagram.connect');
+        Route::get('/auth/instagram/callback', [InstagramController::class, 'callback'])->name('instagram.callback');
+        Route::delete('/auth/instagram', [InstagramController::class, 'disconnect'])->name('instagram.disconnect');
+
+        // Facebook OAuth
+        Route::get('/auth/facebook', [FacebookController::class, 'connect'])->name('facebook.connect');
+        Route::get('/auth/facebook/callback', [FacebookController::class, 'callback'])->name('facebook.callback');
+        Route::delete('/auth/facebook', [FacebookController::class, 'disconnect'])->name('facebook.disconnect');
+
+        // Zernio Sync
+        Route::get('/auth/zernio/sync', [\App\Http\Controllers\ZernioController::class, 'sync'])->name('zernio.sync');
+    });
 });
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
+
+Route::get('/render/post/{post}', [\App\Http\Controllers\RenderPostController::class, 'show'])->name('render.post');
 
 require __DIR__.'/auth.php';

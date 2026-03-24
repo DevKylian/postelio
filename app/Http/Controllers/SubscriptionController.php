@@ -15,8 +15,9 @@ class SubscriptionController extends Controller
         $plans = config('subscription.plans');
         $user = Auth::user();
         $currentPlan = $user->currentPlanKey();
+        $subscription = $user->subscription('default');
 
-        return view('subscription.plans', compact('plans', 'currentPlan'));
+        return view('subscription.plans', compact('plans', 'currentPlan', 'subscription'));
     }
 
     /**
@@ -25,7 +26,7 @@ class SubscriptionController extends Controller
     public function checkout(Request $request)
     {
         $request->validate([
-            'plan' => 'required|string|in:starter,pro,business',
+            'plan' => 'required|string|in:free,monthly,annual',
         ]);
 
         $plan = config("subscription.plans.{$request->plan}");
@@ -36,9 +37,9 @@ class SubscriptionController extends Controller
 
         $user = Auth::user();
 
-        // If already subscribed, redirect to billing portal to change plan
+        // If already subscribed, redirect to billing portal or plans
         if ($user->subscribed('default')) {
-            return $user->redirectToBillingPortal(route('subscription.billing'));
+            return $user->redirectToBillingPortal(route('subscription.plans'));
         }
 
         return $user->newSubscription('default', $plan['stripe_price_id'])
@@ -69,25 +70,14 @@ class SubscriptionController extends Controller
         return redirect()->route('dashboard')->with('success', 'Abonnement activé avec succès !');
     }
 
-    /**
-     * Show the billing management page.
-     */
     public function billing()
     {
-        $user = Auth::user();
-        $plans = config('subscription.plans');
-        $currentPlan = $user->currentPlanKey();
-        $subscription = $user->subscription('default');
-
-        return view('subscription.billing', compact('user', 'plans', 'currentPlan', 'subscription'));
+        return redirect()->route('subscription.plans');
     }
 
-    /**
-     * Redirect to Stripe Customer Portal (manage payment methods, invoices, cancel).
-     */
     public function portal(Request $request)
     {
-        return Auth::user()->redirectToBillingPortal(route('subscription.billing'));
+        return Auth::user()->redirectToBillingPortal(route('subscription.plans'));
     }
 
     /**
@@ -128,7 +118,7 @@ class SubscriptionController extends Controller
     public function changePlan(Request $request)
     {
         $request->validate([
-            'plan' => 'required|string|in:starter,pro,business',
+            'plan' => 'required|string|in:free,monthly,annual',
         ]);
 
         $user = Auth::user();

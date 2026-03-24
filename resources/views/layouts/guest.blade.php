@@ -19,7 +19,7 @@
             <!-- Logo -->
             <div class="mb-8">
                 <a href="/" wire:navigate>
-                    <span class="text-midnight font-bold text-2xl tracking-widest">POSTELIO</span>
+                    <x-logo size="lg" />
                 </a>
             </div>
 

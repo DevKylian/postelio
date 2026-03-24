@@ -10,133 +10,149 @@
         </div>
     </x-slot>
 
-    <div class="py-8 px-4 sm:px-6 lg:px-8">
+    <div class="py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-5xl mx-auto">
+
+            {{-- Manage Subscription (if active) --}}
+            @if(isset($subscription) && $subscription && $subscription->valid())
+                <div class="mb-12 glass-panel rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 border-copper/20 bg-gradient-to-r from-copper/5 to-transparent">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-copper/10 flex items-center justify-center text-copper">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04M12 21.48V22" /></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-midnight">Vous avez un abonnement actif</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Gérez vos factures, votre mode de paiement ou résiliez.</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('subscription.portal') }}" class="inline-flex items-center gap-2 bg-midnight hover:bg-slate-800 text-white text-sm font-bold px-6 py-3 rounded-2xl transition-all shadow-lg shadow-midnight/10">
+                        Gérer mon abonnement
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                    </a>
+                </div>
+            @endif
 
             {{-- Flash Messages --}}
             @if(session('error'))
-                <div class="mb-6 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm">
+                <div class="mb-8 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-2xl text-sm flex items-center gap-3">
+                    <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     {{ session('error') }}
                 </div>
             @endif
             @if(session('success'))
-                <div class="mb-6 bg-green-50 border border-green-100 text-green-600 px-4 py-3 rounded-xl text-sm">
+                <div class="mb-8 bg-green-50 border border-green-100 text-green-600 px-4 py-3 rounded-2xl text-sm flex items-center gap-3">
+                    <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                     {{ session('success') }}
                 </div>
             @endif
 
-            {{-- Free Tier Info --}}
-            @if(!$currentPlan)
-                <div class="mb-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center justify-between">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full uppercase tracking-wider">Plan actuel</span>
-                            <span class="text-sm font-bold text-midnight">Gratuit</span>
-                        </div>
-                        <p class="text-xs text-gray-400">{{ config('subscription.free_credits', 3) }} posts par mois inclus</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-2xl font-bold text-midnight">0&euro;</p>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-wider">/ mois</p>
-                    </div>
-                </div>
-            @endif
 
             {{-- Plans Grid --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch pt-4">
                 @foreach($plans as $key => $plan)
                     @php
-                        $isCurrent = $currentPlan === $key;
-                        $isPopular = $key === 'pro';
+                        $isCurrent = ($currentPlan === $key) || (!$currentPlan && $key === 'free');
+                        $isPopular = $key === 'annual';
+                        $isFree = $key === 'free';
                     @endphp
 
-                    <div class="relative bg-white rounded-2xl border shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md
-                        {{ $isPopular ? 'border-copper ring-2 ring-copper/20' : 'border-gray-100' }}
-                        {{ $isCurrent ? 'ring-2 ring-green-500/30 border-green-200' : '' }}">
+                    <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 {{ $isPopular ? 'ring-2 ring-copper/20' : '' }}">
 
-                        {{-- Popular Badge --}}
-                        @if($isPopular && !$isCurrent)
-                            <div class="absolute top-0 right-0 bg-copper text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-wider">
-                                Populaire
+                        {{-- Labels --}}
+                        @if($isPopular)
+                            <div class="absolute top-0 right-0 bg-copper text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm">
+                                Meilleure Offre
+                            </div>
+                        @elseif($isCurrent)
+                            <div class="absolute top-0 right-0 bg-midnight text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm">
+                                Plan actuel
                             </div>
                         @endif
 
-                        {{-- Current Badge --}}
-                        @if($isCurrent)
-                            <div class="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-wider">
-                                Actif
-                            </div>
-                        @endif
-
-                        <div class="p-6">
-                            {{-- Plan Header --}}
-                            <div class="mb-6">
-                                <h3 class="text-lg font-bold text-midnight">{{ $plan['name'] }}</h3>
-                                <div class="mt-3 flex items-baseline gap-1">
-                                    <span class="text-3xl font-bold text-midnight">{{ number_format($plan['price'], 2, ',', '') }}&euro;</span>
-                                    <span class="text-sm text-gray-400">/ mois</span>
+                        <div class="p-8 flex flex-col flex-grow">
+                            {{-- Header --}}
+                            <div class="mb-8">
+                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 {{ $isFree ? 'bg-slate-50 text-slate-400' : ($isPopular ? 'bg-amber-100 text-copper rotate-3' : 'bg-midnight/5 text-midnight') }}">
+                                    @if($isFree)
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    @elseif($isPopular)
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                                    @else
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    @endif
                                 </div>
-                                <p class="mt-2 text-xs text-gray-400">{{ $plan['credits'] }} posts par mois</p>
+                                <h3 class="text-xl font-bold text-midnight">{{ $plan['name'] }}</h3>
+                                <div class="mt-4 flex items-baseline gap-1">
+                                    <span class="text-4xl font-black text-midnight tracking-tighter">{{ number_format($plan['price'], 2, ',', '') }}&euro;</span>
+                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $isFree ? '' : ($key === 'annual' ? '/ an' : '/ mois') }}</span>
+                                </div>
+                                @if(isset($plan['old_price']) && $plan['old_price'] > 0)
+                                    <p class="text-[11px] font-bold text-gray-400 line-through mt-0.5">{{ number_format($plan['old_price'], 2, ',', '') }}&euro;</p>
+                                @endif
                             </div>
+
+                            {{-- Divider --}}
+                            <div class="h-px bg-slate-50 mb-8"></div>
 
                             {{-- Features --}}
-                            <ul class="space-y-3 mb-8">
+                            <ul class="space-y-4 mb-10 flex-grow">
                                 @foreach($plan['features'] as $feature)
-                                    <li class="flex items-start gap-2.5">
-                                        <svg class="w-4 h-4 text-copper shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span class="text-sm text-gray-600">{{ $feature }}</span>
+                                    <li class="flex items-start gap-3">
+                                        <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
+                                            <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                        <span class="text-xs font-medium text-slate-600 leading-relaxed">{{ $feature }}</span>
                                     </li>
                                 @endforeach
                             </ul>
 
-                            {{-- CTA Button --}}
-                            @if($isCurrent)
-                                <div class="w-full text-center py-2.5 px-4 rounded-xl border-2 border-green-200 bg-green-50 text-green-700 font-semibold text-sm">
-                                    Plan actuel
-                                </div>
-                            @elseif($currentPlan)
-                                <form method="POST" action="{{ route('subscription.change-plan') }}">
-                                    @csrf
-                                    <input type="hidden" name="plan" value="{{ $key }}">
-                                    <button type="submit"
-                                        class="w-full py-2.5 px-4 rounded-xl font-semibold text-sm transition-all duration-200
-                                        {{ $isPopular ? 'bg-copper hover:bg-amber-500 text-white shadow-lg shadow-copper/20' : 'bg-midnight hover:bg-slate-800 text-white' }}">
-                                        Changer vers {{ $plan['name'] }}
-                                    </button>
-                                </form>
-                            @else
-                                <form method="POST" action="{{ route('subscription.checkout') }}">
-                                    @csrf
-                                    <input type="hidden" name="plan" value="{{ $key }}">
-                                    <button type="submit"
-                                        class="w-full py-2.5 px-4 rounded-xl font-semibold text-sm transition-all duration-200
-                                        {{ $isPopular ? 'bg-copper hover:bg-amber-500 text-white shadow-lg shadow-copper/20' : 'bg-midnight hover:bg-slate-800 text-white' }}">
-                                        Commencer
-                                    </button>
-                                </form>
-                            @endif
+                            {{-- CTA --}}
+                            <div class="mt-auto">
+                                @if($isCurrent)
+                                    <div class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-400 font-bold text-xs uppercase tracking-widest">
+                                        Plan actuel
+                                    </div>
+                                @elseif($key === 'free')
+                                    <div class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-400 font-bold text-xs uppercase tracking-widest">
+                                        Inclus par défaut
+                                    </div>
+                                @else
+                                    <form method="POST" action="{{ $currentPlan ? route('subscription.change-plan') : route('subscription.checkout') }}">
+                                        @csrf
+                                        <input type="hidden" name="plan" value="{{ $key }}">
+                                        <x-primary-button type="submit" class="w-full justify-center py-4 !rounded-2xl {{ $isPopular ? 'shadow-lg shadow-copper/20' : '' }}">
+                                            {{ $currentPlan ? 'Changer de plan' : 'Commencer' }}
+                                        </x-primary-button>
+                                    </form>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 @endforeach
             </div>
 
             {{-- FAQ --}}
-            <div class="mt-12 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <h3 class="font-bold text-midnight text-base mb-4">Questions fréquentes</h3>
-                <div class="space-y-4">
+            <div class="mt-16 glass-panel rounded-3xl p-8">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-8 h-8 rounded-xl bg-midnight/5 flex items-center justify-center text-midnight">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <h3 class="font-bold text-midnight tracking-tight">Questions fréquentes</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
-                        <h4 class="text-sm font-semibold text-midnight">Puis-je changer de plan à tout moment ?</h4>
-                        <p class="text-xs text-gray-400 mt-1">Oui, vous pouvez upgrader ou downgrader votre abonnement à tout moment. La différence sera proratisée.</p>
+                        <h4 class="text-sm font-bold text-midnight mb-2">Puis-je changer ?</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Oui, upgradez ou downgradez à tout moment. La différence est proratisée par Stripe.</p>
                     </div>
                     <div>
-                        <h4 class="text-sm font-semibold text-midnight">Comment fonctionne l'annulation ?</h4>
-                        <p class="text-xs text-gray-400 mt-1">Vous conservez l'accès jusqu'à la fin de votre période de facturation. Aucun remboursement partiel.</p>
+                        <h4 class="text-sm font-bold text-midnight mb-2">Comment annuler ?</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Depuis votre espace facturation. Vous gardez l'accès jusqu'à la fin du mois en cours.</p>
                     </div>
                     <div>
-                        <h4 class="text-sm font-semibold text-midnight">Les crédits non utilisés sont-ils reportés ?</h4>
-                        <p class="text-xs text-gray-400 mt-1">Non, les crédits sont réinitialisés chaque mois à la date de renouvellement.</p>
+                        <h4 class="text-sm font-bold text-midnight mb-2">Les posts non utilisés ?</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Votre quota est réinitialisé chaque mois à la date anniversaire. Pas de report possible.</p>
                     </div>
                 </div>
             </div>

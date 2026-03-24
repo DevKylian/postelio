@@ -22,6 +22,10 @@ class Company extends Model
         'facebook_page_id',
         'facebook_page_name',
         'facebook_page_picture_url',
+        'weekly_posts_goal',
+        'zernio_profile_id',
+        'zernio_facebook_account_id',
+        'zernio_instagram_account_id',
     ];
 
     protected $casts = [
@@ -30,18 +34,28 @@ class Company extends Model
 
     public function getInstagramConnectedAttribute(): bool
     {
-        return !empty($this->instagram_access_token)
-            && !empty($this->instagram_business_account_id);
+        return !empty($this->zernio_instagram_account_id);
     }
 
     public function getFacebookConnectedAttribute(): bool
     {
-        return !empty($this->facebook_access_token)
-            && !empty($this->facebook_page_id);
+        return !empty($this->zernio_facebook_account_id);
     }
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get or create a Zernio Profile ID for the company.
+     */
+    public function getZernioProfileId(): string
+    {
+        if ($this->zernio_profile_id) {
+            return $this->zernio_profile_id;
+        }
+
+        return app(\App\Services\ZernioService::class)->createProfile($this);
     }
 }

@@ -10,14 +10,14 @@ uses(\Livewire\WithFileUploads::class);
 
 state([
     'showModal'         => false,
-    'userRequest'       => '',
-    'photoMode'         => 'none',   // none | single | carousel
-    'isGenerating'      => false,
     'isSaving'          => false,
     'generatedTemplate' => null,
     'errorMessage'      => null,
-    'audioRequest'      => null,
-    'isTranscribing'    => false,
+    'editingTemplateId' => null,
+    'adjustmentRequest' => '',
+    'isRefining'        => false,
+    'hasImageText'      => true,
+    'activeTab'         => 'standard', // 'standard', 'glass', 'blueprint', 'kraft' or 'beton'
 ]);
 
 $openModal = function () {
@@ -28,6 +28,9 @@ $openModal = function () {
     $this->errorMessage      = null;
     $this->audioRequest      = null;
     $this->isTranscribing    = false;
+    $this->editingTemplateId = null;
+    $this->adjustmentRequest = '';
+    $this->isRefining        = false;
 };
 
 $transcribeAudioRequest = function (
@@ -56,64 +59,81 @@ $transcribeAudioRequest = function (
 
 $closeModal = function () {
     $this->showModal         = false;
-    $this->userRequest       = '';
-    $this->photoMode         = 'none';
     $this->generatedTemplate = null;
     $this->errorMessage      = null;
-    $this->isGenerating      = false;
     $this->isSaving          = false;
-    $this->audioRequest      = null;
-    $this->isTranscribing    = false;
+    $this->editingTemplateId = null;
+    $this->adjustmentRequest = '';
+    $this->isRefining        = false;
 };
 
-$generateTemplate = function () {
-    $this->validate(['userRequest' => 'required|string|min:10|max:300']);
 
-    $this->isGenerating      = true;
-    $this->errorMessage      = null;
-    $this->generatedTemplate = null;
+$startEditingTemplate = function (int $id) {
+    $template = CustomTemplate::find($id);
+    if (!$template || $template->user_id !== Auth::id()) return;
+
+    $this->editingTemplateId = $template->id;
+    $this->generatedTemplate = [
+        'name'         => $template->name,
+        'description'  => $template->description,
+        'ai_prompt'    => $template->ai_prompt,
+        'visual_style' => $template->visual_style,
+        'layout_type'  => $template->layout_type,
+        'photo_mode'   => $template->photo_mode,
+        'has_image_text' => (bool) $template->has_image_text,
+        'dynamic_content' => $template->dynamic_content,
+    ];
+    $this->photoMode   = $template->photo_mode;
+    $this->hasImageText = (bool) $template->has_image_text;
+    $this->showModal   = true;
+    $this->adjustmentRequest = '';
+    $this->errorMessage = null;
+};
+
+$refineTemplate = function () {
+    if (!$this->editingTemplateId || !$this->adjustmentRequest) return;
+
+    $this->isRefining = true;
+    $this->errorMessage = null;
 
     try {
-        $company = Auth::user()->company;
         $service = app(TemplateGeneratorService::class);
-        $this->generatedTemplate = $service->generate($this->userRequest, $company?->trade ?? '', $this->photoMode);
+        $this->generatedTemplate = $service->refine($this->generatedTemplate, $this->adjustmentRequest);
+        $this->hasImageText = (bool) ($this->generatedTemplate['has_image_text'] ?? true);
+        // Sync photoMode in case the AI changed it
+        $this->photoMode = $this->generatedTemplate['photo_mode'] ?? 'none';
     } catch (\Throwable $e) {
-        $this->errorMessage = 'Une erreur est survenue lors de la génération. Réessayez.';
-        \Illuminate\Support\Facades\Log::error('TemplateGenerator failed: ' . $e->getMessage());
+        $this->errorMessage = 'Une erreur est survenue lors de l\'ajustement. Réessayez.';
+        \Illuminate\Support\Facades\Log::error('TemplateRefiner failed: ' . $e->getMessage());
     } finally {
-        $this->isGenerating = false;
+        $this->isRefining = false;
     }
 };
 
-$saveTemplate = function () {
-    if (!$this->generatedTemplate) return;
+$saveRefinedTemplate = function () {
+    if (!$this->editingTemplateId || !$this->generatedTemplate) return;
 
     $this->isSaving = true;
 
     try {
-        $company = Auth::user()->company;
+        $template = CustomTemplate::find($this->editingTemplateId);
+        if ($template && $template->user_id === Auth::id()) {
+            $template->update([
+                'name'         => $this->generatedTemplate['name'],
+                'description'  => $this->generatedTemplate['description'],
+                'ai_prompt'    => $this->generatedTemplate['ai_prompt'],
+                'visual_style' => $this->generatedTemplate['visual_style'],
+                'layout_type'  => $this->generatedTemplate['layout_type'],
+                'photo_mode'   => $this->photoMode,
+                'has_image_text' => (bool) ($this->generatedTemplate['has_image_text'] ?? true),
+                'dynamic_content' => $this->generatedTemplate['dynamic_content'] ?? null,
+            ]);
+        }
 
-        CustomTemplate::create([
-            'user_id'      => Auth::id(),
-            'company_id'   => $company?->id,
-            'name'         => $this->generatedTemplate['name'],
-            'description'  => $this->generatedTemplate['description'],
-            'ai_prompt'    => $this->generatedTemplate['ai_prompt'],
-            'visual_style' => $this->generatedTemplate['visual_style'],
-            'layout_type'  => $this->generatedTemplate['layout_type'] ?? 'standard',
-            'photo_mode'   => $this->photoMode,
-        ]);
-
-        $this->showModal         = false;
-        $this->userRequest       = '';
-        $this->generatedTemplate = null;
+        $this->closeModal();
     } catch (\Throwable $e) {
-        \Illuminate\Support\Facades\Log::error('CustomTemplate save failed: ' . $e->getMessage(), [
-            'trace'      => $e->getTraceAsString(),
-            'photo_mode' => $this->photoMode,
-            'generated'  => $this->generatedTemplate,
-        ]);
-        $this->errorMessage = 'Impossible de sauvegarder le modèle. Réessayez.';
+        \Illuminate\Support\Facades\Log::error('CustomTemplate update failed: ' . $e->getMessage());
+        $this->errorMessage = 'Impossible de mettre à jour le modèle.';
     } finally {
         $this->isSaving = false;
     }
@@ -137,14 +157,61 @@ $deleteTemplate = function (int $id) {
         $companyCity     = $company?->city ?? '';
         $companyLabel    = $companyName . ($companyCity ? '  ·  ' . strtoupper($companyCity) : '');
         $hasLogo         = $company?->logo_path && Storage::disk('public')->exists($company->logo_path);
+        
+        // Custom templates: only active ones for regular users
+        // (Wait, if it's THEIR template, should it be hidden if admin deactivated it? Yes, per user request)
         $customTemplates = \App\Models\CustomTemplate::where('user_id', auth()->id())
+                            ->where('is_active', true)
                             ->orderByDesc('created_at')
                             ->get()
                             ->toArray();
+
+        // Native templates: fetch all settings
+        $nativeSettings = \App\Models\NativeTemplateSetting::all()->pluck('is_active', 'slug');
+        $isNativeActive = fn($slug) => $nativeSettings[$slug] ?? true;
+
+        $allNativeTemplates = [
+            'project', 'review', 'faq', 'lifestyle', 'quality_focus', 
+            'chantier_detail', 'step_by_step', 'conseil_saisonnier', 
+            'erreur_a_eviter', 'guide_pedagogique'
+        ];
+        $activeNativeCount = collect($allNativeTemplates)->filter(fn($s) => $isNativeActive($s))->count();
     @endphp
 
     <div class="py-8 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
+
+            {{-- Style Tabs --}}
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex p-1.5 bg-gray-100 rounded-2xl w-full sm:w-auto shadow-inner ring-1 ring-gray-100">
+                    <button wire:click="$set('activeTab', 'standard')"
+                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300
+                                {{ $activeTab === 'standard' ? 'bg-white text-midnight shadow-lg shadow-gray-200 ring-1 ring-gray-100' : 'text-gray-400 hover:text-gray-600' }}">
+                        Style Classique
+                    </button>
+                    <button wire:click="$set('activeTab', 'glass')"
+                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2
+                                {{ $activeTab === 'glass' ? 'bg-midnight text-white shadow-lg shadow-midnight/20' : 'text-gray-400 hover:text-gray-600' }}">
+                        <span>Style Glassmorphism</span>
+                    </button>
+                    <button wire:click="$set('activeTab', 'blueprint')"
+                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2
+                                {{ $activeTab === 'blueprint' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-400 hover:text-gray-600' }}">
+                        <span>Style Blueprint</span>
+                    </button>
+                    <button wire:click="$set('activeTab', 'kraft')"
+                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2
+                                {{ $activeTab === 'kraft' ? 'bg-[#BC9A7E] text-slate-900 shadow-lg shadow-[#BC9A7E]/20' : 'text-gray-400 hover:text-gray-600' }}">
+                        <span>Style Kraft</span>
+                    </button>
+                    <button wire:click="$set('activeTab', 'beton')"
+                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2
+                                {{ $activeTab === 'beton' ? 'bg-slate-600 text-white shadow-lg shadow-slate-600/20' : 'text-gray-400 hover:text-gray-600' }}">
+                        <span>Style Béton</span>
+                    </button>
+                </div>
+
+            </div>
 
             {{-- Topbar avec bouton créer --}}
             <div class="flex items-center justify-between mb-6">
@@ -163,406 +230,513 @@ $deleteTemplate = function (int $id) {
                     <div></div>
                     @endif
                 </div>
-                <button wire:click="openModal"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-copper shadow-sm shadow-copper/25 transition-all hover:bg-amber-500 hover:-translate-y-0.5 shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Créer un modèle
-                </button>
             </div>
 
-            {{-- ── Modèles personnalisés ── --}}
-            @if(count($customTemplates) > 0)
-            <div class="mb-10">
-                <div class="flex items-center gap-3 mb-5">
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-lg flex items-center justify-center bg-copper">
-                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                            </svg>
-                        </div>
-                        <h2 class="font-bold text-midnight text-base">Mes modèles personnalisés</h2>
-                    </div>
-                    <div class="flex-1 h-px bg-gray-100"></div>
-                    <span class="text-xs text-gray-400 font-medium">{{ count($customTemplates) }} modèle{{ count($customTemplates) > 1 ? 's' : '' }}</span>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($customTemplates as $ct)
-                    @php
-                        $ctIsCarousel = ($ct['photo_mode'] ?? '') === 'carousel';
-                        $ctIsSingle   = ($ct['photo_mode'] ?? '') === 'single';
-                    @endphp
-                    <div class="space-y-4 group relative"
-                         @if($ctIsCarousel) x-data="{ slide: 0 }" @endif>
-
-                        {{-- ── Carte visuelle ── --}}
-                        @if($ctIsCarousel)
-                        {{-- CAROUSEL : vrai slider avec flèches --}}
-                        <div class="aspect-square bg-slate-800 rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2">
-
-                            {{-- Slide 1 : photo principale avec titre template --}}
-                            <div class="absolute inset-0" x-show="slide === 0">
-                                <div class="w-full h-full bg-slate-600 flex items-center justify-center">
-                                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Photo principale</p>
-                                </div>
-                                <div class="absolute inset-x-0 bottom-10 px-6 pb-2">
-                                    <div class="w-8 h-0.5 mb-3 rounded-full" style="background-color: {{ $brandColor }}"></div>
-                                    <p class="text-white font-black text-sm uppercase leading-tight font-montserrat">{{ $ct['name'] }}</p>
-                                </div>
-                            </div>
-
-                            {{-- Slide 2 --}}
-                            <div class="absolute inset-0" x-show="slide === 1">
-                                <div class="w-full h-full bg-slate-500 flex items-center justify-center">
-                                    <p class="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Détail · photo 2</p>
-                                </div>
-                            </div>
-
-                            {{-- Slide 3 --}}
-                            <div class="absolute inset-0" x-show="slide === 2">
-                                <div class="w-full h-full bg-slate-400 flex items-center justify-center">
-                                    <p class="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Détail · photo 3</p>
-                                </div>
-                            </div>
-
-                            {{-- Footer marque --}}
-                            <div class="absolute inset-x-0 bottom-0 py-2.5 px-6 flex items-center justify-center" style="background-color: rgba(0,0,0,0.8)">
-                                @if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-4 w-4 object-contain rounded absolute right-6">@endif
-                                <p class="text-white font-bold uppercase tracking-widest text-[10px] font-montserrat">{{ $companyLabel }}</p>
-                            </div>
-
-                            {{-- Badge perso --}}
-                            <div class="absolute top-4 left-4 z-10">
-                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm bg-copper text-white">
-                                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                    Personnalisé
-                                </span>
-                            </div>
-
-                            {{-- Supprimer --}}
-                            <button wire:click="deleteTemplate({{ $ct['id'] }})" wire:confirm="Supprimer ce modèle personnalisé ?"
-                                    class="absolute top-4 right-4 z-10 w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm text-white/70 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
-
-                            {{-- Flèches navigation --}}
-                            <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity" style="margin-bottom: 2.5rem">
-                                <button @click="slide = (slide - 1 + 3) % 3" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                </button>
-                                <button @click="slide = (slide + 1) % 3" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                </button>
-                            </div>
-
-                            {{-- Compteur --}}
-                            <div class="absolute top-4 right-12 bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-lg" x-text="(slide + 1) + ' / 3'"></div>
-                        </div>
-
-                        @elseif($ctIsSingle)
-                        {{-- PHOTO UNIQUE : photo plein cadre + overlay bas --}}
-                        @php
-                            $singleBg = match($ct['visual_style']) {
-                                'light_branded' => '#E2E8F0',
-                                'brand_color'   => $brandColor,
-                                default         => '#1E293B',
-                            };
-                        @endphp
-                        <div class="aspect-square rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2"
-                             style="background-color: {{ $singleBg }}">
-                            {{-- Photo placeholder --}}
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <div class="text-center select-none pointer-events-none"
-                                     style="color: {{ $ct['visual_style'] === 'light_branded' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.3)' }}">
-                                    <svg class="w-14 h-14 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    <p class="text-xs font-bold uppercase tracking-widest">Votre photo</p>
-                                </div>
-                            </div>
-                            {{-- Overlay bas avec nom template --}}
-                            <div class="absolute inset-x-0 bottom-0 pt-12 pb-10 px-6"
-                                 style="background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%)">
-                                <div class="w-8 h-0.5 mb-2 rounded-full" style="background-color: {{ $brandColor }}"></div>
-                                <p class="text-white font-black text-sm uppercase tracking-wide font-montserrat">{{ $ct['name'] }}</p>
-                            </div>
-                            {{-- Footer --}}
-                            <div class="absolute inset-x-0 bottom-0 py-2.5 px-6 flex items-center gap-2" style="background-color: rgba(0,0,0,0.75)">
-                                @if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-4 w-4 object-contain rounded shrink-0">@endif
-                                <p class="text-white font-bold uppercase tracking-widest text-[10px] font-montserrat">{{ $companyLabel }}</p>
-                            </div>
-                            {{-- Badge + supprimer --}}
-                            <div class="absolute top-4 left-4 z-10">
-                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-copper text-white">
-                                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                    Personnalisé
-                                </span>
-                            </div>
-                            <button wire:click="deleteTemplate({{ $ct['id'] }})" wire:confirm="Supprimer ce modèle personnalisé ?"
-                                    class="absolute top-4 right-4 z-10 w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm text-white/70 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
-                        </div>
-
-                        @else
-                        {{-- TEXTE SEUL : 3 layouts distincts selon visual_style --}}
-
-                        @if($ct['visual_style'] === 'dark_branded')
-                        {{-- DARK BRANDED : fond marine foncé, accent vertical gauche, typographie large --}}
-                        <div class="aspect-square rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2"
-                             style="background-color: #0B1426">
-                            <div class="absolute -top-16 -right-16 w-56 h-56 rounded-full pointer-events-none" style="background: rgba(255,255,255,0.03)"></div>
-                            {{-- Barre verticale gauche --}}
-                            <div class="absolute left-0 top-0 bottom-0 w-1.5" style="background-color: {{ $brandColor }}"></div>
-                            {{-- Contenu --}}
-                            <div class="absolute inset-0 flex flex-col justify-between px-8 pl-10 py-8">
-                                <div>
-                                    <p class="text-[10px] font-bold uppercase tracking-[0.25em] mb-6" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
-                                    <p class="font-black text-white uppercase leading-none font-montserrat"
-                                       style="font-size: clamp(1.1rem, 3.5vw, 1.35rem); line-height:1.15; letter-spacing:-0.01em">
-                                        {{ $ct['name'] }}
-                                    </p>
-                                    <div class="w-10 h-0.5 mt-4 rounded-full" style="background-color: {{ $brandColor }}; opacity:0.6"></div>
-                                    <p class="text-white/50 text-xs mt-3 leading-relaxed">{{ Str::limit($ct['description'] ?? '', 70) }}</p>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    @if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-5 w-5 object-contain rounded shrink-0">@endif
-                                    <span class="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-copper text-white">
-                                        <svg class="w-2 h-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                        IA
-                                    </span>
-                                </div>
-                            </div>
-                            {{-- Supprimer --}}
-                            <button wire:click="deleteTemplate({{ $ct['id'] }})" wire:confirm="Supprimer ce modèle personnalisé ?"
-                                    class="absolute top-4 right-4 z-10 w-7 h-7 rounded-full bg-black/30 backdrop-blur-sm text-white/70 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
-                        </div>
-
-                        @elseif($ct['visual_style'] === 'light_branded')
-                        {{-- LIGHT BRANDED : fond blanc, style éditorial centré --}}
-                        <div class="aspect-square rounded-2xl shadow-lg ring-1 ring-gray-200 overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2"
-                             style="background-color: #FFFFFF">
-                            {{-- Bande colorée bas --}}
-                            <div class="absolute bottom-0 inset-x-0 h-1.5" style="background-color: {{ $brandColor }}"></div>
-                            {{-- Contenu centré --}}
-                            <div class="absolute inset-0 flex flex-col items-center justify-center px-8 pb-6 text-center">
-                                <p class="text-[10px] font-bold uppercase tracking-[0.3em] mb-5" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
-                                <div class="flex items-center gap-3 mb-5 w-full">
-                                    <div class="flex-1 h-px" style="background-color: {{ $brandColor }}; opacity:0.2"></div>
-                                    <div class="w-1.5 h-1.5 rounded-full" style="background-color: {{ $brandColor }}"></div>
-                                    <div class="flex-1 h-px" style="background-color: {{ $brandColor }}; opacity:0.2"></div>
-                                </div>
-                                <p class="font-black uppercase text-slate-900 leading-tight font-montserrat mb-4"
-                                   style="font-size: clamp(1rem, 3vw, 1.25rem); letter-spacing:-0.01em">
-                                    {{ $ct['name'] }}
-                                </p>
-                                <p class="text-slate-400 text-xs leading-relaxed">{{ Str::limit($ct['description'] ?? '', 65) }}</p>
-                            </div>
-                            {{-- Badge + supprimer --}}
-                            <div class="absolute top-4 left-4 z-10">
-                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-copper text-white shadow-sm">
-                                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                    Personnalisé
-                                </span>
-                            </div>
-                            <button wire:click="deleteTemplate({{ $ct['id'] }})" wire:confirm="Supprimer ce modèle personnalisé ?"
-                                    class="absolute top-4 right-4 z-10 w-7 h-7 rounded-full bg-black/10 text-slate-400 hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
-                        </div>
-
-                        @else
-                        {{-- BRAND COLOR : fond couleur plein, style impact / bold --}}
-                        <div class="aspect-square rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2"
-                             style="background-color: {{ $brandColor }}">
-                            {{-- Cercle géométrique décoratif --}}
-                            <div class="absolute -bottom-12 -right-12 w-48 h-48 rounded-full border-2 pointer-events-none" style="border-color: rgba(255,255,255,0.15)"></div>
-                            <div class="absolute -bottom-6 -right-6 w-28 h-28 rounded-full border-2 pointer-events-none" style="border-color: rgba(255,255,255,0.1)"></div>
-                            {{-- Contenu --}}
-                            <div class="absolute inset-0 flex flex-col justify-between px-8 py-8">
-                                <div>
-                                    <p class="text-white/60 text-[10px] font-bold uppercase tracking-[0.25em] mb-8">{{ $companyLabel }}</p>
-                                    <p class="font-black text-white uppercase leading-none font-montserrat"
-                                       style="font-size: clamp(1.2rem, 4vw, 1.5rem); line-height:1.1; letter-spacing:-0.02em; text-shadow: 0 2px 12px rgba(0,0,0,0.2)">
-                                        {{ $ct['name'] }}
-                                    </p>
-                                    <p class="text-white/70 text-xs mt-4 leading-relaxed">{{ Str::limit($ct['description'] ?? '', 65) }}</p>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        @if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-5 w-5 object-contain rounded shrink-0">@endif
-                                        <span class="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/20 text-white">
-                                            <svg class="w-2 h-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                            IA
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            {{-- Badge + supprimer --}}
-                            <div class="absolute top-4 left-4 z-10">
-                                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-white/20 text-white backdrop-blur-sm">
-                                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                    Personnalisé
-                                </span>
-                            </div>
-                            <button wire:click="deleteTemplate({{ $ct['id'] }})" wire:confirm="Supprimer ce modèle personnalisé ?"
-                                    class="absolute top-4 right-4 z-10 w-7 h-7 rounded-full bg-white/20 text-white hover:bg-red-500 transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
-                        </div>
-                        @endif
-
-                        @endif {{-- end photo_mode --}}
-
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h4 class="font-bold text-midnight text-lg">{{ $ct['name'] }}</h4>
-                                <span class="text-[10px] font-bold text-copper bg-amber-50 px-2 py-0.5 rounded-full">IA</span>
-                            </div>
-                            <p class="text-gray-500 text-sm">{{ $ct['description'] ?? 'Modèle personnalisé généré par IA.' }}</p>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-            @endif
+            @if($activeTab === 'standard')
 
             {{-- ── Gabarits natifs ── --}}
             <div class="flex items-center gap-3 mb-6">
                 <h2 class="font-bold text-midnight text-base">Gabarits inclus</h2>
                 <div class="flex-1 h-px bg-gray-100"></div>
-                <span class="text-xs text-gray-400 font-medium">9 styles</span>
+                <span class="text-xs text-gray-400 font-medium">{{ $activeNativeCount }} style{{ $activeNativeCount > 1 ? 's' : '' }}</span>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                 {{-- ── Avant/Après ── --}}
+                @if($isNativeActive('project'))
                 <div class="space-y-4 group">
-                    <div class="aspect-square bg-white rounded-2xl shadow-lg ring-1 ring-gray-200 overflow-hidden flex flex-col relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2">
-                        <div class="flex-1 flex min-h-0">
-                            <div class="w-1/2 relative overflow-hidden border-r-2 border-white bg-slate-300 flex items-center justify-center group-hover:bg-slate-200 transition-colors duration-500">
-                                <div class="text-center text-slate-500 select-none pointer-events-none">
-                                    <svg class="w-10 h-10 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                    <p class="text-xs font-bold uppercase tracking-widest">Avant</p>
-                                </div>
-                            </div>
-                            <div class="w-1/2 relative overflow-hidden bg-slate-400 flex items-center justify-center group-hover:bg-slate-300 transition-colors duration-500">
-                                <div class="text-center text-slate-100 select-none pointer-events-none">
-                                    <svg class="w-10 h-10 mx-auto mb-2 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                    <p class="text-xs font-bold uppercase tracking-widest">Après</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="shrink-0 flex flex-col items-center justify-center px-6 py-2 gap-0.5" style="background-color: {{ $brandColor }}">
-                            <p class="text-white/80 font-bold uppercase tracking-widest text-[10px] font-montserrat">{{ $companyLabel }}</p>
-                            <div class="flex w-full items-center justify-between">
-                                <span class="text-white font-black uppercase tracking-widest text-base font-montserrat">Avant</span>
-                                <span class="text-white font-black uppercase tracking-widest text-base font-montserrat">Après</span>
-                            </div>
-                        </div>
-                    </div>
+                    <x-post-templates.project :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Avant / Après</h4><p class="text-gray-500 text-sm">Parfait pour valoriser vos rénovations et finitions.</p></div>
                 </div>
+                @endif
 
                 {{-- ── Avis Client ── --}}
+                @if($isNativeActive('review'))
                 <div class="space-y-4 group">
-                    <div class="aspect-square rounded-2xl shadow-lg flex flex-col items-center justify-center p-10 text-center relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2 overflow-hidden" style="background-color: {{ $brandColor }}">
-                        <div class="flex space-x-2 mb-6">@for ($i = 0; $i < 5; $i++)<svg class="w-7 h-7 text-yellow-300 fill-current drop-shadow-md" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>@endfor</div>
-                        <p class="text-white font-black uppercase tracking-tight text-lg leading-tight font-montserrat drop-shadow-sm flex-1 flex items-center">"Travail impeccable ! L'équipe a été ponctuelle, propre et le résultat dépasse nos attentes."</p>
-                        <div class="mt-6 pt-4 border-t border-white/20 w-full"><div class="flex items-center justify-center gap-2">@if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-6 w-6 object-contain rounded">@endif<p class="text-white/80 font-bold text-xs uppercase tracking-widest font-montserrat">{{ $companyLabel }}</p></div></div>
-                        <div class="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-                        <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-black/10 rounded-full blur-2xl pointer-events-none"></div>
-                    </div>
+                    <x-post-templates.review :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Avis Client</h4><p class="text-gray-500 text-sm">Transformez vos témoignages en preuves sociales fortes.</p></div>
                 </div>
+                @endif
 
                 {{-- ── FAQ Artisan ── --}}
+                @if($isNativeActive('faq'))
                 <div class="space-y-4 group">
-                    <div class="aspect-square bg-midnight rounded-2xl shadow-lg flex flex-col p-10 relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2 overflow-hidden" style="border-top: 8px solid {{ $brandColor }}">
-                        <div class="flex-1 flex flex-col justify-center">
-                            <span class="inline-block w-12 h-1 mb-6" style="background-color: {{ $brandColor }}"></span>
-                            <h3 class="font-black uppercase tracking-widest text-sm mb-4" style="color: {{ $brandColor }}">FAQ Artisan</h3>
-                            <p class="text-white font-black uppercase tracking-tight text-xl leading-snug font-montserrat">Pourquoi choisir une isolation par l'extérieur ?</p>
-                        </div>
-                        <div class="pt-4 border-t border-white/10"><div class="flex items-center gap-2">@if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-5 w-5 object-contain rounded">@endif<p class="font-bold text-xs uppercase tracking-widest font-montserrat" style="color: {{ $brandColor }}">{{ $companyLabel }}</p></div></div>
-                        <svg class="absolute -bottom-4 -right-4 w-32 h-32 text-white/5 pointer-events-none" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
-                    </div>
+                    <x-post-templates.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">FAQ Artisan</h4><p class="text-gray-500 text-sm">Éduquez vos clients et affirmez votre professionnalisme.</p></div>
                 </div>
+                @endif
 
                 {{-- ── Lifestyle ── --}}
+                @if($isNativeActive('lifestyle'))
                 <div class="space-y-4 group">
-                    <div class="aspect-square bg-slate-700 rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2 flex items-center justify-center">
-                        <div class="text-center text-slate-400 select-none pointer-events-none"><svg class="w-14 h-14 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg><p class="text-xs font-bold uppercase tracking-widest text-slate-500">Votre photo</p></div>
-                        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent pt-10 pb-4 px-5"><div class="w-full" style="border-top: 3px solid {{ $brandColor }}; padding-top: 8px;"><div class="flex items-center gap-2">@if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-5 w-5 object-contain rounded">@endif<p class="text-white font-bold text-xs uppercase tracking-widest font-montserrat">{{ $companyLabel }}</p></div></div></div>
-                    </div>
+                    <x-post-templates.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Lifestyle</h4><p class="text-gray-500 text-sm">Une immersion brute dans votre métier, sans artifices.</p></div>
                 </div>
+                @endif
+
+                {{-- ── Focus Qualité ── --}}
+                @if($isNativeActive('quality_focus'))
+                <div class="space-y-4 group">
+                    <x-post-templates.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
+                    <div><h4 class="font-bold text-midnight text-lg">Focus Qualité</h4><p class="text-gray-500 text-sm">Valorisez la qualité de vos matériaux et équipements.</p></div>
+                </div>
+                @endif
 
                 {{-- ── Chantier en Détail ── --}}
-                <div class="space-y-4 group" x-data="{ current: 0, total: 3 }">
-                    <div class="aspect-square bg-slate-800 rounded-2xl shadow-lg ring-1 ring-gray-200 overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2">
-                        <div class="absolute inset-0" x-show="current === 0"><div class="w-full h-full bg-slate-600 flex items-center justify-center"><p class="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Couverture du projet</p></div><div class="absolute inset-x-0 bottom-10 bg-black/60 backdrop-blur-sm p-6"><p class="text-white font-black text-sm uppercase leading-tight font-montserrat">Rénovation complète d'une toiture à Nantes</p></div></div>
-                        <div class="absolute inset-0" x-show="current === 1"><div class="w-full h-full bg-slate-500 flex items-center justify-center font-bold text-white/20 select-none">PHOTO DÉTAIL 1</div></div>
-                        <div class="absolute inset-0" x-show="current === 2"><div class="w-full h-full bg-slate-400 flex items-center justify-center font-bold text-white/20 select-none">PHOTO DÉTAIL 2</div></div>
-                        <div class="absolute inset-x-0 bottom-0 py-2.5 px-6 flex items-center justify-center" style="background-color: rgba(0,0,0,0.8)">@if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-5 w-5 object-contain rounded absolute right-6">@endif<p class="text-white font-bold uppercase tracking-widest text-[10px] font-montserrat">{{ $companyLabel }}</p></div>
-                        <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity"><button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
-                        <div class="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-lg" x-text="(current + 1) + ' / ' + total"></div>
-                    </div>
+                @if($isNativeActive('chantier_detail'))
+                <div class="space-y-4 group">
+                    <x-post-templates.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Chantier en Détail</h4><p class="text-gray-500 text-sm">Une immersion complète avec plusieurs photos d'un même projet.</p></div>
                 </div>
+                @endif
 
                 {{-- ── Step-by-Step ── --}}
-                <div class="space-y-4 group" x-data="{ current: 0, total: 3 }">
-                    <div class="aspect-square bg-slate-100 rounded-2xl shadow-lg ring-1 ring-gray-200 overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2" style="border-left: 6px solid {{ $brandColor }}">
-                        <div class="absolute inset-0 p-10 flex flex-col justify-center" x-show="current === 0" style="background-color: {{ $brandColor }}"><p class="text-white/30 font-black text-4xl mb-2 select-none tracking-tighter">ÉTAPES</p><div class="space-y-2"><div class="h-1.5 w-full bg-white/40 rounded-full"></div><div class="h-1.5 w-2/3 bg-white/40 rounded-full"></div></div></div>
-                        <div class="absolute inset-0" x-show="current > 0"><div class="w-full h-full bg-slate-300 flex items-center justify-center font-bold text-slate-500/30 select-none">PHOTO ÉTAPE <span x-text="current"></span></div><div class="absolute top-6 left-6 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg" style="background-color: {{ $brandColor }}" x-text="current"></div><div class="absolute bottom-0 inset-x-0 h-16 bg-black/70 backdrop-blur-md p-4 flex items-center"><div class="h-1 w-2/3 bg-white/30 rounded-full"></div></div></div>
-                        <div class="absolute bottom-0 inset-x-0 h-10 flex items-center justify-center px-4" :style="current === 0 ? 'background-color: rgba(0,0,0,0.2)' : 'background-color: transparent'"><p class="font-bold text-[9px] uppercase tracking-widest font-montserrat" :class="current === 0 ? 'text-white/60' : 'text-white'">{{ $companyLabel }}</p></div>
-                        <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity"><button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
-                    </div>
+                @if($isNativeActive('step_by_step'))
+                <div class="space-y-4 group">
+                    <x-post-templates.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Step-by-Step</h4><p class="text-gray-500 text-sm">Expliquez votre expertise étape par étape, didactique et rassurant.</p></div>
                 </div>
+                @endif
 
                 {{-- ── Conseil Saisonnier ── --}}
+                @if($isNativeActive('conseil_saisonnier'))
                 <div class="space-y-4 group">
-                    <div class="aspect-square rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2" style="background-color: #0B1426; border-top: 8px solid {{ $brandColor }}">
-                        <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none" style="background: rgba(255,255,255,0.03)"></div>
-                        <div class="absolute -top-5 -right-5 w-[104px] h-[104px] rounded-full pointer-events-none" style="background: rgba(255,255,255,0.04)"></div>
-                        <div class="absolute inset-0 p-10 flex flex-col justify-center"><span class="inline-block w-12 h-1 mb-6" style="background-color: {{ $brandColor }}"></span><h3 class="font-black uppercase tracking-widest text-sm mb-5 font-montserrat" style="color: {{ $brandColor }}">Conseil Saisonnier</h3><p class="text-white font-black uppercase tracking-tight text-lg leading-snug font-montserrat">Vérifiez vos canalisations avant les premiers grands froids.</p></div>
-                        <div class="absolute bottom-0 inset-x-0 border-t px-10 py-4" style="border-color: rgba(255,255,255,0.1)"><div class="flex items-center gap-2">@if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-5 w-5 object-contain rounded">@endif<p class="font-bold text-xs uppercase tracking-widest font-montserrat" style="color: {{ $brandColor }}">{{ $companyLabel }}</p></div></div>
-                    </div>
+                    <x-post-templates.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Conseil Saisonnier</h4><p class="text-gray-500 text-sm">Anticipez les besoins de vos clients selon la saison.</p></div>
                 </div>
+                @endif
 
                 {{-- ── Erreur à Éviter ── --}}
+                @if($isNativeActive('erreur_a_eviter'))
                 <div class="space-y-4 group">
-                    <div class="aspect-square rounded-2xl shadow-lg overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2" style="background-color: #111827; border-top: 8px solid {{ $brandColor }}; border-left: 5px solid {{ $brandColor }}">
-                        <div class="absolute inset-0 overflow-hidden pointer-events-none" style="opacity:0.045"><div class="absolute bg-white w-full h-3 top-1/2 left-0" style="transform: rotate(45deg) scaleX(1.6) translateY(-50%)"></div><div class="absolute bg-white w-full h-3 top-1/2 left-0" style="transform: rotate(-45deg) scaleX(1.6) translateY(-50%)"></div></div>
-                        <div class="absolute inset-0 p-10 flex flex-col justify-center"><span class="inline-block w-12 h-1 mb-6" style="background-color: {{ $brandColor }}"></span><h3 class="font-black uppercase tracking-widest text-sm mb-5 font-montserrat" style="color: {{ $brandColor }}">Erreur à Éviter</h3><p class="text-white font-black uppercase tracking-tight text-lg leading-snug font-montserrat">Attendre que la fuite empire avant d'appeler un professionnel.</p></div>
-                        <div class="absolute bottom-0 inset-x-0 border-t px-10 py-4" style="border-color: rgba(255,255,255,0.1)"><div class="flex items-center gap-2">@if ($hasLogo)<img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="h-5 w-5 object-contain rounded">@endif<p class="font-bold text-xs uppercase tracking-widest font-montserrat" style="color: {{ $brandColor }}">{{ $companyLabel }}</p></div></div>
-                    </div>
+                    <x-post-templates.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Erreur à Éviter</h4><p class="text-gray-500 text-sm">Un format alerte très engageant pour éduquer vos clients.</p></div>
                 </div>
+                @endif
 
                 {{-- ── Guide Pédagogique ── --}}
-                <div class="space-y-4 group" x-data="{ current: 0, total: 3 }">
-                    <div class="aspect-square rounded-2xl shadow-lg ring-1 ring-gray-200 overflow-hidden relative transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2 bg-slate-50">
-                        <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 2px 2px, black 1px, transparent 0); background-size: 24px 24px;"></div>
-                        <div class="absolute inset-0 p-10 flex flex-col justify-center text-center" x-show="current === 0" style="background-color: {{ $brandColor }}"><p class="text-white/40 font-bold text-[10px] uppercase tracking-[0.2em] mb-6 select-none">CONSEIL D'EXPERT</p><div class="space-y-3"><div class="h-2 w-full bg-white/30 rounded-full"></div><div class="h-2 w-5/6 mx-auto bg-white/30 rounded-full"></div><div class="h-2 w-4/6 mx-auto bg-white/30 rounded-full"></div></div></div>
-                        <div class="absolute inset-x-0 top-0 h-1.5" style="background-color: {{ $brandColor }}"></div>
-                        <div class="absolute inset-0 p-12 flex flex-col justify-center" x-show="current > 0"><div class="w-10 h-10 rounded-lg flex items-center justify-center text-white mb-6 font-bold text-lg shadow-sm" style="background-color: {{ $brandColor }}" x-text="current + 1"></div><div class="space-y-4"><div class="h-1.5 w-full bg-slate-200 rounded-full"></div><div class="h-1.5 w-full bg-slate-200 rounded-full"></div><div class="h-1.5 w-3/4 bg-slate-200 rounded-full"></div></div></div>
-                        <div class="absolute bottom-0 inset-x-0 h-12 flex items-center justify-center px-6" style="background-color: #1E293B"><p class="text-white/60 font-bold uppercase tracking-widest text-[9px] font-montserrat">{{ $companyLabel }}</p></div>
-                        <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity"><button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
-                    </div>
+                @if($isNativeActive('guide_pedagogique'))
+                <div class="space-y-4 group">
+                    <x-post-templates.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Guide Pédagogique</h4><p class="text-gray-500 text-sm">Apportez de la valeur et positionnez-vous en expert conseil.</p></div>
+                </div>
+                @endif
+
+            </div>
+            @endif
+
+            @if($activeTab === 'glass')
+            <div class="mb-10 animate-fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <h2 class="font-bold text-midnight text-base">Gabarits inclus</h2>
+                <div class="flex-1 h-px bg-gray-100"></div>
+                <span class="text-xs text-gray-400 font-medium">{{ $activeNativeCount }} style{{ $activeNativeCount > 1 ? 's' : '' }}</span>
+            </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{-- Glass Avant/Après --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.glass.project :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Glass Avant / Après</h4>
+                            <p class="text-gray-500 text-sm italic">Un style futuriste et épuré pour vos réalisations.</p>
+                        </div>
+                    </div>
+
+                    {{-- Glass Review --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.glass.review :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Glass Avis Client</h4>
+                            <p class="text-gray-500 text-sm italic">Mettez en valeur vos retours clients avec élégance.</p>
+                        </div>
+                    </div>
+
+                    {{-- Glass FAQ --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.glass.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Glass FAQ</h4>
+                            <p class="text-gray-500 text-sm italic">Répondez aux questions avec un design premium.</p>
+                        </div>
+                    </div>
+
+                    {{-- Glass Lifestyle --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.glass.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Glass Lifestyle</h4>
+                            <p class="text-gray-500 text-sm italic">Une immersion brute et moderne dans votre métier.</p>
+                        </div>
+                    </div>
+
+                    {{-- Glass Quality Focus --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.glass.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Glass Focus Qualité</h4>
+                            <p class="text-gray-500 text-sm italic">Valorisez vos matériaux avec précision.</p>
+                        </div>
+                    </div>
+
+                    {{-- Glass Chantier Détail --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.glass.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Glass Chantier Détail</h4>
+                            <p class="text-gray-500 text-sm italic">Explorez chaque recoin de vos projets.</p>
+                        </div>
+                    </div>
+
+                    {{-- Glass Step-by-Step --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.glass.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Glass Step-by-Step</h4>
+                            <p class="text-gray-500 text-sm italic">Partagez votre expertise étape par étape.</p>
+                        </div>
+                    </div>
+
+                    {{-- Glass Conseil Saisonnier --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.glass.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Glass Conseil Saisonnier</h4>
+                            <p class="text-gray-500 text-sm italic">Le bon conseil, pour le bon moment.</p>
+                        </div>
+                    </div>
+
+                    {{-- Glass Erreur à Éviter --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.glass.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Glass Erreur à Éviter</h4>
+                            <p class="text-gray-500 text-sm italic">Éduquez avec un design d'alerte premium.</p>
+                        </div>
+                    </div>
+
+                    {{-- Glass Guide Pédagogique --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.glass.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Glass Guide Pédagogique</h4>
+                            <p class="text-gray-500 text-sm italic">Devenez la référence conseil de votre secteur.</p>
+                        </div>
+                    </div>
                 </div>
 
             </div>
+            @endif
+            
+            @if($activeTab === 'blueprint')
+            <div class="mb-10 animate-fade-in space-y-12">
+            <div class="flex items-center gap-3 mb-6">
+                <h2 class="font-bold text-midnight text-base">Gabarits inclus</h2>
+                <div class="flex-1 h-px bg-gray-100"></div>
+                <span class="text-xs text-gray-400 font-medium">{{ $activeNativeCount }} style{{ $activeNativeCount > 1 ? 's' : '' }}</span>
+            </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{-- Blueprint Project --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.blueprint.project :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Blueprint Avant / Après</h4>
+                            <p class="text-gray-500 text-sm italic">Le chantier vu comme un projet d'architecte.</p>
+                        </div>
+                    </div>
+
+                    {{-- Blueprint Review --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.blueprint.review :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Blueprint Avis</h4>
+                            <p class="text-gray-500 text-sm italic">La validation technique de vos clients.</p>
+                        </div>
+                    </div>
+
+                    {{-- Blueprint FAQ --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.blueprint.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Blueprint FAQ</h4>
+                            <p class="text-gray-500 text-sm italic">Des réponses claires et documentées.</p>
+                        </div>
+                    </div>
+
+                    {{-- Blueprint Lifestyle --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.blueprint.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Blueprint Lifestyle</h4>
+                            <p class="text-gray-500 text-sm italic">L'immersion brute dans vos réalisations.</p>
+                        </div>
+                    </div>
+
+                    {{-- Blueprint Quality --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.blueprint.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Blueprint Focus Qualité</h4>
+                            <p class="text-gray-500 text-sm italic">L'analyse détaillée de vos matériaux.</p>
+                        </div>
+                    </div>
+
+                    {{-- Blueprint Chantier --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.blueprint.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Blueprint Zoom Chantier</h4>
+                            <p class="text-gray-500 text-sm italic">Le dossier technique de vos chantiers.</p>
+                        </div>
+                    </div>
+
+                    {{-- Blueprint Steps --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.blueprint.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Blueprint Étapes</h4>
+                            <p class="text-gray-500 text-sm italic">Votre méthodologie, étape par étape.</p>
+                        </div>
+                    </div>
+
+                    {{-- Blueprint Seasonal --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.blueprint.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Blueprint Saison</h4>
+                            <p class="text-gray-500 text-sm italic">Le conseil expert, archivé et précis.</p>
+                        </div>
+                    </div>
+
+                    {{-- Blueprint Alert --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.blueprint.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Blueprint Alerte</h4>
+                            <p class="text-gray-500 text-sm italic">Éduquez avec la rigueur d'un expert.</p>
+                        </div>
+                    </div>
+
+                    {{-- Blueprint Guide --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.blueprint.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Blueprint Guide</h4>
+                            <p class="text-gray-500 text-sm italic">Votre base de connaissance technique.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            @endif
+
+            @if($activeTab === 'kraft')
+            <div class="mb-10 animate-fade-in space-y-12">
+            <div class="flex items-center gap-3 mb-6">
+                <h2 class="font-bold text-midnight text-base">Gabarits inclus</h2>
+                <div class="flex-1 h-px bg-gray-100"></div>
+                <span class="text-xs text-gray-400 font-medium">{{ $activeNativeCount }} style{{ $activeNativeCount > 1 ? 's' : '' }}</span>
+            </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{-- Kraft Project --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.kraft.project :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Kraft Avant / Après</h4>
+                            <p class="text-gray-500 text-sm italic">L'authenticité du chantier, étape par étape.</p>
+                        </div>
+                    </div>
+
+                    {{-- Kraft Review --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.kraft.review :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Kraft Avis Client</h4>
+                            <p class="text-gray-500 text-sm italic">La validation brute de vos clients satisfaits.</p>
+                        </div>
+                    </div>
+
+                    {{-- Kraft FAQ --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.kraft.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Kraft FAQ</h4>
+                            <p class="text-gray-500 text-sm italic">Des réponses franches à vos clients.</p>
+                        </div>
+                    </div>
+
+                    {{-- Kraft Lifestyle --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.kraft.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Kraft Lifestyle</h4>
+                            <p class="text-gray-500 text-sm italic">Votre métier au naturel, sans filtre.</p>
+                        </div>
+                    </div>
+
+                    {{-- Kraft Quality --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.kraft.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Kraft Focus Qualité</h4>
+                            <p class="text-gray-500 text-sm italic">La précision technique mise en avant.</p>
+                        </div>
+                    </div>
+
+                    {{-- Kraft Chantier --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.kraft.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Kraft Zoom Chantier</h4>
+                            <p class="text-gray-500 text-sm italic">Le rapport de chantier visuel et efficace.</p>
+                        </div>
+                    </div>
+
+                    {{-- Kraft Steps --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.kraft.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Kraft Étapes</h4>
+                            <p class="text-gray-500 text-sm italic">Une méthodologie claire et industrielle.</p>
+                        </div>
+                    </div>
+
+                    {{-- Kraft Seasonal --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.kraft.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Kraft Saison</h4>
+                            <p class="text-gray-500 text-sm italic">Le mémo technique pour chaque saison.</p>
+                        </div>
+                    </div>
+
+                    {{-- Kraft Alert --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.kraft.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Kraft Alerte</h4>
+                            <p class="text-gray-500 text-sm italic">Évitez les erreurs avec un design impactant.</p>
+                        </div>
+                    </div>
+
+                    {{-- Kraft Guide --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.kraft.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Kraft Guide</h4>
+                            <p class="text-gray-500 text-sm italic">Le guide pratique de votre savoir-faire.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            @endif
+
+            @if($activeTab === 'beton')
+            <div class="mb-10 animate-fade-in space-y-12">
+                <div class="flex items-center gap-3 mb-6">
+                    <h2 class="font-bold text-midnight text-base">Gabarits inclus</h2>
+                    <div class="flex-1 h-px bg-gray-100"></div>
+                    <span class="text-xs text-gray-400 font-medium">{{ $activeNativeCount }} style{{ $activeNativeCount > 1 ? 's' : '' }}</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{-- Béton Project --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.beton.project :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Béton Avant / Après</h4>
+                            <p class="text-gray-500 text-sm italic">Modernité et solidité visuelle.</p>
+                        </div>
+                    </div>
+
+                    {{-- Béton Review --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.beton.review :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Béton Avis Client</h4>
+                            <p class="text-gray-500 text-sm italic">Le témoignage de confiance ancré dans le réel.</p>
+                        </div>
+                    </div>
+
+                    {{-- Béton FAQ --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.beton.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Béton FAQ</h4>
+                            <p class="text-gray-500 text-sm italic">Réponses précises et professionnelles.</p>
+                        </div>
+                    </div>
+
+                    {{-- Béton Lifestyle --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.beton.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Béton Lifestyle</h4>
+                            <p class="text-gray-500 text-sm italic">L'immersion moderne sur vos chantiers.</p>
+                        </div>
+                    </div>
+
+                    {{-- Béton Quality --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.beton.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Béton Focus Qualité</h4>
+                            <p class="text-gray-500 text-sm italic">Le détail qui fait la différence.</p>
+                        </div>
+                    </div>
+
+                    {{-- Béton Chantier --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.beton.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Béton Zoom Chantier</h4>
+                            <p class="text-gray-500 text-sm italic">Vue technique et multi-angle.</p>
+                        </div>
+                    </div>
+
+                    {{-- Béton Steps --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.beton.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Béton Étapes Pro</h4>
+                            <p class="text-gray-500 text-sm italic">Votre méthodologie en 3 étapes claires.</p>
+                        </div>
+                    </div>
+
+                    {{-- Béton Seasonal --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.beton.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Béton Dossier</h4>
+                            <p class="text-gray-500 text-sm italic">Le mémo technique indispensable.</p>
+                        </div>
+                    </div>
+
+                    {{-- Béton Alert --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.beton.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Béton Alerte Erreur</h4>
+                            <p class="text-gray-500 text-sm italic">Prévention et conseils d'expert.</p>
+                        </div>
+                    </div>
+
+                    {{-- Béton Guide --}}
+                    <div class="space-y-4 group">
+                        <x-post-templates.beton.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <div>
+                            <h4 class="font-bold text-midnight text-lg">Béton Guide Pratique</h4>
+                            <p class="text-gray-500 text-sm italic">L'accompagnement client par l'artisan.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            @endif
 
             {{-- CTA branding --}}
             <div class="mt-12 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white shadow ring-1 ring-gray-100">
@@ -603,8 +777,12 @@ $deleteTemplate = function (int $id) {
                         </svg>
                     </div>
                     <div>
-                        <h2 class="font-bold text-midnight text-lg">Créer un modèle avec IA</h2>
-                        <p class="text-xs text-gray-400 mt-0.5">Décrivez le type de post que vous souhaitez</p>
+                        <h2 class="font-bold text-midnight text-lg">
+                            Ajuster le modèle
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-0.5">
+                            Décrivez les modifications à apporter
+                        </p>
                     </div>
                 </div>
                 <button wire:click="closeModal" class="w-8 h-8 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors shrink-0">
@@ -616,260 +794,30 @@ $deleteTemplate = function (int $id) {
 
             <div class="p-6 space-y-5">
 
-                @if(!$generatedTemplate)
-                {{-- Étape 1 : Demande — 3 modes --}}
-                <div x-data="{ mode: 'text' }" @modal-switch-to-text.window="mode = 'text'">
-                    <label class="block text-sm font-semibold text-midnight mb-3">Décrivez votre modèle</label>
-
-                    {{-- Mode tabs --}}
-                    <div class="flex bg-gray-100 rounded-xl p-1 gap-1 mb-3">
-                        <button type="button" @click="mode = 'text'"
-                                :class="mode === 'text' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
-                                class="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                            Décrire
-                        </button>
-                        <button type="button" @click="mode = 'record'"
-                                :class="mode === 'record' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
-                                class="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
-                            Enregistrer
-                        </button>
-                        <button type="button" @click="mode = 'import'"
-                                :class="mode === 'import' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
-                                class="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                            Importer
-                        </button>
-                    </div>
-
-                    {{-- Text mode --}}
-                    <div x-show="mode === 'text'" x-transition>
-                        <textarea wire:model="userRequest"
-                                  placeholder="Ex: Je veux un modèle pour annoncer des promotions saisonnières, présenter un nouveau membre de mon équipe, partager une astuce technique..."
-                                  rows="4"
-                                  class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-copper focus:border-transparent resize-none transition-all"
-                                  maxlength="300"></textarea>
-                        <div class="flex items-center justify-between mt-1.5">
-                            @error('userRequest')
-                                <p class="text-xs text-red-500">{{ $message }}</p>
-                            @else
-                                <p class="text-xs text-gray-400">Soyez précis — l'IA s'adaptera à votre description.</p>
-                            @enderror
-                            <span class="text-xs text-gray-400 tabular-nums shrink-0 ml-2">{{ strlen($userRequest) }}/300</span>
-                        </div>
-                    </div>
-
-                    {{-- Record mode --}}
-                    <div x-show="mode === 'record'" x-transition
-                         x-data="{
-                             recording: false, stream: null, recorder: null, chunks: [],
-                             startRec() {
-                                 navigator.mediaDevices.getUserMedia({ audio: true }).then(s => {
-                                     this.stream = s;
-                                     this.recorder = new MediaRecorder(s);
-                                     this.chunks = [];
-                                     this.recorder.ondataavailable = e => this.chunks.push(e.data);
-                                     this.recorder.onstop = () => {
-                                         const blob = new Blob(this.chunks, { type: 'audio/webm' });
-                                         const file = new File([blob], 'memo.webm', { type: 'audio/webm' });
-                                         const dt = new DataTransfer();
-                                         dt.items.add(file);
-                                         const input = document.getElementById('modalAudioUpload');
-                                         input.files = dt.files;
-                                         input.dispatchEvent(new Event('change'));
-                                     };
-                                     this.recorder.start();
-                                     this.recording = true;
-                                 });
-                             },
-                             stopRec() {
-                                 this.recorder?.stop();
-                                 this.stream?.getTracks().forEach(t => t.stop());
-                                 this.recording = false;
-                             }
-                         }">
-                        <div class="flex flex-col items-center gap-4 py-4">
-                            <button type="button"
-                                    @click="recording ? stopRec() : startRec()"
-                                    :class="recording ? 'bg-red-500 hover:bg-red-600 shadow-red-200' : 'bg-copper hover:bg-amber-500 shadow-copper/20'"
-                                    class="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg transition-all duration-200 active:scale-95">
-                                <template x-if="!recording">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
-                                </template>
-                                <template x-if="recording">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
-                                </template>
+                {{-- ÉDITION OU RÉSULTAT --}}
+                <div class="space-y-6">
+                    
+                    @if($editingTemplateId)
+                    {{-- Barre d'ajustement en haut quand on édite --}}
+                    <div class="bg-amber-50 rounded-2xl p-5 border border-amber-100 shadow-sm" x-data="{ focus: false }">
+                        <label class="block text-xs font-black text-amber-800 uppercase tracking-widest mb-3">Que souhaitez-vous modifier ?</label>
+                        <div class="flex gap-2">
+                            <textarea wire:model="adjustmentRequest"
+                                   placeholder="Ex: Change le style en clair, mets une mise en page citation, ou rends le titre plus accrocheur..."
+                                   rows="2"
+                                   @focus="focus = true" @blur="focus = false"
+                                   class="flex-1 px-4 py-3 rounded-xl border border-amber-200 text-sm focus:ring-2 focus:ring-copper focus:border-transparent outline-none resize-none transition-shadow"
+                                   :class="focus ? 'shadow-md' : ''"></textarea>
+                            <button wire:click="refineTemplate"
+                                    wire:loading.attr="disabled"
+                                    class="px-5 bg-copper text-white text-xs font-bold rounded-xl hover:bg-amber-500 transition-all flex items-center justify-center shrink-0 shadow-sm">
+                                <span wire:loading.remove wire:target="refineTemplate">Ajuster</span>
+                                <svg wire:loading wire:target="refineTemplate" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                             </button>
-                            <p class="text-sm text-gray-500 text-center" x-text="recording ? 'Enregistrement... Cliquez pour arrêter' : 'Cliquez pour enregistrer votre description'"></p>
-                            <div x-show="recording" class="flex gap-1">
-                                <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce" style="animation-delay:0ms"></span>
-                                <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce" style="animation-delay:150ms"></span>
-                                <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce" style="animation-delay:300ms"></span>
-                            </div>
                         </div>
-                        <input type="file" id="modalAudioUpload" wire:model="audioRequest" accept="audio/*" class="hidden">
-                        @if($isTranscribing)
-                            <div class="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-copper font-medium">
-                                <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
-                                Transcription en cours...
-                            </div>
-                        @elseif($audioRequest && !$isTranscribing)
-                            <div class="flex items-center gap-3 mt-2">
-                                <div class="flex-1 flex items-center gap-2 bg-green-50 border border-green-100 rounded-xl px-3 py-2 text-xs text-green-700 font-medium">
-                                    <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    Audio prêt
-                                </div>
-                                <button type="button" wire:click="transcribeAudioRequest"
-                                        class="px-4 py-2 bg-copper text-white text-xs font-bold rounded-xl hover:bg-amber-500 transition-colors">
-                                    Transcrire
-                                </button>
-                            </div>
-                        @elseif($userRequest && !$isTranscribing)
-                            <div class="flex items-center gap-2 mt-2 bg-green-50 border border-green-100 rounded-xl px-3 py-2 text-xs text-green-700 font-medium">
-                                <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                Transcription prête — passez en mode "Décrire" pour modifier.
-                            </div>
-                        @endif
+                        <p class="text-[10px] text-amber-600/70 mt-2 italic">L'IA détectera automatiquement si vous voulez changer le style, la mise en page ou le mode photo.</p>
                     </div>
-
-                    {{-- Import mode --}}
-                    <div x-show="mode === 'import'" x-transition>
-                        <label class="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-gray-200 rounded-xl px-6 py-8 cursor-pointer hover:border-copper/40 hover:bg-amber-50/30 transition-all group">
-                            <svg class="w-8 h-8 text-gray-300 group-hover:text-copper transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                            </svg>
-                            <div class="text-center">
-                                <p class="text-sm font-semibold text-gray-600 group-hover:text-copper transition-colors">Glissez un fichier audio</p>
-                                <p class="text-xs text-gray-400 mt-0.5">MP3, M4A, WAV, WebM — max 10 Mo</p>
-                            </div>
-                            <input type="file" wire:model="audioRequest" accept="audio/*" class="hidden">
-                        </label>
-                        @if($isTranscribing)
-                            <div class="flex items-center gap-2 mt-3 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-copper font-medium">
-                                <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
-                                Transcription en cours...
-                            </div>
-                        @elseif($audioRequest && !$isTranscribing)
-                            <div class="flex items-center gap-3 mt-3">
-                                <div class="flex-1 flex items-center gap-2 bg-green-50 border border-green-100 rounded-xl px-3 py-2 text-xs text-green-700 font-medium">
-                                    <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    Fichier chargé
-                                </div>
-                                <button type="button" wire:click="transcribeAudioRequest"
-                                        class="px-4 py-2 bg-copper text-white text-xs font-bold rounded-xl hover:bg-amber-500 transition-colors">
-                                    Transcrire
-                                </button>
-                            </div>
-                        @elseif($userRequest && !$isTranscribing)
-                            <div class="flex items-center gap-2 mt-3 bg-green-50 border border-green-100 rounded-xl px-3 py-2 text-xs text-green-700 font-medium">
-                                <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                Transcription prête — passez en mode "Décrire" pour modifier.
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
-                {{-- Photo mode --}}
-                <div>
-                    <label class="block text-sm font-semibold text-midnight mb-2">Ce modèle nécessite des photos ?</label>
-                    <div class="grid grid-cols-3 gap-2">
-                        @foreach([
-                            ['value' => 'none',     'label' => 'Aucune photo',     'icon' => 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636', 'desc' => 'Post 100% textuel'],
-                            ['value' => 'single',   'label' => '1 photo',          'icon' => 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z', 'desc' => 'Photo simple'],
-                            ['value' => 'carousel', 'label' => 'Carrousel',        'icon' => 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', 'desc' => '2 à 5 photos'],
-                        ] as $pm)
-                        <button type="button" wire:click="$set('photoMode', '{{ $pm['value'] }}')"
-                                class="flex flex-col items-center gap-2 p-3 rounded-xl border-2 text-center transition-all duration-150
-                                    {{ $photoMode === $pm['value'] ? 'border-copper bg-amber-50' : 'border-gray-200 bg-white hover:border-gray-300' }}">
-                            <svg class="w-5 h-5 {{ $photoMode === $pm['value'] ? 'text-copper' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $pm['icon'] }}"/>
-                            </svg>
-                            <span class="text-xs font-bold {{ $photoMode === $pm['value'] ? 'text-amber-700' : 'text-gray-600' }}">{{ $pm['label'] }}</span>
-                            <span class="text-[10px] text-gray-400">{{ $pm['desc'] }}</span>
-                        </button>
-                        @endforeach
-                    </div>
-                </div>
-
-                {{-- Suggestions --}}
-                <div>
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Idées d'inspiration</p>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach(['Promotion saisonnière', 'Nouveau membre d\'équipe', 'Astuce technique du jour', 'Offre parrainage', 'Présentation d\'un outil', 'Chiffre clé de l\'entreprise'] as $example)
-                        <button type="button"
-                                wire:click="$set('userRequest', 'Modèle pour : {{ $example }}')"
-                                class="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-amber-50 hover:text-copper transition-colors">
-                            {{ $example }}
-                        </button>
-                        @endforeach
-                    </div>
-                </div>
-
-                @if($errorMessage)
-                <div class="flex items-center gap-2 bg-red-50 border border-red-100 text-red-700 rounded-xl px-4 py-3 text-sm">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                    {{ $errorMessage }}
-                </div>
-                @endif
-
-                <button wire:click="generateTemplate"
-                        wire:loading.attr="disabled"
-                        class="w-full py-3 rounded-xl text-sm font-bold text-white bg-copper transition-all hover:bg-amber-500 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 flex items-center justify-center gap-2 shadow-lg shadow-copper/25">
-                    <span wire:loading.remove wire:target="generateTemplate">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    </span>
-                    <svg wire:loading wire:target="generateTemplate" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span wire:loading.remove wire:target="generateTemplate">Générer avec IA</span>
-                    <span wire:loading wire:target="generateTemplate">Génération en cours...</span>
-                </button>
-
-                @else
-                {{-- Étape 2 : Résultat --}}
-                <div class="space-y-4">
-                    <div class="flex items-center gap-2 bg-green-50 border border-green-100 text-green-700 rounded-xl px-4 py-3 text-sm">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                        Modèle généré avec succès par l'IA !
-                    </div>
-
-                    {{-- Aperçu --}}
-                    <div class="rounded-xl border border-gray-100 overflow-hidden">
-                        <div class="h-32 flex items-center justify-center relative overflow-hidden"
-                             style="
-                                @if($generatedTemplate['visual_style'] === 'brand_color') background-color: {{ $brandColor }};
-                                @elseif($generatedTemplate['visual_style'] === 'light_branded') background-color: #F8FAFC;
-                                @else background-color: #0B1426;
-                                @endif
-                             ">
-                            <div class="absolute inset-x-0 top-0 h-1.5" style="background-color: {{ $brandColor }}"></div>
-                            <div class="text-center px-6">
-                                <p class="font-black uppercase tracking-widest text-xs mb-1 font-montserrat"
-                                   style="color: {{ $generatedTemplate['visual_style'] === 'light_branded' ? $brandColor : ($generatedTemplate['visual_style'] === 'brand_color' ? 'rgba(255,255,255,0.8)' : $brandColor) }}">
-                                    {{ strtoupper($generatedTemplate['name']) }}
-                                </p>
-                                <p class="font-bold text-xs"
-                                   style="color: {{ $generatedTemplate['visual_style'] === 'light_branded' ? '#1E293B' : 'rgba(255,255,255,0.7)' }}">
-                                    {{ $generatedTemplate['description'] }}
-                                </p>
-                            </div>
-                            <div class="absolute bottom-2 right-2">
-                                <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
-                                      style="background: rgba(255,255,255,0.15); color: {{ $generatedTemplate['visual_style'] === 'light_branded' ? '#64748B' : 'rgba(255,255,255,0.6)' }}">
-                                    @if($generatedTemplate['visual_style'] === 'dark_branded') Fond sombre
-                                    @elseif($generatedTemplate['visual_style'] === 'light_branded') Fond clair
-                                    @else Couleur de marque
-                                    @endif
-                                </span>
-                            </div>
-                        </div>
-                        <div class="p-4 space-y-2 bg-gray-50">
-                            <div><p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Nom</p><p class="text-sm font-bold text-midnight">{{ $generatedTemplate['name'] }}</p></div>
-                            <div><p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Description</p><p class="text-sm text-gray-600">{{ $generatedTemplate['description'] }}</p></div>
-                        </div>
-                    </div>
+                    @endif
 
                     @if($errorMessage)
                     <div class="flex items-center gap-2 bg-red-50 border border-red-100 text-red-700 rounded-xl px-4 py-3 text-sm">
@@ -878,22 +826,44 @@ $deleteTemplate = function (int $id) {
                     </div>
                     @endif
 
-                    <div class="flex gap-3">
-                        <button wire:click="$set('generatedTemplate', null)"
-                                class="flex-1 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-semibold text-gray-600 hover:border-gray-300 hover:bg-gray-50 transition-all">
-                            Recommencer
-                        </button>
-                        <button wire:click="saveTemplate"
+                    {{-- Aperçu réel --}}
+                    <div>
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Aperçu du modèle</p>
+                        <div class="relative group max-w-[420px] mx-auto shadow-2xl rounded-2xl overflow-hidden ring-4 ring-gray-50 bg-white">
+                            <x-post-templates.custom 
+                                :template="$generatedTemplate" 
+                                :brandColor="$brandColor" 
+                                :companyLabel="$companyLabel" 
+                                :logoUrl="$hasLogo ? Storage::disk('public')->url($company->logo_path) : null" 
+                                :preview="true"
+                                :hasImageText="$hasImageText"
+                                imageBeforeUrl="https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=400"
+                                imageAfterUrl="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=400"
+                                imageUrl="https://images.unsplash.com/photo-1621905235292-057491552730?q=80&w=400"
+                            />
+                            
+                            {{-- Badge info --}}
+                            @php
+                                $pm = $generatedTemplate['photo_mode'] ?? 'none';
+                            @endphp
+                            <div class="absolute bottom-16 right-4 z-10">
+                                <div class="bg-black/40 backdrop-blur-md px-2 py-1 rounded-lg text-[8px] font-bold text-white/90 uppercase tracking-tighter">
+                                    {{ $pm === 'none' ? 'Texte seul' : ($pm === 'carousel' ? 'Carrousel' : ($pm === 'multi' ? 'Multi-ph' : '1 Photo')) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button wire:click="saveRefinedTemplate"
                                 wire:loading.attr="disabled"
-                                class="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-copper transition-all hover:bg-amber-500 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md shadow-copper/25">
-                            <svg wire:loading.remove wire:target="saveTemplate" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            <svg wire:loading wire:target="saveTemplate" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            <span wire:loading.remove wire:target="saveTemplate">Sauvegarder ce modèle</span>
-                            <span wire:loading wire:target="saveTemplate">Sauvegarde...</span>
+                                class="flex-1 py-3 rounded-xl text-sm font-bold text-white bg-copper transition-all hover:bg-amber-500 shadow-lg shadow-copper/25 flex items-center justify-center gap-2">
+                            <span wire:loading.remove wire:target="saveRefinedTemplate">Valider les modifications</span>
+                            <svg wire:loading wire:target="saveRefinedTemplate" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <span wire:loading wire:target="saveRefinedTemplate">Mise à jour...</span>
                         </button>
                     </div>
                 </div>
-                @endif
 
             </div>
         </div>
@@ -902,8 +872,18 @@ $deleteTemplate = function (int $id) {
 
     @push('styles')
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Space+Mono:wght@400;700&display=swap');
         .font-montserrat { font-family: 'Montserrat', sans-serif; }
+        .font-mono-technical { font-family: 'Space Mono', monospace; }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
     @endpush
 

@@ -14,6 +14,7 @@ export default {
             fontFamily: {
                 sans: ['Inter', 'Figtree', ...defaultTheme.fontFamily.sans],
                 display: ['Outfit', 'Inter', 'Figtree', ...defaultTheme.fontFamily.sans],
+                logo: ['Plus Jakarta Sans', 'Inter', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 midnight: '#1E293B',

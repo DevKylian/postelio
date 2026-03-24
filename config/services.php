@@ -51,4 +51,10 @@ return [
         'api_key' => env('IMGBB_API_KEY'),
     ],
 
+    'zernio' => [
+        'api_key' => env('ZERNIO_API_KEY'),
+        'base_url' => 'https://zernio.com/api/v1',
+        'webhook_secret' => env('ZERNIO_WEBHOOK_SECRET'),
+    ],
+
 ];

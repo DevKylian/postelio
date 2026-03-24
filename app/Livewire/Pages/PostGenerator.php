@@ -18,7 +18,7 @@ class PostGenerator extends Component
     public $imageAfter;
     public $extraImages = [];        // for chantier_detail & step_by_step (up to 5)
     public $template = 'review';
-    public $platforms = ['instagram', 'facebook'];           // ['instagram', 'facebook']
+    public $platforms = [];                  // dynamically populated in mount()
     public $scheduleType = 'now';    // 'now' | 'scheduled'
     public $scheduledAt  = '';       // datetime-local string
     public $status = 'idle';
@@ -43,6 +43,7 @@ class PostGenerator extends Component
     public $textContent     = '';    // Free-text alternative to audio
     public $isAnalyzing     = false;
     public $analysisSuccess  = false;
+    public $visualStyle     = 'standard'; // standard | glass | blueprint | kraft | beton
 
     // Carousel templates
     const CAROUSEL_TEMPLATES  = ['chantier_detail', 'step_by_step', 'guide_pedagogique'];
@@ -51,7 +52,25 @@ class PostGenerator extends Component
     // Templates requiring before+after
     const BEFORE_AFTER_TEMPLATES = ['project'];
 
+    public function mount()
+    {
+        $company = Auth::user()->company;
+        $this->platforms = [];
+        if ($company?->instagram_connected) $this->platforms[] = 'instagram';
+        if ($company?->facebook_connected) $this->platforms[] = 'facebook';
+    }
+
     public function updatedAudio()
+    {
+        \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] updatedAudio triggered', [
+            'has_audio' => (bool)$this->audio,
+            'audio_name' => $this->audio?->getClientOriginalName()
+        ]);
+        
+        $this->analyzeAudio();
+    }
+
+    public function analyzeAudio()
     {
         if (!$this->audio) return;
 
@@ -59,17 +78,21 @@ class PostGenerator extends Component
         $this->analysisSuccess = false;
 
         try {
+            \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] analyzeAudio started');
             // 1. Store temporarily to have a local path
             $path = $this->audio->store('temp_memos', 'public');
+            \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] File stored', ['path' => $path]);
 
             // 2. Transcribe
             $transcriber = app(\App\Services\PostGeneration\TranscriptionService::class);
             $transcript = $transcriber->transcribe($path);
+            \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Transcription finished', ['length' => strlen($transcript)]);
 
             // 3. Pré-remplir le champ texte avec la transcription brute
             $this->textContent = $transcript;
 
             // 4. Extract fields
+            \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Starting field extraction');
             $refiner = app(\App\Services\PostGeneration\ContentRefinerService::class);
             $extracted = $refiner->extractFields($transcript);
 
@@ -113,20 +136,30 @@ class PostGenerator extends Component
             $needsExtra = $photoMode === 'carousel';
         }
 
+        $nativeSettings = \App\Models\NativeTemplateSetting::all()->pluck('is_active', 'slug');
+        $activeNativeSlugs = collect($nativeSettings)->filter(fn($active) => $active)->keys()->toArray();
+        $baseSlugs = ['review','project','faq','lifestyle','quality_focus','conseil_saisonnier','erreur_a_eviter','chantier_detail','step_by_step','guide_pedagogique'];
+        // Fallback to defaults if table is empty
+        $finalNativeSlugs = count($nativeSettings) > 0 ? $activeNativeSlugs : $baseSlugs;
+        $allowedTemplates = array_merge($finalNativeSlugs, ['custom']);
+
         $hasInput = $this->audio || !empty(trim($this->textContent));
 
         return [
             'audio'         => (!$hasInput || $this->audio) ? 'nullable|max:10240' : 'nullable',
             'textContent'   => (!$this->audio) ? 'required_without:audio|string|max:2000' : 'nullable|string|max:2000',
-            'template'      => 'required|in:review,project,faq,lifestyle,quality_focus,conseil_saisonnier,erreur_a_eviter,chantier_detail,step_by_step,guide_pedagogique,custom',
+            'template'      => 'required|in:' . implode(',', $allowedTemplates),
             'imageBefore'   => ($needsPhoto && !$needsExtra) ? 'required|image|max:5120' : 'nullable|image|max:5120',
             'imageAfter'    => $needsAfter ? 'required|image|max:5120' : 'nullable',
             'extraImages'   => $needsExtra ? 'required|array|min:2|max:5' : 'nullable|array',
             'extraImages.*' => 'image|max:5120',
+            'platforms'     => 'nullable|array',
+            'platforms.*'   => 'string',
             'scheduleType'  => 'required|in:now,scheduled',
             'scheduledAt'   => $this->scheduleType === 'scheduled' ? 'required|date|after:now' : 'nullable',
             'tone'          => 'required|in:professionnel,chaleureux,expert,dynamique',
             'customNote'    => 'nullable|string|max:300',
+            'visualStyle'   => 'required|in:standard,glass,blueprint,kraft,beton',
         ];
     }
 
@@ -136,6 +169,14 @@ class PostGenerator extends Component
         $this->customTemplateId = $id;
     }
 
+    public function updatedPlatforms()
+    {
+        if (!auth()->user()->canPublishToSocialMedia()) {
+            $platforms = is_array($this->platforms) ? $this->platforms : (is_string($this->platforms) && $this->platforms ? [$this->platforms] : []);
+            $this->platforms = array_values(array_diff($platforms, ['instagram', 'facebook']));
+        }
+    }
+
     public function generate()
     {
         $user = Auth::user();
@@ -143,24 +184,11 @@ class PostGenerator extends Component
 
         $this->validate();
 
-        // Calculate cost
-        $imageCount = 1;
-        if (in_array($this->template, ['chantier_detail', 'step_by_step'])) {
-            $imageCount = count($this->extraImages);
-        } elseif ($this->template === 'guide_pedagogique') {
-            $imageCount = (int) $this->targetSlides;
-        } elseif ($this->template === 'custom' && $this->customTemplateId) {
-            $ct = CustomTemplate::find($this->customTemplateId);
-            if ($ct && ($ct->photo_mode ?? 'none') === 'carousel') {
-                $imageCount = count($this->extraImages);
-            }
-        }
-
-        $platformCount = count($this->platforms) ?: 1;
-        $cost = $imageCount * $platformCount * 2;
+        // Generate 1 post = 1 unit from quota
+        $cost = 1;
 
         if (!$user->hasCredits($cost)) {
-            $this->addError('quota', "Vous n'avez pas assez de crédits pour cette génération (Coût : {$cost} crédits, Restant : {$user->remaining_credits}).");
+            $this->addError('quota', "Vous avez atteint votre quota. (Restant : {$user->remaining_credits} post(s)). Veuillez mettre à niveau votre abonnement.");
             return;
         }
 
@@ -169,8 +197,6 @@ class PostGenerator extends Component
             $this->addError('audio', 'Enregistrez un mémo, importez un fichier audio, ou saisissez votre texte.');
             return;
         }
-
-        $this->status = 'processing';
 
         // Store files
         $audioPath       = $this->audio ? $this->audio->store('memos', 'public') : null;
@@ -218,23 +244,36 @@ class PostGenerator extends Component
             'custom_layout_type'     => $customLayoutType,
             'custom_template_name'   => $customTemplateName,
             'custom_photo_mode'      => $customPhotoModeOpt,
-            'text_content'           => (!$this->audio && !empty(trim($this->textContent))) ? trim($this->textContent) : null,
+            'text_content'           => !empty(trim($this->textContent)) ? trim($this->textContent) : null,
+            'visual_style'           => $this->visualStyle,
         ];
 
-        // Default to instagram if nothing selected
-        $selectedPlatforms = !empty($this->platforms) ? $this->platforms : ['instagram'];
+        // Sanitize platforms array (livewire might cast to string or bool if only one checkbox exists)
+        $selectedPlatforms = is_array($this->platforms) ? $this->platforms : (is_string($this->platforms) && $this->platforms ? [$this->platforms] : []);
+        if ($this->platforms === true) {
+            $company = Auth::user()->company;
+            $selectedPlatforms = $company?->instagram_connected ? ['instagram'] : ($company?->facebook_connected ? ['facebook'] : []);
+        }
+
+        // Premium security: filter out social platforms for free users
+        if (!auth()->user()->canPublishToSocialMedia()) {
+            $selectedPlatforms = array_values(array_diff($selectedPlatforms, ['instagram', 'facebook']));
+        }
+        
+        $this->platforms = $selectedPlatforms;
 
         $post = Post::create([
             'user_id'           => Auth::id(),
             'company_id'        => Auth::user()->company->id,
             'audio_path'        => $audioPath,
+            'image_path'        => in_array($this->template, ['lifestyle', 'quality_focus']) ? $imageBeforePath : null,
             'image_before_path' => $imageBeforePath,
             'image_after_path'  => $imageAfterPath,
             'extra_images'      => count($extraImagePaths) ? $extraImagePaths : null,
             'template'          => $this->template,
             'template_options'  => $templateOptions,
             'platforms'         => $selectedPlatforms,
-            'status'            => 'pending',
+            'status'            => Post::STATUS_PENDING,
             'scheduled_at'      => ($this->scheduleType === 'scheduled' && $this->scheduledAt)
                                     ? \Carbon\Carbon::parse($this->scheduledAt)
                                     : null,
@@ -246,15 +285,18 @@ class PostGenerator extends Component
 
         try {
             ProcessPostGeneration::dispatch($post);
-            $this->status = 'processing';
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('PostGenerator: dispatch failed', [
                 'post_id' => $post->id,
                 'error'   => $e->getMessage(),
             ]);
             $this->errorMessage = $e->getMessage();
-            $this->status = 'failed';
+            $this->status = Post::STATUS_FAILED;
+            return;
         }
+
+        session()->flash('success', "Génération en cours ! La page se mettra à jour automatiquement.");
+        $this->redirect(route('posts.index'), navigate: true);
     }
 
     /**
@@ -262,17 +304,28 @@ class PostGenerator extends Component
      */
     public function checkProcessingStatus(): void
     {
-        if ($this->status !== 'processing' || !$this->generatedPostId) {
+        if ($this->status !== Post::STATUS_PROCESSING || !$this->generatedPostId) {
             return;
         }
 
         $post = Post::find($this->generatedPostId);
         if (!$post) return;
 
-        if ($post->status === 'completed') {
-            $this->status = 'completed';
-        } elseif ($post->status === 'failed') {
-            $this->status = 'failed';
+        if ($post->status === Post::STATUS_REVIEW_PENDING) {
+            $this->status = Post::STATUS_REVIEW_PENDING;
+            $this->previewImageUrl = $post->image_path ? asset(\Illuminate\Support\Facades\Storage::url($post->image_path)) : null;
+            $this->previewSlides   = $post->slides ? array_map(fn($s) => asset(\Illuminate\Support\Facades\Storage::url($s)), $post->slides) : [];
+            $this->previewContent  = $post->refined_caption ?: $post->transcription; // Fallback to transcription if caption not yet ready
+            
+            // If it's a JSON refined content, extract the caption
+            $contentData = json_decode($post->refined_content, true);
+            if (is_array($contentData)) {
+                $this->previewContent = $contentData['caption'] ?? $this->previewContent;
+            }
+        } elseif ($post->status === Post::STATUS_COMPLETED) {
+            $this->status = Post::STATUS_COMPLETED;
+        } elseif ($post->status === Post::STATUS_FAILED) {
+            $this->status = Post::STATUS_FAILED;
             $this->errorMessage = "La génération a échoué. Veuillez réessayer.";
         }
     }
@@ -285,7 +338,7 @@ class PostGenerator extends Component
 
         if (!$post || !$post->transcription) return;
 
-        $this->status = 'processing';
+        $this->status = Post::STATUS_PROCESSING;
         
         $templateOptions = $post->template_options ?? [];
         if ($simplified) {
@@ -293,7 +346,7 @@ class PostGenerator extends Component
         }
 
         $post->update([
-            'status' => 'processing',
+            'status' => Post::STATUS_PROCESSING,
             'template_options' => $templateOptions,
         ]);
 
@@ -302,8 +355,8 @@ class PostGenerator extends Component
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('regeneratePost dispatch failed', ['error' => $e->getMessage()]);
             $this->errorMessage = $e->getMessage();
-            $this->status = 'failed';
-            $post->update(['status' => 'failed']);
+            $this->status = Post::STATUS_FAILED;
+            $post->update(['status' => Post::STATUS_FAILED]);
         }
     }
 
@@ -314,7 +367,7 @@ class PostGenerator extends Component
         if (!$post || $post->user_id !== Auth::id()) return;
 
         // Mark as completed (publishing is already handled by ProcessPostGeneration)
-        $post->update(['status' => 'completed']);
+        $post->update(['status' => Post::STATUS_COMPLETED]);
 
         $platforms   = $post->platforms ?? ['instagram'];
         $scheduledAt = $post->scheduled_at;
@@ -324,9 +377,13 @@ class PostGenerator extends Component
         if (in_array('facebook', $platforms))  $platformNames[] = 'Facebook';
         $platformLabel = implode(' et ', $platformNames);
 
-        $message = ($scheduledAt && $scheduledAt->isFuture())
-            ? 'Post planifié pour le ' . $scheduledAt->translatedFormat('d/m/Y à H\hi') . " sur {$platformLabel} !"
-            : "Votre post a été validé et publié sur {$platformLabel} !";
+        if (empty($platformNames)) {
+            $message = "Votre post a été généré et sauvegardé dans vos créations !";
+        } else {
+            $message = ($scheduledAt && $scheduledAt->isFuture())
+                ? 'Post planifié pour le ' . $scheduledAt->translatedFormat('d/m/Y à H\hi') . " sur {$platformLabel} !"
+                : "Votre post a été validé et publié sur {$platformLabel} !";
+        }
 
         session()->flash('success', $message);
         $this->redirect(route('posts.index'));
@@ -363,8 +420,12 @@ class PostGenerator extends Component
         Auth::user()->checkAndResetQuota();
 
         $customTemplates = CustomTemplate::where('user_id', Auth::id())
+            ->where('is_active', true)
             ->orderByDesc('created_at')
             ->get();
+
+        $nativeSettings = \App\Models\NativeTemplateSetting::all()->pluck('is_active', 'slug');
+        $isNativeActive = fn($slug) => $nativeSettings[$slug] ?? true;
 
         $customPhotoMode = 'none';
         if ($this->template === 'custom' && $this->customTemplateId) {
@@ -402,7 +463,7 @@ class PostGenerator extends Component
         return view('livewire.pages.post-generator', compact(
             'customTemplates', 'customPhotoMode',
             'company', 'brandColor', 'igUsername', 'igCity', 'hasLogo', 'igProfilePicture',
-            'igConnected', 'fbConnected'
+            'igConnected', 'fbConnected', 'isNativeActive'
         ));
     }
 }

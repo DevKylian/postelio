@@ -12,13 +12,13 @@ class EnsureSubscribed
     {
         $user = $request->user();
 
-        if (!$user || !$user->hasActiveSubscription()) {
+        if (!$user || !$user->canPublishToSocialMedia()) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Abonnement requis.'], 403);
+                return response()->json(['message' => 'Abonnement premium requis.'], 403);
             }
 
             return redirect()->route('subscription.plans')
-                ->with('error', 'Un abonnement actif est requis pour accéder à cette fonctionnalité.');
+                ->with('error', 'Un abonnement premium est requis pour accéder à cette fonctionnalité.');
         }
 
         return $next($request);

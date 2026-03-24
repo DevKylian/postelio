@@ -13,43 +13,42 @@ return [
     */
 
     'plans' => [
-        'starter' => [
-            'name' => 'Starter',
-            'stripe_price_id' => env('STRIPE_STARTER_PRICE_ID', ''),
-            'credits' => 30,
-            'price' => 9.99,
+        'free' => [
+            'name' => 'Gratuit',
+            'stripe_price_id' => null,
+            'credits' => 3,
+            'price' => 0,
             'features' => [
-                '30 posts par mois',
-                '1 réseau social',
+                '3 posts par mois',
                 'Templates de base',
                 'Support par email',
             ],
         ],
-        'pro' => [
-            'name' => 'Pro',
-            'stripe_price_id' => env('STRIPE_PRO_PRICE_ID', ''),
+        'monthly' => [
+            'name' => 'Mensuel',
+            'stripe_price_id' => env('STRIPE_MONTHLY_PRICE_ID', ''),
             'credits' => 100,
-            'price' => 24.99,
+            'price' => 29.90,
+            'old_price' => 49.90,
             'features' => [
                 '100 posts par mois',
-                'Instagram + Facebook',
+                'Publication Instagram & Facebook',
                 'Tous les templates',
-                'Templates personnalisés',
                 'Support prioritaire',
             ],
         ],
-        'business' => [
-            'name' => 'Business',
-            'stripe_price_id' => env('STRIPE_BUSINESS_PRICE_ID', ''),
-            'credits' => 300,
-            'price' => 49.99,
+        'annual' => [
+            'name' => 'Annuel',
+            'stripe_price_id' => env('STRIPE_ANNUAL_PRICE_ID', ''),
+            'credits' => 100,
+            'price' => 290.00,
+            'old_price' => 358.80,
             'features' => [
-                '300 posts par mois',
-                'Instagram + Facebook',
+                '100 posts par mois',
+                'Publication Instagram & Facebook',
                 'Tous les templates',
-                'Templates personnalisés',
-                'Calendrier éditorial',
                 'Support dédié',
+                '2 mois offerts inclus',
             ],
         ],
     ],

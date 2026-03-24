@@ -2,25 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\InstagramService;
+use App\Services\ZernioService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class InstagramController extends Controller
 {
-    public function __construct(private InstagramService $instagram) {}
+    public function __construct(private ZernioService $zernio) {}
 
     /**
      * Redirect the user to the Meta OAuth authorization page.
      */
     public function connect(): RedirectResponse
     {
-        $state = Str::random(32);
-        session(['instagram_oauth_state' => $state]);
+        try {
+            $company   = Auth::user()->company;
+            $profileId = $company->getZernioProfileId();
+            $authUrl   = $this->zernio->getConnectUrl('instagram', $profileId, route('instagram.callback'));
 
-        return redirect($this->instagram->getAuthUrl($state));
+            return redirect($authUrl);
+        } catch (\Throwable $e) {
+            Log::error('Zernio Instagram connect failed', ['error' => $e->getMessage()]);
+            return redirect()->route('post-settings')->with('error', 'Impossible de se connecter à Zernio.');
+        }
     }
 
     /**
@@ -28,32 +34,30 @@ class InstagramController extends Controller
      */
     public function callback(Request $request): RedirectResponse
     {
-        if ($request->query('state') !== session('instagram_oauth_state')) {
-            return redirect()->route('post-settings')
-                ->with('error', 'Connexion Instagram annulée (état invalide).');
-        }
-
-        if ($request->has('error')) {
-            return redirect()->route('post-settings')
-                ->with('error', 'Connexion Instagram refusée.');
-        }
-
         try {
-            $tokenData   = $this->instagram->exchangeCodeForLongLivedToken($request->query('code'));
-            $accessToken = $tokenData['access_token'];
-            $expiresAt   = now()->addSeconds($tokenData['expires_in'] ?? 5_183_944);
+            $company  = Auth::user()->company;
+            $accounts = $this->zernio->listAccounts();
 
-            $igAccount = $this->instagram->getInstagramBusinessAccount($accessToken);
+            // Find the first instagram account that belongs to this profile
+            $igAccount = collect($accounts)->first(function($acc) use ($company) {
+                // profileId can be an object with _id or just a string ID
+                $accProfileId = is_array($acc['profileId']) ? $acc['profileId']['_id'] : $acc['profileId'];
+                return $acc['platform'] === 'instagram' && $accProfileId === $company->zernio_profile_id;
+            });
 
-            Auth::user()->company->update([
-                'instagram_access_token'           => $accessToken,
-                'instagram_business_account_id'    => $igAccount['id'],
-                'instagram_username'               => $igAccount['username'],
-                'instagram_profile_picture_url'    => $igAccount['profile_picture_url'] ?? null,
-                'instagram_token_expires_at'       => $expiresAt,
+            if (!$igAccount) {
+                throw new \RuntimeException('Aucun compte Instagram trouvé sur Zernio après connexion.');
+            }
+
+            $company->update([
+                'zernio_instagram_account_id'   => $igAccount['_id'],
+                'instagram_business_account_id' => $igAccount['platformUserId'],
+                'instagram_username'            => $igAccount['username'] ?? $igAccount['displayName'] ?? 'Inconnu',
+                'instagram_profile_picture_url' => $igAccount['profilePicture'] ?? $igAccount['picture'] ?? null,
             ]);
+
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Instagram OAuth failed', [
+            Log::error('Zernio Instagram callback failed', [
                 'error' => $e->getMessage(),
             ]);
 
@@ -62,7 +66,7 @@ class InstagramController extends Controller
         }
 
         return redirect()->route('post-settings')
-            ->with('success', 'Instagram connecté avec succès !');
+            ->with('success', 'Instagram connecté avec succès via Zernio !');
     }
 
     /**
@@ -71,6 +75,7 @@ class InstagramController extends Controller
     public function disconnect(): RedirectResponse
     {
         Auth::user()->company->update([
+            'zernio_instagram_account_id'   => null,
             'instagram_access_token'        => null,
             'instagram_business_account_id' => null,
             'instagram_username'            => null,

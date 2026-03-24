@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Cashier\Billable;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, Billable;
@@ -23,6 +26,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
+        'is_premium',
+        'is_banned',
         'onboarding_completed',
         'total_credits',
         'used_credits',
@@ -49,6 +55,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
+            'is_premium' => 'boolean',
+            'is_banned' => 'boolean',
             'onboarding_completed' => 'boolean',
             'last_quota_reset_at' => 'datetime',
             'total_credits' => 'integer',
@@ -78,11 +87,17 @@ class User extends Authenticatable
 
     public function hasCredits(int $amount): bool
     {
+        if ($this->is_admin || $this->is_premium) {
+            return true;
+        }
         return $this->remaining_credits >= $amount;
     }
 
     public function deductCredits(int $amount): void
     {
+        if ($this->is_admin || $this->is_premium) {
+            return;
+        }
         $this->increment('used_credits', $amount);
     }
 
@@ -130,6 +145,14 @@ class User extends Authenticatable
         return $this->subscribed('default');
     }
 
+    /**
+     * Whether the user can connect and publish to Instagram/Facebook.
+     */
+    public function canPublishToSocialMedia(): bool
+    {
+        return $this->is_premium || $this->hasActiveSubscription();
+    }
+
     public function company()
     {
         return $this->hasOne(Company::class);
@@ -138,5 +161,24 @@ class User extends Authenticatable
     public function posts()
     {
         return $this->hasMany(Post::class);
+    }
+
+    /**
+     * Send the email verification notification.
+     *
+     * @return void
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(config('auth.verification.expire', 60)),
+            [
+                'id' => $this->getKey(),
+                'hash' => sha1($this->getEmailForVerification()),
+            ]
+        );
+
+        Mail::to($this)->send(new WelcomeMail($this, $verificationUrl));
     }
 }

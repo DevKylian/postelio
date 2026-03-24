@@ -31,7 +31,17 @@ class ContentRefinerService
             . "- Structure la légende avec de vrais sauts de ligne entre chaque idée/paragraphe (retour à la ligne simple entre deux phrases liées, ligne vide entre deux blocs distincts).\n"
             . "- Exemple de structure attendue : accroche sur une ligne, ligne vide, corps espacé point par point, ligne vide, call-to-action, ligne vide, hashtags.\n\n";
 
-        $prompt = $noHallucinateGlobal . $noMarkdownPrefix . $this->getPromptForTemplate($template, $photoCount, $options);
+        $noTruncationRule = "RÈGLE DE RÉDACTION STRICTE SUR LES TEXTES COURTS :\n"
+            . "- Tu ne dois JAMAIS couper une phrase ou une idée en plein milieu pour respecter une limite de caractères.\n"
+            . "- Chaque texte généré (titre de slide, texte sur image) DOIT composer une idée ou une phrase parfaitement lisible et complète.\n"
+            . "- Les limites de caractères (ex: ~50 car.) sont indicatives. Si besoin, dépasse-les très légèrement pour terminer le mot ou la phrase intelligemment.\n\n";
+
+        $prompt = $noHallucinateGlobal . $noMarkdownPrefix . $noTruncationRule . $this->getPromptForTemplate($template, $photoCount, $options);
+        
+        // Ensure the word "json" is present for the API requirement
+        if (!str_contains(strtolower($prompt), 'json')) {
+            $prompt .= "\n\nRéponds UNIQUEMENT sous forme de JSON valide.";
+        }
 
         // ── Simplification à la demande ──────────────────────────────────────────
         if (!empty($options['simplified'])) {
@@ -132,8 +142,10 @@ IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponct
         $jsonCarousel = "Tu dois répondre UNIQUEMENT par un objet JSON valide avec cette structure :
 {
   \"caption\": \"La légende Instagram complète (300-500 caractères, {$hashtagInstruction})\",
-  \"slides\": [\"Texte slide 1\", \"Texte slide 2\", ...]
-}";
+  \"title\": \"Un titre très court et accrocheur pour la couverture (~50 car., phrase complète)\",
+  \"slides\": [\"Texte court pour slide 1\", \"Texte court pour slide 2\", ...]
+}
+IMPORTANT : Les textes dans 'slides' et 'title' ne doivent JAMAIS contenir de hashtags, de numéros d'étape (car ils sont ajoutés automatiquement) ni d'emojis.";
 
         return match ($template) {
 
@@ -145,7 +157,7 @@ IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponct
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
                 "Légende Instagram complète avec storytelling (250-400 caractères). {$hashtagInstruction}",
-                "Citation courte et percutante tirée de l'avis client. MAX 70 caractères. Sans hashtag."
+                "Citation percutante tirée de l'avis client. Préfère utiliser les mots EXACTS si un témoignage est présent dans le vocal. ~160 caractères, phrase complète. Sans hashtag."
             ),
 
                 'faq' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
@@ -153,13 +165,13 @@ IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponct
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
                 "Légende Instagram avec la réponse développée à la question (250-400 caractères). {$hashtagInstruction}",
-                "La question seule, courte, percutante, avec point d'interrogation. MAX 75 caractères. Sans hashtag."
+                "La question seule, courte, percutante, avec point d'interrogation. ~75 caractères, phrase complète. Sans hashtag."
             ),
 
                 'quality_focus' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . $jsonSingleWithImageText(
                 "Légende Instagram qui développe pourquoi ce matériau/équipement garantit qualité et durabilité (250-400 caractères). {$hashtagInstruction}",
-                "Nom ou courte description du matériau/équipement mis en valeur. MAX 55 caractères. Majuscules recommandées. Sans hashtag."
+                "Nom ou courte description du matériau/équipement mis en valeur. ~55 caractères, expression complète. Majuscules recommandées. Sans hashtag."
             ),
 
                 'conseil_saisonnier' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
@@ -167,44 +179,50 @@ IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponct
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
                 "Légende Instagram avec contexte saisonnier développé (250-400 caractères). {$hashtagInstruction}",
-                "Le conseil saisonnier actionnable, commençant par un verbe (Vérifiez, Anticipez, Préparez...). MAX 85 caractères. Sans hashtag."
+                "Le conseil saisonnier actionnable, commençant par un verbe (Vérifiez, Anticipez, Préparez...). ~85 caractères, phrase complète. Sans hashtag."
             ),
 
                 'erreur_a_eviter' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . $jsonSingleWithImageText(
                 "Légende Instagram qui décrit l'erreur et explique comment l'éviter (250-400 caractères). {$hashtagInstruction}",
-                "L'erreur formulée en alerte courte et directe (ex: Peindre sur une surface humide.). MAX 75 caractères. Sans hashtag."
+                "L'erreur formulée en alerte courte et directe (ex: Ne pas attendre que la fuite empire.). ~100 caractères, phrase complète. Sans hashtag."
             ),
 
-                // ── Single templates WITHOUT image text ──────────────────────────
+                // ── Single templates with short generic image text ─────────────────
 
                 'lifestyle' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
-                . str_replace('{$hashtagInstruction}', $hashtagInstruction, $jsonCaptionOnly),
+                . $jsonSingleWithImageText(
+                    "Légende Instagram complète (250-400 caractères, storytelling). {$hashtagInstruction}",
+                    "Titre concis et percutant (~80 caractères, phrase complète). Sans hashtag."
+                ),
 
                 'project' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
                 . ($options['workCategory'] ? " Type de travaux : {$options['workCategory']}." : "")
                 . ($options['jobDuration'] ? " Durée : {$options['jobDuration']}." : "")
                 . "{$extraNote} "
-                . str_replace('{$hashtagInstruction}', $hashtagInstruction, $jsonCaptionOnly),
+                . $jsonSingleWithImageText(
+                    "Légende Instagram complète (250-400 caractères, storytelling). {$hashtagInstruction}",
+                    "Titre descriptif du projet (~80 caractères, phrase complète). Sans hashtag."
+                ),
 
                 // ── Carousels ─────────────────────────────────────────────────────
 
                 'chantier_detail' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . "À partir de la description vocale d'un chantier, crée un post carrousel. Nous avons {$photoCount} photos. "
-                . "{$jsonCarousel} Le premier slide est la couverture (titre accrocheur, MAX 50 caractères). Les slides suivants décrivent les détails correspondant aux photos (MAX 60 caractères chacun).",
+                . "{$jsonCarousel} Le premier slide est la couverture (titre accrocheur, ~50 caractères, complet). Les slides suivants décrivent les détails correspondant aux photos (~60 caractères chacun, complets).",
 
                 'step_by_step' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . "À partir du vocal décrivant un processus, crée un carrousel étape par étape. Nous avons {$photoCount} photos. "
-                . "{$jsonCarousel} Le premier slide est le titre du process (MAX 50 caractères). Les slides suivants sont les étapes numérotées (MAX 55 caractères chacun, sans le préfixe 'Étape X :').",
+                . "{$jsonCarousel} Le premier slide est le titre du process (~50 caractères, complet). Les slides suivants sont les étapes numérotées (~55 caractères chacun, phrases complètes, sans le préfixe 'Étape X :').",
 
                 'guide_pedagogique' => (function () use ($noRefuseRule, $toneInstruction, $extraNote, $jsonCarousel, $options) {
                 $targetSlides = isset($options['targetSlides']) ? (int)$options['targetSlides'] : 5;
                 $slidesRange = max(3, $targetSlides - 1) . ' à ' . min(8, $targetSlides + 1);
                 return "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                     . "À partir du vocal, crée un carrousel éducatif. "
-                    . "{$jsonCarousel} Le premier slide est une question/accroche forte (MAX 80 caractères). "
-                    . "Les slides suivants ({$slidesRange} au total) développent les conseils (MAX 90 caractères chacun). "
-                    . "Le dernier slide est un appel à l'action (MAX 60 caractères).";
+                    . "{$jsonCarousel} Le premier slide est une question/accroche forte (~80 caractères, complète). "
+                    . "Les slides suivants ({$slidesRange} au total) développent les conseils (~90 caractères chacun, complets). "
+                    . "Le dernier slide est un appel à l'action (~60 caractères, complet).";
             })(),
 
                 'custom' => (function () use ($options, $noRefuseRule, $toneInstruction, $hashtagInstruction, $extraNote, $includeHashtags) {
@@ -216,10 +234,10 @@ IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponct
                         . ($extraNote ? "\n{$extraNote}" : "");
                 }
                 return "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
-                    . "{\"caption\": \"Légende Instagram (250-400 caractères). {$hashtagInstruction}\", \"image_text\": null}";
+                    . "Tu dois répondre UNIQUEMENT par un objet JSON valide : {\"caption\": \"Légende Instagram (250-400 caractères). {$hashtagInstruction}\", \"image_text\": \"Titre accrocheur et concis (~80 caractères, phrase complète). Sans hashtag.\"}";
             })(),
 
-                default => "{$noRefuseRule} {\"caption\": \"Légende Instagram courte (150 caractères max). {$hashtagInstruction}\"}",
+                default => "{$noRefuseRule} Tu dois répondre UNIQUEMENT par un objet JSON valide : {\"caption\": \"Légende Instagram courte (150 caractères max). {$hashtagInstruction}\", \"image_text\": \"Titre concis (~80 caractères, complet)\"}",
             };
     }
 

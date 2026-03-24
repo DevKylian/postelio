@@ -101,7 +101,7 @@
                                 <div class="h-full bg-gradient-to-r from-copper to-amber-400 rounded-full transition-all duration-500"
                                      style="width: {{ $usedPct }}%"></div>
                             </div>
-                            <p class="text-[10px] text-gray-400 mt-2">{{ $user->remaining_credits }} crédits restants</p>
+                            <p class="text-[10px] text-gray-400 mt-2">{{ $user->remaining_credits }} posts restants</p>
                         </div>
 
                     @else
@@ -152,7 +152,7 @@
                         <div class="px-6 py-4 flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-midnight">Changer de plan</p>
-                                <p class="text-xs text-gray-400 mt-0.5">Upgrader ou downgrader votre abonnement</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Augmenter ou modifier votre forfait</p>
                             </div>
                             <a href="{{ route('subscription.plans') }}" wire:navigate
                                class="text-sm font-semibold text-copper hover:text-amber-500 transition-colors flex items-center gap-1">

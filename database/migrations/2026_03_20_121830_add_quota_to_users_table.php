@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('total_credits')->default(1000);
+            $table->integer('total_credits')->default(3);
             $table->integer('used_credits')->default(0);
             $table->timestamp('last_quota_reset_at')->nullable();
         });

@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 /* ── Custom base styles ─────────────────────────────────────── */
 @layer base {
@@ -113,6 +114,15 @@
         @apply bg-white/60 border border-white/80 backdrop-blur-xl rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:bg-white/80 transition-all duration-500;
     }
 
+    /* Dashboard Glass Panels */
+    .glass-panel {
+        @apply bg-white/60 backdrop-blur-xl border border-white/60 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:bg-white/80 transition-all duration-300;
+    }
+    
+    .glass-panel-dark {
+        @apply bg-midnight/90 backdrop-blur-xl border border-slate-700/50 shadow-lg shadow-midnight/20 hover:shadow-xl hover:bg-midnight transition-all duration-300;
+    }
+
     .btn-primary {
         @apply px-6 py-3 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-medium transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_8px_20px_-6px_rgba(15,23,42,0.3)];
     }
@@ -160,3 +170,17 @@
 
 /* ── Livewire loading indicator ─────────────────────────────── */
 [wire\:loading] { opacity: 0.6; pointer-events: none; }
+
+/* ── Customizing Livewire Navigate Progress Bar ─────────────── */
+#nprogress .bar {
+    background: theme('colors.copper') !important;
+}
+
+#nprogress .peg {
+    box-shadow: 0 0 10px theme('colors.copper'), 0 0 5px theme('colors.copper') !important;
+}
+
+#nprogress .spinner-icon {
+    border-top-color: theme('colors.copper') !important;
+    border-left-color: theme('colors.copper') !important;
+}

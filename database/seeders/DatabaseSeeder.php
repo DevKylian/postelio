@@ -21,6 +21,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin Postelio',
             'email' => 'admin@postelio.com',
             'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+            'is_admin' => true,
+            'is_premium' => true,
+            'email_verified_at' => now(),
         ]);
 
         $admin->company()->create([

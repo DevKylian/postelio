@@ -41,12 +41,7 @@
       <nav class="fixed top-4 inset-x-0 z-50 transition-all duration-500 flex justify-center px-4">
         <div class="w-full max-w-5xl transition-all duration-500 rounded-full px-4 sm:px-6 py-3 flex justify-between items-center border glass-card bg-white/70"
              :class="scrolled ? 'bg-white/95 shadow-lg' : 'bg-white/70 shadow-sm'">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-[0_2px_10px_rgba(245,158,11,0.2)]">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-1.11a2 2 0 0 0-.59-1.42L15 2.54"/><path d="m14 4 .71.71a2 2 0 0 1 .59 1.42v1.11c0 .85.33 1.65.93 2.25L18 11.25"/></svg>
-            </div>
-             <span class="font-display font-semibold text-xl tracking-tight text-midnight">Postelio</span>
-          </div>
+          <x-logo size="md" />
           
           <!-- Desktop Nav -->
           <div class="hidden md:flex items-center gap-8">
@@ -60,6 +55,7 @@
                     Tableau de Bord
                 </a>
             @else
+                <a href="{{ route('login') }}" wire:navigate class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Connexion</a>
                 <a href="{{ route('register') }}" wire:navigate class="btn-primary ml-4 text-sm px-6 py-2.5">
                     Essayer gratuitement
                 </a>
@@ -96,6 +92,7 @@
                     Tableau de Bord
                 </a>
             @else
+                <a href="{{ route('login') }}" wire:navigate class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Connexion</a>
                 <a href="{{ route('register') }}" wire:navigate class="block w-full text-center btn-primary mt-4">
                     Essayer gratuitement
                 </a>
@@ -611,12 +608,7 @@
           <div class="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
             <!-- Col 1: Brand -->
             <div class="col-span-2 md:col-span-1">
-              <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center shadow-[0_2px_10px_rgba(245,158,11,0.2)]">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-1.11a2 2 0 0 0-.59-1.42L15 2.54"/><path d="m14 4 .71.71a2 2 0 0 1 .59 1.42v1.11c0 .85.33 1.65.93 2.25L18 11.25"/></svg>
-                </div>
-                <span class="font-display font-bold text-2xl text-midnight tracking-tight">Postelio</span>
-              </div>
+              <x-logo size="lg" class="mb-6" />
               <p class="text-slate-500 font-light leading-relaxed mb-6 max-w-xs">
                 La solution intelligente pour les artisans qui veulent transformer leurs chantiers en aimants à clients.
               </p>

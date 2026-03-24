@@ -18,8 +18,15 @@
 
         @stack('styles')
     </head>
-    <body class="font-sans antialiased bg-[#F1F5F9] text-midnight h-screen overflow-hidden" x-data="{ sidebarOpen: false }">
-        <div class="flex h-screen overflow-hidden">
+    <body class="font-sans antialiased text-midnight h-screen overflow-hidden bg-slate-50 relative selection:bg-copper/20 selection:text-copper" x-data="{ sidebarOpen: false }">
+        <!-- Global Ambient Background for Glassmorphism -->
+        <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+            <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-orange-500/15 blur-[120px]"></div>
+            <div class="absolute top-[20%] -right-[10%] w-[40%] h-[40%] rounded-full bg-amber-500/15 blur-[120px]"></div>
+            <div class="absolute -bottom-[20%] left-[20%] w-[50%] h-[50%] rounded-full bg-copper/15 blur-[120px]"></div>
+        </div>
+
+        <div class="relative z-10 flex h-screen overflow-hidden">
             <!-- Sidebar -->
             <livewire:layout.navigation />
 
@@ -28,7 +35,7 @@
 
                 <!-- Page Heading -->
                 @if (isset($header))
-                    <header class="bg-white/90 backdrop-blur-md border-b border-gray-200/60 sticky top-0 z-20 shrink-0">
+                    <header class="bg-white/60 backdrop-blur-xl border-b border-white/80 shadow-sm sticky top-0 z-20 shrink-0">
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div class="flex items-center gap-4 py-4">
                                 <!-- Mobile Toggle -->

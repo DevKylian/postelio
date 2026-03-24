@@ -114,11 +114,11 @@ class ContentRefinerService
      */
     private function textZone(string $template, string $field, array $options = []): ?array
     {
-        $zones = config('template-text-zones');
+        $zones = config('template-text-zones') ?? [];
 
         if ($template === 'custom') {
             $layout = $options['custom_layout_type'] ?? 'standard';
-            return $zones['custom'][$layout] ?? $zones['custom']['standard'];
+            return $zones['custom'][$layout] ?? ($zones['custom']['standard'] ?? null);
         }
 
         return $zones[$template][$field] ?? null;
@@ -163,9 +163,11 @@ class ContentRefinerService
             . "Compte les caractères avant de répondre.\n\n";
 
         // ── Caption zone config ──────────────────────────────────────────────
-        $captionZones = config('template-text-zones.caption');
+        $captionZones = config('template-text-zones.caption') ?? [];
         $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique']);
-        $captionConfig = $isCarousel ? $captionZones['carousel'] : $captionZones['standard'];
+        $captionConfig = $isCarousel
+            ? ($captionZones['carousel'] ?? ['idealChars' => [250, 450], 'maxChars' => 600])
+            : ($captionZones['standard'] ?? ['idealChars' => [200, 400], 'maxChars' => 500]);
         $captionRange = "{$captionConfig['idealChars'][0]}-{$captionConfig['idealChars'][1]} caractères";
 
         // ── JSON schema descriptions ──────────────────────────────────────────
@@ -208,8 +210,8 @@ class ContentRefinerService
                 // ── Single templates WITH image text ─────────────────────────────
 
                 'review' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
-                . ($options['clientName'] ? " Prénom du client : {$options['clientName']}." : "")
-                . ($options['serviceType'] ? " Contexte du service (indicatif) : {$options['serviceType']}." : "")
+                . (($options['clientName'] ?? null) ? " Prénom du client : {$options['clientName']}." : "")
+                . (($options['serviceType'] ?? null) ? " Contexte du service (indicatif) : {$options['serviceType']}." : "")
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
                 "Légende Instagram complète avec storytelling ({$captionRange}). {$hashtagInstruction}",
@@ -217,7 +219,7 @@ class ContentRefinerService
             ),
 
                 'faq' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
-                . ($options['faqCategory'] ? " Catégorie FAQ : {$options['faqCategory']}." : "")
+                . (($options['faqCategory'] ?? null) ? " Catégorie FAQ : {$options['faqCategory']}." : "")
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
                 "Légende Instagram avec la réponse développée à la question ({$captionRange}). {$hashtagInstruction}",
@@ -231,7 +233,7 @@ class ContentRefinerService
             ),
 
                 'conseil_saisonnier' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
-                . ($options['season'] ? " Saison ciblée : {$options['season']}." : "")
+                . (($options['season'] ?? null) ? " Saison ciblée : {$options['season']}." : "")
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
                 "Légende Instagram avec contexte saisonnier développé ({$captionRange}). {$hashtagInstruction}",
@@ -253,8 +255,8 @@ class ContentRefinerService
                 ),
 
                 'project' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
-                . ($options['workCategory'] ? " Type de travaux : {$options['workCategory']}." : "")
-                . ($options['jobDuration'] ? " Durée : {$options['jobDuration']}." : "")
+                . (($options['workCategory'] ?? null) ? " Type de travaux : {$options['workCategory']}." : "")
+                . (($options['jobDuration'] ?? null) ? " Durée : {$options['jobDuration']}." : "")
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
                     "Légende Instagram complète ({$captionRange}, storytelling). {$hashtagInstruction}",
@@ -284,7 +286,9 @@ class ContentRefinerService
                 'custom' => (function () use ($options, $noRefuseRule, $toneInstruction, $hashtagInstruction, $extraNote, $includeHashtags, $textZoneRule, $captionRange) {
                 $customPrompt = $options['custom_template_prompt'] ?? null;
                 $layout = $options['custom_layout_type'] ?? 'standard';
-                $zone = config("template-text-zones.custom.{$layout}") ?? config('template-text-zones.custom.standard');
+                $zone = config("template-text-zones.custom.{$layout}")
+                    ?? config('template-text-zones.custom.standard')
+                    ?? ['idealChars' => [60, 150], 'maxChars' => 180];
                 [$min, $max] = $zone['idealChars'];
                 $hard = $zone['maxChars'];
                 $imgConstraint = "STRICTEMENT entre {$min} et {$max} caractères (maximum absolu : {$hard} car.)";

@@ -108,6 +108,37 @@ class ContentRefinerService
         }
     }
 
+    /**
+     * Read the text zone config for a given template and field.
+     * Returns ['idealChars' => [min, max], 'maxChars' => int] or null.
+     */
+    private function textZone(string $template, string $field, array $options = []): ?array
+    {
+        $zones = config('template-text-zones');
+
+        if ($template === 'custom') {
+            $layout = $options['custom_layout_type'] ?? 'standard';
+            return $zones['custom'][$layout] ?? $zones['custom']['standard'];
+        }
+
+        return $zones[$template][$field] ?? null;
+    }
+
+    /**
+     * Build a strict character constraint string for the AI prompt.
+     * Example: "STRICTEMENT entre 40 et 75 caractères (maximum absolu : 100)"
+     */
+    private function charConstraint(string $template, string $field, array $options = []): string
+    {
+        $zone = $this->textZone($template, $field, $options);
+        if (!$zone) {
+            return '~80 caractères';
+        }
+        [$min, $max] = $zone['idealChars'];
+        $hard = $zone['maxChars'];
+        return "STRICTEMENT entre {$min} et {$max} caractères (maximum absolu : {$hard} car. — au-delà le texte sera coupé)";
+    }
+
     private function getPromptForTemplate(string $template, int $photoCount = 0, array $options = []): string
     {
         $tone = $options['tone'] ?? 'professionnel';
@@ -123,29 +154,54 @@ class ContentRefinerService
 
         $extraNote = $customNote ? " Note de l'artisan : {$customNote}." : '';
 
+        // ── Strict text zone rule (applied globally) ─────────────────────────
+        $textZoneRule = "RÈGLE ZONE DE TEXTE (priorité haute) :\n"
+            . "Le texte affiché sur l'image (image_text, title, slides) sera rendu dans une zone visuelle fixe.\n"
+            . "Si le texte est trop long, il sera TRONQUÉ automatiquement et le résultat sera visuellement cassé.\n"
+            . "Tu DOIS donc respecter les limites de caractères indiquées pour chaque champ.\n"
+            . "Préfère un texte court et percutant à un texte long qui déborde.\n"
+            . "Compte les caractères avant de répondre.\n\n";
+
+        // ── Caption zone config ──────────────────────────────────────────────
+        $captionZones = config('template-text-zones.caption');
+        $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique']);
+        $captionConfig = $isCarousel ? $captionZones['carousel'] : $captionZones['standard'];
+        $captionRange = "{$captionConfig['idealChars'][0]}-{$captionConfig['idealChars'][1]} caractères";
+
         // ── JSON schema descriptions ──────────────────────────────────────────
 
         // For templates that show text on the image
         $jsonSingleWithImageText = fn(string $captionDesc, string $imageTextDesc) =>
-        "Tu dois répondre UNIQUEMENT par un objet JSON valide avec exactement cette structure :
-{
-  \"caption\": \"{$captionDesc}\",
-  \"image_text\": \"{$imageTextDesc}\"
-}
-IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponctuation lourde.";
+        $textZoneRule
+        . "Tu dois répondre UNIQUEMENT par un objet JSON valide avec exactement cette structure :\n"
+        . "{\n"
+        . "  \"caption\": \"{$captionDesc}\",\n"
+        . "  \"image_text\": \"{$imageTextDesc}\"\n"
+        . "}\n"
+        . "IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponctuation lourde.\n"
+        . "IMPORTANT : Respecte EXACTEMENT les limites de caractères pour image_text. Compte avant de répondre.";
 
-        // For templates that do NOT show text on the image (lifestyle, project)
-        $jsonCaptionOnly = "Tu dois répondre UNIQUEMENT par un objet JSON valide avec exactement cette structure :
-{\"caption\": \"La légende Instagram complète (250-400 caractères, storytelling, {$hashtagInstruction})\"}";
+        // For carousels — uses text zone config for title & slides
+        $titleConstraint = $this->charConstraint($template, 'title', $options);
+        $slideConstraint = $this->charConstraint($template, 'slide', $options);
+        $jsonCarousel = $textZoneRule
+        . "Tu dois répondre UNIQUEMENT par un objet JSON valide avec cette structure :\n"
+        . "{\n"
+        . "  \"caption\": \"La légende Instagram complète ({$captionRange}, {$hashtagInstruction})\",\n"
+        . "  \"title\": \"Un titre très court et accrocheur pour la couverture ({$titleConstraint}, phrase complète)\",\n"
+        . "  \"slides\": [\"Texte court pour slide 1\", \"Texte court pour slide 2\", ...]\n"
+        . "}\n"
+        . "IMPORTANT : Les textes dans 'slides' et 'title' ne doivent JAMAIS contenir de hashtags, de numéros d'étape (car ils sont ajoutés automatiquement) ni d'emojis.\n"
+        . "IMPORTANT : Chaque texte de slide doit faire {$slideConstraint}. Compte les caractères.";
 
-        // For carousels
-        $jsonCarousel = "Tu dois répondre UNIQUEMENT par un objet JSON valide avec cette structure :
-{
-  \"caption\": \"La légende Instagram complète (300-500 caractères, {$hashtagInstruction})\",
-  \"title\": \"Un titre très court et accrocheur pour la couverture (~50 car., phrase complète)\",
-  \"slides\": [\"Texte court pour slide 1\", \"Texte court pour slide 2\", ...]
-}
-IMPORTANT : Les textes dans 'slides' et 'title' ne doivent JAMAIS contenir de hashtags, de numéros d'étape (car ils sont ajoutés automatiquement) ni d'emojis.";
+        // ── Template-specific image_text constraints ──────────────────────────
+        $reviewImgConstraint = $this->charConstraint('review', 'image_text');
+        $faqImgConstraint = $this->charConstraint('faq', 'image_text');
+        $qfImgConstraint = $this->charConstraint('quality_focus', 'image_text');
+        $csImgConstraint = $this->charConstraint('conseil_saisonnier', 'image_text');
+        $eaeImgConstraint = $this->charConstraint('erreur_a_eviter', 'image_text');
+        $lifeImgConstraint = $this->charConstraint('lifestyle', 'image_text');
+        $projImgConstraint = $this->charConstraint('project', 'image_text');
 
         return match ($template) {
 
@@ -156,44 +212,44 @@ IMPORTANT : Les textes dans 'slides' et 'title' ne doivent JAMAIS contenir de ha
                 . ($options['serviceType'] ? " Contexte du service (indicatif) : {$options['serviceType']}." : "")
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
-                "Légende Instagram complète avec storytelling (250-400 caractères). {$hashtagInstruction}",
-                "Citation percutante tirée de l'avis client. Préfère utiliser les mots EXACTS si un témoignage est présent dans le vocal. ~160 caractères, phrase complète. Sans hashtag."
+                "Légende Instagram complète avec storytelling ({$captionRange}). {$hashtagInstruction}",
+                "Citation percutante tirée de l'avis client. Préfère utiliser les mots EXACTS si un témoignage est présent dans le vocal. {$reviewImgConstraint}, phrase complète. Sans hashtag."
             ),
 
                 'faq' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
                 . ($options['faqCategory'] ? " Catégorie FAQ : {$options['faqCategory']}." : "")
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
-                "Légende Instagram avec la réponse développée à la question (250-400 caractères). {$hashtagInstruction}",
-                "La question seule, courte, percutante, avec point d'interrogation. ~75 caractères, phrase complète. Sans hashtag."
+                "Légende Instagram avec la réponse développée à la question ({$captionRange}). {$hashtagInstruction}",
+                "La question seule, courte, percutante, avec point d'interrogation. {$faqImgConstraint}, phrase complète. Sans hashtag."
             ),
 
                 'quality_focus' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . $jsonSingleWithImageText(
-                "Légende Instagram qui développe pourquoi ce matériau/équipement garantit qualité et durabilité (250-400 caractères). {$hashtagInstruction}",
-                "Nom ou courte description du matériau/équipement mis en valeur. ~55 caractères, expression complète. Majuscules recommandées. Sans hashtag."
+                "Légende Instagram qui développe pourquoi ce matériau/équipement garantit qualité et durabilité ({$captionRange}). {$hashtagInstruction}",
+                "Nom ou courte description du matériau/équipement mis en valeur. {$qfImgConstraint}, expression complète. Majuscules recommandées. Sans hashtag."
             ),
 
                 'conseil_saisonnier' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
                 . ($options['season'] ? " Saison ciblée : {$options['season']}." : "")
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
-                "Légende Instagram avec contexte saisonnier développé (250-400 caractères). {$hashtagInstruction}",
-                "Le conseil saisonnier actionnable, commençant par un verbe (Vérifiez, Anticipez, Préparez...). ~85 caractères, phrase complète. Sans hashtag."
+                "Légende Instagram avec contexte saisonnier développé ({$captionRange}). {$hashtagInstruction}",
+                "Le conseil saisonnier actionnable, commençant par un verbe (Vérifiez, Anticipez, Préparez...). {$csImgConstraint}, phrase complète. Sans hashtag."
             ),
 
                 'erreur_a_eviter' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . $jsonSingleWithImageText(
-                "Légende Instagram qui décrit l'erreur et explique comment l'éviter (250-400 caractères). {$hashtagInstruction}",
-                "L'erreur formulée en alerte courte et directe (ex: Ne pas attendre que la fuite empire.). ~100 caractères, phrase complète. Sans hashtag."
+                "Légende Instagram qui décrit l'erreur et explique comment l'éviter ({$captionRange}). {$hashtagInstruction}",
+                "L'erreur formulée en alerte courte et directe (ex: Ne pas attendre que la fuite empire.). {$eaeImgConstraint}, phrase complète. Sans hashtag."
             ),
 
                 // ── Single templates with short generic image text ─────────────────
 
                 'lifestyle' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . $jsonSingleWithImageText(
-                    "Légende Instagram complète (250-400 caractères, storytelling). {$hashtagInstruction}",
-                    "Titre concis et percutant (~80 caractères, phrase complète). Sans hashtag."
+                    "Légende Instagram complète ({$captionRange}, storytelling). {$hashtagInstruction}",
+                    "Titre concis et percutant ({$lifeImgConstraint}, phrase complète). Sans hashtag."
                 ),
 
                 'project' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
@@ -201,43 +257,54 @@ IMPORTANT : Les textes dans 'slides' et 'title' ne doivent JAMAIS contenir de ha
                 . ($options['jobDuration'] ? " Durée : {$options['jobDuration']}." : "")
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
-                    "Légende Instagram complète (250-400 caractères, storytelling). {$hashtagInstruction}",
-                    "Titre descriptif du projet (~80 caractères, phrase complète). Sans hashtag."
+                    "Légende Instagram complète ({$captionRange}, storytelling). {$hashtagInstruction}",
+                    "Titre descriptif du projet ({$projImgConstraint}, phrase complète). Sans hashtag."
                 ),
 
                 // ── Carousels ─────────────────────────────────────────────────────
 
                 'chantier_detail' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . "À partir de la description vocale d'un chantier, crée un post carrousel. Nous avons {$photoCount} photos. "
-                . "{$jsonCarousel} Le premier slide est la couverture (titre accrocheur, ~50 caractères, complet). Les slides suivants décrivent les détails correspondant aux photos (~60 caractères chacun, complets).",
+                . "{$jsonCarousel} Le premier slide est la couverture (titre accrocheur, {$titleConstraint}, complet). Les slides suivants décrivent les détails correspondant aux photos ({$slideConstraint} chacun, complets).",
 
                 'step_by_step' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . "À partir du vocal décrivant un processus, crée un carrousel étape par étape. Nous avons {$photoCount} photos. "
-                . "{$jsonCarousel} Le premier slide est le titre du process (~50 caractères, complet). Les slides suivants sont les étapes numérotées (~55 caractères chacun, phrases complètes, sans le préfixe 'Étape X :').",
+                . "{$jsonCarousel} Le premier slide est le titre du process ({$titleConstraint}, complet). Les slides suivants sont les étapes numérotées ({$slideConstraint} chacun, phrases complètes, sans le préfixe 'Étape X :').",
 
-                'guide_pedagogique' => (function () use ($noRefuseRule, $toneInstruction, $extraNote, $jsonCarousel, $options) {
+                'guide_pedagogique' => (function () use ($noRefuseRule, $toneInstruction, $extraNote, $jsonCarousel, $options, $titleConstraint, $slideConstraint) {
                 $targetSlides = isset($options['targetSlides']) ? (int)$options['targetSlides'] : 5;
                 $slidesRange = max(3, $targetSlides - 1) . ' à ' . min(8, $targetSlides + 1);
                 return "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                     . "À partir du vocal, crée un carrousel éducatif. "
-                    . "{$jsonCarousel} Le premier slide est une question/accroche forte (~80 caractères, complète). "
-                    . "Les slides suivants ({$slidesRange} au total) développent les conseils (~90 caractères chacun, complets). "
-                    . "Le dernier slide est un appel à l'action (~60 caractères, complet).";
+                    . "{$jsonCarousel} Le premier slide est une question/accroche forte ({$titleConstraint}, complète). "
+                    . "Les slides suivants ({$slidesRange} au total) développent les conseils ({$slideConstraint} chacun, complets). "
+                    . "Le dernier slide est un appel à l'action ({$slideConstraint}, complet).";
             })(),
 
-                'custom' => (function () use ($options, $noRefuseRule, $toneInstruction, $hashtagInstruction, $extraNote, $includeHashtags) {
+                'custom' => (function () use ($options, $noRefuseRule, $toneInstruction, $hashtagInstruction, $extraNote, $includeHashtags, $textZoneRule, $captionRange) {
                 $customPrompt = $options['custom_template_prompt'] ?? null;
+                $layout = $options['custom_layout_type'] ?? 'standard';
+                $zone = config("template-text-zones.custom.{$layout}") ?? config('template-text-zones.custom.standard');
+                [$min, $max] = $zone['idealChars'];
+                $hard = $zone['maxChars'];
+                $imgConstraint = "STRICTEMENT entre {$min} et {$max} caractères (maximum absolu : {$hard} car.)";
+
                 if ($customPrompt) {
-                    return "{$customPrompt}"
+                    return $textZoneRule
+                        . "{$customPrompt}"
+                        . "\n\nCONTRAINTE TEXTE IMAGE : Le champ image_text doit faire {$imgConstraint}. Au-delà, le texte sera tronqué."
                         . "\n\n{$toneInstruction}"
                         . "\n" . ($includeHashtags ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende." : "N'ajoute aucun hashtag.")
                         . ($extraNote ? "\n{$extraNote}" : "");
                 }
                 return "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
-                    . "Tu dois répondre UNIQUEMENT par un objet JSON valide : {\"caption\": \"Légende Instagram (250-400 caractères). {$hashtagInstruction}\", \"image_text\": \"Titre accrocheur et concis (~80 caractères, phrase complète). Sans hashtag.\"}";
+                    . $textZoneRule
+                    . "Tu dois répondre UNIQUEMENT par un objet JSON valide : {\"caption\": \"Légende Instagram ({$captionRange}). {$hashtagInstruction}\", \"image_text\": \"Titre accrocheur et concis ({$imgConstraint}, phrase complète). Sans hashtag.\"}";
             })(),
 
-                default => "{$noRefuseRule} Tu dois répondre UNIQUEMENT par un objet JSON valide : {\"caption\": \"Légende Instagram courte (150 caractères max). {$hashtagInstruction}\", \"image_text\": \"Titre concis (~80 caractères, complet)\"}",
+                default => (function () use ($noRefuseRule, $hashtagInstruction, $textZoneRule) {
+                return "{$noRefuseRule} {$textZoneRule}Tu dois répondre UNIQUEMENT par un objet JSON valide : {\"caption\": \"Légende Instagram courte (150 caractères max). {$hashtagInstruction}\", \"image_text\": \"Titre concis (maximum 80 caractères, complet)\"}";
+            })(),
             };
     }
 

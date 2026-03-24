@@ -8,6 +8,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use App\Models\Post;
 use App\Services\PostGeneration\TranscriptionService;
 use App\Services\PostGeneration\ContentRefinerService;
+use App\Services\PostGeneration\TextFitterService;
 use App\Services\PostGeneration\ImageGeneratorService;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -28,6 +29,7 @@ class ProcessPostGeneration implements ShouldQueue
     public function handle(
         TranscriptionService $transcriber,
         ContentRefinerService $refiner,
+        TextFitterService $fitter,
         ImageGeneratorService $generator
     ): void {
         Log::info("ProcessPostGeneration handle started", ['post_id' => $this->post->id]);
@@ -59,6 +61,11 @@ class ProcessPostGeneration implements ShouldQueue
             $templateOptions = $this->post->template_options ?? [];
             $refined = $refiner->refine($transcript, $this->post->template, $photoCount, $templateOptions);
             Log::info("AI refinement finished");
+
+            // 2b. Enforce text zone constraints (truncate if AI exceeded limits)
+            $refined = $fitter->fit($refined, $this->post->template, $templateOptions);
+            Log::info("Text fitting applied");
+
             $this->post->update(['refined_content' => $refined]);
 
             // 3. Image generation

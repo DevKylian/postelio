@@ -3,6 +3,7 @@
 namespace App\Services\PostGeneration;
 
 use OpenAI\Laravel\Facades\OpenAI;
+use App\Services\PostGeneration\TextZoneSpec;
 
 class ContentRefinerService
 {
@@ -209,14 +210,29 @@ IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponct
 
                 'custom' => (function () use ($options, $noRefuseRule, $toneInstruction, $hashtagInstruction, $extraNote, $includeHashtags) {
                 $customPrompt = $options['custom_template_prompt'] ?? null;
+                $layoutType   = $options['custom_layout_type'] ?? 'standard';
+                $hasImageText = $options['custom_has_image_text'] ?? true;
+
+                // Build text zone constraints from the layout spec
+                $textZoneRule = '';
+                if ($hasImageText) {
+                    $textZoneRule = "\n\n" . TextZoneSpec::promptConstraint($layoutType);
+                } else {
+                    $textZoneRule = "\n\nCe modèle n'affiche PAS de texte sur l'image. "
+                        . "Le champ image_text doit être null. "
+                        . "Concentre tout le contenu dans la légende (caption).";
+                }
+
                 if ($customPrompt) {
-                    return "{$customPrompt}"
+                    return "{$noRefuseRule}\n\n{$customPrompt}"
+                        . $textZoneRule
                         . "\n\n{$toneInstruction}"
                         . "\n" . ($includeHashtags ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende." : "N'ajoute aucun hashtag.")
                         . ($extraNote ? "\n{$extraNote}" : "");
                 }
                 return "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
-                    . "{\"caption\": \"Légende Instagram (250-400 caractères). {$hashtagInstruction}\", \"image_text\": null}";
+                    . $textZoneRule
+                    . "\n{\"caption\": \"Légende Instagram (250-400 caractères). {$hashtagInstruction}\", \"image_text\": null}";
             })(),
 
                 default => "{$noRefuseRule} {\"caption\": \"Légende Instagram courte (150 caractères max). {$hashtagInstruction}\"}",

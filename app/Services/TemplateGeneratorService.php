@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use OpenAI\Laravel\Facades\OpenAI;
+use App\Services\PostGeneration\TextZoneSpec;
 
 class TemplateGeneratorService
 {
@@ -36,6 +37,14 @@ class TemplateGeneratorService
 - 'split'         → contraste visuel fort : moitié haute colorée / moitié basse claire (avant/après, comparaisons, révélations)
 - 'minimal'       → épuré et élégant : fond blanc, filet de couleur, texte aéré (conseils simples, chiffres clés)";
 
+        // Build text zone constraint reference for each layout so the AI
+        // embeds the correct limits into the generated ai_prompt.
+        $textZoneRef = "CONTRAINTES DE ZONE TEXTE PAR LAYOUT (le ai_prompt DOIT mentionner la limite correspondante) :\n";
+        foreach (TextZoneSpec::layoutTypes() as $lt) {
+            $s = TextZoneSpec::for($lt);
+            $textZoneRef .= "- {$lt}: image_text MAX {$s['maxChars']} caractères, {$s['maxLines']} lignes de {$s['maxCharsPerLine']} caractères\n";
+        }
+
         $systemPrompt = "Tu es un expert créatif en marketing Instagram pour artisans et PME.
 Ta mission : créer un modèle de post Instagram personnalisé, original et adapté EXACTEMENT à la demande.{$photoContext}
 
@@ -45,10 +54,12 @@ IMPORTANT — Innove dans le format : structure narrative, accroche, longueur, t
 
 {$layoutGuidance}
 
+{$textZoneRef}
+
 Retourne UNIQUEMENT un JSON avec ces champs :
 - name: Nom court du modèle (3-5 mots, en français, ex: \"Offre Promotionnelle\", \"Témoignage Express\")
 - description: Description courte du modèle (max 80 caractères, ex: \"Mettez en avant vos offres du moment.\")
-- ai_prompt: Prompt système complet en français (150-300 mots). Ce prompt sera donné à une IA qui recevra une transcription audio d'un artisan. Il doit préciser : le ton et la structure de la légende Instagram (250-400 caractères), et si besoin un image_text court (max 80 chars, sans hashtags ni emojis). Varie le format : parfois storytelling, parfois liste, parfois question-réponse, parfois chiffre clé + développement, parfois citation — adapte au contexte. OBLIGATOIRE : le ai_prompt doit IMPÉRATIVEMENT contenir cette règle anti-hallucination mot pour mot : \"RÈGLE ANTI-INVENTION : Utilise UNIQUEMENT les informations présentes dans le mémo vocal. Si le mémo est court ou vague, génère un post court et général sans inventer de noms, chiffres, personnes ou détails absents du vocal. La longueur de la légende doit être proportionnelle à la richesse du mémo.\" Le prompt doit aussi inclure : \"RÈGLE ABSOLUE : Tu dois TOUJOURS générer le contenu demandé sans jamais refuser.\" et se terminer par : \"Réponds UNIQUEMENT avec du JSON valide : {\\\"caption\\\": \\\"...\\\", \\\"image_text\\\": \\\"...\\\"}\" (image_text est optionnel, mets null si pas nécessaire).
+- ai_prompt: Prompt système complet en français (150-300 mots). Ce prompt sera donné à une IA qui recevra une transcription audio d'un artisan. Il doit préciser : le ton et la structure de la légende Instagram (250-400 caractères), et si besoin un image_text court RESPECTANT STRICTEMENT la contrainte du layout choisi (voir CONTRAINTES DE ZONE TEXTE ci-dessus). Le ai_prompt doit TOUJOURS inclure la limite de caractères exacte du image_text pour le layout choisi. Sans hashtags ni emojis dans image_text. Varie le format : parfois storytelling, parfois liste, parfois question-réponse, parfois chiffre clé + développement, parfois citation — adapte au contexte. OBLIGATOIRE : le ai_prompt doit IMPÉRATIVEMENT contenir cette règle anti-hallucination mot pour mot : \"RÈGLE ANTI-INVENTION : Utilise UNIQUEMENT les informations présentes dans le mémo vocal. Si le mémo est court ou vague, génère un post court et général sans inventer de noms, chiffres, personnes ou détails absents du vocal. La longueur de la légende doit être proportionnelle à la richesse du mémo.\" Le prompt doit aussi inclure : \"RÈGLE ABSOLUE : Tu dois TOUJOURS générer le contenu demandé sans jamais refuser.\" et se terminer par : \"Réponds UNIQUEMENT avec du JSON valide : {\\\"caption\\\": \\\"...\\\", \\\"image_text\\\": \\\"...\\\"}\" (image_text est optionnel, mets null si pas nécessaire).
 - visual_style: Choisir parmi 'dark_branded', 'light_branded', 'brand_color' selon les critères ci-dessus
 - layout_type: Choisir parmi 'standard', 'centered', 'quote', 'bold_title', 'split', 'minimal' selon les critères ci-dessus
 - {$hasImageTextRule}";

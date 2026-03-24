@@ -3,6 +3,7 @@
 namespace App\Services\PostGeneration;
 
 use App\Models\Post;
+use App\Services\PostGeneration\TextZoneSpec;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Facades\Storage;
@@ -312,12 +313,13 @@ class ImageGeneratorService
 
     private function renderLayoutStandard(Post $post, $company, string $brandColor, string $visualStyle, string $fileName, int $width = 1080, int $height = 1080): string
     {
+        $spec         = TextZoneSpec::for('standard');
         $image        = $this->manager->create($width, $height);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
-        $imageText    = $this->extractImageText($post, 100);
+        $imageText    = TextZoneSpec::fitText($this->extractImageText($post, $spec['maxChars']), 'standard');
 
         // Layout constants — proportionally scaled
-        $left    = (int) ($width * (100 / 1080)); 
+        $left    = (int) ($width * (100 / 1080));
         $barH    = (int) ($height * (16 / 1080));
         $accentY = (int) ($height * (270 / 1080));
         $labelY  = (int) ($height * (336 / 1080));
@@ -359,9 +361,9 @@ class ImageGeneratorService
                 $font->valign('middle');
             });
 
-            // Description text — left-aligned
+            // Description text — left-aligned, auto-fit
             if ($imageText) {
-                $this->drawTextLeftAligned($image, mb_strtoupper($imageText), $left, $textTop, 54, '#FFFFFF', 22);
+                $this->drawTextAutoFit($image, mb_strtoupper($imageText), 'standard', $left, $textTop, '#FFFFFF', $width, $height);
             }
 
             // Bottom: separator + company label
@@ -401,9 +403,9 @@ class ImageGeneratorService
                 $font->valign('middle');
             });
 
-            // Description text — left-aligned
+            // Description text — left-aligned, auto-fit
             if ($imageText) {
-                $this->drawTextLeftAligned($image, mb_strtoupper($imageText), $left, $textTop, 54, '#1E293B', 22);
+                $this->drawTextAutoFit($image, mb_strtoupper($imageText), 'standard', $left, $textTop, '#1E293B', $width, $height);
             }
 
             // Bottom: separator + company label
@@ -458,9 +460,9 @@ class ImageGeneratorService
                 $font->valign('middle');
             });
 
-            // Description text — left-aligned
+            // Description text — left-aligned, auto-fit
             if ($imageText) {
-                $this->drawTextLeftAligned($image, mb_strtoupper($imageText), $left, $textTop, 54, '#FFFFFF', 22);
+                $this->drawTextAutoFit($image, mb_strtoupper($imageText), 'standard', $left, $textTop, '#FFFFFF', $width, $height);
             }
 
             // Bottom: separator + company label
@@ -488,10 +490,11 @@ class ImageGeneratorService
 
     private function renderLayoutCentered(Post $post, $company, string $brandColor, string $visualStyle, string $fileName, int $width = 1080, int $height = 1080): string
     {
+        $spec         = TextZoneSpec::for('centered');
         $colors       = $this->styleColors($visualStyle, $brandColor);
         $image        = $this->manager->create($width, $height);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
-        $imageText    = $this->extractImageText($post, 110);
+        $imageText    = TextZoneSpec::fitText($this->extractImageText($post, $spec['maxChars']), 'centered');
 
         $image->fill($colors['bg']);
 
@@ -518,9 +521,9 @@ class ImageGeneratorService
         // Centered accent line under title
         $image->drawRectangle($centerX - (int)($width * 0.09), (int)($height * 0.39), fn($d) => $d->size((int)($width * 0.18), (int)($height * 0.005))->background($brandColor));
 
-        // Image text — centered with wrap
+        // Image text — centered with wrap, auto-fit
         if ($imageText) {
-            $this->drawTextRaw($image, mb_strtoupper($imageText), (int)($height * 0.42), (int)($height * 0.82), (int)($height * 0.028), $colors['text'], 24);
+            $this->drawTextAutoFit($image, mb_strtoupper($imageText), 'centered', null, null, $colors['text'], $width, $height);
         }
 
         // Bottom separator + company centered
@@ -542,10 +545,11 @@ class ImageGeneratorService
 
     private function renderLayoutQuote(Post $post, $company, string $brandColor, string $visualStyle, string $fileName, int $width = 1080, int $height = 1080): string
     {
+        $spec         = TextZoneSpec::for('quote');
         $colors       = $this->styleColors($visualStyle, $brandColor);
         $image        = $this->manager->create($width, $height);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
-        $imageText    = $this->extractImageText($post, 120);
+        $imageText    = TextZoneSpec::fitText($this->extractImageText($post, $spec['maxChars']), 'quote');
 
         $image->fill($colors['bg']);
 
@@ -576,9 +580,9 @@ class ImageGeneratorService
         // Thin accent line
         $image->drawRectangle((int)($width * 0.092), (int)($height * 0.074), fn($d) => $d->size((int)($width * 0.074), (int)($height * 0.004))->background($brandColor));
 
-        // Quote text — centered
+        // Quote text — centered, auto-fit
         if ($imageText) {
-            $this->drawTextRaw($image, mb_strtoupper($imageText), (int)($height * 0.26), (int)($height * 0.8), (int)($height * 0.03), $colors['text'], 22);
+            $this->drawTextAutoFit($image, mb_strtoupper($imageText), 'quote', null, null, $colors['text'], $width, $height);
         }
 
         // Closing quote mark — bottom right
@@ -609,10 +613,11 @@ class ImageGeneratorService
 
     private function renderLayoutBoldTitle(Post $post, $company, string $brandColor, string $visualStyle, string $fileName, int $width = 1080, int $height = 1080): string
     {
+        $spec         = TextZoneSpec::for('bold_title');
         $colors       = $this->styleColors($visualStyle, $brandColor);
         $image        = $this->manager->create($width, $height);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
-        $imageText    = $this->extractImageText($post, 120);
+        $imageText    = TextZoneSpec::fitText($this->extractImageText($post, $spec['maxChars']), 'bold_title');
 
         $image->fill($colors['bg']);
 
@@ -637,9 +642,9 @@ class ImageGeneratorService
         // Subtitle line
         $image->drawRectangle($centerX - (int)($width * 0.185), (int)($height * 0.24), fn($d) => $d->size((int)($width * 0.37), (int)($height * 0.002))->background('rgba(255,255,255,0.40)'));
 
-        // Image text — left-aligned
+        // Image text — left-aligned, auto-fit
         if ($imageText) {
-            $this->drawTextLeftAligned($image, mb_strtoupper($imageText), (int)($width * 0.092), (int)($height * 0.36), (int)($height * 0.024), $colors['text'], 28);
+            $this->drawTextAutoFit($image, mb_strtoupper($imageText), 'bold_title', (int)($width * 0.092), (int)($height * 0.36), $colors['text'], $width, $height);
         }
 
         // Bottom separator + company
@@ -661,9 +666,10 @@ class ImageGeneratorService
 
     private function renderLayoutSplit(Post $post, $company, string $brandColor, string $visualStyle, string $fileName, int $width = 1080, int $height = 1080): string
     {
+        $spec         = TextZoneSpec::for('split');
         $image        = $this->manager->create($width, $height);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
-        $imageText    = $this->extractImageText($post, 120);
+        $imageText    = TextZoneSpec::fitText($this->extractImageText($post, $spec['maxChars']), 'split');
 
         $bottomBg    = ($visualStyle === 'light_branded') ? '#F8FAFC' : '#0B1426';
         $bottomText  = ($visualStyle === 'light_branded') ? '#1E293B' : '#FFFFFF';
@@ -700,9 +706,9 @@ class ImageGeneratorService
         // Accent line in bottom half
         $image->drawRectangle((int)($width * 0.092), $splitY + (int)($height * 0.037), fn($d) => $d->size((int)($width * 0.074), (int)($height * 0.005))->background($brandColor));
 
-        // Image text — bottom half
+        // Image text — bottom half, auto-fit
         if ($imageText) {
-            $this->drawTextLeftAligned($image, mb_strtoupper($imageText), (int)($width * 0.092), $splitY + (int)($height * 0.065), (int)($height * 0.022), $bottomText, 26);
+            $this->drawTextAutoFit($image, mb_strtoupper($imageText), 'split', (int)($width * 0.092), $splitY + (int)($height * 0.065), $bottomText, $width, $height);
         }
 
         // Bottom separator + company
@@ -724,9 +730,10 @@ class ImageGeneratorService
 
     private function renderLayoutMinimal(Post $post, $company, string $brandColor, string $fileName, int $width = 1080, int $height = 1080): string
     {
+        $spec         = TextZoneSpec::for('minimal');
         $image        = $this->manager->create($width, $height);
         $templateName = mb_strtoupper($this->cleanText($post->template_options['custom_template_name'] ?? 'MODÈLE PERSO'));
-        $imageText    = $this->extractImageText($post, 130);
+        $imageText    = TextZoneSpec::fitText($this->extractImageText($post, $spec['maxChars']), 'minimal');
 
         // White background
         $image->fill('#FFFFFF');
@@ -746,9 +753,9 @@ class ImageGeneratorService
         // Thin separator under title
         $image->drawRectangle((int)($width * 0.074), (int)($height * 0.41), fn($d) => $d->size((int)($width * 0.83), (int)($height * 0.002))->background('#E2E8F0'));
 
-        // Image text — left-aligned
+        // Image text — left-aligned, auto-fit
         if ($imageText) {
-            $this->drawTextLeftAligned($image, mb_strtoupper($imageText), (int)($width * 0.074), (int)($height * 0.435), (int)($height * 0.024), '#334155', 30);
+            $this->drawTextAutoFit($image, mb_strtoupper($imageText), 'minimal', (int)($width * 0.074), (int)($height * 0.435), '#334155', $width, $height);
         }
 
         // Bottom: thin line + company label
@@ -1503,6 +1510,112 @@ class ImageGeneratorService
         $label = ($name && $city) ? $name . '  ·  ' . $city : $name;
         
         return mb_strtoupper($this->cleanText($label));
+    }
+
+    /**
+     * Draw text on image with automatic font-size reduction to fit within the
+     * layout's text zone. Uses TextZoneSpec to determine bounds and constraints.
+     *
+     * @param mixed       $image      Intervention Image instance
+     * @param string      $text       The text to render
+     * @param string      $layoutType One of TextZoneSpec layout types
+     * @param int|null    $xLeft      X origin (for left-aligned layouts), null = use spec
+     * @param int|null    $yTop       Y origin override, null = use spec's textTopPct
+     * @param string      $color      Text color
+     * @param int         $width      Canvas width
+     * @param int         $height     Canvas height
+     */
+    private function drawTextAutoFit($image, string $text, string $layoutType, ?int $xLeft, ?int $yTop, string $color, int $width, int $height): void
+    {
+        $spec = TextZoneSpec::for($layoutType);
+
+        $baseFontSize    = $spec['fontSize'];
+        $maxCharsPerLine = $spec['maxCharsPerLine'];
+        $maxLines        = $spec['maxLines'];
+        $alignment       = $spec['alignment'];
+        $topPct          = $spec['textTopPct'];
+        $bottomPct       = $spec['textBottomPct'];
+
+        // Scale to actual canvas
+        $scaledFontSize = (int)($height * ($baseFontSize / 1080));
+        $topBound       = $yTop ?? (int)($height * $topPct);
+        $bottomBound    = (int)($height * $bottomPct);
+        $availableH     = $bottomBound - $topBound;
+
+        // Word-wrap into lines
+        $wrapLines = function (string $t, int $maxCpl) {
+            $words   = explode(' ', $t);
+            $lines   = [];
+            $current = '';
+            foreach ($words as $word) {
+                $candidate = $current ? $current . ' ' . $word : $word;
+                if (mb_strlen($candidate) <= $maxCpl) {
+                    $current = $candidate;
+                } else {
+                    if ($current !== '') $lines[] = $current;
+                    $current = $word;
+                }
+            }
+            if ($current !== '') $lines[] = $current;
+            return $lines;
+        };
+
+        $lines      = $wrapLines($text, $maxCharsPerLine);
+        $fontSize   = $scaledFontSize;
+        $lineHeight = (int)($fontSize * 1.35);
+
+        // Auto-reduce font size if text overflows the zone
+        $minFontSize = (int)($scaledFontSize * 0.55);
+        while (count($lines) > $maxLines || (count($lines) * $lineHeight) > $availableH) {
+            $fontSize -= max(1, (int)($fontSize * 0.08));
+            if ($fontSize < $minFontSize) {
+                // Hard cap: truncate lines to maxLines
+                $lines = array_slice($lines, 0, $maxLines);
+                break;
+            }
+            $lineHeight = (int)($fontSize * 1.35);
+
+            // Re-wrap with slightly more chars per line (proportional to font reduction)
+            $adjustedCpl = (int)($maxCharsPerLine * ($scaledFontSize / $fontSize));
+            $lines       = $wrapLines($text, $adjustedCpl);
+        }
+
+        // Draw
+        if ($alignment === 'center') {
+            $totalH = count($lines) * $lineHeight;
+            $startY = $topBound + ($availableH - $totalH) / 2 + ($lineHeight / 2);
+            $cx     = (int)($width / 2);
+
+            foreach ($lines as $line) {
+                $image->text($line, $cx, (int)$startY, function ($font) use ($fontSize, $color) {
+                    if (file_exists($this->fontPath)) {
+                        $font->filename($this->fontPath);
+                        $font->size((int)$fontSize);
+                    }
+                    $font->color($color);
+                    $font->align('center');
+                    $font->valign('middle');
+                });
+                $startY += $lineHeight;
+            }
+        } else {
+            // left-aligned
+            $lx = $xLeft ?? (int)($width * 0.092);
+            $y  = $topBound + (int)($lineHeight / 2);
+
+            foreach ($lines as $line) {
+                $image->text($line, $lx, (int)$y, function ($font) use ($fontSize, $color) {
+                    if (file_exists($this->fontPath)) {
+                        $font->filename($this->fontPath);
+                        $font->size((int)$fontSize);
+                    }
+                    $font->color($color);
+                    $font->align('left');
+                    $font->valign('middle');
+                });
+                $y += $lineHeight;
+            }
+        }
     }
 
     /**

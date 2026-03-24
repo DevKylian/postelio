@@ -220,6 +220,7 @@ class PostGenerator extends Component
             'custom_layout_type'     => $customLayoutType,
             'custom_template_name'   => $customTemplateName,
             'custom_photo_mode'      => $customPhotoModeOpt,
+            'custom_has_image_text'  => $customPhotoModeOpt === 'none',
             'text_content'           => (!$this->audio && !empty(trim($this->textContent))) ? trim($this->textContent) : null,
         ];
 

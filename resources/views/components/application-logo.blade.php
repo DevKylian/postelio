@@ -1,26 +1,30 @@
 @props(['variant' => 'light'])
 
 {{--
-    Postelio Icon Logo — Voice Wave
-    Now uses the same voice wave icon as <x-logo>.
-    variant="light" → amber gradient circle + white wave (for light backgrounds)
-    variant="dark"  → amber gradient circle + white wave (for dark backgrounds)
+    Postelio Icon Logo
+    variant="light"  → dark hexagon (#1E293B) + white circle + orange wave  (for light backgrounds)
+    variant="dark"   → white hexagon outline + orange wave                   (for dark backgrounds like the sidebar)
 --}}
 
 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {{ $attributes->except('variant') }}>
-    {{-- Gradient circle background --}}
-    <defs>
-        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#FBBF24"/>
-            <stop offset="100%" stop-color="#D97706"/>
-        </linearGradient>
-    </defs>
-    <circle cx="50" cy="50" r="46" fill="url(#logoGradient)"/>
+    @if ($variant === 'dark')
+        {{-- White hexagon for dark backgrounds --}}
+        <polygon points="27,3 73,3 97,50 73,97 27,97 3,50" fill="white" fill-opacity="0.15"/>
+        <polygon points="27,3 73,3 97,50 73,97 27,97 3,50" fill="none" stroke="white" stroke-width="3.5" stroke-linejoin="round"/>
+        <circle cx="50" cy="50" r="29" fill="white" fill-opacity="0.07"/>
+    @else
+        {{-- Dark hexagon for light backgrounds --}}
+        <polygon points="27,3 73,3 97,50 73,97 27,97 3,50" fill="#1E293B"/>
+        <circle cx="50" cy="50" r="29" fill="white"/>
+    @endif
 
-    {{-- Voice wave bars --}}
-    <line x1="22" y1="38" x2="22" y2="62" stroke="white" stroke-width="5" stroke-linecap="round"/>
-    <line x1="36" y1="28" x2="36" y2="72" stroke="white" stroke-width="5" stroke-linecap="round"/>
-    <line x1="50" y1="18" x2="50" y2="82" stroke="white" stroke-width="5" stroke-linecap="round"/>
-    <line x1="64" y1="30" x2="64" y2="70" stroke="white" stroke-width="5" stroke-linecap="round"/>
-    <line x1="78" y1="40" x2="78" y2="60" stroke="white" stroke-width="5" stroke-linecap="round"/>
+    {{-- ECG / heartbeat wave — always copper orange --}}
+    <polyline
+        points="3,50 20,50 26,38 32,60 38,23 44,74 50,38 55,50 97,50"
+        fill="none"
+        stroke="#F59E0B"
+        stroke-width="3.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
 </svg>

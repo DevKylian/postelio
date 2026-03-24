@@ -2,9 +2,9 @@
     <x-slot name="header">
         <div>
             <h1 class="font-bold text-xl lg:text-2xl text-midnight tracking-tight leading-tight">
-                Mes Modèles
+                Gabarits de publications
             </h1>
-            <p class="text-gray-400 text-sm mt-0.5">Personnalisez vos gabarits pour un branding unique.</p>
+            <p class="text-gray-400 text-sm mt-0.5">Découvrez les styles visuels que Postelio peut créer pour vous.</p>
         </div>
     </x-slot>
 

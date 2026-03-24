@@ -34,13 +34,13 @@ $confirmPassword = function () {
 
 <div>
     <div class="mb-4 text-sm text-gray-600">
-        {{ __('Ceci est une zone sécurisée de l\'application. Veuillez confirmer votre mot de passe avant de continuer.') }}
+        {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
     </div>
 
     <form wire:submit="confirmPassword">
         <!-- Password -->
         <div>
-            <x-input-label for="password" :value="__('Mot de passe')" />
+            <x-input-label for="password" :value="__('Password')" />
 
             <x-text-input wire:model="password"
                           id="password"
@@ -54,7 +54,7 @@ $confirmPassword = function () {
 
         <div class="flex justify-end mt-4">
             <x-primary-button>
-                {{ __('Confirmer') }}
+                {{ __('Confirm') }}
             </x-primary-button>
         </div>
     </form>

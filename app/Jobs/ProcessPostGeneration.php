@@ -33,20 +33,19 @@ class ProcessPostGeneration implements ShouldQueue
         Log::info("ProcessPostGeneration handle started", ['post_id' => $this->post->id]);
         set_time_limit(300);
         try {
-            $this->post->update(['status' => Post::STATUS_PROCESSING]);
+            $this->post->update(['status' => 'processing']);
 
-            // 1. Transcription / Content Acquisition
+            // 1. Transcription
             $textContent = $this->post->template_options['text_content'] ?? null;
             $audioPath   = $this->post->audio_path;
-            $transcript  = null;
 
-            if ($textContent) {
-                Log::info("Using provided text content (transcript from UI or manual entry)");
-                $transcript = $textContent;
-            } elseif ($audioPath) {
-                Log::info("Starting transcription from audio file", ['path' => $audioPath]);
+            if ($audioPath) {
+                Log::info("Starting transcription", ['path' => $audioPath]);
                 $transcript = $transcriber->transcribe($audioPath);
                 Log::info("Transcription finished", ['length' => strlen($transcript)]);
+            } elseif ($textContent) {
+                Log::info("Using text content instead of audio");
+                $transcript = $textContent;
             } else {
                 throw new Exception("Aucun contenu (audio ou texte) fourni pour la génération.");
             }
@@ -66,7 +65,7 @@ class ProcessPostGeneration implements ShouldQueue
             $result = $generator->generate($this->post);
             Log::info("Image generation finished");
 
-            $updateData = ['status' => Post::STATUS_REVIEW_PENDING];
+            $updateData = ['status' => 'review_pending'];
 
             if (is_array($result)) {
                 $updateData['image_path'] = $result[0];
@@ -101,35 +100,19 @@ class ProcessPostGeneration implements ShouldQueue
 
             Log::info("ProcessPostGeneration handle completed successfully");
 
-            // 5. Set completed and auto-publish
-            $this->post->update(['status' => Post::STATUS_COMPLETED]);
+            // 5. Auto-publish if requested (default to true for this flow)
+            $this->post->update(['status' => 'completed']);
             $this->post->refresh();
 
             $company = $this->post->company;
             if ($company) {
-                // Determine if we need to delay the publishing jobs
-                $delay = null;
-                if ($this->post->scheduled_at && $this->post->scheduled_at->isFuture()) {
-                    $delay = $this->post->scheduled_at;
-                }
-
                 if (in_array('instagram', $platforms) && $company->instagram_connected) {
-                    $job = PublishToInstagramJob::dispatch($this->post->id);
-                    if ($delay) {
-                        $job->delay($delay);
-                        Log::info("Scheduled to Instagram queue", ['time' => $delay->toDateTimeString()]);
-                    } else {
-                        Log::info("Auto-published to Instagram queue");
-                    }
+                    PublishToInstagramJob::dispatch($this->post->id);
+                    Log::info("Auto-published to Instagram queue");
                 }
                 if (in_array('facebook', $platforms) && $company->facebook_connected) {
-                    $job = PublishToFacebookJob::dispatch($this->post->id);
-                    if ($delay) {
-                        $job->delay($delay);
-                        Log::info("Scheduled to Facebook queue", ['time' => $delay->toDateTimeString()]);
-                    } else {
-                        Log::info("Auto-published to Facebook queue");
-                    }
+                    PublishToFacebookJob::dispatch($this->post->id);
+                    Log::info("Auto-published to Facebook queue");
                 }
             }
 
@@ -146,7 +129,7 @@ class ProcessPostGeneration implements ShouldQueue
             error_log($errorMsg . " in " . $e->getFile() . ":" . $e->getLine());
 
             if ($this->post) {
-                $this->post->update(['status' => Post::STATUS_FAILED]);
+                $this->post->update(['status' => 'failed']);
             }
 
             throw $e;

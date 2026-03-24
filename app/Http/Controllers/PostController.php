@@ -14,7 +14,7 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::where('user_id', Auth::id())
-            ->whereIn('status', ['pending', 'processing', 'completed'])
+            ->where('status', 'completed')
             ->latest()
             ->get();
 

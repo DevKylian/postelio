@@ -38,8 +38,8 @@ $logout = function (Logout $logout) {
 
         <!-- Logo -->
         <div class="px-5 pt-6 pb-4 border-b border-white/[0.06]">
-            <a href="{{ route('dashboard') }}" wire:navigate>
-                <x-logo size="md" textClass="text-[1.4rem] text-white" />
+            <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-2.5">
+                <span class="text-white font-bold text-xl tracking-widest">POSTELIO</span>
             </a>
         </div>
 
@@ -94,48 +94,6 @@ $logout = function (Logout $logout) {
                 </svg>
                 <span>Statistiques</span>
             </x-sidebar-link>
-            
-            <x-sidebar-link :href="route('changelog')" :active="request()->routeIs('changelog')" wire:navigate>
-                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-                <span>Nouveautés</span>
-            </x-sidebar-link>
-
-            @if(auth()->user() && auth()->user()->is_admin)
-            <!-- Section: Administration -->
-            <div class="pt-5 pb-2 px-3">
-                <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-[0.12em]">Administration</p>
-            </div>
-
-            <x-sidebar-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')" wire:navigate>
-                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                <span>Dashboard Admin</span>
-            </x-sidebar-link>
-            
-            <x-sidebar-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" wire:navigate>
-                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                <span>Utilisateurs</span>
-            </x-sidebar-link>
-
-            <x-sidebar-link :href="route('admin.templates.index')" :active="request()->routeIs('admin.templates.*')" wire:navigate>
-                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                </svg>
-                <span>Gabarits</span>
-            </x-sidebar-link>
-
-            <x-sidebar-link :href="route('admin.changelog.index')" :active="request()->routeIs('admin.changelog.*')" wire:navigate>
-                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                <span>Changelog</span>
-            </x-sidebar-link>
-            @endif
 
             <!-- Section: Compte -->
             <div class="pt-5 pb-2 px-3">
@@ -148,13 +106,6 @@ $logout = function (Logout $logout) {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <span>Paramètres</span>
-            </x-sidebar-link>
-
-            <x-sidebar-link :href="route('subscription.plans')" :active="request()->routeIs('subscription.*')" wire:navigate>
-                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                </svg>
-                <span>Abonnement</span>
             </x-sidebar-link>
 
         </nav>
@@ -171,11 +122,7 @@ $logout = function (Logout $logout) {
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Quota Mensuel</span>
                     </div>
                     <span class="text-[12px] font-bold text-slate-200 tabular-nums">
-                        @if(auth()->user()->is_admin || auth()->user()->is_premium)
-                            <span class="text-lg leading-none">∞</span>
-                        @else
-                            {{ auth()->user()->remaining_credits }} <span class="text-slate-500 font-medium">/ {{ auth()->user()->total_credits }}</span>
-                        @endif
+                        {{ auth()->user()->remaining_credits }} <span class="text-slate-500 font-medium">/ {{ auth()->user()->total_credits }}</span>
                     </span>
                 </div>
 
@@ -183,9 +130,8 @@ $logout = function (Logout $logout) {
                     @php
                         $remaining = auth()->user()->remaining_credits;
                         $total = max(1, auth()->user()->total_credits);
-                        $isUnlimited = auth()->user()->is_admin || auth()->user()->is_premium;
-                        $percentage = $isUnlimited ? 100 : min(100, ($remaining / $total) * 100);
-                        $colorClass = $isUnlimited ? 'from-amber-400 to-copper' : ($percentage < 15 ? 'from-rose-500 to-red-600' : ($percentage < 40 ? 'from-orange-500 to-amber-500' : 'from-amber-400 to-copper'));
+                        $percentage = min(100, ($remaining / $total) * 100);
+                        $colorClass = $percentage < 15 ? 'from-rose-500 to-red-600' : ($percentage < 40 ? 'from-orange-500 to-amber-500' : 'from-amber-400 to-copper');
                     @endphp
                     <div class="h-full bg-gradient-to-r {{ $colorClass }} transition-all duration-1000 rounded-full relative"
                          style="width: {{ $percentage }}%">
@@ -193,17 +139,8 @@ $logout = function (Logout $logout) {
                     </div>
                 </div>
 
-                <div class="mt-3 flex items-center justify-between relative z-10">
-                    @if(auth()->user()->hasActiveSubscription())
-                        <p class="text-[10px] text-slate-500 font-medium">
-                            Plan {{ ucfirst(auth()->user()->currentPlanKey() ?? 'gratuit') }}
-                        </p>
-                    @else
-                        <a href="{{ route('subscription.plans') }}" wire:navigate
-                           class="text-[10px] text-copper font-semibold hover:text-amber-400 transition-colors">
-                            Augmenter
-                        </a>
-                    @endif
+                <div class="mt-3 flex items-center gap-1.5 relative z-10">
+                    <p class="text-[10px] text-slate-500 font-medium">Réinitialisation automatique dans le mois</p>
                 </div>
             </div>
         </div>

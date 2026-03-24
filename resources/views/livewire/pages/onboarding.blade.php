@@ -8,12 +8,11 @@ use function Livewire\Volt\{layout, state};
 layout('layouts.onboarding');
 
 state([
-    'step'              => 1,
-    'trade'             => '',
-    'name'              => '',
-    'city'              => '',
-    'brand_color'       => '#F59E0B',
-    'weekly_posts_goal' => 3,
+    'step'        => 1,
+    'trade'       => '',
+    'name'        => '',
+    'city'        => '',
+    'brand_color' => '#F59E0B',
     'trades'      => [
         ['key' => 'plombier',      'label' => 'Plombier',       'icon' => '🔧'],
         ['key' => 'electricien',   'label' => 'Électricien',    'icon' => '⚡'],
@@ -39,7 +38,7 @@ $nextStep = function () {
     if ($this->step === 2) {
         $this->validate([
             'name' => ['required', 'string', 'min:2', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:255'],
         ]);
     }
 
@@ -59,7 +58,6 @@ $prevStep = function () {
 $complete = function () {
     $this->validate([
         'name'        => ['required', 'string', 'min:2', 'max:255'],
-        'city'        => ['required', 'string', 'max:255'],
         'brand_color' => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
     ]);
 
@@ -67,11 +65,10 @@ $complete = function () {
     $company = $user->company;
 
     $data = [
-        'name'              => $this->name,
-        'city'              => $this->city,
-        'trade'             => $this->trade,
-        'brand_color'       => $this->brand_color,
-        'weekly_posts_goal' => $this->weekly_posts_goal,
+        'name'        => $this->name,
+        'city'        => $this->city,
+        'trade'       => $this->trade,
+        'brand_color' => $this->brand_color,
     ];
 
     if ($company) {
@@ -92,8 +89,8 @@ $complete = function () {
     <div class="w-full max-w-2xl">
 
         {{-- Logo --}}
-        <div class="text-center mb-8 flex justify-center">
-            <x-logo size="lg" textClass="text-[1.7rem] text-white" />
+        <div class="text-center mb-8">
+            <span class="text-2xl font-bold tracking-tight text-amber-400">Postelio</span>
         </div>
 
         {{-- Card --}}
@@ -102,18 +99,14 @@ $complete = function () {
             {{-- Progress bar --}}
             <div class="h-1.5 bg-gray-100">
                 <div class="h-full bg-amber-400 transition-all duration-500 ease-out"
-                     style="width: {{ ($step / 5) * 100 }}%"></div>
+                     style="width: {{ ($step / 4) * 100 }}%"></div>
             </div>
 
             {{-- Step indicators --}}
-            <div class="px-4 sm:px-8 pt-5 pb-3">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider">Progression</span>
-                    <span class="text-xs text-gray-400 font-medium">Étape {{ $step }} / 5</span>
-                </div>
-                <div class="flex items-center w-full">
-                    @foreach(range(1, 5) as $i)
-                        <div class="flex items-center {{ $i < 5 ? 'flex-1' : 'flex-none' }}">
+            <div class="px-4 sm:px-8 pt-6 pb-2 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                    @foreach(range(1, 4) as $i)
+                        <div class="flex items-center gap-1.5 sm:gap-2">
                             <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-300 flex-shrink-0
                                 {{ $step > $i ? 'bg-amber-400 text-white' : ($step === $i ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-400') }}">
                                 @if($step > $i)
@@ -124,12 +117,13 @@ $complete = function () {
                                     {{ $i }}
                                 @endif
                             </div>
-                            @if($i < 5)
-                                <div class="flex-1 h-px mx-1.5 sm:mx-2 {{ $step > $i ? 'bg-amber-400' : 'bg-gray-200' }} transition-colors duration-300"></div>
+                            @if($i < 4)
+                                <div class="w-4 sm:w-8 h-px {{ $step > $i ? 'bg-amber-400' : 'bg-gray-200' }} transition-colors duration-300 flex-shrink-0"></div>
                             @endif
                         </div>
                     @endforeach
                 </div>
+                <span class="text-xs text-gray-400 font-medium whitespace-nowrap flex-shrink-0">Étape {{ $step }} / 4</span>
             </div>
 
             <div class="px-4 sm:px-8 pb-6 sm:pb-8 pt-4">
@@ -206,7 +200,7 @@ $complete = function () {
 
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1.5">
-                                Ville <span class="text-amber-400">*</span>
+                                Ville <span class="text-gray-400 font-normal">(optionnel)</span>
                             </label>
                             <input wire:model="city"
                                    type="text"
@@ -333,90 +327,8 @@ $complete = function () {
                 </div>
                 @endif
 
-                {{-- ===== STEP 4 : Objectif de posts ===== --}}
+                {{-- ===== STEP 4 : C'est parti ! ===== --}}
                 @if($step === 4)
-                <div>
-                    <div class="mb-6">
-                        <h1 class="text-2xl font-bold text-slate-800">Objectif hebdomadaire</h1>
-                        <p class="text-gray-500 mt-1 text-sm">Combien de posts souhaitez-vous publier par semaine sur vos réseaux ?</p>
-                    </div>
-
-                    <div class="space-y-6">
-                        <div class="relative pt-6 pb-2">
-                            <input wire:model.live="weekly_posts_goal"
-                                   type="range"
-                                   min="0"
-                                   max="7"
-                                   step="1"
-                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500" />
-                            
-                            <div class="flex justify-between mt-4 text-xs font-bold text-gray-400">
-                                @for($i = 0; $i <= 7; $i++)
-                                    <span class="{{ $weekly_posts_goal == $i ? 'text-amber-500 scale-125' : '' }} transition-all">{{ $i }}</span>
-                                @endfor
-                            </div>
-                        </div>
-
-                        <div class="p-5 rounded-2xl flex items-center gap-4 transition-colors duration-300 border
-                                    {{ $weekly_posts_goal == 0 ? 'bg-red-50 border-red-100 text-red-800' : '' }}
-                                    {{ $weekly_posts_goal >= 1 && $weekly_posts_goal <= 2 ? 'bg-orange-50 border-orange-100 text-orange-800' : '' }}
-                                    {{ $weekly_posts_goal >= 3 && $weekly_posts_goal <= 5 ? 'bg-green-50 border-green-100 text-green-800' : '' }}
-                                    {{ $weekly_posts_goal >= 6 ? 'bg-blue-50 border-blue-100 text-blue-800' : '' }}">
-                            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border shadow-sm bg-white
-                                        {{ $weekly_posts_goal == 0 ? 'border-red-200' : '' }}
-                                        {{ $weekly_posts_goal >= 1 && $weekly_posts_goal <= 2 ? 'border-orange-200' : '' }}
-                                        {{ $weekly_posts_goal >= 3 && $weekly_posts_goal <= 5 ? 'border-green-200' : '' }}
-                                        {{ $weekly_posts_goal >= 6 ? 'border-blue-200' : '' }}">
-                                <span class="text-2xl font-black">{{ $weekly_posts_goal }}</span>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-sm">
-                                    @if($weekly_posts_goal == 0)
-                                        Non recommandé
-                                    @elseif($weekly_posts_goal >= 1 && $weekly_posts_goal <= 2)
-                                        Un peu juste
-                                    @elseif($weekly_posts_goal >= 3 && $weekly_posts_goal <= 5)
-                                        Recommandé
-                                    @else
-                                        Excellent 🚀
-                                    @endif
-                                </h3>
-                                <p class="text-xs pt-1 opacity-80 leading-relaxed">
-                                    @if($weekly_posts_goal == 0)
-                                        Il est important d'être régulier sur les réseaux. Viser au moins 3 posts par semaine.
-                                    @elseif($weekly_posts_goal >= 1 && $weekly_posts_goal <= 2)
-                                        C'est un bon début, mais 3 à 4 posts par semaine créent plus d'engagement.
-                                    @elseif($weekly_posts_goal >= 3 && $weekly_posts_goal <= 5)
-                                        Vous avez le bon tempo pour construire et engager votre communauté.
-                                    @else
-                                        Une omniprésence parfaite pour maximiser votre visibilité !
-                                    @endif
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-8 flex items-center justify-between">
-                        <button wire:click="prevStep" type="button"
-                                class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:text-slate-800 hover:bg-gray-100 transition-all duration-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                            </svg>
-                            Retour
-                        </button>
-                        <button wire:click="nextStep" type="button"
-                                class="flex items-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm bg-slate-800 text-white hover:bg-slate-700 shadow-lg hover:shadow-xl transition-all duration-200">
-                            Continuer
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                @endif
-
-                {{-- ===== STEP 5 : C'est parti ! ===== --}}
-                @if($step === 5)
                 <div>
                     <div class="mb-6 text-center">
                         <div class="w-16 h-16 bg-amber-400 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -460,7 +372,7 @@ $complete = function () {
                             <ul class="space-y-2">
                                 @foreach([
                                     'Créez votre premier post depuis un mémo vocal',
-                                    'Des templates professionnels pour votre activité',
+                                    '10 templates professionnels pour votre activité',
                                     'Publication directe sur Instagram',
                                     'Calendrier éditorial pour organiser vos posts',
                                 ] as $item)

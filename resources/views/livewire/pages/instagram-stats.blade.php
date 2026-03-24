@@ -6,10 +6,9 @@ use Livewire\Volt\Component;
 new class extends Component {
 
     public ?array $account = null;
-    public array $allMedia = [];
     public array $media = [];
     public ?string $error = null;
-    public string $sortBy = 'recent';
+    public string $sortBy = 'recent'; // recent | likes | comments
 
     public array $sortedMedia = [];
     public int $totalLikes = 0;
@@ -17,11 +16,6 @@ new class extends Component {
     public int $avgLikes = 0;
     public int $avgComments = 0;
     public array $topPosts = [];
-
-    // Pagination
-    public int $page = 1;
-    public int $perPage = 12;
-    public bool $hasMore = false;
 
     public function mount(InstagramService $instagram): void
     {
@@ -34,52 +28,29 @@ new class extends Component {
 
         try {
             $this->account = $instagram->getAccountStats(
-                '',
-                $company->zernio_instagram_account_id
+                $company->instagram_access_token,
+                $company->instagram_business_account_id
             );
-            
-            // Fetch everything because Zernio doesn't support limit on this endpoint
-            $result = $instagram->getRecentMedia(
-                '',
-                $company->zernio_instagram_account_id,
-                1,
-                1000 // High limit just in case, but Zernio returns all
+            $this->media = $instagram->getRecentMedia(
+                $company->instagram_access_token,
+                $company->instagram_business_account_id,
+                24
             );
-            
-            $this->allMedia = $result['media'] ?? [];
-            $this->applyPagination();
             $this->computeStats();
         } catch (\Throwable $e) {
             $this->error = $e->getMessage();
         }
     }
 
-    public function loadMore(): void
-    {
-        if (!$this->hasMore) return;
-        $this->page++;
-        $this->applyPagination();
-        // stats are computed on visible media? usually yes for engagement cards
-        $this->computeStats();
-    }
-
-    private function applyPagination(): void
-    {
-        $this->media = array_slice($this->allMedia, 0, $this->page * $this->perPage);
-        $this->hasMore = count($this->allMedia) > count($this->media);
-    }
-
     private function computeStats(): void
     {
-        // Compute stats only on the visible media for dynamic updates, or on allMedia?
-        // Let's do allMedia for total KPIs and allMedia for averages to be consistent
-        $this->totalLikes    = array_sum(array_column($this->allMedia, 'like_count'));
-        $this->totalComments = array_sum(array_column($this->allMedia, 'comments_count'));
-        $count               = count($this->allMedia);
+        $this->totalLikes    = array_sum(array_column($this->media, 'like_count'));
+        $this->totalComments = array_sum(array_column($this->media, 'comments_count'));
+        $count               = count($this->media);
         $this->avgLikes      = $count > 0 ? (int) round($this->totalLikes / $count) : 0;
         $this->avgComments   = $count > 0 ? (int) round($this->totalComments / $count) : 0;
 
-        $sorted = $this->allMedia;
+        $sorted = $this->media;
         usort($sorted, fn($a, $b) =>
             (($b['like_count'] ?? 0) + ($b['comments_count'] ?? 0)) <=>
             (($a['like_count'] ?? 0) + ($a['comments_count'] ?? 0))
@@ -91,7 +62,6 @@ new class extends Component {
 
     private function recomputeSortedMedia(): void
     {
-        // Sort only what is currently displayed
         $media = $this->media;
 
         if ($this->sortBy === 'likes') {
@@ -115,9 +85,8 @@ new class extends Component {
 <div class="py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-7xl mx-auto space-y-8">
 
-        {{-- Error: not connected --}}
+        {{-- ── Error: not connected ── --}}
         @if($error === 'not_connected')
-            {{-- ... same UI ... --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
                 <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
                      style="background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)">
@@ -133,6 +102,7 @@ new class extends Component {
                 </a>
             </div>
 
+        {{-- ── Error: API error ── --}}
         @elseif($error)
             <div class="bg-red-50 border border-red-100 rounded-2xl p-6">
                 <div class="flex items-start gap-3">
@@ -150,7 +120,7 @@ new class extends Component {
 
         @else
 
-        {{-- Profile Card --}}
+        {{-- ── Profile Card ── --}}
         @if($account)
         <div class="bg-midnight rounded-2xl p-6 relative overflow-hidden">
             <div class="absolute -top-12 -right-12 w-48 h-48 bg-copper/10 rounded-full blur-3xl"></div>
@@ -177,6 +147,7 @@ new class extends Component {
                     </div>
                 </div>
 
+                {{-- Info --}}
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
                         <h2 class="text-white font-bold text-xl leading-tight">{{ $account['name'] ?? $account['username'] }}</h2>
@@ -184,6 +155,17 @@ new class extends Component {
                             <span class="text-white/40 text-sm">&#64;{{ $account['username'] }}</span>
                         @endif
                     </div>
+                    @if(!empty($account['biography']))
+                        <p class="text-white/50 text-sm mt-1.5 leading-relaxed line-clamp-2">{{ $account['biography'] }}</p>
+                    @endif
+                    @if(!empty($account['website']))
+                        <a href="{{ $account['website'] }}" target="_blank" class="text-copper text-xs mt-1 inline-flex items-center gap-1 hover:text-amber-400 transition-colors">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                            {{ $account['website'] }}
+                        </a>
+                    @endif
                 </div>
 
                 {{-- Account KPIs --}}
@@ -193,7 +175,11 @@ new class extends Component {
                         <p class="text-white/40 text-xs mt-0.5">Abonnés</p>
                     </div>
                     <div class="text-center">
-                        <p class="text-white font-bold text-xl">{{ number_format($account['media_count'] ?? count($allMedia)) }}</p>
+                        <p class="text-white font-bold text-xl">{{ number_format($account['follows_count'] ?? 0) }}</p>
+                        <p class="text-white/40 text-xs mt-0.5">Abonnements</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-white font-bold text-xl">{{ number_format($account['media_count'] ?? 0) }}</p>
                         <p class="text-white/40 text-xs mt-0.5">Publications</p>
                     </div>
                 </div>
@@ -201,9 +187,11 @@ new class extends Component {
         </div>
         @endif
 
-        {{-- Engagement Stats --}}
-        @if(count($allMedia) > 0)
+        {{-- ── Engagement Stats Cards ── --}}
+        @if(count($media) > 0)
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+            {{-- Total likes --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group card-hover">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center text-rose-400 group-hover:bg-rose-400 group-hover:text-white transition-all duration-200">
@@ -211,11 +199,13 @@ new class extends Component {
                             <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/>
                         </svg>
                     </div>
-                    <span class="text-[11px] font-bold text-rose-400 bg-rose-50 px-2 py-0.5 rounded-full">{{ count($allMedia) }} posts</span>
+                    <span class="text-[11px] font-bold text-rose-400 bg-rose-50 px-2 py-0.5 rounded-full">{{ count($media) }} posts</span>
                 </div>
                 <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total likes</p>
                 <p class="text-2xl font-bold text-midnight mt-1">{{ number_format($totalLikes) }}</p>
             </div>
+
+            {{-- Avg likes --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group card-hover">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center text-orange-400 group-hover:bg-orange-400 group-hover:text-white transition-all duration-200">
@@ -228,6 +218,8 @@ new class extends Component {
                 <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Likes / post</p>
                 <p class="text-2xl font-bold text-midnight mt-1">{{ number_format($avgLikes) }}</p>
             </div>
+
+            {{-- Total comments --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group card-hover">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all duration-200">
@@ -235,10 +227,13 @@ new class extends Component {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
                     </div>
+                    <span class="text-[11px] font-bold text-blue-400 bg-blue-50 px-2 py-0.5 rounded-full">Total</span>
                 </div>
                 <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Total commentaires</p>
                 <p class="text-2xl font-bold text-midnight mt-1">{{ number_format($totalComments) }}</p>
             </div>
+
+            {{-- Avg comments --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 group card-hover">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 group-hover:bg-amber-500 group-hover:text-white transition-all duration-200">
@@ -246,29 +241,61 @@ new class extends Component {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                     </div>
+                    <span class="text-[11px] font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded-full">Moy.</span>
                 </div>
                 <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Commentaires / post</p>
                 <p class="text-2xl font-bold text-midnight mt-1">{{ number_format($avgComments) }}</p>
             </div>
+
         </div>
 
+        {{-- ── Main Grid: Top posts + Media feed ── --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {{-- Top Performers --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden h-fit">
+
+            {{-- Top 3 performers (1/3) --}}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-50">
-                    <h3 class="font-semibold text-midnight text-sm flex items-center gap-2">🏆 Meilleures performances</h3>
+                    <h3 class="font-semibold text-midnight text-sm flex items-center gap-2">
+                        <span class="text-base">🏆</span>
+                        Meilleures performances
+                    </h3>
+                    <p class="text-xs text-gray-400 mt-0.5">Classés par engagement total</p>
                 </div>
                 <div class="divide-y divide-gray-50">
                     @foreach($topPosts as $i => $post)
+                    @php
+                        $thumb = $post['thumbnail_url'] ?? $post['media_url'] ?? null;
+                        $medals = ['🥇', '🥈', '🥉'];
+                    @endphp
                     <div class="flex items-center gap-3 p-4">
-                        @if($post['thumbnail_url'] ?? $post['media_url'])
-                            <img src="{{ $post['thumbnail_url'] ?? $post['media_url'] }}" class="w-12 h-12 rounded-xl object-cover shrink-0">
+                        <span class="text-xl shrink-0 w-7 text-center">{{ $medals[$i] }}</span>
+                        @if($thumb)
+                            <img src="{{ $thumb }}" alt=""
+                                 class="w-12 h-12 rounded-xl object-cover shrink-0 border border-gray-100">
+                        @else
+                            <div class="w-12 h-12 rounded-xl bg-gray-100 shrink-0 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
                         @endif
                         <div class="flex-1 min-w-0">
-                            <p class="text-xs text-gray-400 truncate">{{ $post['caption'] ?? 'Sans légende' }}</p>
+                            <p class="text-xs text-gray-400 truncate leading-relaxed">
+                                {{ Str::limit($post['caption'] ?? 'Sans légende', 50) }}
+                            </p>
                             <div class="flex items-center gap-3 mt-1.5">
-                                <span class="text-rose-400 text-xs font-bold">❤️ {{ $post['like_count'] }}</span>
-                                <span class="text-blue-400 text-xs font-bold">💬 {{ $post['comments_count'] }}</span>
+                                <span class="flex items-center gap-1 text-xs font-semibold text-rose-400">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/>
+                                    </svg>
+                                    {{ number_format($post['like_count'] ?? 0) }}
+                                </span>
+                                <span class="flex items-center gap-1 text-xs font-semibold text-blue-400">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                    {{ number_format($post['comments_count'] ?? 0) }}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -276,36 +303,98 @@ new class extends Component {
                 </div>
             </div>
 
-            {{-- Media Grid --}}
-            <div class="lg:col-span-2 space-y-4">
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
-                        <h3 class="font-semibold text-midnight text-sm">Publications</h3>
-                        <div class="flex bg-gray-50 rounded-xl p-1 gap-1">
-                            @foreach(['recent','likes','comments'] as $b)
-                            <button wire:click="sortMedia('{{$b}}')" class="text-xs font-semibold px-3 py-1.5 rounded-lg {{ $sortBy === $b ? 'bg-white shadow-sm' : '' }}">{{ ucfirst($b) }}</button>
-                            @endforeach
-                        </div>
-                    </div>
-                    <div class="p-4 grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-                        @foreach($sortedMedia as $post)
-                        <div class="relative aspect-square rounded-xl overflow-hidden bg-gray-50">
-                            <img src="{{ $post['thumbnail_url'] ?? $post['media_url'] }}" class="w-full h-full object-cover">
-                        </div>
-                        @endforeach
+            {{-- Media grid (2/3) --}}
+            <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between gap-3">
+                    <h3 class="font-semibold text-midnight text-sm">Publications récentes</h3>
+                    <div class="flex items-center bg-gray-50 rounded-xl p-1 gap-0.5">
+                        <button wire:click="sortMedia('recent')"
+                                class="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-150 {{ $sortBy === 'recent' ? 'bg-white text-midnight shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
+                            Récents
+                        </button>
+                        <button wire:click="sortMedia('likes')"
+                                class="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-150 {{ $sortBy === 'likes' ? 'bg-white text-midnight shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
+                            Likes
+                        </button>
+                        <button wire:click="sortMedia('comments')"
+                                class="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-150 {{ $sortBy === 'comments' ? 'bg-white text-midnight shadow-sm' : 'text-gray-400 hover:text-gray-600' }}">
+                            Commentaires
+                        </button>
                     </div>
                 </div>
 
-                {{-- Manual Load More --}}
-                @if($hasMore)
-                <div class="flex justify-center">
-                    <button wire:click="loadMore" class="bg-white border border-gray-100 shadow-sm px-6 py-2.5 rounded-xl text-sm font-semibold">Voir plus</button>
+                <div class="p-4 grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+                    @foreach($sortedMedia as $post)
+                    @php
+                        $thumb = $post['thumbnail_url'] ?? $post['media_url'] ?? null;
+                        $isVideo = ($post['media_type'] ?? '') === 'VIDEO';
+                        $isCarousel = ($post['media_type'] ?? '') === 'CAROUSEL_ALBUM';
+                    @endphp
+                    <div class="group relative aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-100 hover:border-copper/30 transition-all duration-200 cursor-pointer">
+                        @if($thumb)
+                            <img src="{{ $thumb }}" alt=""
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center">
+                                <svg class="w-6 h-6 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        @endif
+
+                        @if($isVideo || $isCarousel)
+                            <div class="absolute top-1.5 right-1.5 bg-black/50 backdrop-blur-sm text-white rounded-md p-1">
+                                @if($isVideo)
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                @else
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                                    </svg>
+                                @endif
+                            </div>
+                        @endif
+
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-2.5">
+                            <div class="flex items-center gap-3">
+                                <span class="flex items-center gap-1 text-white text-xs font-bold">
+                                    <svg class="w-3.5 h-3.5 text-rose-300" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/>
+                                    </svg>
+                                    {{ number_format($post['like_count'] ?? 0) }}
+                                </span>
+                                <span class="flex items-center gap-1 text-white text-xs font-bold">
+                                    <svg class="w-3.5 h-3.5 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                    {{ number_format($post['comments_count'] ?? 0) }}
+                                </span>
+                            </div>
+                            <p class="text-white/50 text-[9px] mt-1">
+                                {{ \Carbon\Carbon::parse($post['timestamp'])->format('d/m/Y') }}
+                            </p>
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
-                @endif
             </div>
+
         </div>
         @endif
 
+        {{-- No media yet --}}
+        @if(count($media) === 0 && !$error && $account)
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+                <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-7 h-7 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <h4 class="font-semibold text-midnight text-sm mb-1">Aucune publication trouvée</h4>
+                <p class="text-xs text-gray-400">Publiez votre premier post pour voir vos statistiques apparaître ici.</p>
+            </div>
         @endif
+
+        @endif {{-- end error check --}}
+
     </div>
 </div>

@@ -3,89 +3,335 @@
 namespace App\Services;
 
 use App\Models\Post;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class InstagramService
 {
-    public function __construct(private ZernioService $zernio) {}
+    private const GRAPH_BASE    = 'https://graph.facebook.com/v21.0';
+    private const API_VERSION   = 'v21.0';
+
+    private string $appId;
+    private string $appSecret;
+    private string $callbackUrl;
+
+    public function __construct()
+    {
+        $this->appId       = config('services.instagram.client_id');
+        $this->appSecret   = config('services.instagram.client_secret');
+        $this->callbackUrl = config('services.instagram.redirect');
+    }
 
     /**
-     * Publish a post to Instagram via Zernio.
+     * Generate the Meta OAuth authorization URL.
+     */
+    public function getAuthUrl(string $state): string
+    {
+        $params = http_build_query([
+            'client_id'     => $this->appId,
+            'redirect_uri'  => $this->callbackUrl,
+            'scope'         => 'instagram_basic,instagram_content_publish,pages_read_engagement,pages_show_list,business_management',
+            'response_type' => 'code',
+            'state'         => $state,
+        ]);
+
+        return 'https://www.facebook.com/' . self::API_VERSION . '/dialog/oauth?' . $params;
+    }
+
+    /**
+     * Exchange OAuth code for a long-lived user access token (valid ~60 days).
+     * Returns array with access_token and expires_in.
+     */
+    public function exchangeCodeForLongLivedToken(string $code): array
+    {
+        $short = Http::timeout(120)->get(self::GRAPH_BASE . '/oauth/access_token', [
+            'client_id'     => $this->appId,
+            'client_secret' => $this->appSecret,
+            'redirect_uri'  => $this->callbackUrl,
+            'code'          => $code,
+        ])->json();
+
+        if (empty($short['access_token'])) {
+            throw new \RuntimeException('Token exchange failed: ' . json_encode($short));
+        }
+
+        $long = Http::timeout(120)->get(self::GRAPH_BASE . '/oauth/access_token', [
+            'grant_type'        => 'fb_exchange_token',
+            'client_id'         => $this->appId,
+            'client_secret'     => $this->appSecret,
+            'fb_exchange_token' => $short['access_token'],
+        ])->json();
+
+        if (empty($long['access_token'])) {
+            throw new \RuntimeException('Long-lived token exchange failed: ' . json_encode($long));
+        }
+
+        return $long;
+    }
+
+    /**
+     * Find the Instagram Business Account ID linked to one of the user's Facebook Pages.
+     * Returns ['id' => ..., 'username' => ...].
+     */
+    public function getInstagramBusinessAccount(string $accessToken): array
+    {
+        $me = Http::timeout(120)->get(self::GRAPH_BASE . '/me', [
+            'access_token' => $accessToken,
+            'fields'       => 'id,name',
+        ])->json();
+
+        $permissions = Http::timeout(120)->get(self::GRAPH_BASE . '/me/permissions', [
+            'access_token' => $accessToken,
+        ])->json();
+
+        $response = Http::timeout(120)->get(self::GRAPH_BASE . '/me/accounts', [
+            'access_token' => $accessToken,
+            'fields'       => 'id,name,instagram_business_account',
+        ])->json();
+
+        $pages = $response['data'] ?? [];
+
+        // Check direct pages first
+        foreach ($pages as $page) {
+            if (!empty($page['instagram_business_account']['id'])) {
+                return $this->resolveIgAccount($page['instagram_business_account']['id'], $accessToken);
+            }
+        }
+
+        // Fallback: pages managed via Business Manager
+        $businesses = Http::timeout(120)->get(self::GRAPH_BASE . '/me/businesses', [
+            'access_token' => $accessToken,
+            'fields'       => 'id,name',
+        ])->json()['data'] ?? [];
+
+        foreach ($businesses as $business) {
+            $bizPages = Http::timeout(120)->get(self::GRAPH_BASE . '/' . $business['id'] . '/owned_pages', [
+                'access_token' => $accessToken,
+                'fields'       => 'id,name,instagram_business_account',
+            ])->json()['data'] ?? [];
+
+            foreach ($bizPages as $page) {
+                if (!empty($page['instagram_business_account']['id'])) {
+                    return $this->resolveIgAccount($page['instagram_business_account']['id'], $accessToken);
+                }
+            }
+        }
+
+        $pagesDebug = array_map(fn($p) => ['id' => $p['id'] ?? '?', 'name' => $p['name'] ?? '?', 'has_ig' => !empty($p['instagram_business_account'])], $pages);
+        $grantedPerms = array_column(
+            array_filter($permissions['data'] ?? [], fn($p) => $p['status'] === 'granted'),
+            'permission'
+        );
+
+        throw new \RuntimeException(
+            'Aucun compte Instagram Business trouvé lié à une Page Facebook. ' .
+            'Connecté en tant que : ' . ($me['name'] ?? '?') . ' (id: ' . ($me['id'] ?? '?') . '). ' .
+            'Pages trouvées : ' . json_encode($pagesDebug) . '. ' .
+            'Business Manager : ' . json_encode(array_column($businesses, 'name')) . '. ' .
+            'Permissions accordées : ' . implode(', ', $grantedPerms)
+        );
+    }
+
+    private function resolveIgAccount(string $igId, string $accessToken): array
+    {
+        $ig = Http::timeout(120)->get(self::GRAPH_BASE . "/{$igId}", [
+            'fields'       => 'id,username,profile_picture_url',
+            'access_token' => $accessToken,
+        ])->json();
+
+        return [
+            'id'                  => $igId,
+            'username'            => $ig['username'] ?? '',
+            'profile_picture_url' => $ig['profile_picture_url'] ?? null,
+        ];
+    }
+
+    /**
+     * Publish a post to Instagram. Handles both single image and carousel.
+     * Returns the Instagram media ID.
      */
     public function publishPost(Post $post): string
     {
-        $company   = $post->company;
-        $accountId = $company->zernio_instagram_account_id;
+        $company = $post->company;
+        $token   = $company->instagram_access_token;
+        $igId    = $company->instagram_business_account_id;
+        $caption = $post->caption;
 
-        if (!$accountId) {
-             throw new \RuntimeException('Compte Instagram non connecté via Zernio.');
+        $slides = $post->slides ?? [];
+
+        if (count($slides) > 1) {
+            return $this->publishCarousel($igId, $token, $slides, $caption);
         }
 
-        return $this->zernio->publishPost($post, 'instagram', $accountId);
+        $imagePath = $post->image_path;
+        $imageUrl  = $this->publicUrl($imagePath);
+
+
+        return $this->publishSingleImage($igId, $token, $imageUrl, $caption);
+    }
+
+    private function publishSingleImage(string $igId, string $token, string $imageUrl, string $caption): string
+    {
+        $container = Http::timeout(120)->post(self::GRAPH_BASE . "/{$igId}/media", [
+            'image_url'    => $imageUrl,
+            'caption'      => $caption,
+            'access_token' => $token,
+        ])->json();
+
+        if (empty($container['id'])) {
+            throw new \RuntimeException('Création du container échouée : ' . json_encode($container));
+        }
+
+        // Wait for media to be ready
+        $this->pollContainerStatus($container['id'], $token);
+
+        $result = Http::timeout(120)->post(self::GRAPH_BASE . "/{$igId}/media_publish", [
+            'creation_id'  => $container['id'],
+            'access_token' => $token,
+        ])->json();
+
+        if (empty($result['id'])) {
+            throw new \RuntimeException('Publication échouée : ' . json_encode($result));
+        }
+
+        return $result['id'];
+    }
+
+    private function publishCarousel(string $igId, string $token, array $slides, string $caption): string
+    {
+        // Step 1 — upload each slide as a carousel item (no caption)
+        $itemIds = [];
+        foreach ($slides as $slidePath) {
+            $item = Http::timeout(120)->post(self::GRAPH_BASE . "/{$igId}/media", [
+                'image_url'        => $this->publicUrl($slidePath),
+                'is_carousel_item' => true,
+                'access_token'     => $token,
+            ])->json();
+
+            if (empty($item['id'])) {
+                throw new \RuntimeException('Carousel item échoué : ' . json_encode($item));
+            }
+
+            // Wait for item to be ready
+            $this->pollContainerStatus($item['id'], $token);
+
+            $itemIds[] = $item['id'];
+        }
+
+        // Step 2 — create carousel container with caption
+        $container = Http::timeout(120)->post(self::GRAPH_BASE . "/{$igId}/media", [
+            'media_type'   => 'CAROUSEL',
+            'children'     => implode(',', $itemIds),
+            'caption'      => $caption,
+            'access_token' => $token,
+        ])->json();
+
+        if (empty($container['id'])) {
+            throw new \RuntimeException('Carousel container échoué : ' . json_encode($container));
+        }
+
+        // Wait for carousel container to be ready
+        $this->pollContainerStatus($container['id'], $token);
+
+        // Step 3 — publish
+        $result = Http::timeout(120)->post(self::GRAPH_BASE . "/{$igId}/media_publish", [
+            'creation_id'  => $container['id'],
+            'access_token' => $token,
+        ])->json();
+
+        if (empty($result['id'])) {
+            throw new \RuntimeException('Publication carousel échouée : ' . json_encode($result));
+        }
+
+        return $result['id'];
     }
 
     /**
-     * Get account details via Zernio.
+     * Wait for a media container to be processed by Instagram.
      */
-    public function getAccountStats(string $token, string $accountId): array
+    private function pollContainerStatus(string $containerId, string $token, int $maxAttempts = 15, int $interval = 3): void
     {
-        $accounts = $this->zernio->listAccounts();
-        $account  = collect($accounts)->firstWhere('_id', $accountId);
+        for ($i = 0; $i < $maxAttempts; $i++) {
+            $response = Http::timeout(120)->get(self::GRAPH_BASE . "/{$containerId}", [
+                'fields'       => 'status_code',
+                'access_token' => $token,
+            ])->json();
 
-        if (!is_array($account)) {
-            return [
-                'username' => auth()->user()->company->instagram_username ?? 'Compte Instagram',
-                'followers_count' => 0,
-                'follows_count' => 0,
-                'media_count' => 0,
-            ];
+            $status = $response['status_code'] ?? null;
+
+            if ($status === 'FINISHED') {
+                return;
+            }
+
+            if ($status === 'ERROR') {
+                throw new \RuntimeException('Media container error: ' . ($response['status_message'] ?? 'Unknown error'));
+            }
+
+            sleep($interval);
         }
 
-        $profileData = $account['metadata']['profileData'] ?? [];
-
-        return [
-            'username'            => $profileData['username'] ?? ($account['username'] ?? ($account['name'] ?? 'Compte Instagram')),
-            'name'                => $profileData['displayName'] ?? ($account['name'] ?? ''),
-            'followers_count'     => $profileData['followersCount'] ?? ($account['followersCount'] ?? 0),
-            'follows_count'       => $profileData['followsCount'] ?? ($account['followsCount'] ?? 0),
-            'media_count'         => $profileData['mediaCount'] ?? ($account['mediaCount'] ?? 0),
-            'profile_picture_url' => $profileData['profilePicture'] ?? ($account['profilePictureUrl'] ?? ''),
-        ];
+        throw new \RuntimeException('Media container processing timed out for container ' . $containerId);
     }
 
     /**
-     * Get recent media via Zernio with pagination.
+     * Get account-level stats: followers, following, media count, profile picture, bio.
      */
-    public function getRecentMedia(string $token, string $accountId, int $page = 1, int $limit = 24): array
+    public function getAccountStats(string $accessToken, string $igId): array
     {
-        $response = $this->zernio->getAccountPosts($accountId, [
-            'page' => $page,
-            'limit' => $limit,
-        ]);
-        
-        $postsData = $response['posts'] ?? [];
-        $pagination = $response['pagination'] ?? [];
+        $response = Http::timeout(120)->get(self::GRAPH_BASE . "/{$igId}", [
+            'fields'       => 'id,username,name,biography,followers_count,follows_count,media_count,profile_picture_url,website',
+            'access_token' => $accessToken,
+        ])->json();
 
-        $media = array_map(function($post) {
-            $mediaType = strtoupper($post['mediaType'] ?? 'IMAGE');
-            if ($mediaType === 'CAROUSEL') $mediaType = 'CAROUSEL_ALBUM';
-            
-            return [
-                'id'              => $post['id'] ?? '',
-                'caption'         => $post['message'] ?? '',
-                'media_type'      => $mediaType,
-                'media_url'       => $post['picture'] ?? '',
-                'thumbnail_url'   => $post['picture'] ?? '',
-                'like_count'      => $post['likeCount'] ?? 0,
-                'comments_count'  => $post['commentCount'] ?? 0,
-                'timestamp'       => $post['createdTime'] ?? now()->toIso8601String(),
-                'permalink'       => $post['permalink'] ?? null,
-            ];
-        }, $postsData);
+        if (isset($response['error'])) {
+            throw new \RuntimeException('Account stats error: ' . json_encode($response['error']));
+        }
 
-        return [
-            'media' => $media,
-            'has_more' => ($pagination['page'] ?? 1) < ($pagination['pages'] ?? 1),
-            'total' => $pagination['total'] ?? count($media),
-        ];
+        return $response;
+    }
+
+    /**
+     * Get recent media with engagement metrics.
+     */
+    public function getRecentMedia(string $accessToken, string $igId, int $limit = 12): array
+    {
+        $response = Http::timeout(120)->get(self::GRAPH_BASE . "/{$igId}/media", [
+            'fields'       => 'id,caption,media_type,media_url,thumbnail_url,timestamp,like_count,comments_count',
+            'limit'        => $limit,
+            'access_token' => $accessToken,
+        ])->json();
+
+        if (isset($response['error'])) {
+            throw new \RuntimeException('Media fetch error: ' . json_encode($response['error']));
+        }
+
+        return $response['data'] ?? [];
+    }
+
+    private function publicUrl(string $storagePath): string
+    {
+        $localUrl = Storage::disk('public')->url($storagePath);
+
+        $imgbbKey = config('services.imgbb.api_key');
+
+        if (!$imgbbKey) {
+            return $localUrl;
+        }
+
+        try {
+            $imageData = Storage::disk('public')->get($storagePath);
+            $response  = Http::timeout(120)->asForm()->post('https://api.imgbb.com/1/upload?key=' . urlencode($imgbbKey), [
+                'image'      => base64_encode($imageData),
+                'expiration' => 600,
+            ])->json();
+
+            if (!empty($response['data']['url'])) {
+                return $response['data']['url'];
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('imgbb upload failed, falling back to local URL', ['error' => $e->getMessage()]);
+        }
+
+        return $localUrl;
     }
 }

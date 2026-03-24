@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\ZernioService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,23 +11,25 @@ use Illuminate\Support\Str;
 
 class FacebookController extends Controller
 {
-    public function __construct(private ZernioService $zernio) {}
+    private const GRAPH_BASE = 'https://graph.facebook.com/v21.0';
 
     /**
      * Redirect the user to the Facebook OAuth authorization page.
      */
     public function connect(): RedirectResponse
     {
-        try {
-            $company   = Auth::user()->company;
-            $profileId = $company->getZernioProfileId();
-            $authUrl   = $this->zernio->getConnectUrl('facebook', $profileId, route('facebook.callback'));
+        $state = Str::random(32);
+        session(['facebook_oauth_state' => $state]);
 
-            return redirect($authUrl);
-        } catch (\Throwable $e) {
-            Log::error('Zernio Facebook connect failed', ['error' => $e->getMessage()]);
-            return redirect()->route('post-settings')->with('error', 'Impossible de se connecter à Zernio.');
-        }
+        $params = http_build_query([
+            'client_id'     => config('services.facebook.client_id'),
+            'redirect_uri'  => config('services.facebook.redirect'),
+            'scope'         => 'pages_show_list,pages_read_engagement,pages_manage_posts,pages_read_user_content',
+            'response_type' => 'code',
+            'state'         => $state,
+        ]);
+
+        return redirect("https://www.facebook.com/v21.0/dialog/oauth?{$params}");
     }
 
     /**
@@ -36,37 +37,67 @@ class FacebookController extends Controller
      */
     public function callback(Request $request): RedirectResponse
     {
+        if ($request->query('state') !== session('facebook_oauth_state')) {
+            return redirect()->route('post-settings')
+                ->with('error', 'Connexion Facebook annulée (état invalide).');
+        }
+
+        if ($request->has('error')) {
+            return redirect()->route('post-settings')
+                ->with('error', 'Connexion Facebook refusée.');
+        }
+
         try {
-            $company  = Auth::user()->company;
-            $accounts = $this->zernio->listAccounts();
+            // Exchange code for user access token
+            $tokenResponse = Http::get(self::GRAPH_BASE . '/oauth/access_token', [
+                'client_id'     => config('services.facebook.client_id'),
+                'client_secret' => config('services.facebook.client_secret'),
+                'redirect_uri'  => config('services.facebook.redirect'),
+                'code'          => $request->query('code'),
+            ]);
 
-            // Find the first facebook account that belongs to this profile
-            $fbAccount = collect($accounts)->first(function($acc) use ($company) {
-                // profileId can be an object with _id or just a string ID
-                $accProfileId = is_array($acc['profileId']) ? $acc['profileId']['_id'] : $acc['profileId'];
-                return $acc['platform'] === 'facebook' && $accProfileId === $company->zernio_profile_id;
-            });
-
-            if (!$fbAccount) {
-                throw new \RuntimeException('Aucun compte Facebook trouvé sur Zernio après connexion.');
+            if (!$tokenResponse->successful()) {
+                throw new \RuntimeException('Token exchange failed: ' . $tokenResponse->body());
             }
 
-            $company->update([
-                'zernio_facebook_account_id' => $fbAccount['_id'],
-                'facebook_page_id'           => $fbAccount['platformUserId'],
-                'facebook_page_name'         => $fbAccount['displayName'] ?? $fbAccount['name'] ?? 'Nom inconnu',
-                'facebook_page_picture_url'  => $fbAccount['profilePicture'] ?? $fbAccount['picture'] ?? null,
+            $userAccessToken = $tokenResponse->json('access_token');
+
+            // Get list of pages the user manages
+            $pagesResponse = Http::get(self::GRAPH_BASE . '/me/accounts', [
+                'access_token' => $userAccessToken,
+                'fields'       => 'id,name,access_token,picture{url}',
+            ]);
+
+            if (!$pagesResponse->successful()) {
+                throw new \RuntimeException('Failed to fetch pages: ' . $pagesResponse->body());
+            }
+
+            $pages = $pagesResponse->json('data', []);
+
+            if (empty($pages)) {
+                return redirect()->route('post-settings')
+                    ->with('error', 'Aucune Page Facebook trouvée. Vous devez être administrateur d\'au moins une Page.');
+            }
+
+            // Use the first page (most common case for artisans)
+            $page = $pages[0];
+
+            Auth::user()->company->update([
+                'facebook_access_token'     => $page['access_token'],
+                'facebook_page_id'          => $page['id'],
+                'facebook_page_name'        => $page['name'],
+                'facebook_page_picture_url' => $page['picture']['data']['url'] ?? null,
             ]);
 
         } catch (\Throwable $e) {
-            Log::error('Zernio Facebook callback failed', ['error' => $e->getMessage()]);
+            Log::error('Facebook OAuth failed', ['error' => $e->getMessage()]);
 
             return redirect()->route('post-settings')
                 ->with('error', 'Connexion Facebook échouée : ' . $e->getMessage());
         }
 
         return redirect()->route('post-settings')
-            ->with('success', 'Facebook connecté avec succès via Zernio !');
+            ->with('success', 'Facebook connecté avec succès !');
     }
 
     /**
@@ -75,11 +106,10 @@ class FacebookController extends Controller
     public function disconnect(): RedirectResponse
     {
         Auth::user()->company->update([
-            'zernio_facebook_account_id' => null,
-            'facebook_access_token'      => null,
-            'facebook_page_id'           => null,
-            'facebook_page_name'         => null,
-            'facebook_page_picture_url'  => null,
+            'facebook_access_token'     => null,
+            'facebook_page_id'          => null,
+            'facebook_page_name'        => null,
+            'facebook_page_picture_url' => null,
         ]);
 
         return redirect()->route('post-settings')

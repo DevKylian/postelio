@@ -8,7 +8,7 @@
                     'key' => 'single',
                     'category' => 'Posts uniques',
                     'badge' => null,
-                    'templates' => collect([
+                    'templates' => [
                         ['id' => 'review',        'label' => 'Avis Client',       'desc' => 'Un témoignage client transformé en citation premium.',        'icon' => 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.175 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.382-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'],
                         ['id' => 'project',       'label' => 'Avant / Après',     'desc' => 'Valorisez vos réalisations avec un split visuel percutant.',   'icon' => 'M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z M15 13a3 3 0 11-6 0 3 3 0 016 0z'],
                         ['id' => 'faq',           'label' => 'FAQ Artisan',       'desc' => 'Répondez aux questions fréquentes de vos clients.',            'icon' => 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
@@ -16,17 +16,17 @@
                         ['id' => 'quality_focus',       'label' => 'Focus Qualité',        'desc' => 'Mettez en lumière vos matériaux ou équipements.',                          'icon' => 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z'],
                         ['id' => 'conseil_saisonnier',  'label' => 'Conseil Saisonnier',   'desc' => 'Un tip utile et saisonnier pour anticiper les besoins de vos clients.',    'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'],
                         ['id' => 'erreur_a_eviter',     'label' => 'Erreur à Éviter',      'desc' => 'Une erreur fréquente de vos clients — format alerte très engageant.',       'icon' => 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'],
-                    ])->filter(fn($t) => $isNativeActive($t['id']))->toArray(),
+                    ],
                 ],
                 [
                     'key' => 'carousel',
                     'category' => 'Carrousels multi-slides',
                     'badge' => 'Multi-slides',
-                    'templates' => collect([
+                    'templates' => [
                         ['id' => 'chantier_detail',   'label' => 'Chantier en Détail',  'desc' => 'Un chantier sous tous ses angles, slide par slide.',          'icon' => 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
                         ['id' => 'step_by_step',      'label' => 'Step-by-Step',        'desc' => 'Votre process de travail, étape par étape, rassurant.',       'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'],
                         ['id' => 'guide_pedagogique', 'label' => 'Guide Pédagogique',   'desc' => 'Carrousel éducatif — positionnez-vous expert de votre domaine.', 'icon' => 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'],
-                    ])->filter(fn($t) => $isNativeActive($t['id']))->toArray(),
+                    ],
                 ],
             ];
 
@@ -188,18 +188,11 @@
 
                     {{-- Upload Mode --}}
                     <div x-show="mode === 'upload'">
-                        <div x-data="{
-                                uploadError: false,
-                                init() {
-                                    window.addEventListener('livewire-upload-start', () => console.log('[AUDIO DEBUG] Livewire upload START'));
-                                    window.addEventListener('livewire-upload-finish', () => console.log('[AUDIO DEBUG] Livewire upload FINISH'));
-                                    window.addEventListener('livewire-upload-error', () => { console.error('[AUDIO DEBUG] Livewire upload ERROR'); this.uploadError = true; });
-                                    window.addEventListener('livewire-upload-progress', (e) => console.log('[AUDIO DEBUG] Livewire upload progress:', e.detail?.progress));
-                                }
-                             }"
+                        <div x-data="{ uploadError: false }"
+                             x-on:livewire-upload-error.window="uploadError = true"
                              class="relative">
                             <input type="file" wire:model.live="audio" id="audio-input-step1" class="hidden" accept="audio/*"
-                                   x-on:change="uploadError = false; console.log('[AUDIO DEBUG] File selected:', $event.target.files[0]?.name, $event.target.files[0]?.size, $event.target.files[0]?.type)">
+                                   x-on:change="uploadError = false">
                             <label for="audio-input-step1"
                                    class="flex flex-col items-center justify-center w-full min-h-[200px] border-2 border-dashed rounded-2xl transition-all duration-200 cursor-pointer
                                         {{ $audio ? 'border-green-400 bg-green-50' : 'border-gray-200 hover:border-copper hover:bg-copper/5 bg-gray-50' }}">
@@ -220,12 +213,12 @@
                                         <p class="text-xs text-midnight font-bold">Analyse en cours...</p>
                                     </div>
                                 @else
-                                    <div wire:loading.flex wire:target="audio" class="flex-col items-center justify-center animate-pulse w-full">
+                                    <div wire:loading wire:target="audio" class="flex flex-col items-center animate-pulse">
                                         <svg class="animate-spin h-8 w-8 text-copper mb-3" fill="none" viewBox="0 0 24 24">
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        <p class="text-xs text-midnight font-semibold text-center w-full">Envoi du fichier...</p>
+                                        <p class="text-xs text-midnight font-semibold">Envoi du fichier...</p>
                                     </div>
                                     <div wire:loading.remove wire:target="audio" class="flex flex-col items-center">
                                         <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-copper shadow-md mb-3">
@@ -396,79 +389,13 @@
                 </div>
             </div>
 
-            {{-- ── STEP 3 : Style Visuel ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-full bg-midnight flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
-                    <div>
-                        <h3 class="font-semibold text-midnight text-base">Choisissez votre ambiance</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Quel univers visuel souhaitez-vous projeter ?</p>
-                    </div>
-                </div>
-
-                <div class="p-6">
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                        @php
-                            $availableStyles = [
-                                ['id' => 'standard',  'label' => 'Classique',   'icon' => 'M4 5a1 1 0 011-1h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5z', 'color' => 'gray'],
-                                ['id' => 'glass',     'label' => 'Glass',      'icon' => 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z', 'color' => 'sky'],
-                                ['id' => 'blueprint', 'label' => 'Blueprint',  'icon' => 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7', 'color' => 'blue'],
-                                ['id' => 'kraft',     'label' => 'Kraft',      'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'color' => 'amber'],
-                                ['id' => 'beton',     'label' => 'Béton Brut', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', 'color' => 'slate'],
-                            ];
-                            $styleColors = [
-                                'gray'  => ['bg' => 'bg-gray-50',  'text' => 'text-gray-600', 'border' => 'border-gray-200', 'active' => 'border-gray-600 bg-gray-50'],
-                                'sky'   => ['bg' => 'bg-sky-50',   'text' => 'text-sky-600',  'border' => 'border-sky-200',  'active' => 'border-sky-500 bg-sky-50'],
-                                'blue'  => ['bg' => 'bg-blue-50',  'text' => 'text-blue-600', 'border' => 'border-blue-200', 'active' => 'border-blue-600 bg-blue-50'],
-                                'amber' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-600','border' => 'border-amber-200','active' => 'border-amber-600 bg-amber-50'],
-                                'slate' => ['bg' => 'bg-slate-50', 'text' => 'text-slate-600','border' => 'border-slate-200','active' => 'border-slate-600 bg-slate-50'],
-                            ];
-                        @endphp
-
-                        @foreach($availableStyles as $sty)
-                        @php $c = $styleColors[$sty['color']]; @endphp
-                        <button type="button"
-                                wire:click="$set('visualStyle', '{{ $sty['id'] }}')"
-                                class="group relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200
-                                    {{ $visualStyle === $sty['id'] 
-                                        ? $c['active'] . ' shadow-sm' 
-                                        : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50' }}">
-                            
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200
-                                {{ $visualStyle === $sty['id'] 
-                                    ? 'bg-midnight text-white' 
-                                    : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $sty['icon'] }}" />
-                                </svg>
-                            </div>
-
-                            <div class="text-center">
-                                <p class="text-[11px] font-bold uppercase tracking-wider {{ $visualStyle === $sty['id'] ? 'text-midnight' : 'text-gray-500' }}">
-                                    {{ $sty['label'] }}
-                                </p>
-                            </div>
-
-                            @if($visualStyle === $sty['id'])
-                            <div class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-midnight flex items-center justify-center shadow-sm">
-                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            @endif
-                        </button>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
             {{-- ── PERSONNALISATION DU GABARIT ── --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" x-data="{ expanded: false }">
                 <button type="button" 
                         @click="expanded = !expanded" 
                         class="w-full px-6 py-5 border-b border-gray-50 flex items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors group">
                     <div class="flex items-center gap-4">
-                        <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>
+                        <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
                         <div class="text-left">
                             <h3 class="font-semibold text-midnight text-base leading-tight">
                                 Personnaliser le gabarit 
@@ -725,11 +652,11 @@
 
             {{-- REMOVED OLD STEP 2 POSITION --}}
 
-            {{-- ── STEP 5 : Photos (conditionnel) ── --}}
+            {{-- ── STEP 4 : Photos (conditionnel) ── --}}
             @if(in_array($template, ['project', 'lifestyle', 'quality_focus']) || ($template === 'custom' && $customPhotoMode === 'single'))
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">5</div>
+                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>
                     <div>
                         <h3 class="font-semibold text-midnight text-base">
                             {{ $template === 'project' ? 'Photos Avant & Après' : ($template === 'quality_focus' ? 'Photo du matériel' : ($template === 'custom' ? 'Photo requise' : 'Photo Lifestyle')) }}
@@ -768,7 +695,7 @@
                                         <span class="text-xs text-gray-300 mt-1">JPG, PNG, WEBP</span>
                                     @endif
                                 </label>
-                                <div wire:loading.flex wire:target="imageBefore" class="absolute inset-0 bg-white/80 items-center justify-center rounded-xl">
+                                <div wire:loading wire:target="imageBefore" class="absolute inset-0 bg-white/80 flex items-center justify-center rounded-xl">
                                     <svg class="animate-spin w-6 h-6 text-copper" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
                                 </div>
                             </div>
@@ -797,7 +724,7 @@
                                         <span class="text-xs text-gray-300 mt-1">JPG, PNG, WEBP</span>
                                     @endif
                                 </label>
-                                <div wire:loading.flex wire:target="imageAfter" class="absolute inset-0 bg-white/80 items-center justify-center rounded-xl">
+                                <div wire:loading wire:target="imageAfter" class="absolute inset-0 bg-white/80 flex items-center justify-center rounded-xl">
                                     <svg class="animate-spin w-6 h-6 text-copper" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
                                 </div>
                             </div>
@@ -810,11 +737,11 @@
             </div>
             @endif
 
-            {{-- ── STEP 5 : Photos carrousel ── --}}
+            {{-- ── STEP 4 : Photos carrousel ── --}}
             @if(in_array($template, ['chantier_detail', 'step_by_step']) || ($template === 'custom' && $customPhotoMode === 'carousel'))
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">5</div>
+                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>
                     <div class="flex items-center justify-between flex-1">
                         <div>
                             <h3 class="font-semibold text-midnight text-base">Photos du chantier</h3>
@@ -848,7 +775,7 @@
                                         <span class="text-[10px] text-gray-300 font-medium">Ajouter</span>
                                     @endif
                                 </label>
-                                <div wire:loading.flex wire:target="extraImages.{{ $i }}" class="absolute inset-0 bg-white/80 items-center justify-center rounded-xl">
+                                <div wire:loading wire:target="extraImages.{{ $i }}" class="absolute inset-0 bg-white/80 flex items-center justify-center rounded-xl">
                                     <svg class="animate-spin w-5 h-5 text-copper" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
                                 </div>
                             </div>
@@ -877,20 +804,7 @@
             @endif
 
             {{-- ── Plateformes ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative">
-                @if(!$igConnected && !$fbConnected)
-                    <div class="absolute inset-0 bg-white/60 backdrop-blur-sm z-20 flex flex-col items-center justify-center p-6 text-center">
-                        <div class="flex flex-col items-center gap-2">
-                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                            <p class="text-sm font-semibold text-midnight mt-1">Connexion requise</p>
-                            <p class="text-[11px] text-gray-500 max-w-[220px] mx-auto mb-2">Pour configurer la diffusion, veuillez lier un compte social.</p>
-                            <a href="{{ route('post-settings') }}" wire:navigate class="px-3.5 py-1.5 bg-white border border-gray-200 shadow-sm hover:border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                                Paramétrer
-                            </a>
-                        </div>
-                    </div>
-                @endif
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
                     <div class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 shrink-0">
                         <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -903,18 +817,11 @@
                     </div>
                 </div>
                 <div class="p-6">
-                    @php
-                        $isPremium = auth()->user()->canPublishToSocialMedia();
-                        $safePlatforms = is_array($platforms) ? $platforms : (is_string($platforms) && $platforms ? [$platforms] : []);
-                        if ($platforms === true) {
-                            $safePlatforms = ($isPremium && $igConnected) ? ['instagram'] : (($isPremium && $fbConnected) ? ['facebook'] : []);
-                        }
-                    @endphp
                     <div class="grid grid-cols-2 gap-3">
                         {{-- Instagram --}}
-                        <label class="relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200
-                            {{ (!$isPremium || !$igConnected) ? 'opacity-50 grayscale cursor-not-allowed bg-gray-50 border-gray-100' : (in_array('instagram', $safePlatforms) ? 'border-pink-400 bg-pink-50/50 cursor-pointer' : 'border-gray-100 bg-gray-50 hover:border-gray-200 cursor-pointer') }}">
-                            <input type="checkbox" wire:model.live="platforms" value="instagram" class="hidden" {{ (!$isPremium || !$igConnected) ? 'disabled' : '' }} />
+                        <label class="relative flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+                            {{ in_array('instagram', $platforms) ? 'border-pink-400 bg-pink-50/50' : 'border-gray-100 bg-gray-50 hover:border-gray-200' }}">
+                            <input type="checkbox" wire:model.live="platforms" value="instagram" class="hidden" />
                             <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                                  style="background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)">
                                 <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -922,64 +829,52 @@
                                 </svg>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-sm font-semibold {{ in_array('instagram', $safePlatforms) ? 'text-midnight' : 'text-gray-600' }}">Instagram</p>
-                                <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest">{{ $isPremium ? '1080 × 1080 px' : 'Premium' }}</p>
+                                <p class="text-sm font-semibold {{ in_array('instagram', $platforms) ? 'text-midnight' : 'text-gray-600' }}">Instagram</p>
+                                <p class="text-[11px] text-gray-400">1080 × 1080 px</p>
                             </div>
-                            @if(in_array('instagram', $safePlatforms))
+                            @if(in_array('instagram', $platforms))
                                 <div class="w-5 h-5 rounded-full bg-pink-500 flex items-center justify-center shrink-0">
                                     <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
                             @else
-                                <div class="w-5 h-5 rounded-full border-2 border-gray-100 shrink-0 flex items-center justify-center">
-                                    @if(!$isPremium)
-                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                                    @endif
-                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 border-gray-200 shrink-0"></div>
                             @endif
-                            @if(!$isPremium)
-                                <span class="absolute top-2 right-2 text-[9px] font-black text-copper bg-amber-50 px-2.5 py-1 rounded-full uppercase tracking-widest border border-amber-100/50 shadow-sm">Premium</span>
-                            @elseif(!$igConnected)
-                                <span class="absolute top-2 right-2 text-[9px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Non lié</span>
-                            @endif
+                            @unless($igConnected)
+                                <span class="absolute top-2 right-2 text-[9px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full">Non lié</span>
+                            @endunless
                         </label>
 
                         {{-- Facebook --}}
-                        <label class="relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200
-                            {{ (!$isPremium || !$fbConnected) ? 'opacity-50 grayscale cursor-not-allowed bg-gray-50 border-gray-100' : (in_array('facebook', $safePlatforms) ? 'border-blue-400 bg-blue-50/50 cursor-pointer' : 'border-gray-100 bg-gray-50 hover:border-gray-200 cursor-pointer') }}">
-                            <input type="checkbox" wire:model.live="platforms" value="facebook" class="hidden" {{ (!$isPremium || !$fbConnected) ? 'disabled' : '' }} />
-                            <div class="w-9 h-9 rounded-lg bg-[#1877F2] flex items-center justify-center shrink-0 shadow-sm">
+                        <label class="relative flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+                            {{ in_array('facebook', $platforms) ? 'border-blue-400 bg-blue-50/50' : 'border-gray-100 bg-gray-50 hover:border-gray-200' }}">
+                            <input type="checkbox" wire:model.live="platforms" value="facebook" class="hidden" />
+                            <div class="w-9 h-9 rounded-lg bg-[#1877F2] flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                                 </svg>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-sm font-semibold {{ in_array('facebook', $safePlatforms) ? 'text-midnight' : 'text-gray-600' }}">Facebook</p>
-                                <p class="text-[11px] font-bold uppercase tracking-wider {{ $isPremium ? 'text-gray-400' : 'text-copper/70' }}">{{ $isPremium ? '1080 × 1080 px' : 'Premium' }}</p>
+                                <p class="text-sm font-semibold {{ in_array('facebook', $platforms) ? 'text-midnight' : 'text-gray-600' }}">Facebook</p>
+                                <p class="text-[11px] text-gray-400">1080 × 1080 px</p>
                             </div>
-                            @if(in_array('facebook', $safePlatforms))
-                                <div class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center shrink-0 shadow-sm">
+                            @if(in_array('facebook', $platforms))
+                                <div class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center shrink-0">
                                     <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
                             @else
-                                <div class="w-5 h-5 rounded-full border-2 border-gray-100 shrink-0 flex items-center justify-center">
-                                    @if(!$isPremium)
-                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                                    @endif
-                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 border-gray-200 shrink-0"></div>
                             @endif
-                            @if(!$isPremium)
-                                <span class="absolute top-2 right-2 text-[9px] font-black text-copper bg-amber-50 px-2.5 py-1 rounded-full uppercase tracking-widest border border-amber-100/50 shadow-sm">Premium</span>
-                            @elseif(!$fbConnected)
-                                <span class="absolute top-2 right-2 text-[9px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Non lié</span>
-                            @endif
+                            @unless($fbConnected)
+                                <span class="absolute top-2 right-2 text-[9px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full">Non lié</span>
+                            @endunless
                         </label>
                     </div>
 
-                    @if(in_array('instagram', $safePlatforms) && in_array('facebook', $safePlatforms))
+                    @if(in_array('instagram', $platforms) && in_array('facebook', $platforms))
                         <p class="text-xs text-gray-400 mt-3 flex items-center gap-1.5">
                             <svg class="w-3.5 h-3.5 text-copper shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -991,20 +886,7 @@
             </div>
 
             {{-- ── Planification ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative">
-                @if(!$igConnected && !$fbConnected)
-                    <div class="absolute inset-0 bg-white/60 backdrop-blur-sm z-20 flex flex-col items-center justify-center p-6 text-center">
-                        <div class="flex flex-col items-center gap-2">
-                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                            <p class="text-sm font-semibold text-midnight mt-1">Connexion requise</p>
-                            <p class="text-[11px] text-gray-500 max-w-[220px] mx-auto mb-2">Connectez un compte social en premier pour diffuser vos posts.</p>
-                            <a href="{{ route('post-settings') }}" wire:navigate class="px-3.5 py-1.5 bg-white border border-gray-200 shadow-sm hover:border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                                Paramétrer
-                            </a>
-                        </div>
-                    </div>
-                @endif
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
                     <div class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 shrink-0">
                         <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1333,10 +1215,9 @@
                         <svg wire:loading.remove wire:target="validatePost" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                     @endif
                     <svg wire:loading wire:target="validatePost" class="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    {{-- Texte : toujours visible, ne cause pas de double-ligne --}}
                     @if($scheduleType === 'scheduled' && $scheduledAt)
                         <span>Planifier — {{ \Carbon\Carbon::parse($scheduledAt)->translatedFormat('d/m à H\hi') }}</span>
-                    @elseif(!$igConnected && !$fbConnected)
-                        <span>Valider et sauvegarder</span>
                     @else
                         <span>Valider et publier</span>
                     @endif
@@ -1490,9 +1371,7 @@
             this.audioBlob = new Blob(this.chunks, { type });
             if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
             this.audioUrl = URL.createObjectURL(this.audioBlob);
-            
-            // Auto-confirm analysis just like MP3 import
-            this.confirmRecording();
+            this.recState = 'done';
         },
 
         confirmRecording() {
@@ -1503,11 +1382,7 @@
             this.$wire.upload(
                 'audio',
                 file,
-                () => { 
-                    this.recState = 'confirmed'; 
-                    // Manually trigger the analysis since upload doesn't always fire updatedAudio hook
-                    this.$wire.analyzeAudio();
-                },
+                () => { this.recState = 'confirmed'; },
                 () => { this.recState = 'done'; alert('Erreur lors de l\'envoi. Réessayez.'); }
             );
         },

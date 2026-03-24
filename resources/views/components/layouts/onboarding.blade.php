@@ -19,7 +19,12 @@
                 <div class="absolute bottom-0 left-0 w-96 h-96 bg-copper opacity-5 rounded-full -ml-48 -mb-48"></div>
 
                 <div class="relative z-10">
-                    <x-logo size="lg" textClass="text-[1.7rem] text-white" />
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 bg-copper rounded-lg flex items-center justify-center font-display font-extrabold text-white text-xl">
+                            P
+                        </div>
+                        <span class="font-display font-extrabold text-white text-2xl tracking-tight">Postelio</span>
+                    </div>
                 </div>
 
                 <div class="relative z-10">

@@ -507,48 +507,6 @@
           </div>
         </section>
 
-        <!-- FAQ -->
-        <section class="py-32 border-t border-slate-200/40 bg-white/40 backdrop-blur-sm">
-          <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-              <h2 class="text-4xl font-display font-semibold tracking-tight text-midnight mb-6">Questions fréquentes</h2>
-            </div>
-            
-            <div class="space-y-4">
-              @php
-                $faqs = [
-                  ['q' => "Est-ce que j'ai besoin de beaucoup d'abonnés ?", 'short' => "Non. Quelques centaines de personnes locales suffisent.", 'a' => "Vous n'êtes pas un influenceur. Votre but est de toucher les propriétaires de votre région. Un petit réseau local qualifié génère bien plus de chantiers que 10 000 abonnés à l'autre bout du monde."],
-                  ['q' => "Faut-il savoir poster sur Instagram ou Facebook ?", 'short' => "Non, l'application fait tout pour vous.", 'a' => "30 secondes suffisent pour créer et publier un post parfait. Vous n'avez besoin d'aucune compétence en réseaux sociaux."],
-                  ['q' => "Combien de temps ça prend par jour ?", 'short' => "30 secondes par chantier suffisent.", 'a' => "Prenez la photo, dictez votre note vocale, et c'est publié. L'application s'occupe de la rédaction et de la mise en forme."],
-                  ['q' => "Est-ce vraiment rentable dès le premier mois ?", 'short' => "Oui, nos artisans voient +30% de clients premium.", 'a' => "Dès les premières semaines, votre vitrine professionnelle rassure les prospects et justifie vos tarifs sans négociation."]
-                ];
-              @endphp
-              @foreach($faqs as $idx => $faq)
-                <div class="glass-card overflow-hidden">
-                  <button @click="openFaq === {{ $idx }} ? openFaq = null : openFaq = {{ $idx }}" 
-                          class="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50/50 transition-colors">
-                    <div>
-                      <span class="block font-medium text-lg text-midnight mb-1">{{ $faq['q'] }}</span>
-                      <span class="text-copper text-sm">{{ $faq['short'] }}</span>
-                    </div>
-                    <div class="ml-4 flex-shrink-0 text-slate-400">
-                      <i data-lucide="chevron-down" class="w-5 h-5 transition-transform duration-300" :class="openFaq === {{ $idx }} ? 'rotate-180' : ''"></i>
-                    </div>
-                  </button>
-                  <div x-show="openFaq === {{ $idx }}" 
-                       x-collapse
-                       class="px-6 pb-6 text-slate-600 font-light leading-relaxed"
-                       style="display: none;">
-                    <div class="pt-4 border-t border-slate-100">
-                      {{ $faq['a'] }}
-                    </div>
-                  </div>
-                </div>
-              @endforeach
-            </div>
-          </div>
-        </section>
-
         <!-- Pricing -->
         <section id="tarifs" class="py-32 relative">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -701,6 +659,48 @@
                 </div>
               </div>
 
+            </div>
+          </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="py-32 border-t border-slate-200/40 bg-white/40 backdrop-blur-sm">
+          <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+              <h2 class="text-4xl font-display font-semibold tracking-tight text-midnight mb-6">Questions fréquentes</h2>
+            </div>
+
+            <div class="space-y-4">
+              @php
+                $faqs = [
+                  ['q' => "Est-ce que j'ai besoin de beaucoup d'abonnés ?", 'short' => "Non. Quelques centaines de personnes locales suffisent.", 'a' => "Vous n'êtes pas un influenceur. Votre but est de toucher les propriétaires de votre région. Un petit réseau local qualifié génère bien plus de chantiers que 10 000 abonnés à l'autre bout du monde."],
+                  ['q' => "Faut-il savoir poster sur Instagram ou Facebook ?", 'short' => "Non, l'application fait tout pour vous.", 'a' => "30 secondes suffisent pour créer et publier un post parfait. Vous n'avez besoin d'aucune compétence en réseaux sociaux."],
+                  ['q' => "Combien de temps ça prend par jour ?", 'short' => "30 secondes par chantier suffisent.", 'a' => "Prenez la photo, dictez votre note vocale, et c'est publié. L'application s'occupe de la rédaction et de la mise en forme."],
+                  ['q' => "Est-ce vraiment rentable dès le premier mois ?", 'short' => "Oui, nos artisans voient +30% de clients premium.", 'a' => "Dès les premières semaines, votre vitrine professionnelle rassure les prospects et justifie vos tarifs sans négociation."]
+                ];
+              @endphp
+              @foreach($faqs as $idx => $faq)
+                <div class="glass-card overflow-hidden">
+                  <button @click="openFaq === {{ $idx }} ? openFaq = null : openFaq = {{ $idx }}"
+                          class="w-full flex items-center justify-between p-6 text-left hover:bg-slate-50/50 transition-colors">
+                    <div>
+                      <span class="block font-medium text-lg text-midnight mb-1">{{ $faq['q'] }}</span>
+                      <span class="text-copper text-sm">{{ $faq['short'] }}</span>
+                    </div>
+                    <div class="ml-4 flex-shrink-0 text-slate-400">
+                      <i data-lucide="chevron-down" class="w-5 h-5 transition-transform duration-300" :class="openFaq === {{ $idx }} ? 'rotate-180' : ''"></i>
+                    </div>
+                  </button>
+                  <div x-show="openFaq === {{ $idx }}"
+                       x-collapse
+                       class="px-6 pb-6 text-slate-600 font-light leading-relaxed"
+                       style="display: none;">
+                    <div class="pt-4 border-t border-slate-100">
+                      {{ $faq['a'] }}
+                    </div>
+                  </div>
+                </div>
+              @endforeach
             </div>
           </div>
         </section>

@@ -102,17 +102,28 @@ class TextFitterService
             return $text;
         }
 
-        // Try to find a sentence end (. ! ?) within maxChars
+        // Try to find a sentence/clause end (. ! ? :) within maxChars
         $sub = mb_substr($text, 0, $maxChars);
+
+        // First try sentence-ending punctuation
         $lastSentenceEnd = max(
             mb_strrpos($sub, '.') ?: 0,
             mb_strrpos($sub, '!') ?: 0,
             mb_strrpos($sub, '?') ?: 0,
         );
-
-        // Accept sentence cut only if it keeps at least 50% of the budget
         if ($lastSentenceEnd > $maxChars * 0.5) {
             return trim(mb_substr($text, 0, $lastSentenceEnd + 1));
+        }
+
+        // Try clause separators (: — –) — cut BEFORE the separator
+        $lastClauseBreak = max(
+            mb_strrpos($sub, ' :') ?: 0,
+            mb_strrpos($sub, ' —') ?: 0,
+            mb_strrpos($sub, ' –') ?: 0,
+            mb_strrpos($sub, ' -') ?: 0,
+        );
+        if ($lastClauseBreak > $maxChars * 0.4) {
+            return trim(mb_substr($text, 0, $lastClauseBreak));
         }
 
         // Fall back to word boundary, but avoid ending on dangling words

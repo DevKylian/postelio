@@ -31,10 +31,13 @@ class ContentRefinerService
             . "- Structure la légende avec de vrais sauts de ligne entre chaque idée/paragraphe (retour à la ligne simple entre deux phrases liées, ligne vide entre deux blocs distincts).\n"
             . "- Exemple de structure attendue : accroche sur une ligne, ligne vide, corps espacé point par point, ligne vide, call-to-action, ligne vide, hashtags.\n\n";
 
-        $noTruncationRule = "RÈGLE DE RÉDACTION STRICTE SUR LES TEXTES COURTS :\n"
-            . "- Tu ne dois JAMAIS couper une phrase ou une idée en plein milieu pour respecter une limite de caractères.\n"
-            . "- Chaque texte généré (titre de slide, texte sur image) DOIT composer une idée ou une phrase parfaitement lisible et complète.\n"
-            . "- Les limites de caractères (ex: ~50 car.) sont indicatives. Si besoin, dépasse-les très légèrement pour terminer le mot ou la phrase intelligemment.\n\n";
+        $noTruncationRule = "RÈGLE DE RÉDACTION STRICTE SUR LES TEXTES D'IMAGE :\n"
+            . "- Le champ image_text (et title, slides) s'affiche dans une zone visuelle FIXE sur l'image.\n"
+            . "- Si le texte est trop long, il sera COUPÉ visuellement et le résultat sera illisible et cassé.\n"
+            . "- Tu DOIS donc écrire des textes COURTS et COMPLETS dès le départ.\n"
+            . "- Ne génère JAMAIS une longue phrase que tu essaies de faire tenir — écris directement un titre court de 2 à 5 mots.\n"
+            . "- Les limites de caractères sont STRICTES et NON NÉGOCIABLES. Ne les dépasse JAMAIS.\n"
+            . "- Exemple CORRECT : 'Rénovation cuisine' (19 car.) — Exemple INTERDIT : 'Création d'une cuisine sur mesure : élégance et savoir-faire' (59 car.)\n\n";
 
         $prompt = $noHallucinateGlobal . $noMarkdownPrefix . $noTruncationRule . $this->getPromptForTemplate($template, $photoCount, $options);
         

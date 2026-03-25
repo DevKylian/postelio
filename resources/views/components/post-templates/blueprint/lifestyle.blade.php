@@ -13,32 +13,33 @@
          style="background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 30px 30px;">
     </div>
 
-    {{-- Image area — explicit height: 360-64=296px, with min-h-0 to allow flex shrink --}}
-    <div class="flex-1 min-h-0 relative flex items-center justify-center p-10">
+    {{-- Photo area --}}
+    <div class="flex-1 min-h-0 relative flex items-center justify-center pt-8 px-10">
         <div class="relative w-full h-full border border-white/40 p-2 bg-white overflow-hidden">
              @if($imageUrl)
                  <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
              @else
                  <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=600" class="w-full h-full object-cover">
              @endif
-
-             {{-- Text zone: anchored inside photo frame, max 2 lines --}}
-             @php
-                $len = mb_strlen($text);
-                $fontSize = 'text-[11px]';
-                if ($len > 35) $fontSize = 'text-[8px]';
-                elseif ($len > 25) $fontSize = 'text-[9px]';
-             @endphp
-
-             <div class="absolute bottom-2 left-2 right-2 h-[36px] bg-[#0047AB] border-2 border-white shadow-2xl flex items-center justify-center px-3 overflow-hidden">
-                  <span class="text-white {{ $fontSize }} font-black font-mono-technical uppercase tracking-[0.15em] leading-tight text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</span>
-             </div>
         </div>
     </div>
 
-    {{-- Footer — fixed 64px --}}
-    <div class="h-16 shrink-0 bg-white border-t-2 border-[#0047AB] px-10 flex items-center justify-between z-20">
-        <span class="text-[#0047AB] text-[11px] font-black font-mono-technical uppercase tracking-[0.2em] truncate max-w-[80%]">{{ $companyLabel }}</span>
+    {{-- Text zone: between photo and footer, fixed 40px height --}}
+    <div class="h-[40px] shrink-0 flex items-center justify-center px-10 overflow-hidden">
+        @php
+            $len = mb_strlen($text);
+            $fontSize = 'text-[11px]';
+            if ($len > 30) $fontSize = 'text-[8px]';
+            elseif ($len > 20) $fontSize = 'text-[9px]';
+        @endphp
+        <div class="bg-white/15 border border-white/30 px-4 py-1.5 max-w-full overflow-hidden">
+            <span class="text-white {{ $fontSize }} font-black font-mono-technical uppercase tracking-[0.15em] leading-tight text-center block truncate">{{ $text }}</span>
+        </div>
+    </div>
+
+    {{-- Footer — fixed 48px --}}
+    <div class="h-12 shrink-0 bg-white border-t-2 border-[#0047AB] px-10 flex items-center justify-between z-20">
+        <span class="text-[#0047AB] text-[10px] font-black font-mono-technical uppercase tracking-[0.2em] truncate max-w-[80%]">{{ $companyLabel }}</span>
         <div class="flex items-center gap-4">
              <div class="w-2.5 h-2.5 rounded-full" style="background-color: {{ $brandColor }}"></div>
         </div>

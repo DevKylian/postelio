@@ -8,37 +8,38 @@
 
 @php
     $len = mb_strlen($text);
-    $fontSize = 'text-sm';
+    $fontSize = 'text-[13px]';
     if ($len > 25) $fontSize = 'text-[10px]';
-    elseif ($len > 18) $fontSize = 'text-xs';
+    elseif ($len > 18) $fontSize = 'text-[11px]';
 @endphp
 
-<div class="w-full aspect-square bg-[#0047AB] relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
+{{-- 360x360 container, all children absolutely positioned in px --}}
+<div style="width: 100%; aspect-ratio: 1/1; background: #0047AB; position: relative; overflow: hidden;" class="{{ $preview ? 'rounded-xl shadow-2xl' : '' }}">
 
-    {{-- Background Grid --}}
-    <div class="absolute inset-0 opacity-10 pointer-events-none"
-         style="background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 30px 30px;">
-    </div>
+    {{-- Grid background --}}
+    <div style="position: absolute; inset: 0; opacity: 0.1; pointer-events: none; background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 30px 30px;"></div>
 
-    {{-- Photo frame — fixed position with absolute px values --}}
-    <div class="absolute overflow-hidden bg-white" style="top: 28px; left: 28px; right: 28px; bottom: 88px; padding: 6px;">
+    {{-- Photo frame: top 24px, sides 24px, stops at 200px from top (leaving room below) --}}
+    <div style="position: absolute; top: 24px; left: 24px; right: 24px; bottom: 100px; background: white; padding: 5px; overflow: hidden;">
         @if($imageUrl)
-            <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
+            <img src="{{ $imageUrl }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         @else
-            <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=600" class="w-full h-full object-cover">
+            <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=600" style="width: 100%; height: 100%; object-fit: cover; display: block;">
         @endif
     </div>
 
-    {{-- Text band — between photo and footer, 44px tall --}}
-    <div class="absolute overflow-hidden flex items-center justify-center" style="left: 28px; right: 28px; bottom: 44px; height: 44px;">
-        <div class="bg-white/15 backdrop-blur-sm border border-white/30 px-5 py-1.5 max-w-full overflow-hidden">
-            <span class="text-white {{ $fontSize }} font-black font-mono-technical uppercase tracking-[0.15em] leading-snug text-center block truncate">{{ $text }}</span>
+    {{-- Text zone: centered between photo bottom and footer top --}}
+    {{-- Photo bottom = 360-100 = 260px, Footer top = 360-48 = 312px --}}
+    {{-- So text zone: top 262px, bottom 50px → height ~48px, centered --}}
+    <div style="position: absolute; top: 262px; left: 24px; right: 24px; height: 48px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+        <div style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.3); padding: 6px 16px; max-width: 100%; overflow: hidden;">
+            <span style="color: white; font-size: {{ $len > 25 ? '10px' : ($len > 18 ? '11px' : '13px') }}; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.3; text-align: center; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Courier New', monospace;">{{ $text }}</span>
         </div>
     </div>
 
-    {{-- Footer — fixed 44px at bottom --}}
-    <div class="absolute overflow-hidden bg-white flex items-center justify-between" style="left: 0; right: 0; bottom: 0; height: 44px; padding: 0 28px; border-top: 2px solid #0047AB;">
-        <span class="text-[#0047AB] text-[10px] font-black font-mono-technical uppercase tracking-[0.2em] truncate max-w-[80%]">{{ $companyLabel }}</span>
-        <div class="w-2.5 h-2.5 rounded-full" style="background-color: {{ $brandColor }}"></div>
+    {{-- Footer: 48px fixed at bottom --}}
+    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 48px; background: white; border-top: 2px solid #0047AB; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; overflow: hidden;">
+        <span style="color: #0047AB; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; font-family: 'Courier New', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">{{ $companyLabel }}</span>
+        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
     </div>
 </div>

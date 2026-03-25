@@ -39,8 +39,7 @@
         $rawText = preg_replace('/#\S+/', '', $rawText);
         $rawText = trim($rawText);
 
-        // ── Render-time smart truncation ──────────────────────────────────
-        // Hardcoded per-template limits — does NOT depend on config cache
+        // ── Render-time smart truncation (hardcoded, no config/cache dependency) ──
         $imageTextMaxChars = match($template) {
             'lifestyle' => 30,
             'project' => 40,
@@ -49,43 +48,30 @@
         };
 
         if ($imageTextMaxChars && mb_strlen($rawText) > $imageTextMaxChars) {
-            // Smart truncation: never end on a dangling word
             $danglingWords = ['de', 'du', 'des', 'le', 'la', 'les', 'un', 'une',
                 'sur', 'sous', 'dans', 'en', 'et', 'ou', 'à', 'au', 'aux',
                 'pour', 'par', 'avec', 'sans', 'vers', 'ce', 'cette', 'ces',
                 'son', 'sa', 'ses', 'qui', 'que', 'dont'];
 
+            // 1. Cut at clause separator (: — –) if found
             $sub = mb_substr($rawText, 0, $imageTextMaxChars);
-
-            // Never cut inside a hyphenated compound word (savoir-faire, sur-mesure)
-            if (mb_substr($sub, -1) === '-' || (mb_strlen($rawText) > $imageTextMaxChars && mb_substr($rawText, $imageTextMaxChars, 1) === '-')) {
-                $rest = mb_substr($rawText, $imageTextMaxChars);
-                if (preg_match('/^-?\S+/', $rest, $m) && mb_strlen($sub . $m[0]) <= $imageTextMaxChars + 15) {
-                    $rawText = trim($sub . $m[0]);
-                    $sub = $rawText; // update for further processing only if still too long
-                    if (mb_strlen($rawText) <= $imageTextMaxChars + 15) {
-                        goto truncation_done;
-                    }
-                }
-            }
-
-            // Try clause separator first (: — –)
             $clauseBreak = max(
-                mb_strrpos($sub, ' :') ?: 0,
-                mb_strrpos($sub, ' —') ?: 0,
-                mb_strrpos($sub, ' –') ?: 0,
-                mb_strrpos($sub, ' -') ?: 0,
+                mb_strrpos($sub, ' :') ?: 0, mb_strrpos($sub, ' —') ?: 0,
+                mb_strrpos($sub, ' –') ?: 0, mb_strrpos($sub, ' -') ?: 0,
             );
+
             if ($clauseBreak > $imageTextMaxChars * 0.4) {
                 $rawText = trim(mb_substr($rawText, 0, $clauseBreak));
             } else {
-                // Word boundary, then strip dangling words
+                // 2. Cut at last space, then strip dangling words
                 $lastSpace = mb_strrpos($sub, ' ');
                 if ($lastSpace) {
                     $rawText = trim(mb_substr($rawText, 0, $lastSpace));
                     for ($i = 0; $i < 5; $i++) {
                         $lastWord = mb_strtolower(preg_replace('/.*\s+/u', '', $rawText));
-                        if (in_array($lastWord, $danglingWords) && mb_strrpos($rawText, ' ') !== false) {
+                        // Strip dangling words AND half-hyphenated words (e.g. "savoir-")
+                        if ((in_array($lastWord, $danglingWords) || mb_substr($rawText, -1) === '-')
+                            && mb_strrpos($rawText, ' ') !== false) {
                             $rawText = trim(mb_substr($rawText, 0, mb_strrpos($rawText, ' ')));
                         } else {
                             break;
@@ -93,7 +79,6 @@
                     }
                 }
             }
-            truncation_done:
         }
     @endphp
 

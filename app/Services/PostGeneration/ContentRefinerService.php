@@ -254,10 +254,11 @@ class ContentRefinerService
                 'lifestyle' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . $jsonSingleWithImageText(
                     "Légende Instagram complète ({$captionRange}, storytelling). {$hashtagInstruction}",
-                    "Titre ULTRA-COURT de 2 à 5 mots MAXIMUM qui résume le projet ({$lifeImgConstraint}). "
-                    . "Le titre DOIT être une expression COMPLÈTE et autonome (pas une phrase coupée). "
-                    . "Exemples : 'Salle de bain moderne', 'Rénovation cuisine', 'Terrasse bois sur mesure', 'Pose parquet chêne'. "
-                    . "INTERDIT : les titres longs type 'Création d'une cuisine sur mesure dans un appartement'. Sans hashtag."
+                    "MAXIMUM ABSOLU : 30 caractères (2 à 4 mots). "
+                    . "Génère un TITRE, pas une phrase. Pas de verbe, pas de déterminant inutile. "
+                    . "BONS exemples : 'Rénovation cuisine' (19 car.), 'Salle de bain moderne' (22 car.), 'Terrasse bois' (13 car.), 'Pose parquet chêne' (18 car.). "
+                    . "MAUVAIS exemples INTERDITS : 'Création d'une cuisine sur mesure' (34 car. — TROP LONG), 'Rénovation complète de la salle de bain' (40 car. — TROP LONG). "
+                    . "Compte les caractères de ton image_text AVANT de répondre. S'il dépasse 30, RACCOURCIS-LE. Sans hashtag."
                 ),
 
                 'project' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
@@ -266,10 +267,10 @@ class ContentRefinerService
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
                     "Légende Instagram complète ({$captionRange}, storytelling). {$hashtagInstruction}",
-                    "Titre ULTRA-COURT de 2 à 4 mots MAXIMUM décrivant le projet ({$projImgConstraint}). "
-                    . "Le titre DOIT être une expression COMPLÈTE et autonome. "
-                    . "Exemples : 'Avant / Après cuisine', 'Rénovation salle de bain', 'Pose carrelage'. "
-                    . "INTERDIT : les phrases longues. Sans hashtag."
+                    "MAXIMUM ABSOLU : 40 caractères (2 à 5 mots). "
+                    . "Génère un TITRE court, pas une phrase longue. "
+                    . "BONS exemples : 'Avant / Après cuisine' (21 car.), 'Rénovation salle de bain' (25 car.), 'Pose carrelage' (14 car.). "
+                    . "Compte les caractères AVANT de répondre. Sans hashtag."
                 ),
 
                 // ── Carousels ─────────────────────────────────────────────────────

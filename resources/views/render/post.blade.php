@@ -39,12 +39,48 @@
         $rawText = preg_replace('/#\S+/', '', $rawText);
         $rawText = trim($rawText);
 
-        // ── Smart truncation at render time for image_text fields ──
-        // Ensures even old posts with overly long text render cleanly
-        $textZone = config("template-text-zones.{$template}.image_text");
-        if ($textZone && mb_strlen($rawText) > $textZone['maxChars']) {
-            $rawText = app(\App\Services\PostGeneration\TextFitterService::class)
-                ->truncate($rawText, $textZone['maxChars']);
+        // ── Render-time smart truncation ──────────────────────────────────
+        // Hardcoded per-template limits — does NOT depend on config cache
+        $imageTextMaxChars = match($template) {
+            'lifestyle' => 30,
+            'project' => 40,
+            'quality_focus' => 50,
+            default => null,
+        };
+
+        if ($imageTextMaxChars && mb_strlen($rawText) > $imageTextMaxChars) {
+            // Smart truncation: never end on a dangling word
+            $danglingWords = ['de', 'du', 'des', 'le', 'la', 'les', 'un', 'une',
+                'sur', 'sous', 'dans', 'en', 'et', 'ou', 'à', 'au', 'aux',
+                'pour', 'par', 'avec', 'sans', 'vers', 'ce', 'cette', 'ces',
+                'son', 'sa', 'ses', 'qui', 'que', 'dont'];
+
+            $sub = mb_substr($rawText, 0, $imageTextMaxChars);
+
+            // Try clause separator first (: — –)
+            $clauseBreak = max(
+                mb_strrpos($sub, ' :') ?: 0,
+                mb_strrpos($sub, ' —') ?: 0,
+                mb_strrpos($sub, ' –') ?: 0,
+                mb_strrpos($sub, ' -') ?: 0,
+            );
+            if ($clauseBreak > $imageTextMaxChars * 0.4) {
+                $rawText = trim(mb_substr($rawText, 0, $clauseBreak));
+            } else {
+                // Word boundary, then strip dangling words
+                $lastSpace = mb_strrpos($sub, ' ');
+                if ($lastSpace) {
+                    $rawText = trim(mb_substr($rawText, 0, $lastSpace));
+                    for ($i = 0; $i < 5; $i++) {
+                        $lastWord = mb_strtolower(preg_replace('/.*\s+/u', '', $rawText));
+                        if (in_array($lastWord, $danglingWords) && mb_strrpos($rawText, ' ') !== false) {
+                            $rawText = trim(mb_substr($rawText, 0, mb_strrpos($rawText, ' ')));
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
         }
     @endphp
 

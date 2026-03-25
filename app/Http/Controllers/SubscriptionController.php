@@ -26,7 +26,7 @@ class SubscriptionController extends Controller
     public function checkout(Request $request)
     {
         $request->validate([
-            'plan' => 'required|string|in:free,monthly,annual',
+            'plan' => 'required|string|in:free,pro,premium',
         ]);
 
         $plan = config("subscription.plans.{$request->plan}");
@@ -118,7 +118,7 @@ class SubscriptionController extends Controller
     public function changePlan(Request $request)
     {
         $request->validate([
-            'plan' => 'required|string|in:free,monthly,annual',
+            'plan' => 'required|string|in:free,pro,premium',
         ]);
 
         $user = Auth::user();

@@ -557,39 +557,107 @@
               <p class="text-xl font-light text-slate-600">Rentabilisé dès votre premier chantier haut de gamme signé.</p>
             </div>
 
-            <div class="max-w-lg mx-auto glass-card p-8 sm:p-12 relative overflow-hidden">
-              <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-copper via-orange-500 to-amber-600"></div>
-              
-              <div class="text-center mb-10">
-                <h3 class="text-2xl font-display font-medium text-midnight mb-4">Abonnement Pro</h3>
-                <div class="flex justify-center items-baseline gap-2">
-                  <span class="text-6xl font-display font-light text-midnight tracking-tighter">29€</span>
-                  <span class="text-lg text-slate-500 font-light">/ mois</span>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch">
+
+              {{-- Offre Gratuit --}}
+              <div class="glass-card p-8 relative overflow-hidden flex flex-col">
+                <div class="text-center mb-8">
+                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Gratuit</h3>
+                  <div class="flex justify-center items-baseline gap-2">
+                    <span class="text-5xl font-display font-light text-midnight tracking-tighter">0€</span>
+                  </div>
                 </div>
-                <div class="badge badge-copper mt-4 uppercase tracking-widest font-medium">Sans engagement</div>
-              </div>
 
-              <ul class="space-y-4 mb-10">
-                @foreach(["Création de vitrine illimitée", "Rédaction professionnelle automatisée", "Diffusion automatique", "Hébergement sécurisé des photos", "Support client prioritaire"] as $feature)
-                  <li class="flex items-center gap-4">
-                    <div class="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 border border-amber-100 text-copper">
-                      <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                    </div>
-                    <span class="text-slate-700 font-light">{{ $feature }}</span>
-                  </li>
-                @endforeach
-              </ul>
+                <ul class="space-y-4 mb-10 flex-grow">
+                  @foreach(["3 posts par mois", "Modèles de posts standards", "Support email", "Conservation des posts 1 semaine"] as $feature)
+                    <li class="flex items-center gap-4">
+                      <div class="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center flex-shrink-0 border border-slate-200 text-slate-400">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                      </div>
+                      <span class="text-slate-700 font-light text-sm">{{ $feature }}</span>
+                    </li>
+                  @endforeach
+                </ul>
 
-              @auth
-                  <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-4 text-lg text-center block">
+                @auth
+                  <a href="{{ route('dashboard') }}" wire:navigate class="w-full py-3.5 text-center block border border-slate-200 rounded-xl text-midnight font-medium hover:bg-slate-50 transition-colors">
                     Accéder à mon compte
                   </a>
-              @else
-                  <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-lg text-center block">
+                @else
+                  <a href="{{ route('register') }}" wire:navigate class="w-full py-3.5 text-center block border border-slate-200 rounded-xl text-midnight font-medium hover:bg-slate-50 transition-colors">
+                    Commencer gratuitement
+                  </a>
+                @endauth
+              </div>
+
+              {{-- Offre Pro --}}
+              <div class="glass-card p-8 relative overflow-hidden flex flex-col ring-2 ring-copper/20 shadow-xl">
+                <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-copper via-orange-500 to-amber-600"></div>
+                <div class="text-center mb-1">
+                  <div class="badge badge-copper uppercase tracking-widest font-medium text-[10px] mb-4">Populaire</div>
+                </div>
+                <div class="text-center mb-8">
+                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Pro</h3>
+                  <div class="flex justify-center items-baseline gap-2">
+                    <span class="text-5xl font-display font-light text-midnight tracking-tighter">14,90€</span>
+                    <span class="text-lg text-slate-500 font-light">/ mois</span>
+                  </div>
+                </div>
+
+                <ul class="space-y-4 mb-10 flex-grow">
+                  @foreach(["30 posts par mois", "Modèles de posts standards", "Support prioritaire", "Conservation des posts 1 mois"] as $feature)
+                    <li class="flex items-center gap-4">
+                      <div class="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 border border-amber-100 text-copper">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                      </div>
+                      <span class="text-slate-700 font-light text-sm">{{ $feature }}</span>
+                    </li>
+                  @endforeach
+                </ul>
+
+                @auth
+                  <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-3.5 text-center block shadow-lg shadow-amber-500/20">
+                    Accéder à mon compte
+                  </a>
+                @else
+                  <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-3.5 text-center block shadow-lg shadow-amber-500/20">
                     Démarrer mon essai gratuit
                   </a>
-              @endauth
-              <p class="text-center text-sm text-slate-500 mt-6 font-light">14 jours d'essai gratuit. Pas de carte bancaire requise.</p>
+                @endauth
+              </div>
+
+              {{-- Offre Premium --}}
+              <div class="glass-card p-8 relative overflow-hidden flex flex-col">
+                <div class="text-center mb-8">
+                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Premium</h3>
+                  <div class="flex justify-center items-baseline gap-2">
+                    <span class="text-5xl font-display font-light text-midnight tracking-tighter">29,90€</span>
+                    <span class="text-lg text-slate-500 font-light">/ mois</span>
+                  </div>
+                </div>
+
+                <ul class="space-y-4 mb-10 flex-grow">
+                  @foreach(["100 posts par mois", "Analytics des comptes réseaux sociaux", "Publication automatique", "Schedule des posts", "Modèles de posts premiums", "Support prioritaire", "Conservation des posts sans expiration"] as $feature)
+                    <li class="flex items-center gap-4">
+                      <div class="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 border border-amber-100 text-copper">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                      </div>
+                      <span class="text-slate-700 font-light text-sm">{{ $feature }}</span>
+                    </li>
+                  @endforeach
+                </ul>
+
+                @auth
+                  <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-3.5 text-center block">
+                    Accéder à mon compte
+                  </a>
+                @else
+                  <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-3.5 text-center block">
+                    Démarrer mon essai gratuit
+                  </a>
+                @endauth
+              </div>
+
             </div>
           </div>
         </section>

@@ -52,7 +52,7 @@
                 @foreach($plans as $key => $plan)
                     @php
                         $isCurrent = ($currentPlan === $key) || (!$currentPlan && $key === 'free');
-                        $isPopular = $key === 'annual';
+                        $isPopular = $key === 'premium';
                         $isFree = $key === 'free';
                     @endphp
 
@@ -84,7 +84,7 @@
                                 <h3 class="text-xl font-bold text-midnight">{{ $plan['name'] }}</h3>
                                 <div class="mt-4 flex items-baseline gap-1">
                                     <span class="text-4xl font-black text-midnight tracking-tighter">{{ number_format($plan['price'], 2, ',', '') }}&euro;</span>
-                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $isFree ? '' : ($key === 'annual' ? '/ an' : '/ mois') }}</span>
+                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $isFree ? '' : '/ mois' }}</span>
                                 </div>
                                 @if(isset($plan['old_price']) && $plan['old_price'] > 0)
                                     <p class="text-[11px] font-bold text-gray-400 line-through mt-0.5">{{ number_format($plan['old_price'], 2, ',', '') }}&euro;</p>

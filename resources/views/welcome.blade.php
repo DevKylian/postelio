@@ -607,7 +607,7 @@
                 <div class="text-center mb-8">
                   <h3 class="text-2xl font-display font-medium text-midnight mb-4">Basic</h3>
                   <div class="flex justify-center items-baseline gap-2">
-                    <span class="text-5xl font-display font-light text-midnight tracking-tighter">14,90€</span>
+                    <span class="text-5xl font-display font-light text-midnight tracking-tighter">19,90€</span>
                     <span class="text-lg text-slate-500 font-light">/ mois</span>
                   </div>
                 </div>

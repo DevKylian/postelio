@@ -33,7 +33,7 @@ return [
             ],
         ],
         'pro' => [
-            'name' => 'Essentiel',
+            'name' => 'Basic',
             'stripe_price_id' => env('STRIPE_PRO_PRICE_ID', ''),
             'credits' => 30,
             'price' => 14.90,

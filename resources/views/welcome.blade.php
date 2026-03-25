@@ -598,14 +598,14 @@
                 @endauth
               </div>
 
-              {{-- Offre Essentiel --}}
+              {{-- Offre Basic --}}
               <div class="glass-card p-8 relative overflow-hidden flex flex-col ring-2 ring-copper/20 shadow-xl">
                 <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-copper via-orange-500 to-amber-600"></div>
                 <div class="text-center mb-1">
                   <div class="badge badge-copper uppercase tracking-widest font-medium text-[10px] mb-4">Populaire</div>
                 </div>
                 <div class="text-center mb-8">
-                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Essentiel</h3>
+                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Basic</h3>
                   <div class="flex justify-center items-baseline gap-2">
                     <span class="text-5xl font-display font-light text-midnight tracking-tighter">14,90€</span>
                     <span class="text-lg text-slate-500 font-light">/ mois</span>

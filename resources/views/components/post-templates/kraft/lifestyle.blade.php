@@ -34,9 +34,7 @@
             elseif ($len > 30) $fontSize = 'text-[11px]';
         @endphp
         <div class="flex flex-col max-w-[240px]">
-             <div class="max-h-[30px] overflow-hidden">
-                <span class="text-slate-900 {{ $fontSize }} font-black uppercase tracking-[0.2em] font-montserrat leading-tight">{{ $text ?: 'LIFESTYLE' }}</span>
-             </div>
+             <span class="text-slate-900 {{ $fontSize }} font-black uppercase tracking-[0.2em] font-montserrat leading-tight" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text ?: 'LIFESTYLE' }}</span>
              <span class="text-slate-900/40 text-[8px] font-black uppercase font-mono-technical mt-1 truncate">{{ $companyLabel }}</span>
         </div>
         <div class="w-10 h-10 rounded-full border-4 border-slate-900 flex items-center justify-center">

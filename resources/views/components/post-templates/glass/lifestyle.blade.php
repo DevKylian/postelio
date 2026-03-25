@@ -34,8 +34,8 @@
             elseif ($len > 25) $fontSize = 'text-sm';
         @endphp
         <div class="text-center mt-2 flex flex-col items-center">
-            <div class="max-h-[50px] overflow-hidden max-w-[280px]">
-                <h3 class="text-white {{ $fontSize }} font-black uppercase tracking-widest font-montserrat leading-tight">{{ $text ?: 'LIFESTYLE' }}</h3>
+            <div class="max-w-[280px]">
+                <h3 class="text-white {{ $fontSize }} font-black uppercase tracking-widest font-montserrat leading-tight" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text ?: 'LIFESTYLE' }}</h3>
             </div>
             <p class="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em] mt-1 truncate max-w-[200px]">{{ $companyLabel }}</p>
         </div>

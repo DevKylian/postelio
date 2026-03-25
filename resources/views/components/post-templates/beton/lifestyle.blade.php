@@ -30,11 +30,9 @@
         <div class="flex items-end justify-between">
             <div class="flex flex-col w-full">
                 <div class="w-12 h-1 bg-white mb-4" style="background-color: {{ $brandColor }}"></div>
-                <div class="max-h-[180px] overflow-hidden">
-                    <span class="text-white {{ $fontSize }} font-black font-montserrat uppercase leading-tight tracking-tighter block">
-                        {{ $text }}
-                    </span>
-                </div>
+                <span class="text-white {{ $fontSize }} font-black font-montserrat uppercase leading-tight tracking-tighter block" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                    {{ $text }}
+                </span>
             </div>
         </div>
     </div>

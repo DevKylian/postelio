@@ -17,27 +17,28 @@
         </div>
     @endif
 
-    @if($text)
-        @php
-            $len = mb_strlen($text);
-            $fontSize = 'text-[11px]';
-            if ($len > 80) $fontSize = 'text-[8px]';
-            elseif ($len > 40) $fontSize = 'text-[9px]';
-        @endphp
-        <div class="absolute inset-x-4 bottom-16 bg-black/70 backdrop-blur-sm p-3.5 rounded-xl border border-white/10 shadow-xl z-10 text-center">
-            <div class="max-h-[40px] overflow-hidden">
-                <h3 class="text-white font-black {{ $fontSize }} uppercase leading-snug font-montserrat">{{ $text }}</h3>
-            </div>
-        </div>
-    @endif
-    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent pt-10 pb-4 px-5">
-        <div class="w-full" style="border-top: 3px solid {{ $brandColor }}; padding-top: 8px;">
+    {{-- Company footer — fixed height 44px --}}
+    <div class="absolute inset-x-0 bottom-0 h-[44px] bg-gradient-to-t from-black/80 to-black/50 px-5 flex items-center z-10">
+        <div class="w-full" style="border-top: 3px solid {{ $brandColor }}; padding-top: 6px;">
             <div class="flex items-center gap-2">
                 @if ($logoUrl)
                     <img src="{{ $logoUrl }}" alt="Logo" class="h-5 w-5 object-contain rounded">
                 @endif
-                <p class="text-white font-bold text-xs uppercase tracking-widest font-montserrat">{{ $companyLabel }}</p>
+                <p class="text-white font-bold text-xs uppercase tracking-widest font-montserrat truncate">{{ $companyLabel }}</p>
             </div>
         </div>
     </div>
+
+    {{-- Text overlay — sits above footer with 8px gap, max 2 lines --}}
+    @if($text)
+        @php
+            $len = mb_strlen($text);
+            $fontSize = 'text-[11px]';
+            if ($len > 50) $fontSize = 'text-[9px]';
+            elseif ($len > 30) $fontSize = 'text-[10px]';
+        @endphp
+        <div class="absolute inset-x-4 bottom-[52px] bg-black/70 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/10 shadow-xl z-10 text-center">
+            <h3 class="text-white font-black {{ $fontSize }} uppercase leading-snug font-montserrat" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</h3>
+        </div>
+    @endif
 </div>

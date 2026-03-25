@@ -29,8 +29,8 @@
                 elseif ($len > 40) $fontSize = 'text-[9px]';
              @endphp
              
-             <div class="absolute bottom-6 bg-[#0047AB] px-4 py-2 border-2 border-white shadow-2xl max-w-[85%] max-h-[80px] overflow-hidden flex items-center justify-center">
-                  <span class="text-white {{ $fontSize }} font-black font-mono-technical uppercase tracking-[0.2em] leading-tight text-center">{{ $text }}</span>
+             <div class="absolute bottom-6 bg-[#0047AB] px-4 py-2 border-2 border-white shadow-2xl max-w-[85%] flex items-center justify-center">
+                  <span class="text-white {{ $fontSize }} font-black font-mono-technical uppercase tracking-[0.2em] leading-tight text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</span>
              </div>
         </div>
     </div>

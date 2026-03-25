@@ -65,8 +65,8 @@ return [
 
     'lifestyle' => [
         'image_text' => [
-            'maxChars'   => 50,
-            'idealChars' => [20, 40],
+            'maxChars'   => 45,
+            'idealChars' => [15, 35],
             'lineClamp'  => 2,
         ],
     ],

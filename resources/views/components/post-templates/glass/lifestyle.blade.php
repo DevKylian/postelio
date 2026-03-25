@@ -7,7 +7,7 @@
 ])
 
 <div class="w-full aspect-square bg-slate-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
-    
+
     {{-- Photo Background --}}
     @if ($imageUrl)
         <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover">
@@ -17,8 +17,9 @@
         </div>
     @endif
 
-    {{-- Overlay --}}
-    <div class="absolute inset-x-8 bottom-8 pt-12 pb-6 px-6 backdrop-blur-xl bg-slate-900/40 border border-white/20 rounded-2xl shadow-2xl">
+    {{-- Glass overlay card — fixed height, anchored to bottom --}}
+    <div class="absolute inset-x-8 bottom-8 h-[100px] backdrop-blur-xl bg-slate-900/40 border border-white/20 rounded-2xl shadow-2xl overflow-hidden">
+        {{-- Icon floating above --}}
         <div class="absolute -top-10 left-1/2 -ml-10 w-20 h-20 rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/30 flex items-center justify-center shadow-2xl">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-white/5" style="border: 2px solid {{ $brandColor }}">
                 <svg class="w-6 h-6" style="color: {{ $brandColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,15 +29,16 @@
         </div>
 
         @php
-            $len = mb_strlen($text ?: 'LIFESTYLE');
-            $fontSize = 'text-base';
-            if ($len > 40) $fontSize = 'text-xs';
-            elseif ($len > 25) $fontSize = 'text-sm';
+            $displayText = mb_substr($text ?: 'LIFESTYLE', 0, 45);
+            $len = mb_strlen($displayText);
+            $fontSize = 'text-sm';
+            if ($len > 35) $fontSize = 'text-[10px]';
+            elseif ($len > 25) $fontSize = 'text-xs';
         @endphp
-        <div class="text-center mt-2 flex flex-col items-center">
-            <div class="max-w-[280px]">
-                <h3 class="text-white {{ $fontSize }} font-black uppercase tracking-widest font-montserrat leading-tight" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text ?: 'LIFESTYLE' }}</h3>
-            </div>
+
+        {{-- Text zone: fixed area inside the card --}}
+        <div class="absolute inset-x-4 top-[16px] bottom-[8px] flex flex-col items-center justify-center text-center overflow-hidden">
+            <h3 class="text-white {{ $fontSize }} font-black uppercase tracking-widest font-montserrat leading-tight max-w-[240px]" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $displayText }}</h3>
             <p class="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em] mt-1 truncate max-w-[200px]">{{ $companyLabel }}</p>
         </div>
     </div>

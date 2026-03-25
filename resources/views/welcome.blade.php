@@ -560,118 +560,145 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch">
 
               {{-- Offre Starter --}}
-              <div class="glass-card p-8 relative overflow-hidden flex flex-col">
-                <div class="text-center mb-8">
-                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Starter</h3>
-                  <div class="flex justify-center items-baseline gap-2">
-                    <span class="text-5xl font-display font-light text-midnight tracking-tighter">0€</span>
+              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <div class="p-8 flex flex-col flex-grow">
+                  <div class="mb-8">
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-slate-50 text-slate-400">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-midnight">Starter</h3>
+                    <div class="mt-4 flex items-baseline gap-1">
+                      <span class="text-4xl font-black text-midnight tracking-tighter">0,00&euro;</span>
+                    </div>
+                  </div>
+
+                  <div class="h-px bg-slate-100 mb-8"></div>
+
+                  <ul class="space-y-4 mb-10 flex-grow">
+                    @foreach(["Jusqu'à 3 posts par mois", "Modèles de posts standards", "Historique des posts sur 7 jours", "Support par email"] as $feature)
+                      <li class="flex items-start gap-3">
+                        <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
+                          <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                        <span class="text-xs font-medium text-slate-600 leading-relaxed">{{ $feature }}</span>
+                      </li>
+                    @endforeach
+                    @foreach(["Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium", "Support prioritaire dédié"] as $feature)
+                      <li class="flex items-start gap-3 opacity-40">
+                        <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center">
+                          <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </div>
+                        <span class="text-xs font-medium text-slate-400 leading-relaxed line-through">{{ $feature }}</span>
+                      </li>
+                    @endforeach
+                  </ul>
+
+                  <div class="mt-auto">
+                    @auth
+                      <a href="{{ route('dashboard') }}" wire:navigate class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-widest block hover:bg-slate-100 transition-colors">
+                        Accéder à mon compte
+                      </a>
+                    @else
+                      <a href="{{ route('register') }}" wire:navigate class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-widest block hover:bg-slate-100 transition-colors">
+                        Commencer gratuitement
+                      </a>
+                    @endauth
                   </div>
                 </div>
-
-                <ul class="space-y-3.5 mb-10 flex-grow">
-                  @foreach(["Jusqu'à 3 posts par mois", "Modèles de posts standards", "Historique des posts sur 7 jours", "Support par email"] as $feature)
-                    <li class="flex items-center gap-3">
-                      <div class="w-5 h-5 rounded-full bg-slate-50 flex items-center justify-center flex-shrink-0 border border-slate-200 text-slate-400">
-                        <i data-lucide="check" class="w-3 h-3"></i>
-                      </div>
-                      <span class="text-slate-700 font-light text-sm">{{ $feature }}</span>
-                    </li>
-                  @endforeach
-                  @foreach(["Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium", "Support prioritaire dédié"] as $feature)
-                    <li class="flex items-center gap-3 opacity-40">
-                      <div class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-300">
-                        <i data-lucide="x" class="w-3 h-3"></i>
-                      </div>
-                      <span class="text-slate-400 font-light text-sm line-through">{{ $feature }}</span>
-                    </li>
-                  @endforeach
-                </ul>
-
-                @auth
-                  <a href="{{ route('dashboard') }}" wire:navigate class="w-full py-3.5 text-center block border border-slate-200 rounded-xl text-midnight font-medium hover:bg-slate-50 transition-colors">
-                    Accéder à mon compte
-                  </a>
-                @else
-                  <a href="{{ route('register') }}" wire:navigate class="w-full py-3.5 text-center block border border-slate-200 rounded-xl text-midnight font-medium hover:bg-slate-50 transition-colors">
-                    Commencer gratuitement
-                  </a>
-                @endauth
               </div>
 
               {{-- Offre Basic --}}
-              <div class="glass-card p-8 relative overflow-hidden flex flex-col ring-2 ring-copper/20 shadow-xl">
-                <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-copper via-orange-500 to-amber-600"></div>
-                <div class="text-center mb-1">
-                  <div class="badge badge-copper uppercase tracking-widest font-medium text-[10px] mb-4">Populaire</div>
+              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ring-2 ring-copper/20">
+                <div class="absolute top-0 right-0 bg-copper text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm">
+                  Populaire
                 </div>
-                <div class="text-center mb-8">
-                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Basic</h3>
-                  <div class="flex justify-center items-baseline gap-2">
-                    <span class="text-5xl font-display font-light text-midnight tracking-tighter">19,90€</span>
-                    <span class="text-lg text-slate-500 font-light">/ mois</span>
+
+                <div class="p-8 flex flex-col flex-grow">
+                  <div class="mb-8">
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-midnight/5 text-midnight">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-midnight">Basic</h3>
+                    <div class="mt-4 flex items-baseline gap-1">
+                      <span class="text-4xl font-black text-midnight tracking-tighter">19,90&euro;</span>
+                      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
+                    </div>
+                  </div>
+
+                  <div class="h-px bg-slate-100 mb-8"></div>
+
+                  <ul class="space-y-4 mb-10 flex-grow">
+                    @foreach(["Jusqu'à 30 posts par mois", "Modèles de posts standards", "Historique des posts sur 30 jours", "Support prioritaire dédié"] as $feature)
+                      <li class="flex items-start gap-3">
+                        <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
+                          <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                        <span class="text-xs font-medium text-slate-600 leading-relaxed">{{ $feature }}</span>
+                      </li>
+                    @endforeach
+                    @foreach(["Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium"] as $feature)
+                      <li class="flex items-start gap-3 opacity-40">
+                        <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center">
+                          <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </div>
+                        <span class="text-xs font-medium text-slate-400 leading-relaxed line-through">{{ $feature }}</span>
+                      </li>
+                    @endforeach
+                  </ul>
+
+                  <div class="mt-auto">
+                    @auth
+                      <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
+                        Accéder à mon compte
+                      </a>
+                    @else
+                      <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
+                        Démarrer mon essai gratuit
+                      </a>
+                    @endauth
                   </div>
                 </div>
-
-                <ul class="space-y-3.5 mb-10 flex-grow">
-                  @foreach(["Jusqu'à 30 posts par mois", "Modèles de posts standards", "Historique des posts sur 30 jours", "Support prioritaire dédié"] as $feature)
-                    <li class="flex items-center gap-3">
-                      <div class="w-5 h-5 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 border border-amber-100 text-copper">
-                        <i data-lucide="check" class="w-3 h-3"></i>
-                      </div>
-                      <span class="text-slate-700 font-light text-sm">{{ $feature }}</span>
-                    </li>
-                  @endforeach
-                  @foreach(["Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium"] as $feature)
-                    <li class="flex items-center gap-3 opacity-40">
-                      <div class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-300">
-                        <i data-lucide="x" class="w-3 h-3"></i>
-                      </div>
-                      <span class="text-slate-400 font-light text-sm line-through">{{ $feature }}</span>
-                    </li>
-                  @endforeach
-                </ul>
-
-                @auth
-                  <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-3.5 text-center block shadow-lg shadow-amber-500/20">
-                    Accéder à mon compte
-                  </a>
-                @else
-                  <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-3.5 text-center block shadow-lg shadow-amber-500/20">
-                    Démarrer mon essai gratuit
-                  </a>
-                @endauth
               </div>
 
               {{-- Offre Professionnel --}}
-              <div class="glass-card p-8 relative overflow-hidden flex flex-col">
-                <div class="text-center mb-8">
-                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Professionnel</h3>
-                  <div class="flex justify-center items-baseline gap-2">
-                    <span class="text-5xl font-display font-light text-midnight tracking-tighter">29,90€</span>
-                    <span class="text-lg text-slate-500 font-light">/ mois</span>
+              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                <div class="p-8 flex flex-col flex-grow">
+                  <div class="mb-8">
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-amber-100 text-copper rotate-3">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-midnight">Professionnel</h3>
+                    <div class="mt-4 flex items-baseline gap-1">
+                      <span class="text-4xl font-black text-midnight tracking-tighter">29,90&euro;</span>
+                      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
+                    </div>
+                  </div>
+
+                  <div class="h-px bg-slate-100 mb-8"></div>
+
+                  <ul class="space-y-4 mb-10 flex-grow">
+                    @foreach(["Jusqu'à 100 posts par mois", "Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium", "Historique des posts illimité", "Support prioritaire dédié"] as $feature)
+                      <li class="flex items-start gap-3">
+                        <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
+                          <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                        </div>
+                        <span class="text-xs font-medium text-slate-600 leading-relaxed">{{ $feature }}</span>
+                      </li>
+                    @endforeach
+                  </ul>
+
+                  <div class="mt-auto">
+                    @auth
+                      <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl">
+                        Accéder à mon compte
+                      </a>
+                    @else
+                      <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl">
+                        Démarrer mon essai gratuit
+                      </a>
+                    @endauth
                   </div>
                 </div>
-
-                <ul class="space-y-3.5 mb-10 flex-grow">
-                  @foreach(["Jusqu'à 100 posts par mois", "Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium", "Historique des posts illimité", "Support prioritaire dédié"] as $feature)
-                    <li class="flex items-center gap-3">
-                      <div class="w-5 h-5 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 border border-amber-100 text-copper">
-                        <i data-lucide="check" class="w-3 h-3"></i>
-                      </div>
-                      <span class="text-slate-700 font-light text-sm">{{ $feature }}</span>
-                    </li>
-                  @endforeach
-                </ul>
-
-                @auth
-                  <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-3.5 text-center block">
-                    Accéder à mon compte
-                  </a>
-                @else
-                  <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-3.5 text-center block">
-                    Démarrer mon essai gratuit
-                  </a>
-                @endauth
               </div>
 
             </div>

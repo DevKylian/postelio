@@ -146,9 +146,9 @@
                   </div>
                 </div>
                 <div class="flex flex-wrap justify-center items-center gap-4 text-xs font-medium text-slate-400 uppercase tracking-widest">
-                  <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-copper"></i> 14 jours d'essai</span>
+                  <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-copper"></i> Offre gratuite disponible</span>
                   <span class="hidden sm:block">&bull;</span>
-                  <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-copper"></i> Sans CB</span>
+                  <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-copper"></i> Sans engagement</span>
                 </div>
               </div>
             </div>
@@ -457,7 +457,7 @@
         <section class="py-24">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-20">
-              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Ils ont choisi <span class="text-gradient-copper italic">leurs clients.</span></h2>
+              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Ils ont choisi <span class="text-gradient-copper italic pr-2 pb-1">leurs clients.</span></h2>
             </div>
 
             <div class="grid md:grid-cols-3 gap-6">
@@ -501,7 +501,7 @@
                 </a>
             @else
                 <a href="{{ route('register') }}" wire:navigate class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
-                  Démarrer mon essai gratuit <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                  Créer mon compte gratuitement <i data-lucide="arrow-right" class="w-5 h-5"></i>
                 </a>
             @endauth
           </div>
@@ -511,7 +511,7 @@
         <section id="tarifs" class="py-32 relative">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-20">
-              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Un investissement dérisoire pour <span class="text-gradient-copper italic">monter en gamme.</span></h2>
+              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Un investissement dérisoire pour <span class="text-gradient-copper italic pr-2 pb-1">monter en gamme.</span></h2>
               <p class="text-xl font-light text-slate-600">Rentabilisé dès votre premier chantier haut de gamme signé.</p>
             </div>
 
@@ -611,7 +611,7 @@
                       </a>
                     @else
                       <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
-                        Démarrer mon essai gratuit
+                        Commencer gratuitement
                       </a>
                     @endauth
                   </div>
@@ -652,7 +652,7 @@
                       </a>
                     @else
                       <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl">
-                        Démarrer mon essai gratuit
+                        Commencer gratuitement
                       </a>
                     @endauth
                   </div>
@@ -708,7 +708,7 @@
 
       <div class="md:hidden fixed bottom-0 inset-x-0 p-4 pb-6 bg-white/90 backdrop-blur-2xl border-t border-slate-200 z-50">
         <a href="#tarifs" class="btn-primary flex justify-center items-center w-full py-3.5 text-base shadow-lg shadow-amber-500/20">
-          Essai gratuit 14 jours 
+          Découvrir les offres
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
       </div>

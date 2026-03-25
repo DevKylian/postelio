@@ -85,13 +85,14 @@ class TextFitterService
     }
 
     /**
-     * Truncate text at word boundary, preserving sentence completeness.
+     * Truncate text intelligently, never breaking mid-expression.
      *
      * Strategy:
      *  1. If text fits, return as-is.
      *  2. Try to cut at the last sentence-ending punctuation within limit.
-     *  3. Otherwise cut at the last space before the limit.
-     *  4. Append "…" only if we actually cut mid-thought.
+     *  3. Cut at last word boundary, but ONLY at a "meaningful" break point
+     *     (avoids cutting after prepositions/articles like "sur", "de", "une").
+     *  4. If no clean break found, remove trailing incomplete words.
      */
     public function truncate(string $text, int $maxChars): string
     {
@@ -109,18 +110,40 @@ class TextFitterService
             mb_strrpos($sub, '?') ?: 0,
         );
 
-        // Accept sentence cut only if it keeps at least 60% of the budget
-        if ($lastSentenceEnd > $maxChars * 0.6) {
+        // Accept sentence cut only if it keeps at least 50% of the budget
+        if ($lastSentenceEnd > $maxChars * 0.5) {
             return trim(mb_substr($text, 0, $lastSentenceEnd + 1));
         }
 
-        // Fall back to word boundary
+        // Fall back to word boundary, but avoid ending on dangling words
+        // (prepositions, articles, conjunctions that make no sense alone)
+        $danglingWords = ['de', 'du', 'des', 'le', 'la', 'les', 'un', 'une',
+            'sur', 'sous', 'dans', 'en', 'et', 'ou', 'à', 'au', 'aux',
+            'pour', 'par', 'avec', 'sans', 'vers', "d'", "l'", "n'",
+            'ce', 'cette', 'ces', 'son', 'sa', 'ses', 'mon', 'ma', 'mes',
+            'ton', 'ta', 'tes', 'notre', 'votre', 'leur', 'leurs', 'qui', 'que'];
+
         $lastSpace = mb_strrpos($sub, ' ');
-        if ($lastSpace && $lastSpace > $maxChars * 0.5) {
-            return trim(mb_substr($text, 0, $lastSpace));
+        if ($lastSpace && $lastSpace > $maxChars * 0.3) {
+            $candidate = trim(mb_substr($text, 0, $lastSpace));
+
+            // Keep removing trailing dangling words
+            $maxIterations = 5;
+            while ($maxIterations-- > 0) {
+                $lastWord = mb_strtolower(preg_replace('/.*\s+/', '', $candidate));
+                if (in_array($lastWord, $danglingWords) && mb_strrpos($candidate, ' ') !== false) {
+                    $candidate = trim(mb_substr($candidate, 0, mb_strrpos($candidate, ' ')));
+                } else {
+                    break;
+                }
+            }
+
+            if (mb_strlen($candidate) > $maxChars * 0.3) {
+                return $candidate;
+            }
         }
 
-        // Hard cut as last resort
+        // Hard cut as last resort (should rarely happen)
         return trim(mb_substr($text, 0, $maxChars));
     }
 }

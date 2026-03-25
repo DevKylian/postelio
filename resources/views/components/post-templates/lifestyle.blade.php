@@ -37,14 +37,13 @@
         {{-- Text overlay — max 2 lines, above company label --}}
         @if($text)
             @php
-                $displayText = mb_substr($text, 0, 45);
-                $len = mb_strlen($displayText);
+                $len = mb_strlen($text);
                 $fontSize = 'text-[11px]';
                 if ($len > 35) $fontSize = 'text-[9px]';
                 elseif ($len > 25) $fontSize = 'text-[10px]';
             @endphp
             <div class="absolute inset-x-4 top-1 bottom-[32px] flex items-center justify-center overflow-hidden">
-                <h3 class="text-white font-black {{ $fontSize }} uppercase leading-snug font-montserrat text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $displayText }}</h3>
+                <h3 class="text-white font-black {{ $fontSize }} uppercase leading-snug font-montserrat text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</h3>
             </div>
         @endif
     </div>

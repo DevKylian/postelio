@@ -27,7 +27,7 @@
     {{-- Footer — fixed 80px, shrink-0 to guarantee visibility --}}
     <div class="h-20 shrink-0 bg-[#CBB198] border-t-[6px] border-slate-900 px-10 flex items-center justify-between z-20">
         @php
-            $displayText = mb_substr($text ?: 'LIFESTYLE', 0, 40);
+            $displayText = $text ?: 'LIFESTYLE';
             $len = mb_strlen($displayText);
             $fontSize = 'text-[13px]';
             if ($len > 30) $fontSize = 'text-[9px]';

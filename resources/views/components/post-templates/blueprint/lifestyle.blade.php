@@ -24,15 +24,14 @@
 
              {{-- Text zone: anchored inside photo frame, max 2 lines --}}
              @php
-                $displayText = mb_substr($text, 0, 45);
-                $len = mb_strlen($displayText);
+                $len = mb_strlen($text);
                 $fontSize = 'text-[11px]';
                 if ($len > 35) $fontSize = 'text-[8px]';
                 elseif ($len > 25) $fontSize = 'text-[9px]';
              @endphp
 
              <div class="absolute bottom-2 left-2 right-2 h-[36px] bg-[#0047AB] border-2 border-white shadow-2xl flex items-center justify-center px-3 overflow-hidden">
-                  <span class="text-white {{ $fontSize }} font-black font-mono-technical uppercase tracking-[0.15em] leading-tight text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $displayText }}</span>
+                  <span class="text-white {{ $fontSize }} font-black font-mono-technical uppercase tracking-[0.15em] leading-tight text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</span>
              </div>
         </div>
     </div>

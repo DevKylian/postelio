@@ -29,7 +29,7 @@
         </div>
 
         @php
-            $displayText = mb_substr($text ?: 'LIFESTYLE', 0, 45);
+            $displayText = $text ?: 'LIFESTYLE';
             $len = mb_strlen($displayText);
             $fontSize = 'text-sm';
             if ($len > 35) $fontSize = 'text-[10px]';

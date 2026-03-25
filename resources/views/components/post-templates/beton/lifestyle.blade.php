@@ -29,14 +29,13 @@
         <div class="flex flex-col w-full">
             <div class="w-12 h-1 mb-3" style="background-color: {{ $brandColor }}"></div>
             @php
-                $displayText = mb_substr($text, 0, 45);
-                $len = mb_strlen($displayText);
+                $len = mb_strlen($text);
                 $fontSize = 'text-2xl';
                 if ($len > 35) $fontSize = 'text-lg';
                 elseif ($len > 25) $fontSize = 'text-xl';
             @endphp
             <span class="text-white {{ $fontSize }} font-black font-montserrat uppercase leading-tight tracking-tighter block" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                {{ $displayText }}
+                {{ $text }}
             </span>
         </div>
     </div>

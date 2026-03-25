@@ -251,7 +251,10 @@ class ContentRefinerService
                 'lifestyle' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . $jsonSingleWithImageText(
                     "Légende Instagram complète ({$captionRange}, storytelling). {$hashtagInstruction}",
-                    "Titre concis et percutant ({$lifeImgConstraint}, phrase complète). Sans hashtag."
+                    "Titre ULTRA-COURT de 2 à 5 mots MAXIMUM qui résume le projet ({$lifeImgConstraint}). "
+                    . "Le titre DOIT être une expression COMPLÈTE et autonome (pas une phrase coupée). "
+                    . "Exemples : 'Salle de bain moderne', 'Rénovation cuisine', 'Terrasse bois sur mesure', 'Pose parquet chêne'. "
+                    . "INTERDIT : les titres longs type 'Création d'une cuisine sur mesure dans un appartement'. Sans hashtag."
                 ),
 
                 'project' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
@@ -260,7 +263,10 @@ class ContentRefinerService
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
                     "Légende Instagram complète ({$captionRange}, storytelling). {$hashtagInstruction}",
-                    "Titre descriptif du projet ({$projImgConstraint}, phrase complète). Sans hashtag."
+                    "Titre ULTRA-COURT de 2 à 4 mots MAXIMUM décrivant le projet ({$projImgConstraint}). "
+                    . "Le titre DOIT être une expression COMPLÈTE et autonome. "
+                    . "Exemples : 'Avant / Après cuisine', 'Rénovation salle de bain', 'Pose carrelage'. "
+                    . "INTERDIT : les phrases longues. Sans hashtag."
                 ),
 
                 // ── Carousels ─────────────────────────────────────────────────────

@@ -3,7 +3,7 @@
     'companyLabel' => 'Votre Société',
     'logoUrl' => null,
     'imageUrl' => null,
-    'text' => null, // optional title
+    'text' => null,
     'preview' => false,
 ])
 
@@ -20,31 +20,31 @@
         </div>
     @endif
 
-    {{-- Bottom zone: fixed 80px band at bottom for text + company --}}
-    <div class="absolute inset-x-0 bottom-0 h-[80px] bg-gradient-to-t from-black/90 via-black/70 to-transparent z-10">
-        {{-- Company label — pinned to very bottom --}}
-        <div class="absolute inset-x-0 bottom-0 h-[30px] px-5 flex items-center">
-            <div class="w-full" style="border-top: 2px solid {{ $brandColor }}; padding-top: 4px;">
-                <div class="flex items-center gap-2">
-                    @if ($logoUrl)
-                        <img src="{{ $logoUrl }}" alt="Logo" class="h-4 w-4 object-contain rounded">
-                    @endif
-                    <p class="text-white font-bold text-[10px] uppercase tracking-widest font-montserrat truncate">{{ $companyLabel }}</p>
-                </div>
-            </div>
-        </div>
+    {{-- Dark gradient on lower half --}}
+    <div class="absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-black/80 via-black/40 to-transparent z-[1]"></div>
 
-        {{-- Text overlay — max 2 lines, above company label --}}
-        @if($text)
-            @php
-                $len = mb_strlen($text);
-                $fontSize = 'text-[11px]';
-                if ($len > 35) $fontSize = 'text-[9px]';
-                elseif ($len > 25) $fontSize = 'text-[10px]';
-            @endphp
-            <div class="absolute inset-x-4 top-1 bottom-[32px] flex items-center justify-center overflow-hidden">
+    {{-- Company label — bottom bar --}}
+    <div class="absolute inset-x-0 bottom-0 h-[28px] px-5 flex items-center z-10">
+        <div class="w-full flex items-center gap-2" style="border-top: 2px solid {{ $brandColor }}; padding-top: 3px;">
+            @if ($logoUrl)
+                <img src="{{ $logoUrl }}" alt="Logo" class="h-4 w-4 object-contain rounded">
+            @endif
+            <p class="text-white font-bold text-[9px] uppercase tracking-widest font-montserrat truncate">{{ $companyLabel }}</p>
+        </div>
+    </div>
+
+    {{-- Text overlay — centered in lower third, above company label --}}
+    @if($text)
+        @php
+            $len = mb_strlen($text);
+            $fontSize = 'text-sm';
+            if ($len > 25) $fontSize = 'text-[10px]';
+            elseif ($len > 18) $fontSize = 'text-xs';
+        @endphp
+        <div class="absolute inset-x-6 bottom-[34px] top-[60%] flex items-center justify-center z-10 overflow-hidden">
+            <div class="bg-black/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/10">
                 <h3 class="text-white font-black {{ $fontSize }} uppercase leading-snug font-montserrat text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</h3>
             </div>
-        @endif
-    </div>
+        </div>
+    @endif
 </div>

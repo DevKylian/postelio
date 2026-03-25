@@ -37,7 +37,15 @@
         $contentData = json_decode($post->refined_content, true);
         $rawText = is_array($contentData) ? ($contentData['image_text'] ?? $contentData['caption'] ?? '') : ($post->refined_content ?? '');
         $rawText = preg_replace('/#\S+/', '', $rawText);
-        $rawText = trim($rawText); 
+        $rawText = trim($rawText);
+
+        // ── Smart truncation at render time for image_text fields ──
+        // Ensures even old posts with overly long text render cleanly
+        $textZone = config("template-text-zones.{$template}.image_text");
+        if ($textZone && mb_strlen($rawText) > $textZone['maxChars']) {
+            $rawText = app(\App\Services\PostGeneration\TextFitterService::class)
+                ->truncate($rawText, $textZone['maxChars']);
+        }
     @endphp
 
     @php

@@ -13,35 +13,34 @@
          style="background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 30px 30px;">
     </div>
 
-    {{-- Photo area --}}
-    <div class="flex-1 min-h-0 relative flex items-center justify-center pt-8 px-10">
-        <div class="relative w-full h-full border border-white/40 p-2 bg-white overflow-hidden">
+    {{-- Photo area with text overlay --}}
+    <div class="flex-1 min-h-0 relative flex items-center justify-center p-8 pb-4">
+        <div class="relative w-full h-full border-2 border-white/50 p-2 bg-white overflow-hidden">
              @if($imageUrl)
                  <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
              @else
                  <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=600" class="w-full h-full object-cover">
              @endif
+
+             {{-- Dark gradient for text readability --}}
+             <div class="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+
+             {{-- Text: centered in lower third of photo --}}
+             @php
+                $len = mb_strlen($text);
+                $fontSize = 'text-sm';
+                if ($len > 25) $fontSize = 'text-[10px]';
+                elseif ($len > 18) $fontSize = 'text-xs';
+             @endphp
+             <div class="absolute inset-x-3 bottom-3 top-[55%] flex items-center justify-center overflow-hidden">
+                 <span class="text-white {{ $fontSize }} font-black font-mono-technical uppercase tracking-[0.15em] leading-snug text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</span>
+             </div>
         </div>
     </div>
 
-    {{-- Text zone: between photo and footer, fixed 40px height --}}
-    <div class="h-[40px] shrink-0 flex items-center justify-center px-10 overflow-hidden">
-        @php
-            $len = mb_strlen($text);
-            $fontSize = 'text-[11px]';
-            if ($len > 30) $fontSize = 'text-[8px]';
-            elseif ($len > 20) $fontSize = 'text-[9px]';
-        @endphp
-        <div class="bg-white/15 border border-white/30 px-4 py-1.5 max-w-full overflow-hidden">
-            <span class="text-white {{ $fontSize }} font-black font-mono-technical uppercase tracking-[0.15em] leading-tight text-center block truncate">{{ $text }}</span>
-        </div>
-    </div>
-
-    {{-- Footer — fixed 48px --}}
-    <div class="h-12 shrink-0 bg-white border-t-2 border-[#0047AB] px-10 flex items-center justify-between z-20">
+    {{-- Footer --}}
+    <div class="h-12 shrink-0 bg-white border-t-2 border-[#0047AB] px-8 flex items-center justify-between z-20">
         <span class="text-[#0047AB] text-[10px] font-black font-mono-technical uppercase tracking-[0.2em] truncate max-w-[80%]">{{ $companyLabel }}</span>
-        <div class="flex items-center gap-4">
-             <div class="w-2.5 h-2.5 rounded-full" style="background-color: {{ $brandColor }}"></div>
-        </div>
+        <div class="w-2.5 h-2.5 rounded-full" style="background-color: {{ $brandColor }}"></div>
     </div>
 </div>

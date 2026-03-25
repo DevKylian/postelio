@@ -38,7 +38,8 @@ class ContentRefinerService
             . "- INTERDIT : les phrases avec verbe ('Création de...', 'Réalisation d'un...', 'Installation de...').\n"
             . "- INTERDIT : les articles introductifs inutiles ('Une cuisine...', 'Le salon...').\n"
             . "- CORRECT : 'Cuisine sur mesure', 'Douche italienne', 'Terrasse bois'.\n"
-            . "- Le texte doit avoir du SENS seul — jamais une phrase coupée au milieu.\n\n";
+            . "- Le texte doit avoir du SENS seul — jamais une phrase coupée au milieu.\n"
+            . "- Les mots composés avec trait d'union comptent comme UN SEUL mot (ex: 'savoir-faire' = 1 mot, 'sur-mesure' = 1 mot). Ne coupe JAMAIS un mot composé.\n\n";
 
         $prompt = $noHallucinateGlobal . $noMarkdownPrefix . $noTruncationRule . $this->getPromptForTemplate($template, $photoCount, $options);
         

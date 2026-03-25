@@ -126,6 +126,20 @@ class TextFitterService
             return trim(mb_substr($text, 0, $lastClauseBreak));
         }
 
+        // Never cut inside a hyphenated compound word (savoir-faire, sur-mesure, etc.)
+        // If $sub ends mid-compound (e.g. "savoir-"), include the rest of the compound
+        if (mb_substr($sub, -1) === '-' || (mb_strlen($text) > $maxChars && mb_substr($text, $maxChars, 1) === '-')) {
+            // Find the end of the compound word
+            $rest = mb_substr($text, $maxChars);
+            if (preg_match('/^-?\S+/', $rest, $m)) {
+                $extended = $sub . $m[0];
+                // Only allow small overrun for compound words (up to 15 extra chars)
+                if (mb_strlen($extended) <= $maxChars + 15) {
+                    return trim($extended);
+                }
+            }
+        }
+
         // Fall back to word boundary, but avoid ending on dangling words
         // (prepositions, articles, conjunctions that make no sense alone)
         $danglingWords = ['de', 'du', 'des', 'le', 'la', 'les', 'un', 'une',

@@ -57,6 +57,18 @@
 
             $sub = mb_substr($rawText, 0, $imageTextMaxChars);
 
+            // Never cut inside a hyphenated compound word (savoir-faire, sur-mesure)
+            if (mb_substr($sub, -1) === '-' || (mb_strlen($rawText) > $imageTextMaxChars && mb_substr($rawText, $imageTextMaxChars, 1) === '-')) {
+                $rest = mb_substr($rawText, $imageTextMaxChars);
+                if (preg_match('/^-?\S+/', $rest, $m) && mb_strlen($sub . $m[0]) <= $imageTextMaxChars + 15) {
+                    $rawText = trim($sub . $m[0]);
+                    $sub = $rawText; // update for further processing only if still too long
+                    if (mb_strlen($rawText) <= $imageTextMaxChars + 15) {
+                        goto truncation_done;
+                    }
+                }
+            }
+
             // Try clause separator first (: — –)
             $clauseBreak = max(
                 mb_strrpos($sub, ' :') ?: 0,
@@ -81,6 +93,7 @@
                     }
                 }
             }
+            truncation_done:
         }
     @endphp
 

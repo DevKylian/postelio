@@ -51,7 +51,7 @@ return [
             ],
         ],
         'premium' => [
-            'name' => 'Business',
+            'name' => 'Professionnel',
             'stripe_price_id' => env('STRIPE_PREMIUM_PRICE_ID', ''),
             'credits' => 100,
             'price' => 29.90,

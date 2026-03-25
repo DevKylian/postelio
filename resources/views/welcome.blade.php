@@ -642,10 +642,10 @@
                 @endauth
               </div>
 
-              {{-- Offre Business --}}
+              {{-- Offre Professionnel --}}
               <div class="glass-card p-8 relative overflow-hidden flex flex-col">
                 <div class="text-center mb-8">
-                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Business</h3>
+                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Professionnel</h3>
                   <div class="flex justify-center items-baseline gap-2">
                     <span class="text-5xl font-display font-light text-midnight tracking-tighter">29,90€</span>
                     <span class="text-lg text-slate-500 font-light">/ mois</span>

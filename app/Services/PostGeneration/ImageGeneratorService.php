@@ -51,6 +51,7 @@ class ImageGeneratorService
         return \Spatie\Browsershot\Browsershot::html($html)
             ->windowSize(360, 360)
             ->deviceScaleFactor(3)
+            ->clip(0, 0, 360, 360)
             ->format('jpeg')
             ->noSandbox()
             ->timeout(60);
@@ -69,9 +70,10 @@ class ImageGeneratorService
 
         // Use Browsershot to get the image as a string, then force JPEG via Intervention Image
         $imageData = $this->getBrowsershotInstance($html)->screenshot();
-        
+
         $manager = new ImageManager(new Driver());
         $image = $manager->read($imageData);
+        $image->cover(1080, 1080);
         $image->toJpeg(90)->save($fullPath);
 
         Log::debug('Image Generator: Single image saved as JPEG', ['path' => $fullPath]);
@@ -107,9 +109,10 @@ class ImageGeneratorService
             }
 
             $imageData = $this->getBrowsershotInstance($html)->screenshot();
-            
+
             $manager = new ImageManager(new Driver());
             $image = $manager->read($imageData);
+            $image->cover(1080, 1080);
             $image->toJpeg(90)->save($fullPath);
             
             Log::debug("Image Generator: Carousel slide $i saved as JPEG", ['path' => $fullPath]);

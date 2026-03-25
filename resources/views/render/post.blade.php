@@ -131,8 +131,9 @@
         }
     @endphp
 
+    <div style="width: 360px; height: 360px; overflow: hidden; position: relative;">
     @if($props)
-        <x-dynamic-component :component="$componentName" 
+        <x-dynamic-component :component="$componentName"
             :brand-color="$props['brandColor'] ?? $brandColor"
             :company-label="$props['companyLabel'] ?? $companyLabel"
             :logo-url="$props['logoUrl'] ?? $logoUrl"
@@ -154,6 +155,7 @@
             {{ $rawText }}
         </div>
     @endif
+    </div>
 
 </body>
 </html>

@@ -569,7 +569,7 @@
                 </div>
 
                 <ul class="space-y-3.5 mb-10 flex-grow">
-                  @foreach(["3 posts par mois", "Modèles de posts standards", "Support email", "Conservation des posts 1 semaine"] as $feature)
+                  @foreach(["Jusqu'à 3 posts par mois", "Modèles de posts standards", "Historique des posts sur 7 jours", "Support par email"] as $feature)
                     <li class="flex items-center gap-3">
                       <div class="w-5 h-5 rounded-full bg-slate-50 flex items-center justify-center flex-shrink-0 border border-slate-200 text-slate-400">
                         <i data-lucide="check" class="w-3 h-3"></i>
@@ -577,7 +577,7 @@
                       <span class="text-slate-700 font-light text-sm">{{ $feature }}</span>
                     </li>
                   @endforeach
-                  @foreach(["Analytics des comptes réseaux sociaux", "Publication automatique", "Schedule des posts", "Modèles de posts premiums", "Support prioritaire"] as $feature)
+                  @foreach(["Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium", "Support prioritaire dédié"] as $feature)
                     <li class="flex items-center gap-3 opacity-40">
                       <div class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-300">
                         <i data-lucide="x" class="w-3 h-3"></i>
@@ -613,7 +613,7 @@
                 </div>
 
                 <ul class="space-y-3.5 mb-10 flex-grow">
-                  @foreach(["30 posts par mois", "Modèles de posts standards", "Support prioritaire", "Conservation des posts 1 mois"] as $feature)
+                  @foreach(["Jusqu'à 30 posts par mois", "Modèles de posts standards", "Historique des posts sur 30 jours", "Support prioritaire dédié"] as $feature)
                     <li class="flex items-center gap-3">
                       <div class="w-5 h-5 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 border border-amber-100 text-copper">
                         <i data-lucide="check" class="w-3 h-3"></i>
@@ -621,7 +621,7 @@
                       <span class="text-slate-700 font-light text-sm">{{ $feature }}</span>
                     </li>
                   @endforeach
-                  @foreach(["Analytics des comptes réseaux sociaux", "Publication automatique", "Schedule des posts", "Modèles de posts premiums"] as $feature)
+                  @foreach(["Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium"] as $feature)
                     <li class="flex items-center gap-3 opacity-40">
                       <div class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-300">
                         <i data-lucide="x" class="w-3 h-3"></i>
@@ -653,7 +653,7 @@
                 </div>
 
                 <ul class="space-y-3.5 mb-10 flex-grow">
-                  @foreach(["100 posts par mois", "Analytics des comptes réseaux sociaux", "Publication automatique", "Schedule des posts", "Modèles de posts premiums", "Support prioritaire", "Conservation des posts sans expiration"] as $feature)
+                  @foreach(["Jusqu'à 100 posts par mois", "Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium", "Historique des posts illimité", "Support prioritaire dédié"] as $feature)
                     <li class="flex items-center gap-3">
                       <div class="w-5 h-5 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 border border-amber-100 text-copper">
                         <i data-lucide="check" class="w-3 h-3"></i>

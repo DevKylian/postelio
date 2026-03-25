@@ -32,12 +32,13 @@ class ContentRefinerService
             . "- Exemple de structure attendue : accroche sur une ligne, ligne vide, corps espacé point par point, ligne vide, call-to-action, ligne vide, hashtags.\n\n";
 
         $noTruncationRule = "RÈGLE DE RÉDACTION STRICTE SUR LES TEXTES D'IMAGE :\n"
-            . "- Le champ image_text (et title, slides) s'affiche dans une zone visuelle FIXE sur l'image.\n"
-            . "- Si le texte est trop long, il sera COUPÉ visuellement et le résultat sera illisible et cassé.\n"
-            . "- Tu DOIS donc écrire des textes COURTS et COMPLETS dès le départ.\n"
-            . "- Ne génère JAMAIS une longue phrase que tu essaies de faire tenir — écris directement un titre court de 2 à 5 mots.\n"
-            . "- Les limites de caractères sont STRICTES et NON NÉGOCIABLES. Ne les dépasse JAMAIS.\n"
-            . "- Exemple CORRECT : 'Rénovation cuisine' (19 car.) — Exemple INTERDIT : 'Création d'une cuisine sur mesure : élégance et savoir-faire' (59 car.)\n\n";
+            . "- Le champ image_text s'affiche dans une petite zone visuelle FIXE sur l'image générée.\n"
+            . "- Tu dois penser image_text comme une ÉTIQUETTE ou un NOM D'ALBUM, jamais comme une phrase.\n"
+            . "- Commence par identifier le SUJET en 1-2 mots, puis ajoute UN qualificatif si nécessaire.\n"
+            . "- INTERDIT : les phrases avec verbe ('Création de...', 'Réalisation d'un...', 'Installation de...').\n"
+            . "- INTERDIT : les articles introductifs inutiles ('Une cuisine...', 'Le salon...').\n"
+            . "- CORRECT : 'Cuisine sur mesure', 'Douche italienne', 'Terrasse bois'.\n"
+            . "- Le texte doit avoir du SENS seul — jamais une phrase coupée au milieu.\n\n";
 
         $prompt = $noHallucinateGlobal . $noMarkdownPrefix . $noTruncationRule . $this->getPromptForTemplate($template, $photoCount, $options);
         
@@ -254,11 +255,11 @@ class ContentRefinerService
                 'lifestyle' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . $jsonSingleWithImageText(
                     "Légende Instagram complète ({$captionRange}, storytelling). {$hashtagInstruction}",
-                    "MAXIMUM ABSOLU : 30 caractères (2 à 4 mots). "
-                    . "Génère un TITRE, pas une phrase. Pas de verbe, pas de déterminant inutile. "
-                    . "BONS exemples : 'Rénovation cuisine' (19 car.), 'Salle de bain moderne' (22 car.), 'Terrasse bois' (13 car.), 'Pose parquet chêne' (18 car.). "
-                    . "MAUVAIS exemples INTERDITS : 'Création d'une cuisine sur mesure' (34 car. — TROP LONG), 'Rénovation complète de la salle de bain' (40 car. — TROP LONG). "
-                    . "Compte les caractères de ton image_text AVANT de répondre. S'il dépasse 30, RACCOURCIS-LE. Sans hashtag."
+                    "Une ÉTIQUETTE courte qui nomme le sujet du projet, comme on nommerait un album photo ou un tableau Pinterest. "
+                    . "Méthode : identifie le SUJET principal en 1-2 mots, puis ajoute éventuellement UN qualificatif. "
+                    . "Exemples corrects : 'Cuisine sur mesure', 'Salle de bain moderne', 'Terrasse bois', 'Parquet chêne massif', 'Douche italienne'. "
+                    . "Ne rédige JAMAIS une phrase avec verbe ou article introductif (pas de 'Création de...', 'Réalisation d'une...', 'Installation du...'). "
+                    . "Maximum 30 caractères. Sans hashtag."
                 ),
 
                 'project' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
@@ -267,10 +268,10 @@ class ContentRefinerService
                 . "{$extraNote} "
                 . $jsonSingleWithImageText(
                     "Légende Instagram complète ({$captionRange}, storytelling). {$hashtagInstruction}",
-                    "MAXIMUM ABSOLU : 40 caractères (2 à 5 mots). "
-                    . "Génère un TITRE court, pas une phrase longue. "
-                    . "BONS exemples : 'Avant / Après cuisine' (21 car.), 'Rénovation salle de bain' (25 car.), 'Pose carrelage' (14 car.). "
-                    . "Compte les caractères AVANT de répondre. Sans hashtag."
+                    "Une ÉTIQUETTE courte qui nomme le projet, comme un titre d'album photo. "
+                    . "Méthode : SUJET + qualificatif optionnel. Pas de phrase, pas de verbe, pas d'article introductif. "
+                    . "Exemples : 'Avant / Après cuisine', 'Rénovation salle de bain', 'Pose carrelage'. "
+                    . "Maximum 40 caractères. Sans hashtag."
                 ),
 
                 // ── Carousels ─────────────────────────────────────────────────────

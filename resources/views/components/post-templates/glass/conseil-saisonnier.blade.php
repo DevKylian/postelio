@@ -6,6 +6,12 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $text = $text ?: '3 gestes essentiels pour protéger votre toiture avant l\'hiver.';
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-slate-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
     
     {{-- Background Season Glow --}}
@@ -15,8 +21,8 @@
     <div class="flex-1 flex flex-col items-center justify-center p-8 relative z-10">
         
         {{-- Season Icon Glass --}}
-        <div class="w-24 h-24 rounded-3xl backdrop-blur-2xl bg-white/10 border border-white/20 flex items-center justify-center shadow-2xl mb-8 transition-transform duration-500">
-             <svg class="w-12 h-12" style="color: {{ $brandColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="w-14 h-14 rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/20 flex items-center justify-center shadow-2xl mb-4 transition-transform duration-500">
+             <svg class="w-7 h-7" style="color: {{ $brandColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
              </svg>
         </div>

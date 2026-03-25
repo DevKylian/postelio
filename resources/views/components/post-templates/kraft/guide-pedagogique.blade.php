@@ -7,6 +7,17 @@
     'slideIndex' => null,
 ])
 
+@if($preview)
+    @php
+        $title = ($title === 'Guide Pratique') ? 'Le guide ultime pour choisir votre pompe à chaleur' : $title;
+        $slideContents = !empty($slideContents) ? $slideContents : [
+            'Comprendre le fonctionnement et les differents types de PAC.',
+            'Évaluer la puissance nécessaire selon votre surface.',
+            'Bénéficier des aides de l\'État pour votre installation.'
+        ];
+    @endphp
+@endif
+
 @php
     $total = count($slideContents) + 1; // +1 for cover
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
@@ -24,23 +35,23 @@
             $coverStyle = !$isCoverVisible ? 'display: none;' : '';
         @endphp
         <div class="absolute inset-0" {!! $coverAlpine !!} style="{{ $coverStyle }}">
-            <div class="flex-1 flex flex-col p-10 justify-center gap-6 relative z-10 h-full">
-                <div class="flex items-center gap-6 mb-2">
-                    <div class="w-16 h-16 bg-slate-900 border-4 border-white flex items-center justify-center p-3 shadow-2xl -rotate-6 shrink-0">
+            <div class="flex-1 flex flex-col p-8 pb-20 justify-center gap-4 relative z-10 h-full">
+                <div class="flex items-center gap-4 mb-2">
+                    <div class="w-12 h-12 bg-slate-900 border-2 border-white flex items-center justify-center p-2 shadow-2xl -rotate-3 shrink-0">
                         <svg class="w-full h-full text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
                     </div>
-                    <div class="bg-white border-4 border-slate-900 p-4 shadow-[8px_8px_0px_0px_rgba(15,23,42,0.1)] flex-1">
-                        <h3 class="text-slate-900 text-lg font-black font-montserrat leading-[1.1] uppercase tracking-tighter">{{ $title }}</h3>
+                    <div class="bg-white border-2 border-slate-900 p-3 shadow-[4px_4px_0px_0px_rgba(15,23,42,0.1)] flex-1">
+                        <h3 class="text-slate-900 text-sm font-black font-montserrat leading-tight uppercase tracking-tighter">{{ $title }}</h3>
                     </div>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-2">
                     @foreach(array_slice($slideContents, 0, 3) as $idx => $item)
-                        <div class="flex items-center gap-4 bg-white border-4 border-slate-900 p-3 shadow-xl {{ $idx % 2 == 0 ? 'translate-x-3' : '' }}">
-                            <div class="w-3 h-3 shrink-0" style="background-color: {{ $idx == 0 ? $brandColor : 'rgb(15, 23, 42)' }}"></div>
-                            <p class="text-slate-900 text-[10px] font-black font-mono-technical uppercase">{{ $item }}</p>
+                        <div class="flex items-center gap-3 bg-white border-2 border-slate-900 p-2 shadow-lg {{ $idx % 2 == 0 ? 'translate-x-2' : '' }}">
+                            <div class="w-2 h-2 shrink-0" style="background-color: {{ $idx == 0 ? $brandColor : 'rgb(15, 23, 42)' }}"></div>
+                            <p class="text-slate-900 text-[9px] font-black font-mono-technical uppercase leading-tight">{{ $item }}</p>
                         </div>
                     @endforeach
                 </div>
@@ -56,20 +67,20 @@
                 $slideStyle = !$isSlideVisible ? 'display: none;' : '';
             @endphp
             <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
-                <div class="flex-1 flex flex-col p-12 justify-center relative z-10 h-full">
-                    <div class="bg-white border-4 border-slate-900 p-10 shadow-2xl relative rotate-1">
-                        <div class="absolute -top-10 -left-6 w-16 h-16 bg-slate-900 flex items-center justify-center font-black text-white text-3xl shadow-2xl border-2 border-white -rotate-6" style="background-color: {{ $brandColor }}">
+                <div class="flex-1 flex flex-col p-10 pb-20 justify-center relative z-10 h-full">
+                    <div class="bg-white border-2 border-slate-900 p-8 shadow-2xl relative rotate-1">
+                        <div class="absolute -top-6 -left-4 w-12 h-12 bg-slate-900 flex items-center justify-center font-black text-white text-xl shadow-2xl border-2 border-white -rotate-3" style="background-color: {{ $brandColor }}">
                             {{ $realIdx }}
                         </div>
                         @php
                             $cLen = mb_strlen($content);
-                            $cFontSize = 'text-xl';
-                            if ($cLen > 150) $cFontSize = 'text-sm';
-                            elseif ($cLen > 80) $cFontSize = 'text-base';
-                            elseif ($cLen > 40) $cFontSize = 'text-lg';
+                            $cFontSize = 'text-lg';
+                            if ($cLen > 150) $cFontSize = 'text-xs';
+                            elseif ($cLen > 80) $cFontSize = 'text-sm';
+                            elseif ($cLen > 40) $cFontSize = 'text-base';
                         @endphp
-                        <div class="max-h-[220px] overflow-hidden">
-                            <p class="text-slate-900 {{ $cFontSize }} font-black font-montserrat leading-snug uppercase pt-4">
+                        <div class="max-h-[180px] overflow-hidden">
+                            <p class="text-slate-900 {{ $cFontSize }} font-black font-montserrat leading-tight uppercase pt-2">
                                 {{ $content }}
                             </p>
                         </div>

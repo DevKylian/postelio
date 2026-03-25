@@ -7,6 +7,17 @@
     'slideIndex' => null,
 ])
 
+@if($preview)
+    @php
+        $title = ($title === 'Guide Pratique') ? 'Le guide ultime pour choisir votre pompe à chaleur' : $title;
+        $slideContents = !empty($slideContents) ? $slideContents : [
+            'Comprendre le fonctionnement et les differents types de PAC.',
+            'Évaluer la puissance nécessaire selon votre surface.',
+            'Bénéficier des aides de l\'État pour votre installation.'
+        ];
+    @endphp
+@endif
+
 @php
     $total = count($slideContents) + 1; // +1 for cover
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
@@ -26,24 +37,24 @@
             $coverStyle = !$isCoverVisible ? 'display: none;' : '';
         @endphp
         <div class="absolute inset-0" {!! $coverAlpine !!} style="{{ $coverStyle }}">
-            <div class="flex-1 flex flex-col p-10 justify-center gap-6 relative z-10 h-full">
-                <div class="flex items-center gap-4 mb-4">
-                     <div class="w-14 h-14 rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/20 flex items-center justify-center shadow-2xl">
-                         <svg class="w-7 h-7" style="color: {{ $brandColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex-1 flex flex-col p-8 pb-20 justify-center gap-4 relative z-10 h-full">
+                <div class="flex items-center gap-4 mb-2">
+                     <div class="w-12 h-12 rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/20 flex items-center justify-center shadow-2xl shrink-0">
+                         <svg class="w-6 h-6" style="color: {{ $brandColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                          </svg>
                      </div>
                      <div>
-                         <span class="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] block font-montserrat">Guide d'Expert</span>
-                         <h3 class="text-white text-xl font-bold leading-tight uppercase tracking-tight">{{ $title }}</h3>
+                         <span class="text-white/40 text-[9px] font-black uppercase tracking-[0.2em] block font-montserrat">Guide d'Expert</span>
+                         <h3 class="text-white text-lg font-bold leading-tight uppercase tracking-tight">{{ $title }}</h3>
                      </div>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-2">
                     @foreach(array_slice($slideContents, 0, 3) as $idx => $item)
-                        <div class="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-4 transition-colors shadow-lg {{ $idx % 2 == 0 ? 'translate-x-3' : '' }}">
-                            <div class="w-2 h-2 rounded-full" style="background-color: {{ $idx == 0 ? $brandColor : 'rgba(255,255,255,0.2)' }}"></div>
-                            <p class="text-white/90 text-sm font-medium uppercase tracking-tight">{{ $item }}</p>
+                        <div class="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-3 flex items-center gap-3 transition-colors shadow-lg {{ $idx % 2 == 0 ? 'translate-x-2' : '' }}">
+                            <div class="w-2 h-2 rounded-full shrink-0" style="background-color: {{ $idx == 0 ? $brandColor : 'rgba(255,255,255,0.2)' }}"></div>
+                            <p class="text-white/90 text-[11px] font-medium uppercase tracking-tight leading-tight">{{ $item }}</p>
                         </div>
                     @endforeach
                 </div>
@@ -59,20 +70,20 @@
                 $slideStyle = !$isSlideVisible ? 'display: none;' : '';
             @endphp
             <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
-                <div class="flex-1 flex flex-col p-12 justify-center relative z-10 h-full">
-                    <div class="backdrop-blur-3xl bg-white/5 border border-white/10 p-10 rounded-[32px] shadow-2xl relative">
-                        <div class="absolute -top-6 -left-6 w-16 h-16 rounded-2xl backdrop-blur-2xl bg-white/10 flex items-center justify-center font-black text-white text-2xl shadow-2xl border border-white/20" style="background-color: {{ $brandColor }}">
+                <div class="flex-1 flex flex-col p-10 pb-20 justify-center relative z-10 h-full">
+                    <div class="backdrop-blur-3xl bg-white/5 border border-white/10 p-8 rounded-[32px] shadow-2xl relative">
+                        <div class="absolute -top-5 -left-5 w-14 h-14 rounded-2xl backdrop-blur-2xl bg-white/10 flex items-center justify-center font-black text-white text-xl shadow-2xl border border-white/20" style="background-color: {{ $brandColor }}">
                             {{ $realIdx }}
                         </div>
                         @php
                             $cLen = mb_strlen($content);
-                            $cFontSize = 'text-xl';
-                            if ($cLen > 150) $cFontSize = 'text-sm';
-                            elseif ($cLen > 80) $cFontSize = 'text-base';
-                            elseif ($cLen > 40) $cFontSize = 'text-lg';
+                            $cFontSize = 'text-lg';
+                            if ($cLen > 150) $cFontSize = 'text-xs';
+                            elseif ($cLen > 80) $cFontSize = 'text-sm';
+                            elseif ($cLen > 40) $cFontSize = 'text-base';
                         @endphp
-                        <div class="max-h-[200px] overflow-hidden">
-                            <p class="text-white {{ $cFontSize }} font-bold leading-snug uppercase pt-4 tracking-tight">
+                        <div class="max-h-[180px] overflow-hidden">
+                            <p class="text-white {{ $cFontSize }} font-bold leading-tight uppercase pt-2 tracking-tight">
                                 {{ $content }}
                             </p>
                         </div>

@@ -6,6 +6,12 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $text = 'L\'erreur fatale : négliger l\'étanchéité sous le carrelage de votre douche.';
+    @endphp
+@endif
+
 <div class="w-full aspect-square relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: #111827; border-top: 8px solid {{ $brandColor }};">
     <div class="absolute inset-0 overflow-hidden pointer-events-none" style="opacity:0.045">
         <div class="absolute bg-white w-full h-3 top-1/2 left-0" style="transform: rotate(45deg) scaleX(1.6) translateY(-50%)"></div>

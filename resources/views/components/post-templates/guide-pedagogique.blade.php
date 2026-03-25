@@ -7,6 +7,17 @@
     'slideIndex' => null,
 ])
 
+@if($preview)
+    @php
+        $title = $title ?? 'Le guide ultime pour choisir votre pompe à chaleur';
+        $slideContents = !empty($slideContents) ? $slideContents : [
+            'Comprendre le fonctionnement et les differents types de PAC.',
+            'Évaluer la puissance nécessaire selon votre surface.',
+            'Bénéficier des aides de l\'État pour votre installation.'
+        ];
+    @endphp
+@endif
+
 @php
     // Determine total slides. If preview without data, pretend there are 3 slides.
     $total = (!empty($slideContents)) ? count($slideContents) + 1 : 3;
@@ -57,7 +68,7 @@
                 $slideStyle = !$isSlideVisible ? 'display: none;' : '';
                 $slideAlpine = $slideIndex === null ? "x-show=\"current === $realIdx\" style=\"display: none;\"" : '';
             @endphp
-            <div class="absolute inset-0 p-12 flex flex-col justify-center text-center" {!! $slideAlpine !!} style="{{ $slideStyle }}">
+            <div class="absolute inset-0 p-10 pb-20 flex flex-col justify-center text-center" {!! $slideAlpine !!} style="{{ $slideStyle }}">
                 <div class="bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-blue-100 relative">
                      <div class="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-lg shadow-xl" style="background-color: {{ $brandColor }}">
                          {{ $realIdx }}

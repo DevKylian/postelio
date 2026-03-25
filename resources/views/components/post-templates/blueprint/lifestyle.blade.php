@@ -6,6 +6,13 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $imageUrl = $imageUrl ?? 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800';
+        $text = ($text === 'SUR LE TERRAIN') ? 'La passion du métier se lit dans chaque geste.' : $text;
+    @endphp
+@endif
+
 @php
     $displayText = strtoupper($text ?: 'SUR LE TERRAIN');
     $len = mb_strlen($displayText);
@@ -27,7 +34,7 @@
     </div>
 
     {{-- Text label zone: photo ends at 68%, footer starts at ~86.5% → text in between --}}
-    <div style="position: absolute; top: 70%; left: 6%; right: 6%; height: 14%; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+    <div style="position: absolute; top: 72%; left: 6%; right: 6%; height: 14%; display: flex; align-items: center; justify-content: center; overflow: hidden;">
         <div style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.3); padding: 2% 5%; max-width: 100%; overflow: hidden; white-space: nowrap;">
             <span class="{{ $len > 25 ? 'text-[10px] sm:text-[11px]' : ($len > 18 ? 'text-[11px] sm:text-[12px]' : 'text-[12px] sm:text-[13px]') }}" style="color: white; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.3; text-align: center; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Courier New', monospace;">{{ $displayText }}</span>
         </div>

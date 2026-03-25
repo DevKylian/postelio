@@ -6,6 +6,12 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $text = $text ?: '3 gestes essentiels pour protéger votre toiture avant l\'hiver.';
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
     
     <div class="absolute inset-0 opacity-10 pointer-events-none" 

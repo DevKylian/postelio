@@ -7,6 +7,13 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $imageUrl = $imageUrl ?? 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800';
+        $text = ($text === 'FOCUS QUALITÉ') ? 'Le choix des meilleurs matériaux pour une durabilité garantie.' : $text;
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-slate-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
     
     {{-- Background image with focus --}}
@@ -51,18 +58,6 @@
         </div>
 
         <div class="flex items-center gap-4">
-             <div class="flex flex-col items-center">
-                 <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center mb-1 border border-white/10">
-                     <svg class="w-4 h-4" style="color: {{ $brandColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                 </div>
-                 <span class="text-white/40 text-[8px] font-bold uppercase tracking-widest">Labels</span>
-             </div>
-             <div class="flex flex-col items-center">
-                 <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center mb-1 border border-white/10">
-                     <svg class="w-4 h-4" style="color: {{ $brandColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                 </div>
-                 <span class="text-white/40 text-[8px] font-bold uppercase tracking-widest">Normes</span>
-             </div>
         </div>
     </div>
 </div>

@@ -6,6 +6,13 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $imageUrl = $imageUrl ?? 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800';
+        $text = ($text === 'SUR LE TERRAIN') ? 'La passion du métier se lit dans chaque geste.' : $text;
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Kraft Texture Overlay --}}
     <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
@@ -37,8 +44,7 @@
              <span class="text-slate-900 {{ $fontSize }} font-black uppercase tracking-[0.1em] font-montserrat leading-tight truncate">{{ $displayText }}</span>
              <span class="text-slate-900/40 text-[8px] font-black uppercase font-mono-technical mt-0.5 truncate">{{ $companyLabel }}</span>
         </div>
-        <div class="w-10 h-10 shrink-0 rounded-full border-4 border-slate-900 flex items-center justify-center">
-             <div class="w-4 h-4 rounded-full" style="background-color: {{ $brandColor }}"></div>
+        <div class="flex items-center gap-4">
         </div>
     </div>
 </div>

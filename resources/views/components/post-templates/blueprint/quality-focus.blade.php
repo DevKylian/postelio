@@ -7,6 +7,13 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $imageUrl = $imageUrl ?? 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800';
+        $text = ($text === 'FOCUS QUALITÉ') ? 'Le choix des meilleurs matériaux pour une durabilité garantie.' : $text;
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
     
     <div class="absolute inset-0 opacity-10 pointer-events-none" 
@@ -21,14 +28,6 @@
                 <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600" class="w-full h-full object-cover">
             @endif
             
-            {{-- Simplified Zoom Marker --}}
-            <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-between px-2 pointer-events-none">
-                <div class="w-6 h-px bg-[#0047AB]/40"></div>
-                <div class="w-16 h-16 border border-[#0047AB] rounded-full flex items-center justify-center shadow-lg bg-white/10 backdrop-blur-sm">
-                    <div class="w-1 h-1 bg-[#0047AB] rounded-full"></div>
-                </div>
-                <div class="w-6 h-px bg-[#0047AB]/40"></div>
-            </div>
             
         </div>
     </div>

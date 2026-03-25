@@ -7,6 +7,23 @@
     'slideIndex' => null,
 ])
 
+@if($preview)
+    @php
+        $slides = [
+            null,
+            'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=800',
+            'https://images.unsplash.com/photo-1517646287270-a5a067f920f0?q=80&w=800',
+            'https://images.unsplash.com/photo-1590644365607-1c5a519a7a37?q=80&w=800'
+        ];
+        $slideContents = [
+            'Comment nous réalisons votre isolation par l\'extérieur',
+            'Analyse de la structure existante et préparation des supports.',
+            'Mise en œuvre des panneaux isolants avec fixation mécanique.',
+            'Application de l\'enduit de finition et contrôle qualité.'
+        ];
+    @endphp
+@endif
+
 @php
     $total = count($slides);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';

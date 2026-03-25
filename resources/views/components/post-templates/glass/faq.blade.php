@@ -6,6 +6,12 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $question = $question ?: 'Quels sont les délais moyens pour une rénovation complète de toiture ?';
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-slate-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
     
     <div class="absolute -top-10 -left-10 w-40 h-40 rounded-full blur-[80px] opacity-20" style="background-color: {{ $brandColor }}"></div>

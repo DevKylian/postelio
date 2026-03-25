@@ -5,6 +5,12 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $text = $text ?: '3 gestes essentiels pour protéger votre toiture avant l\'hiver.';
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-[#CBD5E1] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Concrete Texture --}}
     <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" style="background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');"></div>

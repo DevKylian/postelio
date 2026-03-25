@@ -6,6 +6,13 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $imageUrl = $imageUrl ?? 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800';
+        $text = ($text === '') ? 'La passion du métier se lit dans chaque geste.' : $text;
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-[#CBD5E1] relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Full Image --}}
     <div class="absolute inset-0">
@@ -31,7 +38,7 @@
         if ($len > 25) $fontSize = 'text-lg';
         elseif ($len > 18) $fontSize = 'text-xl';
     @endphp
-    <div class="absolute inset-x-8 bottom-8 top-[55%] flex items-end z-10 overflow-hidden">
+    <div class="absolute inset-x-8 bottom-20 top-[55%] flex items-end z-10 overflow-hidden">
         <div class="flex flex-col w-full">
             <div class="w-10 h-1 mb-3" style="background-color: {{ $brandColor }}"></div>
             <span class="text-white {{ $fontSize }} font-black font-montserrat uppercase leading-tight tracking-tighter block" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">

@@ -8,6 +8,24 @@
     'slideIndex' => null, 
 ])
 
+@if($preview)
+    @php
+        $title = 'Focus sur l\'installation du système de chauffage';
+        $slides = [
+            'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?q=80&w=800',
+            'https://images.unsplash.com/photo-1590644365607-1c5a519a7a37?q=80&w=800',
+            'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800',
+            'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800'
+        ];
+        $slideContents = [
+            'Préparation technique et traçage des réseaux.',
+            'Installation des collecteurs et mise en pression.',
+            'Finalisation des raccordements et test de chauffe.',
+            'Contrôle final et mise en service.'
+        ];
+    @endphp
+@endif
+
 @php
     $total = count($slides);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
@@ -44,7 +62,7 @@
                                 $cFontSize = 'text-[10px]';
                                 if ($cLen > 100) $cFontSize = 'text-[8px]';
                             @endphp
-                            <div class="absolute inset-x-4 bottom-4 bg-slate-900/90 backdrop-blur-sm p-4 rounded border-l-4 shadow-xl shrink-0" style="border-color: {{ $brandColor }}">
+                            <div class="absolute inset-x-4 bottom-16 bg-slate-900/90 backdrop-blur-sm p-4 rounded border-l-4 shadow-xl shrink-0" style="border-color: {{ $brandColor }}">
                                 <div class="max-h-[60px] overflow-hidden">
                                     <p class="text-white font-black {{ $cFontSize }} uppercase leading-tight font-montserrat">{{ $currentText }}</p>
                                 </div>

@@ -7,6 +7,13 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $imageUrl = $imageUrl ?? 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800';
+        $text = ($text === 'La qualité et le choix des matériaux avant tout.') ? 'Le choix des meilleurs matériaux pour une durabilité garantie.' : $text;
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-white relative overflow-hidden flex flex-col justify-end {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="border: 6px solid {{ $brandColor }}">
     @if ($imageUrl)
         <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover">
@@ -19,7 +26,7 @@
         </div>
     @endif
     
-    <div class="absolute inset-x-4 bottom-14 bg-black/70 backdrop-blur-sm p-4 rounded-2xl border border-white/10 shadow-xl z-10 text-center">
+    <div class="absolute inset-x-4 bottom-20 bg-black/70 backdrop-blur-sm p-4 rounded-2xl border border-white/10 shadow-xl z-10 text-center">
         @php
             $len = mb_strlen($text);
             $fontSize = 'text-xs';

@@ -6,6 +6,12 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $text = '3 gestes essentiels pour protéger votre toiture avant l\'hiver.';
+    @endphp
+@endif
+
 <div class="w-full aspect-square relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: #0B1426; border-top: 8px solid {{ $brandColor }}">
     <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none" style="background: rgba(255,255,255,0.03)"></div>
     <div class="absolute -top-5 -right-5 w-[104px] h-[104px] rounded-full pointer-events-none" style="background: rgba(255,255,255,0.04)"></div>

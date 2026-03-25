@@ -8,6 +8,24 @@
     'slideIndex' => null,
 ])
 
+@if($preview)
+    @php
+        $title = 'Focus sur l\'installation du système de chauffage';
+        $slides = [
+            'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?q=80&w=800',
+            'https://images.unsplash.com/photo-1590644365607-1c5a519a7a37?q=80&w=800',
+            'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800',
+            'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800'
+        ];
+        $slideContents = [
+            'Préparation technique et traçage des réseaux.',
+            'Installation des collecteurs et mise en pression.',
+            'Finalisation des raccordements et test de chauffe.',
+            'Contrôle final et mise en service.'
+        ];
+    @endphp
+@endif
+
 @php
     $total = count($slides);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';

@@ -7,6 +7,13 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $customerName = 'Jean-Pierre D.';
+        $text = $text ?: 'Une expérience parfaite de A à Z. L\'équipe a su transformer notre vision en réalité avec un professionnalisme exemplaire. Les délais ont été respectés et les finitions sont impeccables. Nous recommandons vivement pour vos projets !';
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-slate-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
     
     {{-- Background pattern --}}
@@ -17,13 +24,6 @@
     {{-- Backdrop glass --}}
     <div class="relative flex-1 flex flex-col items-center justify-center p-8">
         
-        {{-- Floating Quote Icon --}}
-        <div class="absolute top-12 left-10 w-16 h-16 rounded-2xl backdrop-blur-md bg-white/5 border border-white/10 flex items-center justify-center shadow-2xl">
-            <svg class="w-8 h-8 text-white/40" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H16.017C14.9124 8 14.017 7.10457 14.017 6V5C14.017 3.89543 14.9124 3 16.017 3H19.017C21.2261 3 23.017 4.79086 23.017 7V15C23.017 18.3137 20.3307 21 17.017 21H14.017ZM1.017 21L1.017 18C1.017 16.8954 1.91243 16 3.017 16H6.017C6.56929 16 7.017 15.5523 7.017 15V9C7.017 8.44772 6.56929 8 6.017 8H3.017C1.91243 8 1.017 7.10457 1.017 6V5C1.017 3.89543 1.91243 3 3.017 3H6.017C8.22614 3 10.017 4.79086 10.017 7V15C10.017 18.3137 7.33071 21 4.017 21H1.017Z" />
-            </svg>
-        </div>
-
         <div class="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-8 shadow-2xl w-full max-w-[340px] relative z-20">
             <div class="flex items-center gap-1 mb-4">
                 @for($i=0; $i<5; $i++)

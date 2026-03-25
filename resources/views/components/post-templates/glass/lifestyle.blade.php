@@ -6,6 +6,13 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $imageUrl = $imageUrl ?? 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800';
+        $text = ($text === 'SUR LE TERRAIN') ? 'La passion du métier se lit dans chaque geste.' : $text;
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-slate-900 relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
 
     {{-- Photo Background --}}
@@ -18,15 +25,7 @@
     @endif
 
     {{-- Glass card — centered vertically in lower half --}}
-    <div class="absolute inset-x-10 bottom-[40px] h-[90px] backdrop-blur-xl bg-slate-900/40 border border-white/20 rounded-2xl shadow-2xl overflow-hidden">
-        {{-- Icon --}}
-        <div class="absolute -top-8 left-1/2 -ml-8 w-16 h-16 rounded-2xl backdrop-blur-2xl bg-white/10 border border-white/30 flex items-center justify-center shadow-2xl">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5" style="border: 2px solid {{ $brandColor }}">
-                <svg class="w-5 h-5" style="color: {{ $brandColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                </svg>
-            </div>
-        </div>
+    <div class="absolute inset-x-10 bottom-[40px] h-[90px] backdrop-blur-xl bg-slate-900/40 border border-white/20 rounded-2xl shadow-2xl">
 
         @php
             $displayText = $text ?: 'LIFESTYLE';

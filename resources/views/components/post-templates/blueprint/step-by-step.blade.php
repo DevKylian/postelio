@@ -7,6 +7,23 @@
     'slideIndex' => null,
 ])
 
+@if($preview)
+    @php
+        $slides = [
+            null,
+            'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=800',
+            'https://images.unsplash.com/photo-1517646287270-a5a067f920f0?q=80&w=800',
+            'https://images.unsplash.com/photo-1590644365607-1c5a519a7a37?q=80&w=800'
+        ];
+        $slideContents = [
+            'Analyse de la structure et préparation.',
+            'Mise en œuvre de l\'isolation thermique.',
+            'Application de l\'enduit de finition.',
+            'Contrôle final et nettoyage du chantier.'
+        ];
+    @endphp
+@endif
+
 @php
     $total = count($slides);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
@@ -35,22 +52,22 @@
                     </div>
                 @endif
 
-                <div class="absolute inset-0 flex flex-col p-12 justify-center gap-6 z-10">
+                <div class="absolute inset-0 flex flex-col p-8 pb-16 justify-center gap-3 z-10">
                     @foreach($slideContents as $stepIndex => $stepText)
                         @php
                             $isCurrentStep = $index === ($stepIndex + 1);
                             $isPastStep = $index > ($stepIndex + 1);
                         @endphp
-                        <div class="flex items-center gap-6 group/step transition-all duration-300 {{ $isCurrentStep ? 'scale-105 translate-x-4' : ($isPastStep ? 'opacity-40' : 'opacity-10') }}">
-                            <div class="w-10 h-10 border-2 border-[#0047AB] bg-white flex items-center justify-center font-black text-[#0047AB] text-xs font-mono-technical shadow-lg"
+                        <div class="flex items-center gap-4 group/step transition-all duration-300 {{ $isCurrentStep ? 'scale-105 translate-x-2' : ($isPastStep ? 'opacity-40' : 'opacity-10') }}">
+                            <div class="w-8 h-8 border-2 border-[#0047AB] bg-white flex items-center justify-center font-black text-[#0047AB] text-[10px] font-mono-technical shadow-lg shrink-0"
                                  style="{{ $isCurrentStep ? 'background-color: '.$brandColor.'; color: white; border-color: white;' : '' }}">
                                 {{ sprintf('%02d', $stepIndex + 1) }}
                             </div>
-                            <div class="flex-1 bg-white p-4 shadow-xl border-t border-blue-100 max-h-[80px] overflow-hidden {{ $isCurrentStep ? 'border-l-4' : '' }}"
+                            <div class="flex-1 bg-white p-3 shadow-xl border-t border-blue-100 max-h-[70px] overflow-hidden {{ $isCurrentStep ? 'border-l-4' : '' }}"
                                  style="{{ $isCurrentStep ? 'border-left-color: '.$brandColor : '' }}">
                                 @php
                                     $sLen = mb_strlen($stepText);
-                                    $sFontSize = 'text-[10px]';
+                                    $sFontSize = 'text-[9px]';
                                     if ($sLen > 80) $sFontSize = 'text-[7px]';
                                     elseif ($sLen > 40) $sFontSize = 'text-[8px]';
                                 @endphp
@@ -60,9 +77,9 @@
                     @endforeach
                     
                     @if($index === 0)
-                        <div class="mt-8 bg-white p-6 shadow-2xl border-t-2 border-t-[#003380] relative">
-                             <span class="text-[#0047AB]/40 text-[7px] font-black font-mono-technical uppercase tracking-[0.3em] block mb-1">PROGRAMME TECHNIQUE</span>
-                             <h2 class="text-[#0047AB] text-lg font-black font-mono-technical leading-none uppercase tracking-tighter">LES ÉTAPES DU PROJET</h2>
+                        <div class="mt-4 bg-white p-5 shadow-2xl border-t-2 border-t-[#003380] relative">
+                             <span class="text-[#0047AB]/40 text-[7px] font-black font-mono-technical uppercase tracking-[0.3em] block mb-0.5">PROGRAMME TECHNIQUE</span>
+                             <h2 class="text-[#0047AB] text-base font-black font-mono-technical leading-none uppercase tracking-tighter">LES ÉTAPES DU PROJET</h2>
                         </div>
                     @endif
                 </div>

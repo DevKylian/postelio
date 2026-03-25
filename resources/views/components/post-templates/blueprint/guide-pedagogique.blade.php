@@ -7,6 +7,17 @@
     'slideIndex' => null,
 ])
 
+@if($preview)
+    @php
+        $title = ($title === 'Guide de Projet') ? 'Le guide ultime pour choisir votre pompe à chaleur' : $title;
+        $slideContents = !empty($slideContents) ? $slideContents : [
+            'Comprendre le fonctionnement et les differents types de PAC.',
+            'Évaluer la puissance nécessaire selon votre surface.',
+            'Bénéficier des aides de l\'État pour votre installation.'
+        ];
+    @endphp
+@endif
+
 @php
     $total = count($slideContents) + 1; // +1 for cover
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
@@ -26,15 +37,15 @@
             $coverStyle = !$isCoverVisible ? 'display: none;' : '';
         @endphp
         <div class="absolute inset-0" {!! $coverAlpine !!} style="{{ $coverStyle }}">
-            <div class="flex-1 flex flex-col p-12 justify-center gap-8 relative z-10 h-full">
-                <div class="flex items-center gap-6 mb-4">
-                     <div class="w-16 h-16 border-2 border-white bg-white/10 flex items-center justify-center p-3 shadow-xl">
+            <div class="flex-1 flex flex-col p-10 pb-20 justify-center gap-6 relative z-10 h-full">
+                <div class="flex items-center gap-6 mb-2">
+                     <div class="w-14 h-14 border-2 border-white bg-white/10 flex items-center justify-center p-3 shadow-xl shrink-0">
                          <svg class="w-full h-full text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                          </svg>
                      </div>
-                     <div class="bg-white p-5 shadow-xl border-t-2 border-t-[#003380] flex-1">
-                         <h3 class="text-[#0047AB] text-lg font-black font-mono-technical leading-tight uppercase tracking-tighter">{{ $title }}</h3>
+                     <div class="bg-white p-4 shadow-xl border-t-2 border-t-[#003380] flex-1">
+                         <h3 class="text-[#0047AB] text-[16px] font-black font-mono-technical leading-tight uppercase tracking-tighter">{{ $title }}</h3>
                      </div>
                 </div>
 
@@ -58,18 +69,18 @@
                 $slideStyle = !$isSlideVisible ? 'display: none;' : '';
             @endphp
             <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
-                <div class="flex-1 flex flex-col p-12 justify-center relative z-10 h-full">
-                    <div class="bg-white p-12 shadow-2xl relative border-t-2 border-t-[#003380]">
-                         <div class="absolute -top-3 -left-3 w-10 h-10 bg-[#0047AB] border-2 border-white flex items-center justify-center font-black text-white font-mono-technical shadow-xl">
+                <div class="flex-1 flex flex-col p-10 pb-20 justify-center relative z-10 h-full">
+                    <div class="bg-white p-10 shadow-2xl relative border-t-2 border-t-[#003380]">
+                         <div class="absolute -top-3 -left-3 w-8 h-8 bg-[#0047AB] border-2 border-white flex items-center justify-center font-black text-white font-mono-technical shadow-xl text-sm">
                              {{ $realIdx }}
                          </div>
                          @php
                             $cLen = mb_strlen($content);
-                            $cFontSize = 'text-[15px]';
-                            if ($cLen > 150) $cFontSize = 'text-[10px]';
-                            elseif ($cLen > 80) $cFontSize = 'text-[12px]';
+                            $cFontSize = 'text-[14px]';
+                            if ($cLen > 150) $cFontSize = 'text-[9px]';
+                            elseif ($cLen > 80) $cFontSize = 'text-[11px]';
                          @endphp
-                         <div class="max-h-[240px] overflow-hidden">
+                         <div class="max-h-[220px] overflow-hidden">
                              <p class="text-[#0047AB] {{ $cFontSize }} font-black font-mono-technical leading-snug uppercase tracking-tight">
                                  {{ $content }}
                              </p>

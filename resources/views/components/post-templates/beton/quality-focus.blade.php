@@ -6,6 +6,13 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $imageUrl = $imageUrl ?? 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800';
+        $text = ($text === '') ? 'Le choix des meilleurs matériaux pour une durabilité garantie.' : $text;
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-[#CBD5E1] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Concrete Texture --}}
     <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" style="background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');"></div>
@@ -18,10 +25,6 @@
                 <img src="https://images.unsplash.com/photo-1504148455328-c376907d081c?q=80&w=600" class="w-full h-full object-cover grayscale-[0.2]">
             @endif
             
-            {{-- Focus Point --}}
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-2 border-white border-dashed rounded-full flex items-center justify-center">
-                 <div class="w-4 h-4 rounded-full shadow-2xl" style="background-color: {{ $brandColor }}"></div>
-            </div>
 
             @php
                 $fLen = mb_strlen($text ?: 'FOCUS QUALITÉ');

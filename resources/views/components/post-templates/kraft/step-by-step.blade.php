@@ -7,6 +7,23 @@
     'slideIndex' => null,
 ])
 
+@if($preview)
+    @php
+        $slides = [
+            null,
+            'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=800',
+            'https://images.unsplash.com/photo-1517646287270-a5a067f920f0?q=80&w=800',
+            'https://images.unsplash.com/photo-1590644365607-1c5a519a7a37?q=80&w=800'
+        ];
+        $slideContents = [
+            'Analyse de la structure et préparation.',
+            'Mise en œuvre de l\'isolation thermique.',
+            'Application de l\'enduit de finition.',
+            'Contrôle final et nettoyage du chantier.'
+        ];
+    @endphp
+@endif
+
 @php
     $total = count($slides);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
@@ -34,20 +51,26 @@
                     </div>
                 @endif
 
-                <div class="absolute inset-0 flex flex-col p-10 justify-center gap-6 z-10">
+                <div class="absolute inset-0 flex flex-col p-8 pb-20 justify-center gap-3 z-10">
                     @foreach($slideContents as $stepIndex => $stepText)
                         @php
                             $isCurrentStep = $index === ($stepIndex + 1);
                             $isPastStep = $index > ($stepIndex + 1);
-                            $rot = ($stepIndex % 2 == 0) ? 'rotate-2' : '-rotate-2';
+                            $rot = ($stepIndex % 2 == 0) ? 'rotate-1' : '-rotate-1';
                         @endphp
-                        <div class="relative flex items-center gap-8 group/step transition-all duration-300 {{ $isCurrentStep ? 'scale-105 translate-x-4' : ($isPastStep ? 'opacity-40' : 'opacity-20') }}">
-                            <div class="w-14 h-14 flex items-center justify-center font-black text-white text-xl font-montserrat shadow-xl border-2 border-white shrink-0 {{ $rot }}"
+                        <div class="relative flex items-center gap-4 group/step transition-all duration-300 {{ $isCurrentStep ? 'scale-105 translate-x-2' : ($isPastStep ? 'opacity-40' : 'opacity-20') }}">
+                            <div class="w-10 h-10 flex items-center justify-center font-black text-white text-base font-montserrat shadow-xl border-2 border-white shrink-0 {{ $rot }}"
                                  style="background-color: {{ $isCurrentStep ? $brandColor : 'rgb(15, 23, 42)' }}">
                                 {{ str_pad($stepIndex + 1, 2, '0', STR_PAD_LEFT) }}
                             </div>
-                            <div class="flex-1 bg-white border-4 border-slate-900 p-4 shadow-[8px_8px_0px_0px_rgba(15,23,42,0.1)] max-h-[80px] overflow-hidden">
-                                <p class="text-slate-900 text-[10px] font-black font-mono-technical uppercase leading-tight">
+                            <div class="flex-1 bg-white border-2 border-slate-900 p-3 shadow-[4px_4px_0px_0px_rgba(15,23,42,0.1)] max-h-[70px] overflow-hidden">
+                                @php
+                                    $sLen = mb_strlen($stepText);
+                                    $sFontSize = 'text-[9px]';
+                                    if ($sLen > 80) $sFontSize = 'text-[7px]';
+                                    elseif ($sLen > 40) $sFontSize = 'text-[8px]';
+                                @endphp
+                                <p class="text-slate-900 {{ $sFontSize }} font-black font-mono-technical uppercase leading-tight">
                                     {{ $stepText }}
                                 </p>
                             </div>
@@ -55,9 +78,9 @@
                     @endforeach
                     
                     @if($index === 0)
-                        <div class="bg-slate-900 p-8 border-4 border-white shadow-2xl rotate-1">
-                             <span class="text-white/40 text-[9px] font-black uppercase tracking-[0.2em] mb-2 block">TECHNICAL WORKFLOW</span>
-                             <h2 class="text-white text-3xl font-black font-montserrat leading-none uppercase tracking-tighter">LES ÉTAPES DU CHANTIER</h2>
+                        <div class="bg-slate-900 p-6 border-4 border-white shadow-2xl rotate-1">
+                             <span class="text-white/40 text-[8px] font-black uppercase tracking-[0.2em] mb-1 block">TECHNICAL WORKFLOW</span>
+                             <h2 class="text-white text-2xl font-black font-montserrat leading-none uppercase tracking-tighter">LES ÉTAPES DU CHANTIER</h2>
                         </div>
                     @endif
                 </div>

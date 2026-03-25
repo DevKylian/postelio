@@ -8,6 +8,24 @@
     'slideIndex' => null,
 ])
 
+@if($preview)
+    @php
+        $title = 'Focus sur l\'installation du système de chauffage';
+        $slides = [
+            'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?q=80&w=800',
+            'https://images.unsplash.com/photo-1590644365607-1c5a519a7a37?q=80&w=800',
+            'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800',
+            'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800'
+        ];
+        $slideContents = [
+            'Préparation technique et traçage des réseaux.',
+            'Installation des collecteurs et mise en pression.',
+            'Finalisation des raccordements et test de chauffe.',
+            'Contrôle final et mise en service.'
+        ];
+    @endphp
+@endif
+
 @php
     $total = count($slides);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
@@ -36,14 +54,14 @@
                 <div class="absolute inset-0 bg-slate-900/40"></div>
                 
                 @if(!empty($currentText))
-                    <div class="absolute inset-x-8 bottom-24 z-20">
+                    <div class="absolute inset-x-8 bottom-28 z-20">
                         @php
                             $cLen = mb_strlen($currentText);
                             $cFontSize = 'text-base';
                             if ($cLen > 80) $cFontSize = 'text-xs';
                             elseif ($cLen > 40) $cFontSize = 'text-sm';
                         @endphp
-                        <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6 shadow-2xl max-h-[100px] overflow-hidden shrink-0">
+                        <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 shadow-2xl max-h-[100px] overflow-hidden shrink-0">
                              <p class="text-white {{ $cFontSize }} font-bold leading-tight uppercase tracking-tight">{{ $currentText }}</p>
                         </div>
                     </div>

@@ -7,6 +7,13 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $customerName = 'Jean-Pierre D.';
+        $text = '"Une expérience parfaite de A à Z. L\'équipe a su transformer notre vision en réalité avec un professionnalisme exemplaire. Les délais ont été respectés et les finitions sont impeccables. Nous recommandons vivement pour vos projets !"';
+    @endphp
+@endif
+
 <div class="w-full aspect-square flex flex-col items-center justify-center p-10 text-center relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: {{ $brandColor }}">
     <div class="flex space-x-2 mb-6">
         @for ($i = 0; $i < 5; $i++)

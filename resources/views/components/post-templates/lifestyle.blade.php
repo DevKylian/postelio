@@ -7,6 +7,13 @@
     'preview' => false,
 ])
 
+@if($preview)
+    @php
+        $imageUrl = $imageUrl ?? 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800';
+        $text = $text ?? 'La passion du métier se lit dans chaque geste.';
+    @endphp
+@endif
+
 <div class="w-full aspect-square bg-slate-700 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
     {{-- Full-bleed photo --}}
     @if ($imageUrl)
@@ -41,7 +48,7 @@
             if ($len > 25) $fontSize = 'text-[10px]';
             elseif ($len > 18) $fontSize = 'text-xs';
         @endphp
-        <div class="absolute inset-x-6 bottom-[34px] top-[60%] flex items-center justify-center z-10 overflow-hidden">
+        <div class="absolute inset-x-6 bottom-[42px] top-[60%] flex items-center justify-center z-10 overflow-hidden">
             <div class="bg-black/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/10">
                 <h3 class="text-white font-black {{ $fontSize }} uppercase leading-snug font-montserrat text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</h3>
             </div>

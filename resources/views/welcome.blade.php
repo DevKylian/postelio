@@ -559,22 +559,30 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch">
 
-              {{-- Offre Gratuit --}}
+              {{-- Offre Starter --}}
               <div class="glass-card p-8 relative overflow-hidden flex flex-col">
                 <div class="text-center mb-8">
-                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Gratuit</h3>
+                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Starter</h3>
                   <div class="flex justify-center items-baseline gap-2">
                     <span class="text-5xl font-display font-light text-midnight tracking-tighter">0€</span>
                   </div>
                 </div>
 
-                <ul class="space-y-4 mb-10 flex-grow">
+                <ul class="space-y-3.5 mb-10 flex-grow">
                   @foreach(["3 posts par mois", "Modèles de posts standards", "Support email", "Conservation des posts 1 semaine"] as $feature)
-                    <li class="flex items-center gap-4">
-                      <div class="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center flex-shrink-0 border border-slate-200 text-slate-400">
-                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <li class="flex items-center gap-3">
+                      <div class="w-5 h-5 rounded-full bg-slate-50 flex items-center justify-center flex-shrink-0 border border-slate-200 text-slate-400">
+                        <i data-lucide="check" class="w-3 h-3"></i>
                       </div>
                       <span class="text-slate-700 font-light text-sm">{{ $feature }}</span>
+                    </li>
+                  @endforeach
+                  @foreach(["Analytics des comptes réseaux sociaux", "Publication automatique", "Schedule des posts", "Modèles de posts premiums", "Support prioritaire"] as $feature)
+                    <li class="flex items-center gap-3 opacity-40">
+                      <div class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-300">
+                        <i data-lucide="x" class="w-3 h-3"></i>
+                      </div>
+                      <span class="text-slate-400 font-light text-sm line-through">{{ $feature }}</span>
                     </li>
                   @endforeach
                 </ul>
@@ -590,27 +598,35 @@
                 @endauth
               </div>
 
-              {{-- Offre Pro --}}
+              {{-- Offre Essentiel --}}
               <div class="glass-card p-8 relative overflow-hidden flex flex-col ring-2 ring-copper/20 shadow-xl">
                 <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-copper via-orange-500 to-amber-600"></div>
                 <div class="text-center mb-1">
                   <div class="badge badge-copper uppercase tracking-widest font-medium text-[10px] mb-4">Populaire</div>
                 </div>
                 <div class="text-center mb-8">
-                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Pro</h3>
+                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Essentiel</h3>
                   <div class="flex justify-center items-baseline gap-2">
                     <span class="text-5xl font-display font-light text-midnight tracking-tighter">14,90€</span>
                     <span class="text-lg text-slate-500 font-light">/ mois</span>
                   </div>
                 </div>
 
-                <ul class="space-y-4 mb-10 flex-grow">
+                <ul class="space-y-3.5 mb-10 flex-grow">
                   @foreach(["30 posts par mois", "Modèles de posts standards", "Support prioritaire", "Conservation des posts 1 mois"] as $feature)
-                    <li class="flex items-center gap-4">
-                      <div class="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 border border-amber-100 text-copper">
-                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <li class="flex items-center gap-3">
+                      <div class="w-5 h-5 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 border border-amber-100 text-copper">
+                        <i data-lucide="check" class="w-3 h-3"></i>
                       </div>
                       <span class="text-slate-700 font-light text-sm">{{ $feature }}</span>
+                    </li>
+                  @endforeach
+                  @foreach(["Analytics des comptes réseaux sociaux", "Publication automatique", "Schedule des posts", "Modèles de posts premiums"] as $feature)
+                    <li class="flex items-center gap-3 opacity-40">
+                      <div class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-300">
+                        <i data-lucide="x" class="w-3 h-3"></i>
+                      </div>
+                      <span class="text-slate-400 font-light text-sm line-through">{{ $feature }}</span>
                     </li>
                   @endforeach
                 </ul>
@@ -626,21 +642,21 @@
                 @endauth
               </div>
 
-              {{-- Offre Premium --}}
+              {{-- Offre Business --}}
               <div class="glass-card p-8 relative overflow-hidden flex flex-col">
                 <div class="text-center mb-8">
-                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Premium</h3>
+                  <h3 class="text-2xl font-display font-medium text-midnight mb-4">Business</h3>
                   <div class="flex justify-center items-baseline gap-2">
                     <span class="text-5xl font-display font-light text-midnight tracking-tighter">29,90€</span>
                     <span class="text-lg text-slate-500 font-light">/ mois</span>
                   </div>
                 </div>
 
-                <ul class="space-y-4 mb-10 flex-grow">
+                <ul class="space-y-3.5 mb-10 flex-grow">
                   @foreach(["100 posts par mois", "Analytics des comptes réseaux sociaux", "Publication automatique", "Schedule des posts", "Modèles de posts premiums", "Support prioritaire", "Conservation des posts sans expiration"] as $feature)
-                    <li class="flex items-center gap-4">
-                      <div class="w-6 h-6 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 border border-amber-100 text-copper">
-                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <li class="flex items-center gap-3">
+                      <div class="w-5 h-5 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 border border-amber-100 text-copper">
+                        <i data-lucide="check" class="w-3 h-3"></i>
                       </div>
                       <span class="text-slate-700 font-light text-sm">{{ $feature }}</span>
                     </li>

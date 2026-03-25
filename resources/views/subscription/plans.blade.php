@@ -106,6 +106,16 @@
                                         <span class="text-xs font-medium text-slate-600 leading-relaxed">{{ $feature }}</span>
                                     </li>
                                 @endforeach
+                                @foreach($plan['disabled_features'] ?? [] as $feature)
+                                    <li class="flex items-start gap-3 opacity-40">
+                                        <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center">
+                                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </div>
+                                        <span class="text-xs font-medium text-slate-400 leading-relaxed line-through">{{ $feature }}</span>
+                                    </li>
+                                @endforeach
                             </ul>
 
                             {{-- CTA --}}

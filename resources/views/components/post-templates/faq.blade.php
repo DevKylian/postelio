@@ -44,11 +44,11 @@
             </div>
         </div>
 
-        {{-- Slide 1: Answer --}}
+        {{-- Slide 1+: Answer --}}
         @php
-            $isSlide1 = $slideIndex === 1;
+            $isSlide1 = $slideIndex !== null && $slideIndex >= 1;
             $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
-            $slide1Style = $slideIndex !== 1 ? 'display: none;' : '';
+            $slide1Style = !$isSlide1 ? 'display: none;' : '';
         @endphp
         <div {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             <h3 class="font-black uppercase tracking-widest text-sm mb-4" style="color: {{ $brandColor }}">La Réponse</h3>

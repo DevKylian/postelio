@@ -93,7 +93,12 @@ class ImageGeneratorService
         } elseif ($post->template === 'project') {
             $totalSlides = 3;
         } elseif ($post->template === 'faq') {
-            $totalSlides = 2;
+            // 1 cover (question) + N answer slides
+            $faqContentData = json_decode($post->refined_content, true);
+            $faqSlideCount = (is_array($faqContentData) && isset($faqContentData['slides']) && is_array($faqContentData['slides']))
+                ? count($faqContentData['slides'])
+                : 1;
+            $totalSlides = 1 + $faqSlideCount;
         } else {
             $totalSlides = count($post->extra_images ?? []) + ($post->image_path ? 1 : 0);
             if ($post->template === 'step_by_step') {

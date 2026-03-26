@@ -54,9 +54,9 @@
 
         {{-- Slide 1: Answer --}}
         @php
-            $isSlide1 = $slideIndex === 1;
+            $isSlide1 = $slideIndex !== null && $slideIndex >= 1;
             $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
-            $slide1Style = $slideIndex !== 1 ? 'display: none;' : '';
+            $slide1Style = !$isSlide1 ? 'display: none;' : '';
         @endphp
         <div {!! $slide1Alpine !!} style="{{ $slide1Style }}" class="relative pl-14">
             <div class="absolute left-0 top-0 w-12 h-12 border-2 border-white flex items-center justify-center font-mono-technical text-white font-black z-20 text-xl shadow-lg" style="background-color: {{ $brandColor }}">R</div>

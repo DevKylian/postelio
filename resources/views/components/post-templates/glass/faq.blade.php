@@ -51,9 +51,9 @@
 
         {{-- Slide 1: Answer --}}
         @php
-            $isSlide1 = $slideIndex === 1;
+            $isSlide1 = $slideIndex !== null && $slideIndex >= 1;
             $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
-            $slide1Style = $slideIndex !== 1 ? 'display: none;' : '';
+            $slide1Style = !$isSlide1 ? 'display: none;' : '';
         @endphp
         <div {!! $slide1Alpine !!} style="{{ $slide1Style }}" class="space-y-4">
             <span class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] ml-1">Réponse d'Expert</span>

@@ -117,9 +117,16 @@
                 'customerName' => $contentData['customerName'] ?? ($contentData['clientName'] ?? 'Client'),
             ]);
         } elseif ($template === 'faq') {
+            // Extract FAQ answers from refined_content slides array
+            $faqSlides = (is_array($contentData) && isset($contentData['slides']) && is_array($contentData['slides']))
+                ? $contentData['slides']
+                : [];
+            // slideIndex 0 = question, slideIndex 1+ = answers
+            $answerIndex = ($slideIndexFinal !== null && $slideIndexFinal > 0) ? $slideIndexFinal - 1 : 0;
+            $faqAnswer = $faqSlides[$answerIndex] ?? 'La réponse arrive bientôt...';
             $props = array_merge($commonProps, [
                 'question' => $rawText ?: 'Une question fréquente ?',
-                'answer' => $slideContents[0] ?? 'La réponse arrive bientôt...',
+                'answer' => $faqAnswer,
                 'slideIndex' => $slideIndexFinal,
             ]);
         } elseif (in_array($template, ['lifestyle', 'quality_focus'])) {
@@ -341,6 +348,7 @@
             :text="$props['text'] ?? null"
             :customer-name="$props['customerName'] ?? null"
             :question="$props['question'] ?? null"
+            :answer="$props['answer'] ?? null"
             :image-url="$props['imageUrl'] ?? null"
             :image-before-url="$props['imageBeforeUrl'] ?? null"
             :image-after-url="$props['imageAfterUrl'] ?? null"

@@ -6,13 +6,13 @@
         </linearGradient>
     </defs>
 
-    <!-- Fond dégradé jaune-orange avec coins arrondis -->
-    <rect width="512" height="512" rx="112" ry="112" fill="url(#bgGradient)"/>
+    <!-- Fond dégradé jaune-orange sans arrondi -->
+    <rect width="512" height="512" fill="url(#bgGradient)"/>
 
-    <!-- Barres vocales blanches (logo Postelio) -->
-    <line x1="112" y1="218" x2="112" y2="294" stroke="white" stroke-width="28" stroke-linecap="round"/>
-    <line x1="184" y1="160" x2="184" y2="352" stroke="white" stroke-width="28" stroke-linecap="round"/>
-    <line x1="256" y1="102" x2="256" y2="410" stroke="white" stroke-width="28" stroke-linecap="round"/>
-    <line x1="328" y1="170" x2="328" y2="342" stroke="white" stroke-width="28" stroke-linecap="round"/>
-    <line x1="400" y1="224" x2="400" y2="288" stroke="white" stroke-width="28" stroke-linecap="round"/>
+    <!-- Barres vocales blanches (logo Postelio) — plus petit, centré -->
+    <line x1="186" y1="232" x2="186" y2="280" stroke="white" stroke-width="22" stroke-linecap="round"/>
+    <line x1="221" y1="200" x2="221" y2="312" stroke="white" stroke-width="22" stroke-linecap="round"/>
+    <line x1="256" y1="168" x2="256" y2="344" stroke="white" stroke-width="22" stroke-linecap="round"/>
+    <line x1="291" y1="204" x2="291" y2="308" stroke="white" stroke-width="22" stroke-linecap="round"/>
+    <line x1="326" y1="236" x2="326" y2="276" stroke="white" stroke-width="22" stroke-linecap="round"/>
 </svg>

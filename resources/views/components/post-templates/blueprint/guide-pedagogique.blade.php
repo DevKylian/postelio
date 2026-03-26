@@ -50,12 +50,11 @@
                 </div>
 
                 <div class="space-y-3">
-                    @foreach(array_slice($slideContents, 0, 3) as $idx => $item)
-                        <div class="flex items-center gap-4 bg-white p-4 shadow-lg ring-1 ring-black/5 {{ $idx % 2 == 0 ? 'translate-x-3' : '' }}">
-                            <div class="w-2 h-2" style="background-color: {{ $idx == 0 ? $brandColor : '#e2e8f0' }}"></div>
-                            <p class="text-[#0047AB] text-[10px] font-black font-mono-technical uppercase tracking-tight">{{ $item }}</p>
-                        </div>
-                    @endforeach
+                    <div class="flex items-center gap-4 mt-2">
+                        <div class="h-px flex-1 bg-white/30"></div>
+                        <span class="text-white/60 text-[9px] font-black font-mono-technical uppercase tracking-widest">{{ count($slideContents) }} points</span>
+                        <div class="h-px flex-1 bg-white/30"></div>
+                    </div>
                 </div>
             </div>
         </div>

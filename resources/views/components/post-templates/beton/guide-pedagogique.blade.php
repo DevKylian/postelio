@@ -49,12 +49,11 @@
                 </div>
 
                 <div class="space-y-4">
-                    @foreach(array_slice($slideContents, 0, 3) as $item)
-                        <div class="flex items-center gap-4 bg-white/50 border border-slate-900/10 p-4 rounded-xl backdrop-blur-sm">
-                            <div class="w-2 h-2 rounded-full" style="background-color: {{ $brandColor }}"></div>
-                            <p class="text-slate-900 text-[11px] font-black font-montserrat uppercase">{{ $item }}</p>
-                        </div>
-                    @endforeach
+                    <div class="flex items-center gap-4 mt-2">
+                        <div class="h-px flex-1 bg-slate-900/15"></div>
+                        <span class="text-slate-900/30 text-[9px] font-black font-montserrat uppercase tracking-widest">{{ count($slideContents) }} conseils</span>
+                        <div class="h-px flex-1 bg-slate-900/15"></div>
+                    </div>
                 </div>
             </div>
         </div>

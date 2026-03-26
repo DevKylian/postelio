@@ -33,15 +33,13 @@
         <div class="absolute inset-0 flex" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
             <div class="w-1/2 relative overflow-hidden bg-slate-800">
                 @if ($imageBeforeUrl)
-                    <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover grayscale-[0.3] brightness-75">
+                    <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 @endif
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
             </div>
             <div class="w-1/2 relative overflow-hidden bg-slate-700">
                 @if ($imageAfterUrl)
-                    <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover brightness-110">
+                    <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 @endif
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
             </div>
             {{-- Glass Divider --}}
             <div class="absolute inset-y-0 left-1/2 -ml-px w-0.5 bg-white/30 backdrop-blur-md z-10"></div>
@@ -55,8 +53,7 @@
         @endphp
         <div class="absolute inset-0 bg-slate-800" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if ($imageBeforeUrl)
-                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover grayscale-[0.2] brightness-90">
-                <div class="absolute inset-0 bg-slate-900/20"></div>
+                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 <div class="absolute top-6 left-6 backdrop-blur-xl bg-white/10 border border-white/20 px-4 py-2 rounded-xl z-20 shadow-2xl">
                     <p class="text-white text-[10px] font-black uppercase tracking-[0.3em] leading-none">Avant</p>
                 </div>
@@ -71,8 +68,7 @@
         @endphp
         <div class="absolute inset-0 bg-slate-700" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if ($imageAfterUrl)
-                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover brightness-110">
-                <div class="absolute inset-0 bg-slate-900/10"></div>
+                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 <div class="absolute top-6 right-6 backdrop-blur-xl bg-white/20 border border-white/30 px-4 py-2 rounded-xl z-20 shadow-2xl">
                     <p class="text-white text-[10px] font-black uppercase tracking-[0.3em] leading-none">Après</p>
                 </div>
@@ -104,7 +100,7 @@
         $brandingAlpine = $slideIndex === null ? 'x-show="current === 0"' : '';
     @endphp
     @if($showBranding)
-    <div {!! $brandingAlpine !!} class="shrink-0 backdrop-blur-xl bg-white/10 border-t border-white/20 p-5 flex flex-col items-center gap-1 shadow-2xl relative z-20">
+    <div {!! $brandingAlpine !!} class="shrink-0 backdrop-blur-xl bg-white/10 border-t border-white/20 px-5 py-2.5 flex items-center justify-between shadow-2xl relative z-20">
         @php
             $cLen = mb_strlen($companyLabel);
             $cFontSize = 'text-[9px]';
@@ -112,26 +108,13 @@
             elseif ($cLen > 20) $cFontSize = 'text-[8px]';
 
             $tLen = mb_strlen($text ?: 'TRANSFORMATION');
-            $tFontSize = 'text-base';
-            if ($tLen > 40) $tFontSize = 'text-xs';
-            elseif ($tLen > 25) $tFontSize = 'text-sm';
+            $tFontSize = 'text-sm';
+            if ($tLen > 40) $tFontSize = 'text-[10px]';
+            elseif ($tLen > 25) $tFontSize = 'text-xs';
         @endphp
-        <div class="flex flex-col items-center max-w-[200px]">
-            <span class="text-white/60 {{ $cFontSize }} font-bold uppercase tracking-[0.2em] font-montserrat truncate w-full text-center">{{ $companyLabel }}</span>
-            <div class="max-h-[30px] overflow-hidden flex items-center justify-center">
-                <span class="text-white {{ $tFontSize }} font-black uppercase tracking-tighter font-montserrat text-center">{{ $text ?: 'TRANSFORMATION' }}</span>
-            </div>
-        </div>
-        <div class="flex w-full items-center justify-between px-6">
-            <div class="flex flex-col items-center">
-                <span class="text-white/40 text-[8px] font-black uppercase tracking-widest font-montserrat mb-1">Avant</span>
-                <div class="h-1 w-12 rounded-full transition-all duration-300" :class="current === 1 ? 'bg-white' : 'bg-white/20'"></div>
-            </div>
-            
-            <div class="flex flex-col items-center">
-                <span class="text-white text-[8px] font-black uppercase tracking-widest font-montserrat mb-1">Après</span>
-                <div class="h-1 w-12 rounded-full transition-all duration-300" :style="current === 0 ? 'background-color: {{ $brandColor }}; opacity: 0.5;' : (current === 2 ? 'background-color: {{ $brandColor }};' : 'background-color: white; opacity: 0.1;')"></div>
-            </div>
+        <div class="flex flex-col min-w-0 flex-1">
+            <span class="text-white/50 {{ $cFontSize }} font-bold uppercase tracking-[0.2em] font-montserrat truncate">{{ $companyLabel }}</span>
+            <span class="text-white {{ $tFontSize }} font-black uppercase tracking-tighter font-montserrat truncate">{{ $text ?: 'TRANSFORMATION' }}</span>
         </div>
     </div>
     @endif

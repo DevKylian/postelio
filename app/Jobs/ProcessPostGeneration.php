@@ -53,13 +53,18 @@ class ProcessPostGeneration implements ShouldQueue
                 throw new Exception("Aucun contenu (audio ou texte) fourni pour la génération.");
             }
 
+            // 1b. Correct known company terms in transcript (city, name, trade)
+            $company = $this->post->company;
+            if ($company) {
+                $transcript = $this->correctKnownTerms($transcript, $company);
+            }
+
             $this->post->update(['transcription' => $transcript]);
 
             // 2. AI content refinement
             Log::info("Starting AI refinement", ['template' => $this->post->template]);
             $photoCount = count($this->post->extra_images ?? []);
             $templateOptions = $this->post->template_options ?? [];
-            $company = $this->post->company;
             if ($company) {
                 $templateOptions['company_city']  = $company->city;
                 $templateOptions['company_name']  = $company->name;
@@ -68,7 +73,12 @@ class ProcessPostGeneration implements ShouldQueue
             $refined = $refiner->refine($transcript, $this->post->template, $photoCount, $templateOptions);
             Log::info("AI refinement finished");
 
-            // 2b. Enforce text zone constraints (truncate if AI exceeded limits)
+            // 2b. Correct known company terms in refined content
+            if ($company) {
+                $refined = $this->correctKnownTermsInJson($refined, $company);
+            }
+
+            // 2c. Enforce text zone constraints (truncate if AI exceeded limits)
             $refined = $fitter->fit($refined, $this->post->template, $templateOptions);
             Log::info("Text fitting applied");
 
@@ -164,5 +174,141 @@ class ProcessPostGeneration implements ShouldQueue
 
             throw $e;
         }
+    }
+
+    /**
+     * Correct known company terms (city, name) in a plain text string.
+     *
+     * Whisper often misspells proper nouns (e.g. "Lannion" → "L'Agnon",
+     * "Montpellier" → "Mont-Pelier"). This method finds words that are
+     * phonetically similar to known company terms and replaces them.
+     */
+    private function correctKnownTerms(string $text, $company): string
+    {
+        $knownTerms = array_filter([
+            $company->city,
+            $company->name,
+        ]);
+
+        foreach ($knownTerms as $correct) {
+            if (!$correct || mb_strlen($correct) < 3) continue;
+            $text = $this->fuzzyReplace($text, $correct);
+        }
+
+        return $text;
+    }
+
+    /**
+     * Correct known company terms inside a JSON string (refined content).
+     */
+    private function correctKnownTermsInJson(string $json, $company): string
+    {
+        $data = json_decode($json, true);
+        if (!is_array($data)) return $json;
+
+        $knownTerms = array_filter([
+            $company->city,
+            $company->name,
+        ]);
+
+        foreach ($data as $key => $value) {
+            if (is_string($value)) {
+                foreach ($knownTerms as $correct) {
+                    if (!$correct || mb_strlen($correct) < 3) continue;
+                    $data[$key] = $this->fuzzyReplace($value, $correct);
+                }
+            } elseif (is_array($value)) {
+                foreach ($value as $i => $item) {
+                    if (is_string($item)) {
+                        foreach ($knownTerms as $correct) {
+                            if (!$correct || mb_strlen($correct) < 3) continue;
+                            $data[$key][$i] = $this->fuzzyReplace($item, $correct);
+                        }
+                    }
+                }
+            }
+        }
+
+        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Find and replace words/phrases that are phonetically similar to the correct term.
+     *
+     * Uses a combination of:
+     * - Normalized string comparison (remove accents, hyphens, apostrophes)
+     * - similar_text() percentage for fuzzy matching
+     * - Word boundary detection to avoid replacing partial words
+     */
+    private function fuzzyReplace(string $text, string $correct): string
+    {
+        $correctNormalized = $this->normalizeForComparison($correct);
+        $correctLen = mb_strlen($correct);
+        $minLen = max(3, (int)($correctLen * 0.6));
+        $maxLen = (int)($correctLen * 1.6);
+
+        // Build a regex pattern that finds candidate words/phrases of similar length
+        // Match sequences of word chars, hyphens, apostrophes that could be the misspelled term
+        // e.g. "L'Agnon", "Mont-Pelier", "Lanion"
+        $pattern = "/[A-ZÀ-ÿa-z][A-ZÀ-ÿa-z'''\-]{" . ($minLen - 1) . "," . ($maxLen - 1) . "}/u";
+
+        return preg_replace_callback($pattern, function ($match) use ($correct, $correctNormalized) {
+            $candidate = $match[0];
+
+            // Skip if it's already the correct term
+            if ($candidate === $correct) return $candidate;
+
+            $candidateNormalized = $this->normalizeForComparison($candidate);
+
+            // Skip if normalized forms are identical (already correct, just different casing)
+            if (mb_strtolower($candidateNormalized) === mb_strtolower($correctNormalized)) {
+                return $correct;
+            }
+
+            // Compare normalized forms
+            similar_text(
+                mb_strtolower($candidateNormalized),
+                mb_strtolower($correctNormalized),
+                $percent
+            );
+
+            // Threshold: 70%+ similarity on normalized forms = likely the same word
+            if ($percent >= 70) {
+                Log::info("Fuzzy term correction", [
+                    'from' => $candidate,
+                    'to' => $correct,
+                    'similarity' => round($percent, 1),
+                ]);
+                return $correct;
+            }
+
+            return $candidate;
+        }, $text);
+    }
+
+    /**
+     * Normalize a string for comparison: remove accents, hyphens, apostrophes.
+     * "L'Agnon" → "LAgnon", "Mont-Pelier" → "MontPelier", "Lannion" → "Lannion"
+     */
+    private function normalizeForComparison(string $str): string
+    {
+        // Remove hyphens, apostrophes, spaces
+        $str = str_replace(['-', "'", "'", "'", ' '], '', $str);
+
+        // Transliterate accented characters
+        if (function_exists('transliterator_transliterate')) {
+            $str = transliterator_transliterate('Any-Latin; Latin-ASCII', $str);
+        } else {
+            $str = strtr($str, [
+                'à' => 'a', 'â' => 'a', 'ä' => 'a', 'é' => 'e', 'è' => 'e',
+                'ê' => 'e', 'ë' => 'e', 'î' => 'i', 'ï' => 'i', 'ô' => 'o',
+                'ö' => 'o', 'ù' => 'u', 'û' => 'u', 'ü' => 'u', 'ç' => 'c',
+                'À' => 'A', 'Â' => 'A', 'Ä' => 'A', 'É' => 'E', 'È' => 'E',
+                'Ê' => 'E', 'Ë' => 'E', 'Î' => 'I', 'Ï' => 'I', 'Ô' => 'O',
+                'Ö' => 'O', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ç' => 'C',
+            ]);
+        }
+
+        return $str;
     }
 }

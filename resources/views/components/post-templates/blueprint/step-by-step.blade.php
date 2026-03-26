@@ -48,7 +48,7 @@
                 {{-- Show image if available --}}
                 @if($imageUrl)
                     <div class="absolute inset-0">
-                        <img src="{{ $imageUrl }}" class="w-full h-full object-cover opacity-20">
+                        <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
                     </div>
                 @endif
 

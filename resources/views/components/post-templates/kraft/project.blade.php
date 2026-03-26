@@ -37,7 +37,7 @@
         <div class="absolute inset-6 grid grid-cols-2 gap-4" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
              <div class="relative border-[4px] border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23,42,0.1)] overflow-hidden bg-slate-800">
                  @if($imageBeforeUrl)
-                    <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover grayscale-[0.2]">
+                    <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
                  @endif
                  <div class="absolute -top-1 -left-1 bg-slate-900 text-white px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] font-mono-technical shadow-xl z-20">AVANT</div>
              </div>

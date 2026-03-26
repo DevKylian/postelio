@@ -19,7 +19,7 @@
     {{-- Background image with focus --}}
     <div class="absolute inset-0 bg-slate-800">
         @if($imageUrl)
-            <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover opacity-60 grayscale blur-[2px]">
+            <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover blur-[2px]">
         @else
             <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600" class="absolute inset-0 w-full h-full object-cover opacity-60 grayscale blur-[2px]">
         @endif

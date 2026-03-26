@@ -59,6 +59,12 @@ class ProcessPostGeneration implements ShouldQueue
             Log::info("Starting AI refinement", ['template' => $this->post->template]);
             $photoCount = count($this->post->extra_images ?? []);
             $templateOptions = $this->post->template_options ?? [];
+            $company = $this->post->company;
+            if ($company) {
+                $templateOptions['company_city']  = $company->city;
+                $templateOptions['company_name']  = $company->name;
+                $templateOptions['company_trade'] = $company->trade;
+            }
             $refined = $refiner->refine($transcript, $this->post->template, $photoCount, $templateOptions);
             Log::info("AI refinement finished");
 

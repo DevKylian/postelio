@@ -35,7 +35,7 @@
         $slideIndexFinal = $parsedIndex !== false ? (int)$slideIndex : null;
         
         $contentData = json_decode($post->refined_content, true);
-        $rawText = is_array($contentData) ? ($contentData['image_text'] ?? $contentData['caption'] ?? '') : ($post->refined_content ?? '');
+        $rawText = is_array($contentData) ? ($contentData['title'] ?? $contentData['image_text'] ?? $contentData['caption'] ?? '') : ($post->refined_content ?? '');
         $rawText = preg_replace('/#\S+/', '', $rawText);
         $rawText = trim($rawText);
 
@@ -118,7 +118,9 @@
             ]);
         } elseif ($template === 'faq') {
             $props = array_merge($commonProps, [
-                'question' => $rawText,
+                'question' => $rawText ?: 'Une question fréquente ?',
+                'answer' => $slideContents[0] ?? 'La réponse arrive bientôt...',
+                'slideIndex' => $slideIndexFinal,
             ]);
         } elseif (in_array($template, ['lifestyle', 'quality_focus'])) {
             $imgUrl = $post->image_path ? asset(Storage::url($post->image_path)) : ($post->image_before_path ? asset(Storage::url($post->image_before_path)) : null);

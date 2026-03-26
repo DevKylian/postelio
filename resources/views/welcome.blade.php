@@ -508,11 +508,26 @@
         </section>
 
         <!-- Pricing -->
-        <section id="tarifs" class="py-32 relative">
+        <section id="tarifs" class="py-32 relative" x-data="{ billingPeriod: 'monthly' }">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-20">
+            <div class="text-center max-w-3xl mx-auto mb-10">
               <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Un investissement dérisoire pour <span class="text-gradient-copper italic pr-2 pb-1">monter en gamme.</span></h2>
               <p class="text-xl font-light text-slate-600">Rentabilisé dès votre premier chantier haut de gamme signé.</p>
+            </div>
+
+            <!-- Toggle Billing Period -->
+            <div class="flex justify-center items-center gap-4 mb-16">
+              <span class="text-sm font-bold transition-colors duration-300" :class="billingPeriod === 'monthly' ? 'text-midnight' : 'text-gray-400'">Mensuel</span>
+              <button @click="billingPeriod = billingPeriod === 'monthly' ? 'yearly' : 'monthly'" 
+                      class="relative w-14 h-7 rounded-full transition-all duration-300 focus:outline-none ring-offset-2 focus:ring-2 focus:ring-copper/50"
+                      :class="billingPeriod === 'yearly' ? 'bg-copper' : 'bg-slate-200'">
+                  <div class="absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-md"
+                       :class="billingPeriod === 'yearly' ? 'translate-x-7' : ''"></div>
+              </button>
+              <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold transition-colors duration-300" :class="billingPeriod === 'yearly' ? 'text-midnight' : 'text-gray-400'">Annuel</span>
+                  <span class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter border border-green-200 shadow-sm animate-pulse">-20%</span>
+              </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch">
@@ -526,7 +541,7 @@
                     </div>
                     <h3 class="text-xl font-bold text-midnight">Starter</h3>
                     <div class="mt-4 flex items-baseline gap-1">
-                      <span class="text-4xl font-black text-midnight tracking-tighter">0,00&euro;</span>
+                      <span class="text-4xl font-black text-midnight tracking-tighter">0€</span>
                     </div>
                   </div>
 
@@ -578,9 +593,14 @@
                     </div>
                     <h3 class="text-xl font-bold text-midnight">Basic</h3>
                     <div class="mt-4 flex items-baseline gap-1">
-                      <span class="text-4xl font-black text-midnight tracking-tighter">19,90&euro;</span>
-                      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
+                      <span class="text-4xl font-black text-midnight tracking-tighter" x-text="billingPeriod === 'yearly' ? '180€' : '19€'">19€</span>
+                      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest" x-text="billingPeriod === 'yearly' ? '/ an' : '/ mois'">/ mois</span>
                     </div>
+                    <template x-if="billingPeriod === 'yearly'">
+                        <div class="mt-2 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg border border-green-100 inline-block">
+                            Économisez 48€ par an
+                        </div>
+                    </template>
                   </div>
 
                   <div class="h-px bg-slate-100 mb-8"></div>
@@ -627,9 +647,14 @@
                     </div>
                     <h3 class="text-xl font-bold text-midnight">Professionnel</h3>
                     <div class="mt-4 flex items-baseline gap-1">
-                      <span class="text-4xl font-black text-midnight tracking-tighter">29,90&euro;</span>
-                      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
+                      <span class="text-4xl font-black text-midnight tracking-tighter" x-text="billingPeriod === 'yearly' ? '280€' : '29€'">29€</span>
+                      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest" x-text="billingPeriod === 'yearly' ? '/ an' : '/ mois'">/ mois</span>
                     </div>
+                    <template x-if="billingPeriod === 'yearly'">
+                        <div class="mt-2 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg border border-green-100 inline-block">
+                            Économisez 68€ par an
+                        </div>
+                    </template>
                   </div>
 
                   <div class="h-px bg-slate-100 mb-8"></div>

@@ -16,7 +16,7 @@ class ContentRefinerService
      */
     public function refine(string $transcript, string $template, int $photoCount = 0, array $options = []): string
     {
-        $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique']);
+        $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq']);
 
         // ── Règle fondamentale anti-invention — s'applique à TOUS les templates ──
         $noHallucinateGlobal = "RÈGLE FONDAMENTALE — Anti-invention (priorité absolue) :\n"
@@ -151,8 +151,17 @@ class ContentRefinerService
         $customNote = $options['customNote'] ?? null;
 
         $toneInstruction = $this->toneInstruction($tone);
+        $city = $options['company_city'] ?? null;
+        $trade = $options['company_trade'] ?? null;
+        $locationTag = $city ? "#" . str_replace(' ', '', $city) : null;
+        $tradeTag = $trade ? "#" . str_replace([' ', '/'], '', $trade) : null;
+
         $hashtagInstruction = $includeHashtags
-            ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende."
+            ? "Ajoute exactement 5 hashtags à la fin de la légende, séparés par une ligne vide. "
+                . "Structure : 2 métier" . ($tradeTag ? " (dont $tradeTag)" : "") 
+                . " + 2 locaux" . ($locationTag ? " (dont $locationTag et #Artisan" . str_replace('#', '', $locationTag) . ")" : " (ville/département)")
+                . " + 1 valeur (ex: #SavoirFaire, #TravailSoigné). "
+                . "Sois pertinent et local pour attirer des clients de proximité."
             : "N'ajoute aucun hashtag.";
 
         $noRefuseRule = "RÈGLE ABSOLUE : Tu dois TOUJOURS générer le contenu demandé. Si certains champs de contexte semblent ne pas correspondre au mémo vocal, ignore-les et travaille avec le transcript audio uniquement. Ne refuse jamais.";
@@ -169,7 +178,7 @@ class ContentRefinerService
 
         // ── Caption zone config ──────────────────────────────────────────────
         $captionZones = config('template-text-zones.caption') ?? [];
-        $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique']);
+        $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq']);
         $captionConfig = $isCarousel
             ? ($captionZones['carousel'] ?? ['idealChars' => [250, 450], 'maxChars' => 600])
             : ($captionZones['standard'] ?? ['idealChars' => [200, 400], 'maxChars' => 500]);
@@ -226,10 +235,8 @@ class ContentRefinerService
                 'faq' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
                 . (($options['faqCategory'] ?? null) ? " Catégorie FAQ : {$options['faqCategory']}." : "")
                 . "{$extraNote} "
-                . $jsonSingleWithImageText(
-                "Légende Instagram avec la réponse développée à la question ({$captionRange}). {$hashtagInstruction}",
-                "La question seule, courte, percutante, avec point d'interrogation. {$faqImgConstraint}, phrase complète. Sans hashtag."
-            ),
+                . "{$jsonCarousel} Le premier slide est la Question ({$titleConstraint}, avec point d'interrogation). "
+                . "Le second slide est la Réponse ({$slideConstraint}, phrase affirmative/explicative).",
 
                 'quality_focus' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
                 . $jsonSingleWithImageText(
@@ -267,13 +274,8 @@ class ContentRefinerService
                 . (($options['workCategory'] ?? null) ? " Type de travaux : {$options['workCategory']}." : "")
                 . (($options['jobDuration'] ?? null) ? " Durée : {$options['jobDuration']}." : "")
                 . "{$extraNote} "
-                . $jsonSingleWithImageText(
-                    "Légende Instagram complète ({$captionRange}, storytelling). {$hashtagInstruction}",
-                    "Une ÉTIQUETTE courte qui nomme le projet, comme un titre d'album photo. "
-                    . "Méthode : SUJET + qualificatif optionnel. Pas de phrase, pas de verbe, pas d'article introductif. "
-                    . "Exemples : 'Avant / Après cuisine', 'Rénovation salle de bain', 'Pose carrelage'. "
-                    . "Maximum 40 caractères. Sans hashtag."
-                ),
+                . "{$jsonCarousel} Le premier slide est la couverture (titre accrocheur nommant le projet, par exemple 'Rénovation Cuisine', {$titleConstraint}). "
+                . "Les slides 2 et 3 sont fixées sur 'Avant' et 'Après' (tu peux mettre n'importe quel texte court dans 'slides', il ne sera pas affiché mais la structure JSON doit être respectée avec 2 entrées).",
 
                 // ── Carousels ─────────────────────────────────────────────────────
 

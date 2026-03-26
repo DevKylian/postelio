@@ -32,7 +32,7 @@ class ImageGeneratorService
             return $this->generateSingleViaBrowsershot($post);
         }
 
-        if (in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique'])) {
+        if (in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq'])) {
             return $this->generateCarouselViaBrowsershot($post);
         }
 
@@ -90,6 +90,10 @@ class ImageGeneratorService
             $contentData = json_decode($post->refined_content, true);
             $totalSlides = is_array($contentData) && isset($contentData['slides']) ? count($contentData['slides']) : 3;
             $totalSlides += 1; // +1 for the cover slide
+        } elseif ($post->template === 'project') {
+            $totalSlides = 3;
+        } elseif ($post->template === 'faq') {
+            $totalSlides = 2;
         } else {
             $totalSlides = count($post->extra_images ?? []) + ($post->image_path ? 1 : 0);
             if ($post->template === 'step_by_step') {

@@ -27,11 +27,14 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             'plan' => 'required|string|in:free,pro,premium',
+            'period' => 'nullable|string|in:monthly,yearly',
         ]);
 
         $plan = config("subscription.plans.{$request->plan}");
+        $period = $request->input('period', 'monthly');
+        $priceId = $period === 'yearly' ? ($plan['yearly_stripe_price_id'] ?? $plan['stripe_price_id']) : $plan['stripe_price_id'];
 
-        if (!$plan || !$plan['stripe_price_id']) {
+        if (!$plan || !$priceId) {
             return back()->with('error', 'Plan invalide ou non configuré.');
         }
 
@@ -42,7 +45,7 @@ class SubscriptionController extends Controller
             return $user->redirectToBillingPortal(route('subscription.plans'));
         }
 
-        return $user->newSubscription('default', $plan['stripe_price_id'])
+        return $user->newSubscription('default', $priceId)
             ->checkout([
                 'success_url' => route('subscription.success') . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('subscription.plans'),
@@ -119,22 +122,25 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             'plan' => 'required|string|in:free,pro,premium',
+            'period' => 'nullable|string|in:monthly,yearly',
         ]);
 
         $user = Auth::user();
         $plan = config("subscription.plans.{$request->plan}");
+        $period = $request->input('period', 'monthly');
+        $priceId = $period === 'yearly' ? ($plan['yearly_stripe_price_id'] ?? $plan['stripe_price_id']) : $plan['stripe_price_id'];
 
-        if (!$plan || !$plan['stripe_price_id']) {
+        if (!$plan || !$priceId) {
             return back()->with('error', 'Plan invalide.');
         }
 
         $subscription = $user->subscription('default');
 
         if (!$subscription || !$subscription->valid()) {
-            return redirect()->route('subscription.checkout', ['plan' => $request->plan]);
+            return redirect()->route('subscription.checkout', ['plan' => $request->plan, 'period' => $period]);
         }
 
-        $subscription->swap($plan['stripe_price_id']);
+        $subscription->swap($priceId);
 
         // Update credits
         $user->update([

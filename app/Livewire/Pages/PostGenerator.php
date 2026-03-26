@@ -46,7 +46,7 @@ class PostGenerator extends Component
     public $visualStyle     = 'standard'; // standard | glass | blueprint | kraft | beton
 
     // Carousel templates
-    const CAROUSEL_TEMPLATES  = ['chantier_detail', 'step_by_step', 'guide_pedagogique'];
+    const CAROUSEL_TEMPLATES  = ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq'];
     // Templates requiring photos
     const PHOTO_TEMPLATES     = ['project', 'lifestyle', 'quality_focus', 'chantier_detail', 'step_by_step'];
     // Templates requiring before+after

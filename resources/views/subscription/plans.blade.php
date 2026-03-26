@@ -47,8 +47,24 @@
             @endif
 
 
-            {{-- Plans Grid --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch pt-4">
+            {{-- Pricing Toggle --}}
+            <div x-data="{ billingPeriod: 'monthly' }">
+                <div class="flex justify-center items-center gap-4 mb-12">
+                    <span class="text-sm font-bold transition-colors duration-300" :class="billingPeriod === 'monthly' ? 'text-midnight' : 'text-gray-400'">Mensuel</span>
+                    <button @click="billingPeriod = billingPeriod === 'monthly' ? 'yearly' : 'monthly'" 
+                            class="relative w-14 h-7 rounded-full transition-all duration-300 focus:outline-none ring-offset-2 focus:ring-2 focus:ring-copper/50"
+                            :class="billingPeriod === 'yearly' ? 'bg-copper' : 'bg-slate-200'">
+                        <div class="absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-md"
+                             :class="billingPeriod === 'yearly' ? 'translate-x-7' : ''"></div>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold transition-colors duration-300" :class="billingPeriod === 'yearly' ? 'text-midnight' : 'text-gray-400'">Annuel</span>
+                        <span class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter border border-green-200 shadow-sm animate-pulse">-20%</span>
+                    </div>
+                </div>
+
+                {{-- Plans Grid --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch pt-4">
                 @foreach($plans as $key => $plan)
                     @php
                         $isCurrent = ($currentPlan === $key) || (!$currentPlan && $key === 'free');
@@ -83,9 +99,16 @@
                                 </div>
                                 <h3 class="text-xl font-bold text-midnight">{{ $plan['name'] }}</h3>
                                 <div class="mt-4 flex items-baseline gap-1">
-                                    <span class="text-4xl font-black text-midnight tracking-tighter">{{ number_format($plan['price'], 2, ',', '') }}&euro;</span>
-                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $isFree ? '' : '/ mois' }}</span>
+                                    <span class="text-4xl font-black text-midnight tracking-tighter" x-text="billingPeriod === 'yearly' ? '{{ $plan['yearly_price'] }}€' : '{{ number_format($plan['price'], 0, ',', '.') }}€'">{{ number_format($plan['price'], 0, ',', '.') }}€</span>
+                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest" x-show="!{{ $isFree ? 'true' : 'false' }}" x-text="billingPeriod === 'yearly' ? '/ an' : '/ mois'">{{ $isFree ? '' : '/ mois' }}</span>
                                 </div>
+                                @if(!$isFree && $plan['price'] > 0 && $plan['yearly_price'] > 0)
+                                    <template x-if="billingPeriod === 'yearly'">
+                                        <div class="mt-2 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg border border-green-100 inline-block">
+                                            Économisez {{ round(($plan['price'] * 12) - $plan['yearly_price']) }}€ par an
+                                        </div>
+                                    </template>
+                                @endif
                                 @if(isset($plan['old_price']) && $plan['old_price'] > 0)
                                     <p class="text-[11px] font-bold text-gray-400 line-through mt-0.5">{{ number_format($plan['old_price'], 2, ',', '') }}&euro;</p>
                                 @endif
@@ -132,6 +155,7 @@
                                     <form method="POST" action="{{ $currentPlan ? route('subscription.change-plan') : route('subscription.checkout') }}">
                                         @csrf
                                         <input type="hidden" name="plan" value="{{ $key }}">
+                                        <input type="hidden" name="period" :value="billingPeriod">
                                         <x-primary-button type="submit" class="w-full justify-center py-4 !rounded-2xl {{ $isPopular ? 'shadow-lg shadow-copper/20' : '' }}">
                                             {{ $currentPlan ? 'Changer de plan' : 'Commencer' }}
                                         </x-primary-button>
@@ -169,4 +193,5 @@
 
         </div>
     </div>
+</div>
 </x-app-layout>

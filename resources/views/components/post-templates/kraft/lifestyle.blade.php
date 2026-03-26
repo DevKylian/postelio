@@ -22,7 +22,7 @@
         <div class="relative w-full h-full border-[8px] border-slate-900 p-3 bg-white shadow-2xl rotate-1 overflow-hidden">
              <div class="w-full h-full overflow-hidden relative">
                  @if($imageUrl)
-                     <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
+                     <img src="{{ $imageUrl }}" class="w-full h-full object-contain">
                  @else
                      <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=600" class="w-full h-full object-cover">
                  @endif

@@ -49,7 +49,7 @@
                 <div class="absolute inset-0 p-4">
                     <div class="w-full h-full relative rounded-lg overflow-hidden border-2 border-slate-900 bg-slate-800 shadow-xl">
                         @if ($imageUrl)
-                            <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
+                            <img src="{{ $imageUrl }}" class="w-full h-full object-contain">
                         @else
                             <div class="w-full h-full flex items-center justify-center bg-slate-700">
                                 <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Photo {{ $index + 1 }}</p>

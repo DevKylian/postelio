@@ -44,7 +44,7 @@
             @endphp
             <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
                 @if ($imageUrl)
-                    <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
+                    <img src="{{ $imageUrl }}" class="w-full h-full object-contain">
                 @else
                     <div class="w-full h-full flex items-center justify-center {{ $index % 2 === 0 ? 'bg-slate-600' : 'bg-slate-500' }}">
                          <div class="text-center">

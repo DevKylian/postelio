@@ -46,7 +46,7 @@
                 {{-- Show image if index > 0 (steps) or if it's the cover with image --}}
                 @if($imageUrl)
                     <div class="absolute inset-0">
-                        <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
+                        <img src="{{ $imageUrl }}" class="w-full h-full object-contain">
                         <div class="absolute inset-0 bg-slate-900/40"></div>
                     </div>
                 @endif

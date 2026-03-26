@@ -29,7 +29,7 @@
     <div class="relative flex-1 flex items-center justify-center p-12">
         <div class="relative w-full h-full rounded-2xl border border-white/10 shadow-2xl overflow-hidden group/zoom">
             @if($imageUrl)
-                <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/zoom:scale-110">
+                <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-contain transition-transform duration-700 group-hover/zoom:scale-110">
             @else
                 <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/zoom:scale-110">
             @endif

@@ -45,7 +45,7 @@
             @endphp
             <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
                 @if($imageUrl)
-                    <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                    <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-contain">
                 @else
                     <div class="absolute inset-0 flex items-center justify-center bg-slate-800">
                         <span class="text-white/10 text-xs font-black uppercase tracking-widest">Photo {{ $index + 1 }}</span>

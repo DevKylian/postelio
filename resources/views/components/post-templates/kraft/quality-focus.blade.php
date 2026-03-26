@@ -21,7 +21,7 @@
     <div class="flex-1 relative flex items-center justify-center p-16">
         <div class="relative w-full h-full border-[6px] border-slate-900 p-4 bg-white shadow-2xl -rotate-1">
             @if($imageUrl)
-                <img src="{{ $imageUrl }}" class="w-full h-full object-cover grayscale-[0.1]">
+                <img src="{{ $imageUrl }}" class="w-full h-full object-contain">
             @else
                 <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600" class="w-full h-full object-cover grayscale-[0.1]">
             @endif

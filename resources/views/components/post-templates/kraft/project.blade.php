@@ -57,7 +57,7 @@
         @endphp
         <div class="absolute inset-6 bg-slate-800 border-[6px] border-slate-900 shadow-[12px_12px_0px_0px_rgba(15,23,42,0.15)] overflow-hidden" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if($imageBeforeUrl)
-                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover grayscale-[0.3] brightness-90">
+                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-contain">
                 <div class="absolute top-4 left-4 bg-slate-900 text-white px-5 py-2 text-xs font-black uppercase tracking-[0.3em] font-mono-technical shadow-2xl z-20">ETAT INITIAL</div>
             @endif
         </div>
@@ -70,7 +70,7 @@
         @endphp
         <div class="absolute inset-6 bg-slate-800 border-[6px] border-slate-900 shadow-[12px_12px_0px_0px_rgba(15,23,42,0.15)] overflow-hidden" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if($imageAfterUrl)
-                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-contain">
                 <div class="absolute top-4 right-4 bg-orange-600 text-white px-5 py-2 text-xs font-black uppercase tracking-[0.3em] font-mono-technical shadow-2xl z-20">RÉALISATION FINALE</div>
             @endif
         </div>

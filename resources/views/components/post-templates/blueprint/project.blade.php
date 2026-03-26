@@ -67,7 +67,7 @@
         @endphp
         <div class="absolute inset-6 bg-blue-900 border-2 border-white/20" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if($imageBeforeUrl)
-                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover opacity-80">
+                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-contain">
                 <div class="absolute top-0 left-0 px-5 py-2 bg-white text-[#0047AB] text-xs font-black font-mono-technical uppercase tracking-[0.2em] shadow-2xl">ETAT INITIAL / AVANT</div>
             @endif
         </div>
@@ -80,7 +80,7 @@
         @endphp
         <div class="absolute inset-6 bg-blue-900 border-2 border-white/20" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if($imageAfterUrl)
-                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-contain">
                 <div class="absolute top-0 left-0 px-5 py-2 bg-white text-[#0047AB] text-xs font-black font-mono-technical uppercase tracking-[0.2em] shadow-2xl">PROJET FINALISÉ / APRÈS</div>
             @endif
         </div>

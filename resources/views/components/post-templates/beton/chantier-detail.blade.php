@@ -56,7 +56,7 @@
                             </div>
                         @endif
                         
-                        @if(!empty($currentText))
+                        @if(!empty($currentText) && !$imageUrl)
                             @php
                                 $cLen = mb_strlen($currentText);
                                 $cFontSize = 'text-[10px]';

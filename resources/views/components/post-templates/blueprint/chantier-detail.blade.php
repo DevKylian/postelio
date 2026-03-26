@@ -53,7 +53,7 @@
                 @endif
                 <div class="absolute inset-0 bg-blue-900/20"></div>
                 
-                @if(!empty($currentText))
+                @if(!empty($currentText) && !$imageUrl)
                     <div class="absolute bottom-20 left-8 right-8 z-20">
                         @php
                             $cLen = mb_strlen($currentText);

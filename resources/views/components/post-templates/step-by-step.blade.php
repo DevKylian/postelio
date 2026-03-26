@@ -88,7 +88,7 @@
                     @php
                         $stepText = $slideContents[$index] ?? '';
                     @endphp
-                    @if(!empty($stepText))
+                    @if(!empty($stepText) && !$imageUrl)
                         @php
                             $sLen = mb_strlen($stepText);
                             $sFontSize = 'text-xs';

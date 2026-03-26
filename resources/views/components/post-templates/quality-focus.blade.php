@@ -16,7 +16,7 @@
 
 <div class="w-full aspect-square bg-white relative overflow-hidden flex flex-col justify-end {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="border: 6px solid {{ $brandColor }}">
     @if ($imageUrl)
-        <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-contain">
+        <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover">
     @else
         <div class="absolute inset-0 w-full h-full bg-slate-200 flex items-center justify-center text-slate-400 select-none pointer-events-none">
             <div class="text-center">

@@ -17,7 +17,7 @@
 <div class="w-full aspect-square bg-slate-700 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
     {{-- Full-bleed photo --}}
     @if ($imageUrl)
-        <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-contain">
+        <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover">
     @else
         <div class="absolute inset-0 flex items-center justify-center">
             <div class="text-center text-slate-400 select-none pointer-events-none">

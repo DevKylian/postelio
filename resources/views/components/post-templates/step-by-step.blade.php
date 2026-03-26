@@ -71,7 +71,7 @@
                     @endif
                 @else
                     @if($imageUrl)
-                        <img src="{{ $imageUrl }}" class="w-full h-full object-contain">
+                        <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full bg-slate-300 flex items-center justify-center font-bold text-slate-500/30 select-none">
                             <div class="text-center">

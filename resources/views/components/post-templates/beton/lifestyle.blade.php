@@ -17,7 +17,7 @@
     {{-- Full Image --}}
     <div class="absolute inset-0">
         @if($imageUrl)
-            <img src="{{ $imageUrl }}" class="w-full h-full object-contain">
+            <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
         @else
             <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600" class="w-full h-full object-cover">
         @endif

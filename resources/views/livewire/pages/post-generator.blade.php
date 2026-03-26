@@ -67,16 +67,172 @@
                     }
                 }
             }
+
+            // Load template spec for vocal hint
+            $templateSpec = config("template-specs.{$template}");
+            $vocalHint = $templateSpec['vocal_hint'] ?? 'Décrivez votre projet — l\'IA pré-remplira les champs suivants.';
+            $templateDescription = $templateSpec['description'] ?? null;
             @endphp
-            {{-- ── STEP 1 : Votre mémo vocal ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" x-data="voiceRecorder">
+
+            {{-- ── STEP 1 : Choix du gabarit ── --}}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
                     <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">1</div>
                     <div>
-                        <h3 class="font-semibold text-midnight text-base">Votre mémo vocal</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Décrivez votre projet — l'IA pré-remplira les champs suivants.</p>
+                        <h3 class="font-semibold text-midnight text-base">Choisissez votre gabarit</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Quel type de post voulez-vous créer ?</p>
                     </div>
                 </div>
+
+                <div class="p-6 space-y-3"
+                     x-data="{
+                         openGroups: {
+                             carousel: @js(in_array($template, ['chantier_detail','step_by_step','guide_pedagogique'])),
+                             custom:   @js($template === 'custom')
+                         }
+                     }">
+                    @foreach($templateGroups as $group)
+                    @php $isCollapsible = in_array($group['key'], ['carousel', 'custom']); @endphp
+
+                    <div x-data="{}" {{ $isCollapsible ? '' : '' }}>
+                        {{-- Group header --}}
+                        @if($isCollapsible)
+                        <button type="button"
+                                @click="openGroups['{{ $group['key'] }}'] = !openGroups['{{ $group['key'] }}']"
+                                class="w-full flex items-center gap-3 py-2 px-1 rounded-lg hover:bg-gray-50 transition-colors group">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $group['category'] }}</span>
+                            @if($group['badge'])
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-copper bg-amber-50 px-2 py-0.5 rounded-full">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                                    {{ $group['badge'] }}
+                                </span>
+                            @endif
+                            <div class="flex-1 h-px bg-gray-100"></div>
+                            <svg class="w-4 h-4 text-gray-300 group-hover:text-copper transition-all duration-200 shrink-0"
+                                 :class="openGroups['{{ $group['key'] }}'] ? 'rotate-180' : ''"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        @else
+                        <div class="flex items-center gap-3 mb-3 px-1">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $group['category'] }}</span>
+                            @if($group['badge'])
+                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-copper bg-amber-50 px-2 py-0.5 rounded-full">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                                    {{ $group['badge'] }}
+                                </span>
+                            @endif
+                            <div class="flex-1 h-px bg-gray-100"></div>
+                        </div>
+                        @endif
+
+                        {{-- Templates grid --}}
+                        <div
+                            @if($isCollapsible)
+                            x-show="openGroups['{{ $group['key'] }}']"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 -translate-y-1"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 translate-y-0"
+                            x-transition:leave-end="opacity-0 -translate-y-1"
+                            @endif
+                            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 {{ $isCollapsible ? 'mt-3' : '' }}">
+                            @foreach($group['templates'] as $tpl)
+                            @php
+                                $isCustomTpl = $group['key'] === 'custom';
+                                $isSelected  = $isCustomTpl
+                                    ? ($template === 'custom' && $customTemplateId == ($tpl['custom_id'] ?? null))
+                                    : ($template === $tpl['id']);
+                            @endphp
+                            <button type="button"
+                                    @if($isCustomTpl)
+                                        wire:click="selectCustomTemplate({{ $tpl['custom_id'] }})"
+                                    @else
+                                        wire:click="$set('template', '{{ $tpl['id'] }}'); $set('customTemplateId', null)"
+                                    @endif
+                                    class="group relative flex flex-col gap-3 p-4 rounded-xl border-2 text-left transition-all duration-200
+                                        {{ $isSelected
+                                            ? 'border-copper bg-copper/[0.04] shadow-sm'
+                                            : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/50' }}">
+
+                                <div class="flex items-start justify-between">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200
+                                        {{ $isSelected
+                                            ? 'bg-copper text-white'
+                                            : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $tpl['icon'] }}" />
+                                        </svg>
+                                    </div>
+                                    @if($isSelected)
+                                    <div class="w-5 h-5 rounded-full bg-copper flex items-center justify-center">
+                                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    @endif
+                                </div>
+
+                                <div>
+                                    <div class="flex items-center gap-1.5">
+                                        <p class="font-semibold text-sm leading-tight {{ $isSelected ? 'text-copper' : 'text-midnight' }}">
+                                            {{ $tpl['label'] }}
+                                        </p>
+                                        @if($isCustomTpl)
+                                            <span class="text-[9px] font-bold text-copper bg-amber-50 px-1.5 py-0.5 rounded-full leading-none">IA</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">{{ $tpl['desc'] }}</p>
+                                </div>
+                            </button>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- ── STEP 2 : Votre mémo vocal (contextuel au gabarit choisi) ── --}}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" x-data="voiceRecorder">
+                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">2</div>
+                    <div>
+                        <h3 class="font-semibold text-midnight text-base">Votre mémo vocal</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">{{ $vocalHint }}</p>
+                    </div>
+                </div>
+
+                {{-- Contextual guidance banner based on selected template --}}
+                @if($templateSpec)
+                <div class="mx-6 mt-4 flex items-start gap-3 p-3 bg-amber-50/70 border border-amber-100 rounded-xl">
+                    <svg class="w-5 h-5 text-copper shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div>
+                        <p class="text-xs font-semibold text-amber-800">
+                            Gabarit : {{ $selectedTemplateInfo['label'] ?? $template }}
+                        </p>
+                        <p class="text-xs text-amber-700 mt-0.5">
+                            {{ $vocalHint }}
+                        </p>
+                        @php
+                            $specFields = $templateSpec['fields'] ?? [];
+                            $fieldSummary = [];
+                            foreach ($specFields as $f) {
+                                $count = $f['count'] === 'dynamic' ? ($f['countMin'] ?? 1) . '-' . ($f['countMax'] ?? 4) : $f['count'];
+                                $fieldSummary[] = $f['label'] . ' (' . $f['maxChars'] . ' car. max' . ($f['isArray'] ? ", {$count} textes" : '') . ')';
+                            }
+                        @endphp
+                        @if(count($fieldSummary) > 0)
+                        <p class="text-[10px] text-amber-600 mt-1.5 leading-relaxed">
+                            L'IA va générer : {{ implode(' + ', $fieldSummary) }}
+                        </p>
+                        @endif
+                    </div>
+                </div>
+                @endif
 
                 <div class="p-6 space-y-4">
                     {{-- Tab Switcher --}}
@@ -273,126 +429,6 @@
                             {{ $message }}
                         </p>
                     @enderror
-                </div>
-            </div>
-
-            {{-- ── STEP 2 : Template ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">2</div>
-                    <div>
-                        <h3 class="font-semibold text-midnight text-base">Choisissez votre gabarit</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Quel type de post voulez-vous créer ?</p>
-                    </div>
-                </div>
-
-                <div class="p-6 space-y-3"
-                     x-data="{
-                         openGroups: {
-                             carousel: @js(in_array($template, ['chantier_detail','step_by_step','guide_pedagogique'])),
-                             custom:   @js($template === 'custom')
-                         }
-                     }">
-                    @foreach($templateGroups as $group)
-                    @php $isCollapsible = in_array($group['key'], ['carousel', 'custom']); @endphp
-
-                    <div x-data="{}" {{ $isCollapsible ? '' : '' }}>
-                        {{-- Group header --}}
-                        @if($isCollapsible)
-                        <button type="button"
-                                @click="openGroups['{{ $group['key'] }}'] = !openGroups['{{ $group['key'] }}']"
-                                class="w-full flex items-center gap-3 py-2 px-1 rounded-lg hover:bg-gray-50 transition-colors group">
-                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $group['category'] }}</span>
-                            @if($group['badge'])
-                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-copper bg-amber-50 px-2 py-0.5 rounded-full">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                                    {{ $group['badge'] }}
-                                </span>
-                            @endif
-                            <div class="flex-1 h-px bg-gray-100"></div>
-                            <svg class="w-4 h-4 text-gray-300 group-hover:text-copper transition-all duration-200 shrink-0"
-                                 :class="openGroups['{{ $group['key'] }}'] ? 'rotate-180' : ''"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </button>
-                        @else
-                        <div class="flex items-center gap-3 mb-3 px-1">
-                            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ $group['category'] }}</span>
-                            @if($group['badge'])
-                                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-copper bg-amber-50 px-2 py-0.5 rounded-full">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                                    {{ $group['badge'] }}
-                                </span>
-                            @endif
-                            <div class="flex-1 h-px bg-gray-100"></div>
-                        </div>
-                        @endif
-
-                        {{-- Templates grid --}}
-                        <div
-                            @if($isCollapsible)
-                            x-show="openGroups['{{ $group['key'] }}']"
-                            x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 -translate-y-1"
-                            x-transition:enter-end="opacity-100 translate-y-0"
-                            x-transition:leave="transition ease-in duration-150"
-                            x-transition:leave-start="opacity-100 translate-y-0"
-                            x-transition:leave-end="opacity-0 -translate-y-1"
-                            @endif
-                            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 {{ $isCollapsible ? 'mt-3' : '' }}">
-                            @foreach($group['templates'] as $tpl)
-                            @php
-                                $isCustomTpl = $group['key'] === 'custom';
-                                $isSelected  = $isCustomTpl
-                                    ? ($template === 'custom' && $customTemplateId == ($tpl['custom_id'] ?? null))
-                                    : ($template === $tpl['id']);
-                            @endphp
-                            <button type="button"
-                                    @if($isCustomTpl)
-                                        wire:click="selectCustomTemplate({{ $tpl['custom_id'] }})"
-                                    @else
-                                        wire:click="$set('template', '{{ $tpl['id'] }}'); $set('customTemplateId', null)"
-                                    @endif
-                                    class="group relative flex flex-col gap-3 p-4 rounded-xl border-2 text-left transition-all duration-200
-                                        {{ $isSelected
-                                            ? 'border-copper bg-copper/[0.04] shadow-sm'
-                                            : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/50' }}">
-
-                                <div class="flex items-start justify-between">
-                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200
-                                        {{ $isSelected
-                                            ? 'bg-copper text-white'
-                                            : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $tpl['icon'] }}" />
-                                        </svg>
-                                    </div>
-                                    @if($isSelected)
-                                    <div class="w-5 h-5 rounded-full bg-copper flex items-center justify-center">
-                                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    @endif
-                                </div>
-
-                                <div>
-                                    <div class="flex items-center gap-1.5">
-                                        <p class="font-semibold text-sm leading-tight {{ $isSelected ? 'text-copper' : 'text-midnight' }}">
-                                            {{ $tpl['label'] }}
-                                        </p>
-                                        @if($isCustomTpl)
-                                            <span class="text-[9px] font-bold text-copper bg-amber-50 px-1.5 py-0.5 rounded-full leading-none">IA</span>
-                                        @endif
-                                    </div>
-                                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">{{ $tpl['desc'] }}</p>
-                                </div>
-                            </button>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endforeach
                 </div>
             </div>
 

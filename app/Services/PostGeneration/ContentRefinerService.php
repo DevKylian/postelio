@@ -12,43 +12,29 @@ class ContentRefinerService
     /**
      * Refine raw transcription into structured post content.
      * Always returns JSON: { caption, image_text? } for single templates,
-     * or { caption, slides } for carousel templates.
+     * or { caption, title?, slides? } for carousel templates.
+     *
+     * Uses template-specs.php to dynamically build the AI prompt with
+     * precise field requirements, character limits, and content instructions.
      */
     public function refine(string $transcript, string $template, int $photoCount = 0, array $options = []): string
     {
-        $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq']);
+        $spec = config("template-specs.{$template}");
+        $isCarousel = $spec ? $spec['type'] === 'carousel' : in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq']);
 
-        // ── Règle fondamentale anti-invention — s'applique à TOUS les templates ──
-        $noHallucinateGlobal = "RÈGLE FONDAMENTALE — Anti-invention (priorité absolue) :\n"
-            . "Utilise UNIQUEMENT les informations explicitement présentes dans la transcription fournie.\n"
-            . "N'invente jamais de noms, prénoms, chiffres, dates, réalisations ou détails absents du vocal.\n"
-            . "Si le mémo est court ou vague, génère un post court et sobre qui reste dans ce cadre — "
-            . "ne complète JAMAIS avec du contenu inventé pour le rendre plus complet.\n"
-            . "Adapte la longueur et la richesse de la légende à la richesse du mémo vocal : mémo court = légende courte.\n\n";
+        // Build the prompt from template spec or fall back to custom/default
+        if ($spec) {
+            $prompt = $this->buildPromptFromSpec($spec, $template, $photoCount, $options);
+        } else {
+            $prompt = $this->buildFallbackPrompt($template, $photoCount, $options);
+        }
 
-        $noMarkdownPrefix = "RÈGLE DE FORMAT STRICTE :\n"
-            . "- Jamais de Markdown : aucun **, aucun *, aucun _, aucun #. Instagram n'en supporte pas.\n"
-            . "- Structure la légende avec de vrais sauts de ligne entre chaque idée/paragraphe (retour à la ligne simple entre deux phrases liées, ligne vide entre deux blocs distincts).\n"
-            . "- Exemple de structure attendue : accroche sur une ligne, ligne vide, corps espacé point par point, ligne vide, call-to-action, ligne vide, hashtags.\n\n";
-
-        $noTruncationRule = "RÈGLE DE RÉDACTION STRICTE SUR LES TEXTES D'IMAGE :\n"
-            . "- Le champ image_text s'affiche dans une petite zone visuelle FIXE sur l'image générée.\n"
-            . "- Tu dois penser image_text comme une ÉTIQUETTE ou un NOM D'ALBUM, jamais comme une phrase.\n"
-            . "- Commence par identifier le SUJET en 1-2 mots, puis ajoute UN qualificatif si nécessaire.\n"
-            . "- INTERDIT : les phrases avec verbe ('Création de...', 'Réalisation d'un...', 'Installation de...').\n"
-            . "- INTERDIT : les articles introductifs inutiles ('Une cuisine...', 'Le salon...').\n"
-            . "- CORRECT : 'Cuisine sur mesure', 'Douche italienne', 'Terrasse bois'.\n"
-            . "- Le texte doit avoir du SENS seul — jamais une phrase coupée au milieu.\n"
-            . "- Les mots composés avec trait d'union comptent comme UN SEUL mot (ex: 'savoir-faire' = 1 mot, 'sur-mesure' = 1 mot). Ne coupe JAMAIS un mot composé.\n\n";
-
-        $prompt = $noHallucinateGlobal . $noMarkdownPrefix . $noTruncationRule . $this->getPromptForTemplate($template, $photoCount, $options);
-        
         // Ensure the word "json" is present for the API requirement
         if (!str_contains(strtolower($prompt), 'json')) {
             $prompt .= "\n\nRéponds UNIQUEMENT sous forme de JSON valide.";
         }
 
-        // ── Simplification à la demande ──────────────────────────────────────────
+        // Simplification override
         if (!empty($options['simplified'])) {
             $prompt .= "\n\nSIMPLIFICATION DEMANDÉE : Génère une légende TRÈS COURTE (80-130 caractères maximum). "
                 . "Va à l'essentiel : une phrase principale + 2-3 hashtags. Pas de storytelling. Pas de liste.";
@@ -73,6 +59,247 @@ class ContentRefinerService
         $this->assertNotRefusal($raw);
 
         return $raw;
+    }
+
+    /**
+     * Build a complete AI prompt from the template specification.
+     *
+     * The prompt tells OpenAI exactly:
+     * - What type of content to generate
+     * - How many text fields are needed
+     * - The character limits for each field
+     * - The expected JSON structure
+     * - Context from the artisan's options
+     */
+    private function buildPromptFromSpec(array $spec, string $template, int $photoCount, array $options): string
+    {
+        $tone = $options['tone'] ?? 'professionnel';
+        $includeHashtags = $options['includeHashtags'] ?? true;
+        $customNote = $options['customNote'] ?? null;
+
+        $prompt = '';
+
+        // ── 1. Global anti-hallucination rule ──
+        $prompt .= "RÈGLE FONDAMENTALE — Anti-invention (priorité absolue) :\n"
+            . "Utilise UNIQUEMENT les informations explicitement présentes dans la transcription fournie.\n"
+            . "N'invente jamais de noms, prénoms, chiffres, dates, réalisations ou détails absents du vocal.\n"
+            . "Si le mémo est court ou vague, génère un post court et sobre qui reste dans ce cadre — "
+            . "ne complète JAMAIS avec du contenu inventé pour le rendre plus complet.\n"
+            . "Adapte la longueur et la richesse de la légende à la richesse du mémo vocal : mémo court = légende courte.\n\n";
+
+        // ── 2. Format rules ──
+        $prompt .= "RÈGLE DE FORMAT STRICTE :\n"
+            . "- Jamais de Markdown : aucun **, aucun *, aucun _, aucun #. Instagram n'en supporte pas.\n"
+            . "- Structure la légende avec de vrais sauts de ligne entre chaque idée/paragraphe.\n"
+            . "- Exemple de structure : accroche, ligne vide, corps espacé, ligne vide, call-to-action, ligne vide, hashtags.\n\n";
+
+        // ── 3. Image text rules ──
+        $prompt .= "RÈGLE DE RÉDACTION STRICTE SUR LES TEXTES D'IMAGE :\n"
+            . "- Les textes affichés sur l'image (image_text, title, slides) s'affichent dans des zones visuelles FIXES.\n"
+            . "- Si le texte est trop long, il sera TRONQUÉ automatiquement et le résultat sera visuellement CASSÉ.\n"
+            . "- Tu DOIS respecter scrupuleusement les limites de caractères indiquées pour chaque champ.\n"
+            . "- Préfère un texte court et percutant à un texte long qui déborde.\n"
+            . "- Compte les caractères avant de répondre.\n"
+            . "- Les mots composés avec trait d'union comptent comme UN SEUL mot (ex: 'savoir-faire'). Ne coupe JAMAIS un mot composé.\n\n";
+
+        // ── 4. No-refuse rule ──
+        $prompt .= "RÈGLE ABSOLUE : Tu dois TOUJOURS générer le contenu demandé. Si certains champs de contexte "
+            . "semblent ne pas correspondre au mémo vocal, ignore-les et travaille avec le transcript uniquement. Ne refuse jamais.\n\n";
+
+        // ── 5. AI role and content instructions ──
+        $prompt .= $spec['ai_role'] . ' ' . $this->toneInstruction($tone) . "\n\n";
+        $prompt .= "TYPE DE POST : " . $spec['description'] . "\n";
+        $prompt .= "INSTRUCTIONS : " . $spec['ai_content_instructions'] . "\n\n";
+
+        // ── 6. Context from artisan options ──
+        $contextParts = [];
+        foreach ($spec['context_fields'] as $field) {
+            $value = $options[$field] ?? null;
+            if ($value && $value !== 'auto') {
+                $label = $this->contextFieldLabel($field);
+                $contextParts[] = "{$label} : {$value}";
+            }
+        }
+        if ($customNote) {
+            $contextParts[] = "Note de l'artisan : {$customNote}";
+        }
+        if (!empty($contextParts)) {
+            $prompt .= "CONTEXTE FOURNI PAR L'ARTISAN :\n" . implode("\n", $contextParts) . "\n\n";
+        }
+
+        // ── 7. Build JSON structure specification ──
+        $prompt .= "═══ STRUCTURE JSON ATTENDUE ═══\n";
+        $prompt .= "Tu dois répondre UNIQUEMENT par un objet JSON valide avec EXACTEMENT cette structure :\n\n";
+        $prompt .= "{\n";
+
+        // Caption field
+        $captionSpec = $spec['caption'];
+        $hashtagInstruction = $this->hashtagInstruction($includeHashtags, $options);
+        $prompt .= "  \"caption\": \"" . $captionSpec['purpose']
+            . " ({$captionSpec['idealChars'][0]}-{$captionSpec['idealChars'][1]} caractères idéal, max {$captionSpec['maxChars']}). "
+            . "{$hashtagInstruction}\",\n";
+
+        // Template-specific fields
+        foreach ($spec['fields'] as $field) {
+            $charConstraint = "STRICTEMENT entre {$field['idealChars'][0]} et {$field['idealChars'][1]} caractères "
+                . "(maximum absolu : {$field['maxChars']} car. — au-delà le texte sera coupé)";
+
+            if ($field['isArray']) {
+                // Determine count
+                $count = $this->resolveFieldCount($field, $photoCount, $options);
+                $prompt .= "  \"{$field['name']}\": [\n";
+                for ($i = 1; $i <= min($count, 3); $i++) {
+                    $comma = ($i < min($count, 3)) ? ',' : ($count > 3 ? ', ...' : '');
+                    $prompt .= "    \"Texte slide {$i} — {$field['purpose']} {$charConstraint}\"{$comma}\n";
+                }
+                $prompt .= "  ]  // Exactement {$count} " . ($count > 1 ? 'textes' : 'texte') . " dans ce tableau\n";
+            } else {
+                $prompt .= "  \"{$field['name']}\": \"{$field['purpose']} {$charConstraint}\"\n";
+            }
+        }
+
+        $prompt .= "}\n\n";
+
+        // ── 8. Critical reminders ──
+        $prompt .= "RAPPELS CRITIQUES :\n";
+        $prompt .= "- Les champs image (image_text, title, slides) ne doivent JAMAIS contenir de hashtags, d'emojis ni de numéros d'étape.\n";
+        $prompt .= "- Respecte EXACTEMENT les limites de caractères. COMPTE avant de répondre.\n";
+        $prompt .= "- Chaque texte doit avoir du SENS seul — jamais une phrase coupée au milieu.\n";
+
+        if ($photoCount > 0 && $spec['type'] === 'carousel') {
+            $prompt .= "- Nous avons {$photoCount} photos. Adapte le nombre de slides en conséquence.\n";
+        }
+
+        return $prompt;
+    }
+
+    /**
+     * Resolve how many items a dynamic array field should contain.
+     */
+    private function resolveFieldCount(array $field, int $photoCount, array $options): int
+    {
+        if (is_int($field['count'])) {
+            return $field['count'];
+        }
+
+        // Dynamic count
+        $source = $field['countSource'] ?? 'content';
+
+        if ($source === 'photos' && $photoCount > 0) {
+            return max($field['countMin'] ?? 1, min($photoCount, $field['countMax'] ?? 8));
+        }
+
+        if ($source === 'targetSlides') {
+            $target = (int) ($options['targetSlides'] ?? ($field['countDefault'] ?? 5));
+            // targetSlides includes cover, so subtract 1 for the content slides
+            $slideCount = max(1, $target - 1);
+            return max($field['countMin'] ?? 1, min($slideCount, $field['countMax'] ?? 8));
+        }
+
+        // 'content' source — let AI decide based on content, give a reasonable range
+        $default = $field['countDefault'] ?? $field['countMin'] ?? 1;
+        $max = $field['countMax'] ?? 4;
+        return max($default, min($default, $max));
+    }
+
+    /**
+     * Build the hashtag instruction string.
+     */
+    private function hashtagInstruction(bool $includeHashtags, array $options): string
+    {
+        if (!$includeHashtags) {
+            return "N'ajoute aucun hashtag.";
+        }
+
+        $city = $options['company_city'] ?? null;
+        $trade = $options['company_trade'] ?? null;
+        $locationTag = $city ? "#" . str_replace(' ', '', $city) : null;
+        $tradeTag = $trade ? "#" . str_replace([' ', '/'], '', $trade) : null;
+
+        return "Ajoute exactement 5 hashtags à la fin de la légende, séparés par une ligne vide. "
+            . "Structure : 2 métier" . ($tradeTag ? " (dont {$tradeTag})" : "")
+            . " + 2 locaux" . ($locationTag ? " (dont {$locationTag} et #Artisan" . str_replace('#', '', $locationTag) . ")" : " (ville/département)")
+            . " + 1 valeur (ex: #SavoirFaire, #TravailSoigné). "
+            . "Sois pertinent et local pour attirer des clients de proximité.";
+    }
+
+    /**
+     * Build fallback prompt for custom templates or unknown template types.
+     */
+    private function buildFallbackPrompt(string $template, int $photoCount, array $options): string
+    {
+        $tone = $options['tone'] ?? 'professionnel';
+        $includeHashtags = $options['includeHashtags'] ?? true;
+        $customNote = $options['customNote'] ?? null;
+        $toneInstruction = $this->toneInstruction($tone);
+        $hashtagInstruction = $this->hashtagInstruction($includeHashtags, $options);
+        $extraNote = $customNote ? " Note de l'artisan : {$customNote}." : '';
+
+        $noHallucinateGlobal = "RÈGLE FONDAMENTALE — Anti-invention (priorité absolue) :\n"
+            . "Utilise UNIQUEMENT les informations explicitement présentes dans la transcription fournie.\n"
+            . "N'invente jamais de noms, prénoms, chiffres, dates, réalisations ou détails absents du vocal.\n"
+            . "Si le mémo est court ou vague, génère un post court et sobre qui reste dans ce cadre — "
+            . "ne complète JAMAIS avec du contenu inventé pour le rendre plus complet.\n"
+            . "Adapte la longueur et la richesse de la légende à la richesse du mémo vocal : mémo court = légende courte.\n\n";
+
+        $noMarkdownPrefix = "RÈGLE DE FORMAT STRICTE :\n"
+            . "- Jamais de Markdown : aucun **, aucun *, aucun _, aucun #. Instagram n'en supporte pas.\n"
+            . "- Structure la légende avec de vrais sauts de ligne entre chaque idée/paragraphe.\n\n";
+
+        $textZoneRule = "RÈGLE ZONE DE TEXTE (priorité haute) :\n"
+            . "Le texte affiché sur l'image (image_text, title, slides) sera rendu dans une zone visuelle fixe.\n"
+            . "Si le texte est trop long, il sera TRONQUÉ automatiquement et le résultat sera visuellement cassé.\n"
+            . "Tu DOIS donc respecter les limites de caractères indiquées pour chaque champ.\n"
+            . "Préfère un texte court et percutant à un texte long qui déborde.\n"
+            . "Compte les caractères avant de répondre.\n\n";
+
+        $noRefuseRule = "RÈGLE ABSOLUE : Tu dois TOUJOURS générer le contenu demandé. Ne refuse jamais.\n\n";
+
+        $captionRange = "200-400 caractères";
+
+        if ($template === 'custom') {
+            $customPrompt = $options['custom_template_prompt'] ?? null;
+            $layout = $options['custom_layout_type'] ?? 'standard';
+            $zone = config("template-text-zones.custom.{$layout}")
+                ?? config('template-text-zones.custom.standard')
+                ?? ['idealChars' => [60, 150], 'maxChars' => 180];
+            [$min, $max] = $zone['idealChars'];
+            $hard = $zone['maxChars'];
+            $imgConstraint = "STRICTEMENT entre {$min} et {$max} caractères (maximum absolu : {$hard} car.)";
+
+            if ($customPrompt) {
+                return $noHallucinateGlobal . $noMarkdownPrefix . $textZoneRule
+                    . "{$customPrompt}"
+                    . "\n\nCONTRAINTE TEXTE IMAGE : Le champ image_text doit faire {$imgConstraint}. Au-delà, le texte sera tronqué."
+                    . "\n\n{$toneInstruction}"
+                    . "\n" . ($includeHashtags ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende." : "N'ajoute aucun hashtag.")
+                    . ($extraNote ? "\n{$extraNote}" : "");
+            }
+            return $noHallucinateGlobal . $noMarkdownPrefix . $noRefuseRule . $textZoneRule
+                . "Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
+                . "Tu dois répondre UNIQUEMENT par un objet JSON valide : {\"caption\": \"Légende Instagram ({$captionRange}). {$hashtagInstruction}\", \"image_text\": \"Titre accrocheur et concis ({$imgConstraint}, phrase complète). Sans hashtag.\"}";
+        }
+
+        // Unknown template — generic fallback
+        return $noHallucinateGlobal . $noMarkdownPrefix . $noRefuseRule . $textZoneRule
+            . "Tu dois répondre UNIQUEMENT par un objet JSON valide : {\"caption\": \"Légende Instagram courte (150 caractères max). {$hashtagInstruction}\", \"image_text\": \"Titre concis (maximum 80 caractères, complet)\"}";
+    }
+
+    /**
+     * Get human-readable label for a context field.
+     */
+    private function contextFieldLabel(string $field): string
+    {
+        return match ($field) {
+            'clientName' => 'Prénom du client',
+            'serviceType' => 'Service réalisé',
+            'workCategory' => 'Type de travaux',
+            'jobDuration' => 'Durée du chantier',
+            'faqCategory' => 'Catégorie FAQ',
+            'season' => 'Saison ciblée',
+            'targetSlides' => 'Nombre de slides souhaité',
+            default => ucfirst($field),
+        };
     }
 
     /**
@@ -129,203 +356,6 @@ class ContentRefinerService
         return $zones[$template][$field] ?? null;
     }
 
-    /**
-     * Build a strict character constraint string for the AI prompt.
-     * Example: "STRICTEMENT entre 40 et 75 caractères (maximum absolu : 100)"
-     */
-    private function charConstraint(string $template, string $field, array $options = []): string
-    {
-        $zone = $this->textZone($template, $field, $options);
-        if (!$zone) {
-            return '~80 caractères';
-        }
-        [$min, $max] = $zone['idealChars'];
-        $hard = $zone['maxChars'];
-        return "STRICTEMENT entre {$min} et {$max} caractères (maximum absolu : {$hard} car. — au-delà le texte sera coupé)";
-    }
-
-    private function getPromptForTemplate(string $template, int $photoCount = 0, array $options = []): string
-    {
-        $tone = $options['tone'] ?? 'professionnel';
-        $includeHashtags = $options['includeHashtags'] ?? true;
-        $customNote = $options['customNote'] ?? null;
-
-        $toneInstruction = $this->toneInstruction($tone);
-        $city = $options['company_city'] ?? null;
-        $trade = $options['company_trade'] ?? null;
-        $locationTag = $city ? "#" . str_replace(' ', '', $city) : null;
-        $tradeTag = $trade ? "#" . str_replace([' ', '/'], '', $trade) : null;
-
-        $hashtagInstruction = $includeHashtags
-            ? "Ajoute exactement 5 hashtags à la fin de la légende, séparés par une ligne vide. "
-                . "Structure : 2 métier" . ($tradeTag ? " (dont $tradeTag)" : "") 
-                . " + 2 locaux" . ($locationTag ? " (dont $locationTag et #Artisan" . str_replace('#', '', $locationTag) . ")" : " (ville/département)")
-                . " + 1 valeur (ex: #SavoirFaire, #TravailSoigné). "
-                . "Sois pertinent et local pour attirer des clients de proximité."
-            : "N'ajoute aucun hashtag.";
-
-        $noRefuseRule = "RÈGLE ABSOLUE : Tu dois TOUJOURS générer le contenu demandé. Si certains champs de contexte semblent ne pas correspondre au mémo vocal, ignore-les et travaille avec le transcript audio uniquement. Ne refuse jamais.";
-
-        $extraNote = $customNote ? " Note de l'artisan : {$customNote}." : '';
-
-        // ── Strict text zone rule (applied globally) ─────────────────────────
-        $textZoneRule = "RÈGLE ZONE DE TEXTE (priorité haute) :\n"
-            . "Le texte affiché sur l'image (image_text, title, slides) sera rendu dans une zone visuelle fixe.\n"
-            . "Si le texte est trop long, il sera TRONQUÉ automatiquement et le résultat sera visuellement cassé.\n"
-            . "Tu DOIS donc respecter les limites de caractères indiquées pour chaque champ.\n"
-            . "Préfère un texte court et percutant à un texte long qui déborde.\n"
-            . "Compte les caractères avant de répondre.\n\n";
-
-        // ── Caption zone config ──────────────────────────────────────────────
-        $captionZones = config('template-text-zones.caption') ?? [];
-        $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq']);
-        $captionConfig = $isCarousel
-            ? ($captionZones['carousel'] ?? ['idealChars' => [250, 450], 'maxChars' => 600])
-            : ($captionZones['standard'] ?? ['idealChars' => [200, 400], 'maxChars' => 500]);
-        $captionRange = "{$captionConfig['idealChars'][0]}-{$captionConfig['idealChars'][1]} caractères";
-
-        // ── JSON schema descriptions ──────────────────────────────────────────
-
-        // For templates that show text on the image
-        $jsonSingleWithImageText = fn(string $captionDesc, string $imageTextDesc) =>
-        $textZoneRule
-        . "Tu dois répondre UNIQUEMENT par un objet JSON valide avec exactement cette structure :\n"
-        . "{\n"
-        . "  \"caption\": \"{$captionDesc}\",\n"
-        . "  \"image_text\": \"{$imageTextDesc}\"\n"
-        . "}\n"
-        . "IMPORTANT : image_text ne doit JAMAIS contenir de hashtags, d'emojis ni de ponctuation lourde.\n"
-        . "IMPORTANT : Respecte EXACTEMENT les limites de caractères pour image_text. Compte avant de répondre.";
-
-        // For carousels — uses text zone config for title & slides
-        $titleConstraint = $this->charConstraint($template, 'title', $options);
-        $slideConstraint = $this->charConstraint($template, 'slide', $options);
-        $jsonCarousel = $textZoneRule
-        . "Tu dois répondre UNIQUEMENT par un objet JSON valide avec cette structure :\n"
-        . "{\n"
-        . "  \"caption\": \"La légende Instagram complète ({$captionRange}, {$hashtagInstruction})\",\n"
-        . "  \"title\": \"Un titre très court et accrocheur pour la couverture ({$titleConstraint}, phrase complète)\",\n"
-        . "  \"slides\": [\"Texte court pour slide 1\", \"Texte court pour slide 2\", ...]\n"
-        . "}\n"
-        . "IMPORTANT : Les textes dans 'slides' et 'title' ne doivent JAMAIS contenir de hashtags, de numéros d'étape (car ils sont ajoutés automatiquement) ni d'emojis.\n"
-        . "IMPORTANT : Chaque texte de slide doit faire {$slideConstraint}. Compte les caractères.";
-
-        // ── Template-specific image_text constraints ──────────────────────────
-        $reviewImgConstraint = $this->charConstraint('review', 'image_text');
-        $faqImgConstraint = $this->charConstraint('faq', 'image_text');
-        $qfImgConstraint = $this->charConstraint('quality_focus', 'image_text');
-        $csImgConstraint = $this->charConstraint('conseil_saisonnier', 'image_text');
-        $eaeImgConstraint = $this->charConstraint('erreur_a_eviter', 'image_text');
-        $lifeImgConstraint = $this->charConstraint('lifestyle', 'image_text');
-        $projImgConstraint = $this->charConstraint('project', 'image_text');
-
-        return match ($template) {
-
-                // ── Single templates WITH image text ─────────────────────────────
-
-                'review' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
-                . (($options['clientName'] ?? null) ? " Prénom du client : {$options['clientName']}." : "")
-                . (($options['serviceType'] ?? null) ? " Contexte du service (indicatif) : {$options['serviceType']}." : "")
-                . "{$extraNote} "
-                . $jsonSingleWithImageText(
-                "Légende Instagram complète avec storytelling ({$captionRange}). {$hashtagInstruction}",
-                "Citation percutante tirée de l'avis client. Préfère utiliser les mots EXACTS si un témoignage est présent dans le vocal. {$reviewImgConstraint}, phrase complète. Sans hashtag."
-            ),
-
-                'faq' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
-                . (($options['faqCategory'] ?? null) ? " Catégorie FAQ : {$options['faqCategory']}." : "")
-                . "{$extraNote} "
-                . "{$jsonCarousel} Le premier slide est la Question ({$titleConstraint}, avec point d'interrogation). "
-                . "Le second slide est la Réponse ({$slideConstraint}, phrase affirmative/explicative).",
-
-                'quality_focus' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
-                . $jsonSingleWithImageText(
-                "Légende Instagram qui développe pourquoi ce matériau/équipement garantit qualité et durabilité ({$captionRange}). {$hashtagInstruction}",
-                "Nom ou courte description du matériau/équipement mis en valeur. {$qfImgConstraint}, expression complète. Majuscules recommandées. Sans hashtag."
-            ),
-
-                'conseil_saisonnier' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
-                . (($options['season'] ?? null) ? " Saison ciblée : {$options['season']}." : "")
-                . "{$extraNote} "
-                . $jsonSingleWithImageText(
-                "Légende Instagram avec contexte saisonnier développé ({$captionRange}). {$hashtagInstruction}",
-                "Le conseil saisonnier actionnable, commençant par un verbe (Vérifiez, Anticipez, Préparez...). {$csImgConstraint}, phrase complète. Sans hashtag."
-            ),
-
-                'erreur_a_eviter' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
-                . $jsonSingleWithImageText(
-                "Légende Instagram qui décrit l'erreur et explique comment l'éviter ({$captionRange}). {$hashtagInstruction}",
-                "L'erreur formulée en alerte courte et directe (ex: Ne pas attendre que la fuite empire.). {$eaeImgConstraint}, phrase complète. Sans hashtag."
-            ),
-
-                // ── Single templates with short generic image text ─────────────────
-
-                'lifestyle' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
-                . $jsonSingleWithImageText(
-                    "Légende Instagram complète ({$captionRange}, storytelling). {$hashtagInstruction}",
-                    "Une ÉTIQUETTE courte qui nomme le sujet du projet, comme on nommerait un album photo ou un tableau Pinterest. "
-                    . "Méthode : identifie le SUJET principal en 1-2 mots, puis ajoute éventuellement UN qualificatif. "
-                    . "Exemples corrects : 'Cuisine sur mesure', 'Salle de bain moderne', 'Terrasse bois', 'Parquet chêne massif', 'Douche italienne'. "
-                    . "Ne rédige JAMAIS une phrase avec verbe ou article introductif (pas de 'Création de...', 'Réalisation d'une...', 'Installation du...'). "
-                    . "Maximum 30 caractères. Sans hashtag."
-                ),
-
-                'project' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}"
-                . (($options['workCategory'] ?? null) ? " Type de travaux : {$options['workCategory']}." : "")
-                . (($options['jobDuration'] ?? null) ? " Durée : {$options['jobDuration']}." : "")
-                . "{$extraNote} "
-                . "{$jsonCarousel} Le premier slide est la couverture (titre accrocheur nommant le projet, par exemple 'Rénovation Cuisine', {$titleConstraint}). "
-                . "Les slides 2 et 3 sont fixées sur 'Avant' et 'Après' (tu peux mettre n'importe quel texte court dans 'slides', il ne sera pas affiché mais la structure JSON doit être respectée avec 2 entrées).",
-
-                // ── Carousels ─────────────────────────────────────────────────────
-
-                'chantier_detail' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
-                . "À partir de la description vocale d'un chantier, crée un post carrousel. Nous avons {$photoCount} photos. "
-                . "{$jsonCarousel} Le premier slide est la couverture (titre accrocheur, {$titleConstraint}, complet). Les slides suivants décrivent les détails correspondant aux photos ({$slideConstraint} chacun, complets).",
-
-                'step_by_step' => "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
-                . "À partir du vocal décrivant un processus, crée un carrousel étape par étape. Nous avons {$photoCount} photos. "
-                . "{$jsonCarousel} Le premier slide est le titre du process ({$titleConstraint}, complet). Les slides suivants sont les étapes numérotées ({$slideConstraint} chacun, phrases complètes, sans le préfixe 'Étape X :').",
-
-                'guide_pedagogique' => (function () use ($noRefuseRule, $toneInstruction, $extraNote, $jsonCarousel, $options, $titleConstraint, $slideConstraint) {
-                $targetSlides = isset($options['targetSlides']) ? (int)$options['targetSlides'] : 5;
-                $slidesRange = max(3, $targetSlides - 1) . ' à ' . min(8, $targetSlides + 1);
-                return "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
-                    . "À partir du vocal, crée un carrousel éducatif. "
-                    . "{$jsonCarousel} Le premier slide est une question/accroche forte ({$titleConstraint}, complète). "
-                    . "Les slides suivants ({$slidesRange} au total) développent les conseils ({$slideConstraint} chacun, complets). "
-                    . "Le dernier slide est un appel à l'action ({$slideConstraint}, complet).";
-            })(),
-
-                'custom' => (function () use ($options, $noRefuseRule, $toneInstruction, $hashtagInstruction, $extraNote, $includeHashtags, $textZoneRule, $captionRange) {
-                $customPrompt = $options['custom_template_prompt'] ?? null;
-                $layout = $options['custom_layout_type'] ?? 'standard';
-                $zone = config("template-text-zones.custom.{$layout}")
-                    ?? config('template-text-zones.custom.standard')
-                    ?? ['idealChars' => [60, 150], 'maxChars' => 180];
-                [$min, $max] = $zone['idealChars'];
-                $hard = $zone['maxChars'];
-                $imgConstraint = "STRICTEMENT entre {$min} et {$max} caractères (maximum absolu : {$hard} car.)";
-
-                if ($customPrompt) {
-                    return $textZoneRule
-                        . "{$customPrompt}"
-                        . "\n\nCONTRAINTE TEXTE IMAGE : Le champ image_text doit faire {$imgConstraint}. Au-delà, le texte sera tronqué."
-                        . "\n\n{$toneInstruction}"
-                        . "\n" . ($includeHashtags ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende." : "N'ajoute aucun hashtag.")
-                        . ($extraNote ? "\n{$extraNote}" : "");
-                }
-                return "{$noRefuseRule} Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
-                    . $textZoneRule
-                    . "Tu dois répondre UNIQUEMENT par un objet JSON valide : {\"caption\": \"Légende Instagram ({$captionRange}). {$hashtagInstruction}\", \"image_text\": \"Titre accrocheur et concis ({$imgConstraint}, phrase complète). Sans hashtag.\"}";
-            })(),
-
-                default => (function () use ($noRefuseRule, $hashtagInstruction, $textZoneRule) {
-                return "{$noRefuseRule} {$textZoneRule}Tu dois répondre UNIQUEMENT par un objet JSON valide : {\"caption\": \"Légende Instagram courte (150 caractères max). {$hashtagInstruction}\", \"image_text\": \"Titre concis (maximum 80 caractères, complet)\"}";
-            })(),
-            };
-    }
-
     public function extractFields(string $transcript): array
     {
         $prompt = "Tu es un assistant expert en extraction de données pour artisans.
@@ -377,31 +407,5 @@ IMPORTANT : Ne sors RIEN d'autre que du JSON. Sois précis sur les catégories."
                 'dynamique' => "Ton dynamique, vendeur et enthousiaste. Mots percutants, énergie positive, donne envie d'agir.",
                 default => "Ton professionnel, sérieux et direct. Sobre, efficace, valorise le savoir-faire.",
             };
-    }
-
-    private function buildContextHints(string $template, array $options): string
-    {
-        $hints = [];
-
-        if (!empty($options['clientName'])) {
-            $hints[] = "Client : {$options['clientName']}";
-        }
-        if (!empty($options['serviceType'])) {
-            $hints[] = "Service : {$options['serviceType']}";
-        }
-        if (!empty($options['workCategory'])) {
-            $hints[] = "Travaux : {$options['workCategory']}";
-        }
-        if (!empty($options['jobDuration'])) {
-            $hints[] = "Durée : {$options['jobDuration']}";
-        }
-        if (!empty($options['faqCategory'])) {
-            $hints[] = "Catégorie FAQ : {$options['faqCategory']}";
-        }
-        if (!empty($options['season'])) {
-            $hints[] = "Saison : {$options['season']}";
-        }
-
-        return implode(' | ', $hints);
     }
 }

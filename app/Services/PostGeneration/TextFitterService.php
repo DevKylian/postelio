@@ -10,7 +10,8 @@ class TextFitterService
      * Enforce text zone constraints on the AI-generated content.
      *
      * Takes the raw JSON from ContentRefinerService and trims every text
-     * field that exceeds the hard limits defined in config/template-text-zones.php.
+     * field that exceeds the hard limits defined in template-specs or
+     * template-text-zones config.
      *
      * Returns the sanitised JSON string, ready for storage.
      */
@@ -21,41 +22,64 @@ class TextFitterService
             return $refinedJson;
         }
 
-        $zones = config('template-text-zones');
-        $isCarousel = in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique']);
+        $spec = config("template-specs.{$template}");
+        $isCarousel = $spec
+            ? ($spec['type'] === 'carousel')
+            : in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique']);
 
-        // ── image_text (single templates) ────────────────────────────────
-        if (isset($data['image_text'])) {
-            $zone = $this->resolveZone($template, 'image_text', $templateOptions, $zones);
-            if ($zone) {
-                $data['image_text'] = $this->truncate($data['image_text'], $zone['maxChars']);
+        // ── Fit fields using template spec (preferred) or legacy text-zones ──
+        if ($spec) {
+            foreach ($spec['fields'] as $field) {
+                $name = $field['name'];
+                $maxChars = $field['maxChars'];
+
+                if ($field['isArray'] && isset($data[$name]) && is_array($data[$name])) {
+                    $data[$name] = array_map(
+                        fn(string $s) => $this->truncate($s, $maxChars),
+                        $data[$name]
+                    );
+                } elseif (!$field['isArray'] && isset($data[$name])) {
+                    $data[$name] = $this->truncate($data[$name], $maxChars);
+                }
             }
-        }
 
-        // ── title (carousel templates) ───────────────────────────────────
-        if (isset($data['title'])) {
-            $zone = $this->resolveZone($template, 'title', $templateOptions, $zones);
-            if ($zone) {
-                $data['title'] = $this->truncate($data['title'], $zone['maxChars']);
+            // Caption
+            if (isset($data['caption']) && isset($spec['caption']['maxChars'])) {
+                $data['caption'] = $this->truncate($data['caption'], $spec['caption']['maxChars']);
             }
-        }
+        } else {
+            // Legacy fallback for custom templates or unknown types
+            $zones = config('template-text-zones');
 
-        // ── slides (carousel templates) ──────────────────────────────────
-        if (isset($data['slides']) && is_array($data['slides'])) {
-            $zone = $this->resolveZone($template, 'slide', $templateOptions, $zones);
-            if ($zone) {
-                $data['slides'] = array_map(
-                    fn(string $s) => $this->truncate($s, $zone['maxChars']),
-                    $data['slides']
-                );
+            if (isset($data['image_text'])) {
+                $zone = $this->resolveZone($template, 'image_text', $templateOptions, $zones);
+                if ($zone) {
+                    $data['image_text'] = $this->truncate($data['image_text'], $zone['maxChars']);
+                }
             }
-        }
 
-        // ── caption ─────────────────────────────────────────────────────
-        if (isset($data['caption'])) {
-            $captionType = $isCarousel ? 'carousel' : 'standard';
-            $maxCaption = $zones['caption'][$captionType]['maxChars'] ?? 500;
-            $data['caption'] = $this->truncate($data['caption'], $maxCaption);
+            if (isset($data['title'])) {
+                $zone = $this->resolveZone($template, 'title', $templateOptions, $zones);
+                if ($zone) {
+                    $data['title'] = $this->truncate($data['title'], $zone['maxChars']);
+                }
+            }
+
+            if (isset($data['slides']) && is_array($data['slides'])) {
+                $zone = $this->resolveZone($template, 'slide', $templateOptions, $zones);
+                if ($zone) {
+                    $data['slides'] = array_map(
+                        fn(string $s) => $this->truncate($s, $zone['maxChars']),
+                        $data['slides']
+                    );
+                }
+            }
+
+            if (isset($data['caption'])) {
+                $captionType = $isCarousel ? 'carousel' : 'standard';
+                $maxCaption = $zones['caption'][$captionType]['maxChars'] ?? 500;
+                $data['caption'] = $this->truncate($data['caption'], $maxCaption);
+            }
         }
 
         $fitted = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -70,7 +94,7 @@ class TextFitterService
     }
 
     /**
-     * Look up the text zone config for a given template + field.
+     * Look up the text zone config for a given template + field (legacy).
      */
     private function resolveZone(string $template, string $field, array $templateOptions, array $zones): ?array
     {
@@ -127,21 +151,17 @@ class TextFitterService
         }
 
         // Never cut inside a hyphenated compound word (savoir-faire, sur-mesure, etc.)
-        // If $sub ends mid-compound (e.g. "savoir-"), include the rest of the compound
         if (mb_substr($sub, -1) === '-' || (mb_strlen($text) > $maxChars && mb_substr($text, $maxChars, 1) === '-')) {
-            // Find the end of the compound word
             $rest = mb_substr($text, $maxChars);
             if (preg_match('/^-?\S+/', $rest, $m)) {
                 $extended = $sub . $m[0];
-                // Only allow small overrun for compound words (up to 15 extra chars)
                 if (mb_strlen($extended) <= $maxChars + 15) {
                     return trim($extended);
                 }
             }
         }
 
-        // Fall back to word boundary, but avoid ending on dangling words
-        // (prepositions, articles, conjunctions that make no sense alone)
+        // Fall back to word boundary, avoiding dangling words
         $danglingWords = ['de', 'du', 'des', 'le', 'la', 'les', 'un', 'une',
             'sur', 'sous', 'dans', 'en', 'et', 'ou', 'à', 'au', 'aux',
             'pour', 'par', 'avec', 'sans', 'vers', "d'", "l'", "n'",
@@ -152,7 +172,6 @@ class TextFitterService
         if ($lastSpace && $lastSpace > $maxChars * 0.3) {
             $candidate = trim(mb_substr($text, 0, $lastSpace));
 
-            // Keep removing trailing dangling words
             $maxIterations = 5;
             while ($maxIterations-- > 0) {
                 $lastWord = mb_strtolower(preg_replace('/.*\s+/', '', $candidate));
@@ -168,7 +187,7 @@ class TextFitterService
             }
         }
 
-        // Hard cut as last resort (should rarely happen)
+        // Hard cut as last resort
         return trim(mb_substr($text, 0, $maxChars));
     }
 }

@@ -118,6 +118,9 @@ class User extends Authenticatable implements MustVerifyEmail
             if ($plan['stripe_price_id'] && $subscription->hasPrice($plan['stripe_price_id'])) {
                 return $key;
             }
+            if (!empty($plan['yearly_stripe_price_id']) && $subscription->hasPrice($plan['yearly_stripe_price_id'])) {
+                return $key;
+            }
         }
 
         return null;

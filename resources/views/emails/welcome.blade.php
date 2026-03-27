@@ -30,12 +30,12 @@
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
                                             <tr>
                                                 <td style="text-align: center; vertical-align: middle; line-height: 0;">
-                                                    <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <line x1="14" y1="34" x2="14" y2="66" stroke="white" stroke-width="9" stroke-linecap="round"/>
-                                                        <line x1="32" y1="20" x2="32" y2="80" stroke="white" stroke-width="9" stroke-linecap="round"/>
-                                                        <line x1="50" y1="8" x2="50" y2="92" stroke="white" stroke-width="9" stroke-linecap="round"/>
-                                                        <line x1="68" y1="24" x2="68" y2="76" stroke="white" stroke-width="9" stroke-linecap="round"/>
-                                                        <line x1="86" y1="38" x2="86" y2="62" stroke="white" stroke-width="9" stroke-linecap="round"/>
+                                                    <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <line x1="14" y1="34" x2="14" y2="66" stroke="white" stroke-width="12" stroke-linecap="round"/>
+                                                        <line x1="32" y1="20" x2="32" y2="80" stroke="white" stroke-width="12" stroke-linecap="round"/>
+                                                        <line x1="50" y1="8" x2="50" y2="92" stroke="white" stroke-width="12" stroke-linecap="round"/>
+                                                        <line x1="68" y1="24" x2="68" y2="76" stroke="white" stroke-width="12" stroke-linecap="round"/>
+                                                        <line x1="86" y1="38" x2="86" y2="62" stroke="white" stroke-width="12" stroke-linecap="round"/>
                                                     </svg>
                                                 </td>
                                             </tr>

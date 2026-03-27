@@ -80,7 +80,13 @@ class SubscriptionController extends Controller
 
     public function portal(Request $request)
     {
-        return Auth::user()->redirectToBillingPortal(route('subscription.plans'));
+        $user = Auth::user();
+
+        if (!$user->hasStripeId()) {
+            return redirect()->route('subscription.plans')->with('error', 'Aucun abonnement actif.');
+        }
+
+        return $user->redirectToBillingPortal(route('subscription.plans'));
     }
 
     /**

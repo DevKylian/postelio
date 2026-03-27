@@ -87,7 +87,11 @@ apt-get install -y -qq \
     certbot python3-certbot-nginx \
     ffmpeg chromium-browser \
     ufw fail2ban \
-    logrotate cron
+    logrotate cron \
+    libatk1.0-0 libatk-bridge2.0-0 libcups2 libxdamage1 \
+    libxcomposite1 libxrandr2 libgbm1 libpango-1.0-0 \
+    libcairo2 libasound2 libnspr4 libnss3 libxss1 libxtst6 \
+    fonts-liberation
 
 # Composer
 if ! command -v composer &>/dev/null; then
@@ -172,6 +176,9 @@ else
     log "Dépôt cloné."
 fi
 
+# Marquer le dossier comme safe pour git (évite l'erreur dubious ownership)
+git config --global --add safe.directory "$APP_DIR"
+
 # Configurer git pour les pulls futurs
 cd "$APP_DIR"
 git remote set-url origin "$CLONE_URL"
@@ -236,9 +243,12 @@ EOF
 
 chmod 640 "$APP_DIR/.env"
 
+# Permissions (avant composer/npm pour que deploy puisse écrire)
+chown -R deploy:www-data "$APP_DIR"
+
 # Installation des dépendances PHP
 info "composer install..."
-sudo -u deploy composer install --no-dev --optimize-autoloader --no-interaction --quiet
+sudo -u deploy composer update --no-dev --optimize-autoloader --no-interaction --quiet
 
 # Installation des dépendances Node.js + build
 info "npm install + build..."

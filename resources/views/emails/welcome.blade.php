@@ -26,20 +26,8 @@
                             <!-- Logo -->
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto 20px;">
                                 <tr>
-                                    <td style="width: 48px; height: 48px; background-color: rgba(255,255,255,0.25); border-radius: 50%; vertical-align: middle;">
-                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
-                                            <tr>
-                                                <td style="text-align: center; vertical-align: middle; line-height: 0;">
-                                                    <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <line x1="14" y1="34" x2="14" y2="66" stroke="white" stroke-width="12" stroke-linecap="round"/>
-                                                        <line x1="32" y1="20" x2="32" y2="80" stroke="white" stroke-width="12" stroke-linecap="round"/>
-                                                        <line x1="50" y1="8" x2="50" y2="92" stroke="white" stroke-width="12" stroke-linecap="round"/>
-                                                        <line x1="68" y1="24" x2="68" y2="76" stroke="white" stroke-width="12" stroke-linecap="round"/>
-                                                        <line x1="86" y1="38" x2="86" y2="62" stroke="white" stroke-width="12" stroke-linecap="round"/>
-                                                    </svg>
-                                                </td>
-                                            </tr>
-                                        </table>
+                                    <td style="vertical-align: middle;">
+                                        <img src="{{ asset('images/postelio-logo-email.png') }}" width="44" height="44" alt="Postelio" style="display: block; border-radius: 12px;" />
                                     </td>
                                     <td style="padding-left: 12px; font-size: 26px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.5px; font-family: 'Plus Jakarta Sans', 'Segoe UI', Tahoma, sans-serif;">
                                         Postelio

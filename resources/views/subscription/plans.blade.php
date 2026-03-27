@@ -25,10 +25,13 @@
                             <p class="text-xs text-gray-400 mt-0.5">Gérez vos factures, votre mode de paiement ou résiliez.</p>
                         </div>
                     </div>
-                    <a href="{{ route('subscription.portal') }}" class="inline-flex items-center gap-2 bg-midnight hover:bg-slate-800 text-white text-sm font-bold px-6 py-3 rounded-2xl transition-all shadow-lg shadow-midnight/10">
-                        Gérer mon abonnement
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                    </a>
+                    <form method="POST" action="{{ route('subscription.portal') }}">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center gap-2 bg-midnight hover:bg-slate-800 text-white text-sm font-bold px-6 py-3 rounded-2xl transition-all shadow-lg shadow-midnight/10">
+                            Gérer mon abonnement
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                        </button>
+                    </form>
                 </div>
             @endif
 

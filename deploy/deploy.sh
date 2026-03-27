@@ -85,10 +85,6 @@ $PHP artisan view:cache
 $PHP artisan event:cache
 $PHP artisan storage:link 2>/dev/null || true
 
-# --- Permissions ------------------------------------------------------------
-chown -R deploy:www-data "${APP_DIR}/storage" "${APP_DIR}/bootstrap/cache"
-chmod -R 775 "${APP_DIR}/storage" "${APP_DIR}/bootstrap/cache"
-
 # --- Mode maintenance OFF ---------------------------------------------------
 log "Mode maintenance OFF..."
 $PHP artisan up

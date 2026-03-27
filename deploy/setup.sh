@@ -593,7 +593,8 @@ composer install --no-dev --optimize-autoloader --no-interaction --quiet
 
 # --- Frontend (seulement si des fichiers JS/CSS ont changé) -----------------
 FRONTEND_CHANGED=\$(git diff "\${PREV_COMMIT}" "\${NEW_COMMIT}" --name-only 2>/dev/null \
-    | grep -cE "^(resources/js|resources/css|package\.json|vite\.config)" || echo 0)
+    | grep -cE "^(resources/js|resources/css|package\.json|vite\.config)" || true)
+FRONTEND_CHANGED=\${FRONTEND_CHANGED:-0}
 
 if [ "\$FRONTEND_CHANGED" -gt 0 ]; then
     log "Changements frontend détectés — rebuild npm..."
@@ -610,7 +611,7 @@ log "Mode maintenance activé..."
 # --- Sauvegarde BDD ----------------------------------------------------------
 log "Sauvegarde de la base de données..."
 mkdir -p "\${BACKUP_DIR}"
-mysqldump --defaults-file="/home/deploy/.my.cnf" --single-transaction postelio \
+mysqldump --defaults-file="/home/deploy/.my.cnf" --single-transaction --no-tablespaces postelio \
     | gzip > "\${BACKUP_DIR}/db_\$(date +%Y%m%d_%H%M%S).sql.gz"
 # Garder seulement les 14 dernières sauvegardes
 ls -t "\${BACKUP_DIR}"/*.sql.gz 2>/dev/null | tail -n +15 | xargs -r rm -f

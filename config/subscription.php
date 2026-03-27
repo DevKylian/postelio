@@ -33,10 +33,10 @@ return [
                 'Support prioritaire dédié',
             ],
         ],
-        'pro' => [
+        'basic' => [
             'name' => 'Basic',
-            'stripe_price_id' => env('STRIPE_PRO_PRICE_ID', ''),
-            'yearly_stripe_price_id' => env('STRIPE_PRO_YEARLY_PRICE_ID', ''),
+            'stripe_price_id' => env('STRIPE_BASIC_PRICE_ID', ''),
+            'yearly_stripe_price_id' => env('STRIPE_BASIC_YEARLY_PRICE_ID', ''),
             'credits' => 30,
             'price' => 19,
             'yearly_price' => 180,
@@ -53,10 +53,10 @@ return [
                 'Accès aux modèles premium',
             ],
         ],
-        'premium' => [
+        'pro' => [
             'name' => 'Professionnel',
-            'stripe_price_id' => env('STRIPE_PREMIUM_PRICE_ID', ''),
-            'yearly_stripe_price_id' => env('STRIPE_PREMIUM_YEARLY_PRICE_ID', ''),
+            'stripe_price_id' => env('STRIPE_PRO_PRICE_ID', ''),
+            'yearly_stripe_price_id' => env('STRIPE_PRO_YEARLY_PRICE_ID', ''),
             'credits' => 100,
             'price' => 29,
             'yearly_price' => 280,

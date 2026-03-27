@@ -71,7 +71,7 @@
                 @foreach($plans as $key => $plan)
                     @php
                         $isCurrent = ($currentPlan === $key) || (!$currentPlan && $key === 'free');
-                        $isPopular = $key === 'premium';
+                        $isPopular = $key === 'pro';
                         $isFree = $key === 'free';
                     @endphp
 

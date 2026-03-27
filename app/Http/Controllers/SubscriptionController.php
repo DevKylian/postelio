@@ -26,7 +26,7 @@ class SubscriptionController extends Controller
     public function checkout(Request $request)
     {
         $request->validate([
-            'plan' => 'required|string|in:free,pro,premium',
+            'plan' => 'required|string|in:free,basic,pro',
             'period' => 'nullable|string|in:monthly,yearly',
         ]);
 
@@ -127,7 +127,7 @@ class SubscriptionController extends Controller
     public function changePlan(Request $request)
     {
         $request->validate([
-            'plan' => 'required|string|in:free,pro,premium',
+            'plan' => 'required|string|in:free,basic,pro',
             'period' => 'nullable|string|in:monthly,yearly',
         ]);
 

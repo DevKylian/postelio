@@ -99,14 +99,12 @@
                                 </div>
                                 <h3 class="text-xl font-bold text-midnight">{{ $plan['name'] }}</h3>
                                 <div class="mt-4 flex items-baseline gap-1">
-                                    <span class="text-4xl font-black text-midnight tracking-tighter" x-text="billingPeriod === 'yearly' ? '{{ $plan['yearly_price'] }}€' : '{{ number_format($plan['price'], 0, ',', '.') }}€'">{{ number_format($plan['price'], 0, ',', '.') }}€</span>
-                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest" x-show="!{{ $isFree ? 'true' : 'false' }}" x-text="billingPeriod === 'yearly' ? '/ an' : '/ mois'">{{ $isFree ? '' : '/ mois' }}</span>
+                                    <span class="text-4xl font-black text-midnight tracking-tighter" x-text="billingPeriod === 'yearly' ? '{{ $plan['yearly_price'] > 0 ? number_format($plan['yearly_price'] / 12, 0, ',', '.') : 0 }}€' : '{{ number_format($plan['price'], 0, ',', '.') }}€'">{{ number_format($plan['price'], 0, ',', '.') }}€</span>
+                                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest" x-show="!{{ $isFree ? 'true' : 'false' }}">/ mois</span>
                                 </div>
                                 @if(!$isFree && $plan['price'] > 0 && $plan['yearly_price'] > 0)
                                     <template x-if="billingPeriod === 'yearly'">
-                                        <div class="mt-2 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg border border-green-100 inline-block">
-                                            Économisez {{ round(($plan['price'] * 12) - $plan['yearly_price']) }}€ par an
-                                        </div>
+                                        <p class="text-xs text-gray-400 mt-1">soit {{ number_format($plan['yearly_price'], 0, ',', '.') }}€ facturé par an</p>
                                     </template>
                                 @endif
                                 @if(isset($plan['old_price']) && $plan['old_price'] > 0)

@@ -5,6 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Postelio — Votre chantier travaille pour vous</title>
 
+        <!-- Favicon -->
+        <link rel="icon" type="image/svg+xml" href="{{ asset('images/postelio-logo-gradient.svg') }}">
+        <link rel="apple-touch-icon" href="{{ asset('images/postelio-logo-gradient.svg') }}">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -593,13 +597,11 @@
                     </div>
                     <h3 class="text-xl font-bold text-midnight">Basic</h3>
                     <div class="mt-4 flex items-baseline gap-1">
-                      <span class="text-4xl font-black text-midnight tracking-tighter" x-text="billingPeriod === 'yearly' ? '180€' : '19€'">19€</span>
-                      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest" x-text="billingPeriod === 'yearly' ? '/ an' : '/ mois'">/ mois</span>
+                      <span class="text-4xl font-black text-midnight tracking-tighter" x-text="billingPeriod === 'yearly' ? '15€' : '19€'">19€</span>
+                      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
                     </div>
                     <template x-if="billingPeriod === 'yearly'">
-                        <div class="mt-2 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg border border-green-100 inline-block">
-                            Économisez 48€ par an
-                        </div>
+                        <p class="text-xs text-gray-400 mt-1">soit 180€ facturé par an</p>
                     </template>
                   </div>
 
@@ -647,13 +649,11 @@
                     </div>
                     <h3 class="text-xl font-bold text-midnight">Professionnel</h3>
                     <div class="mt-4 flex items-baseline gap-1">
-                      <span class="text-4xl font-black text-midnight tracking-tighter" x-text="billingPeriod === 'yearly' ? '280€' : '29€'">29€</span>
-                      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest" x-text="billingPeriod === 'yearly' ? '/ an' : '/ mois'">/ mois</span>
+                      <span class="text-4xl font-black text-midnight tracking-tighter" x-text="billingPeriod === 'yearly' ? '23€' : '29€'">29€</span>
+                      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
                     </div>
                     <template x-if="billingPeriod === 'yearly'">
-                        <div class="mt-2 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg border border-green-100 inline-block">
-                            Économisez 68€ par an
-                        </div>
+                        <p class="text-xs text-gray-400 mt-1">soit 280€ facturé par an</p>
                     </template>
                   </div>
 

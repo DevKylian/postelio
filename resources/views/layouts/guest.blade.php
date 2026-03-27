@@ -7,6 +7,10 @@
 
         <title>{{ config('app.name', 'Postelio') }}</title>
 
+        <!-- Favicon -->
+        <link rel="icon" type="image/svg+xml" href="{{ asset('images/postelio-logo-gradient.svg') }}">
+        <link rel="apple-touch-icon" href="{{ asset('images/postelio-logo-gradient.svg') }}">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />

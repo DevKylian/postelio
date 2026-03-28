@@ -606,9 +606,9 @@ if ! composer install --no-dev --optimize-autoloader --no-interaction --quiet 2>
     composer update --no-dev --optimize-autoloader --no-interaction --quiet
 fi
 
-# --- Frontend (seulement si des fichiers JS/CSS ont changé) -----------------
+# --- Frontend (si JS/CSS/Blade modifié — Tailwind scanne aussi les vues) ----
 FRONTEND_CHANGED=\$(git diff "\${PREV_COMMIT}" "\${NEW_COMMIT}" --name-only 2>/dev/null \
-    | grep -cE "^(resources/js|resources/css|package\.json|vite\.config)" || true)
+    | grep -cE "^(resources/js|resources/css|resources/views|package\.json|vite\.config|tailwind\.config)" || true)
 FRONTEND_CHANGED=\${FRONTEND_CHANGED:-0}
 
 if [ "\$FRONTEND_CHANGED" -gt 0 ]; then

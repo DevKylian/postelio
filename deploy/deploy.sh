@@ -94,9 +94,8 @@ log "Migrations..."
 $PHP artisan migrate --force || fail "Migration échouée"
 
 # --- Caches -----------------------------------------------------------------
-log "Rebuild caches..."
-$PHP artisan config:cache
-$PHP artisan route:cache
+log "Rebuild caches (optimize)..."
+$PHP artisan optimize
 $PHP artisan view:cache
 $PHP artisan event:cache
 $PHP artisan storage:link 2>/dev/null || true

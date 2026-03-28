@@ -284,3 +284,115 @@
 [Sat Mar 28 12:07:37 2026] 127.0.0.1:25748 Accepted
 [Sat Mar 28 12:07:37 2026] 127.0.0.1:25748 [200]: GET /images/postelio-logo-gradient.svg
 [Sat Mar 28 12:07:37 2026] 127.0.0.1:25748 Closing
+[Sat Mar 28 12:08:07 2026] 127.0.0.1:25786 Accepted
+[Sat Mar 28 12:08:07 2026] 127.0.0.1:25787 Accepted
+[Sat Mar 28 12:08:07 2026] 127.0.0.1:25786 Closing
+[Sat Mar 28 12:08:07 2026] 127.0.0.1:25787 Closing
+[Sat Mar 28 12:08:08 2026] 127.0.0.1:25795 Accepted
+[Sat Mar 28 12:08:08 2026] 127.0.0.1:25795 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:08:08 2026] 127.0.0.1:25795 Closing
+[Sat Mar 28 12:08:41 2026] 127.0.0.1:25828 Accepted
+[Sat Mar 28 12:08:41 2026] 127.0.0.1:25829 Accepted
+[Sat Mar 28 12:08:42 2026] 127.0.0.1:25828 Closing
+[Sat Mar 28 12:08:42 2026] 127.0.0.1:25829 Closing
+[Sat Mar 28 12:08:42 2026] 127.0.0.1:25838 Accepted
+[Sat Mar 28 12:08:42 2026] 127.0.0.1:25838 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:08:42 2026] 127.0.0.1:25838 Closing
+[Sat Mar 28 12:09:39 2026] 127.0.0.1:25896 Accepted
+[Sat Mar 28 12:09:40 2026] 127.0.0.1:25896 Closing
+[Sat Mar 28 12:09:40 2026] 127.0.0.1:25897 Accepted
+[Sat Mar 28 12:09:40 2026] 127.0.0.1:25897 Closing
+[Sat Mar 28 12:09:41 2026] 127.0.0.1:25905 Accepted
+[Sat Mar 28 12:09:41 2026] 127.0.0.1:25905 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:09:41 2026] 127.0.0.1:25905 Closing
+[Sat Mar 28 12:09:57 2026] 127.0.0.1:25921 Accepted
+[Sat Mar 28 12:09:57 2026] 127.0.0.1:25922 Accepted
+[Sat Mar 28 12:09:57 2026] 127.0.0.1:25921 Closing
+[Sat Mar 28 12:09:57 2026] 127.0.0.1:25922 Closing
+[Sat Mar 28 12:09:58 2026] 127.0.0.1:25929 Accepted
+[Sat Mar 28 12:09:58 2026] 127.0.0.1:25929 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:09:58 2026] 127.0.0.1:25929 Closing
+[Sat Mar 28 12:10:21 2026] 127.0.0.1:25956 Accepted
+[Sat Mar 28 12:10:21 2026] 127.0.0.1:25957 Accepted
+[Sat Mar 28 12:10:22 2026] 127.0.0.1:25956 Closing
+[Sat Mar 28 12:10:22 2026] 127.0.0.1:25957 Closing
+[Sat Mar 28 12:10:23 2026] 127.0.0.1:25963 Accepted
+[Sat Mar 28 12:10:23 2026] 127.0.0.1:25963 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:10:23 2026] 127.0.0.1:25963 Closing
+[Sat Mar 28 12:10:47 2026] 127.0.0.1:25989 Accepted
+[Sat Mar 28 12:10:47 2026] 127.0.0.1:25990 Accepted
+[Sat Mar 28 12:10:48 2026] 127.0.0.1:25989 Closing
+[Sat Mar 28 12:10:48 2026] 127.0.0.1:25990 Closing
+[Sat Mar 28 12:10:49 2026] 127.0.0.1:25998 Accepted
+[Sat Mar 28 12:10:49 2026] 127.0.0.1:25998 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:10:49 2026] 127.0.0.1:25998 Closing
+[Sat Mar 28 12:10:55 2026] 127.0.0.1:26005 Accepted
+[Sat Mar 28 12:10:55 2026] 127.0.0.1:26006 Accepted
+[Sat Mar 28 12:10:55 2026] 127.0.0.1:26005 Closing
+[Sat Mar 28 12:10:55 2026] 127.0.0.1:26006 Closing
+[Sat Mar 28 12:10:56 2026] 127.0.0.1:26013 Accepted
+[Sat Mar 28 12:10:56 2026] 127.0.0.1:26013 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:10:56 2026] 127.0.0.1:26013 Closing
+[Sat Mar 28 12:11:11 2026] 127.0.0.1:26047 Accepted
+[Sat Mar 28 12:11:12 2026] 127.0.0.1:26047 Closing
+[Sat Mar 28 12:11:12 2026] 127.0.0.1:26048 Accepted
+[Sat Mar 28 12:11:12 2026] 127.0.0.1:26048 Closing
+[Sat Mar 28 12:11:12 2026] 127.0.0.1:26056 Accepted
+[Sat Mar 28 12:11:12 2026] 127.0.0.1:26056 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:11:12 2026] 127.0.0.1:26056 Closing
+[Sat Mar 28 12:11:23 2026] 127.0.0.1:26065 Accepted
+[Sat Mar 28 12:11:23 2026] 127.0.0.1:26066 Accepted
+[Sat Mar 28 12:11:23 2026] 127.0.0.1:26065 Closing
+[Sat Mar 28 12:11:23 2026] 127.0.0.1:26066 Closing
+[Sat Mar 28 12:11:23 2026] 127.0.0.1:26074 Accepted
+[Sat Mar 28 12:11:23 2026] 127.0.0.1:26074 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:11:23 2026] 127.0.0.1:26074 Closing
+[Sat Mar 28 12:11:42 2026] 127.0.0.1:26095 Accepted
+[Sat Mar 28 12:11:42 2026] 127.0.0.1:26096 Accepted
+[Sat Mar 28 12:11:43 2026] 127.0.0.1:26095 Closing
+[Sat Mar 28 12:11:43 2026] 127.0.0.1:26096 Closing
+[Sat Mar 28 12:11:43 2026] 127.0.0.1:26104 Accepted
+[Sat Mar 28 12:11:43 2026] 127.0.0.1:26104 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:11:43 2026] 127.0.0.1:26104 Closing
+[Sat Mar 28 12:13:08 2026] 127.0.0.1:26202 Accepted
+[Sat Mar 28 12:13:08 2026] 127.0.0.1:26203 Accepted
+[Sat Mar 28 12:13:09 2026] 127.0.0.1:26202 Closing
+[Sat Mar 28 12:13:09 2026] 127.0.0.1:26203 Closing
+[Sat Mar 28 12:13:10 2026] 127.0.0.1:26212 Accepted
+[Sat Mar 28 12:13:10 2026] 127.0.0.1:26212 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:13:10 2026] 127.0.0.1:26212 Closing
+[Sat Mar 28 12:13:28 2026] 127.0.0.1:26230 Accepted
+[Sat Mar 28 12:13:28 2026] 127.0.0.1:26231 Accepted
+[Sat Mar 28 12:13:28 2026] 127.0.0.1:26230 Closing
+[Sat Mar 28 12:13:28 2026] 127.0.0.1:26231 Closing
+[Sat Mar 28 12:13:29 2026] 127.0.0.1:26239 Accepted
+[Sat Mar 28 12:13:29 2026] 127.0.0.1:26239 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:13:29 2026] 127.0.0.1:26239 Closing
+[Sat Mar 28 12:14:01 2026] 127.0.0.1:26272 Accepted
+[Sat Mar 28 12:14:01 2026] 127.0.0.1:26273 Accepted
+[Sat Mar 28 12:14:02 2026] 127.0.0.1:26272 Closing
+[Sat Mar 28 12:14:02 2026] 127.0.0.1:26273 Closing
+[Sat Mar 28 12:14:03 2026] 127.0.0.1:26282 Accepted
+[Sat Mar 28 12:14:03 2026] 127.0.0.1:26282 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:14:03 2026] 127.0.0.1:26282 Closing
+[Sat Mar 28 12:15:30 2026] 127.0.0.1:26378 Accepted
+[Sat Mar 28 12:15:30 2026] 127.0.0.1:26379 Accepted
+[Sat Mar 28 12:15:31 2026] 127.0.0.1:26378 Closing
+[Sat Mar 28 12:15:31 2026] 127.0.0.1:26379 Closing
+[Sat Mar 28 12:15:32 2026] 127.0.0.1:26387 Accepted
+[Sat Mar 28 12:15:32 2026] 127.0.0.1:26387 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:15:32 2026] 127.0.0.1:26387 Closing
+[Sat Mar 28 12:15:37 2026] 127.0.0.1:26392 Accepted
+[Sat Mar 28 12:15:37 2026] 127.0.0.1:26393 Accepted
+[Sat Mar 28 12:15:37 2026] 127.0.0.1:26392 Closing
+[Sat Mar 28 12:15:37 2026] 127.0.0.1:26393 Closing
+[Sat Mar 28 12:15:37 2026] 127.0.0.1:26398 Accepted
+[Sat Mar 28 12:15:37 2026] 127.0.0.1:26398 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:15:37 2026] 127.0.0.1:26398 Closing
+[Sat Mar 28 12:15:54 2026] 127.0.0.1:26420 Accepted
+[Sat Mar 28 12:15:55 2026] 127.0.0.1:26420 Closing
+[Sat Mar 28 12:15:55 2026] 127.0.0.1:26421 Accepted
+[Sat Mar 28 12:15:55 2026] 127.0.0.1:26421 Closing
+[Sat Mar 28 12:15:56 2026] 127.0.0.1:26428 Accepted
+[Sat Mar 28 12:15:56 2026] 127.0.0.1:26428 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 12:15:56 2026] 127.0.0.1:26428 Closing

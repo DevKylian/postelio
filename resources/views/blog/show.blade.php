@@ -102,17 +102,7 @@
 
         {{-- Article Content --}}
         <article class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="prose prose-lg prose-slate max-w-none
-                        prose-headings:font-display prose-headings:font-bold prose-headings:text-midnight prose-headings:tracking-tight
-                        prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4
-                        prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-                        prose-p:font-light prose-p:leading-relaxed prose-p:text-slate-600
-                        prose-a:text-copper prose-a:font-medium prose-a:no-underline hover:prose-a:underline
-                        prose-strong:text-midnight prose-strong:font-bold
-                        prose-img:rounded-2xl prose-img:shadow-lg
-                        prose-blockquote:border-copper prose-blockquote:bg-amber-50/30 prose-blockquote:rounded-r-2xl prose-blockquote:py-1
-                        prose-ul:space-y-2 prose-ol:space-y-2
-                        prose-li:text-slate-600 prose-li:font-light">
+            <div class="blog-content">
                 {!! $post->content !!}
             </div>
         </article>

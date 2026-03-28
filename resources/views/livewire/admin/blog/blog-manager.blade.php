@@ -82,33 +82,52 @@
                         @error('excerpt') <span class="text-rose-500 text-xs font-bold px-1">{{ $message }}</span> @enderror
                     </div>
 
-                    {{-- Content (Trix Editor + HTML Mode) --}}
-                    <div class="space-y-2"
+                    {{-- Content (CKEditor 5 + HTML Mode) --}}
+                    <div class="space-y-4"
                          x-data="{
                             content: @entangle('content'),
                             htmlMode: false,
-                            isFocused: false
+                            editor: null,
+                            init() {
+                                if (typeof ClassicEditor === 'undefined') return;
+                                ClassicEditor
+                                    .create(this.$refs.editorArea, {
+                                        toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'insertTable', 'undo', 'redo' ],
+                                        heading: {
+                                            options: [
+                                                { model: 'paragraph', title: 'Paragraphe', class: 'ck-heading_paragraph' },
+                                                { model: 'heading1', view: 'h2', title: 'Titre Principal (H2)', class: 'ck-heading_heading1' },
+                                                { model: 'heading2', view: 'h3', title: 'Sous-titre (H3)', class: 'ck-heading_heading2' }
+                                            ]
+                                        }
+                                    })
+                                    .then(editor => {
+                                        this.editor = editor;
+                                        // Set initial data
+                                        editor.setData(this.content || '');
+                                        // Sync to Alpine/Livewire on change
+                                        editor.model.document.on('change:data', () => {
+                                            this.content = editor.getData();
+                                        });
+
+                                        // Watch for external content changes (Livewire -> Editor)
+                                        this.$watch('content', value => {
+                                            if (!this.htmlMode && value !== editor.getData()) {
+                                                editor.setData(value || '');
+                                            }
+                                        });
+                                    })
+                                    .catch(error => { console.error(error); });
+                            }
                          }"
-                         x-init="
-                            $refs.trix.editor.loadHTML(content);
-                            $watch('content', value => {
-                                if (!htmlMode && value !== $refs.trix.editor.getHTML()) {
-                                    $refs.trix.editor.loadHTML(value);
-                                }
-                            })
-                         "
-                         @trix-change="if (!htmlMode) content = $event.target.value"
                          wire:ignore>
-                        <div class="flex items-center justify-between px-1">
+                        <div class="flex items-center justify-between px-1 mb-2">
                             <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Contenu de l'article</label>
                             <button type="button"
                                     @click="
                                         htmlMode = !htmlMode;
-                                        if (!htmlMode) {
-                                            $refs.trix.editor.loadHTML($refs.htmlTextarea.value);
-                                            content = $refs.trix.editor.getHTML();
-                                        } else {
-                                            $refs.htmlTextarea.value = content;
+                                        if (!htmlMode && editor) {
+                                            editor.setData(content);
                                         }
                                     "
                                     class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all"
@@ -117,18 +136,19 @@
                                 <span x-text="htmlMode ? 'Mode visuel' : 'Mode HTML'"></span>
                             </button>
                         </div>
-                        <input id="blog-content" type="hidden" name="content">
-                        <div x-show="!htmlMode">
-                            <trix-editor input="blog-content"
-                                         x-ref="trix"
-                                         placeholder="Rédigez votre article ici..."
-                                         class="w-full bg-white/50 border-slate-100 rounded-[2rem] p-6 text-sm font-medium text-slate-600 focus:ring-2 focus:ring-copper/20 focus:border-copper transition-all outline-none leading-relaxed min-h-[400px]"></trix-editor>
+
+                        <div x-show="!htmlMode" class="ck-editor-container">
+                            <div x-ref="editorArea" class="prose prose-slate max-w-none"></div>
                         </div>
+
                         <div x-show="htmlMode" x-cloak>
-                            <textarea x-ref="htmlTextarea"
-                                      @input="content = $event.target.value"
+                            <textarea x-model="content"
                                       placeholder="Collez votre code HTML ici..."
-                                      class="w-full bg-slate-900 text-green-400 border-slate-700 rounded-[2rem] p-6 text-sm font-mono focus:ring-2 focus:ring-copper/20 focus:border-copper transition-all outline-none leading-relaxed min-h-[400px] resize-y"></textarea>
+                                      class="w-full bg-slate-900 text-green-400 border-slate-700 rounded-[2rem] p-8 text-sm font-mono focus:ring-2 focus:ring-copper/20 focus:border-copper transition-all outline-none leading-relaxed min-h-[500px] resize-y shadow-2xl shadow-slate-900/20"></textarea>
+                            <div class="mt-2 px-4 py-2 bg-amber-50 rounded-xl border border-amber-100 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <p class="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Note : Modifiez directement le code pour un contrôle total sur le formattage.</p>
+                            </div>
                         </div>
                         @error('content') <span class="text-rose-500 text-xs font-bold px-1">{{ $message }}</span> @enderror
                     </div>
@@ -328,21 +348,36 @@
     </style>
 
     @push('styles')
-        <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
         <style>
-            trix-toolbar .trix-button-group--file-tools { display: none !important; }
-            trix-editor {
-                border-color: #f1f5f9 !important;
-                border-radius: 2rem !important;
+            .ck-editor__separator { display: none !important; }
+            .ck-editor__editable {
+                border-radius: 0 0 2rem 2rem !important;
                 background: white !important;
-                padding: 1.5rem !important;
-                min-height: 400px !important;
+                padding: 1.5rem 2.5rem !important;
+                min-height: 500px !important;
+                border-color: #f1f5f9 !important;
+                font-size: 0.95rem !important;
+                line-height: 1.8 !important;
+                color: #475569 !important;
             }
-            trix-editor:focus { border-color: #b87333 !important; }
+            .ck-toolbar {
+                border-radius: 2rem 2rem 0 0 !important;
+                background: #f8fafc !important;
+                border-color: #f1f5f9 !important;
+                padding: 0.5rem 1rem !important;
+            }
+            .ck-editor__editable:focus {
+                border-color: #f59e0b !important;
+                box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1) !important;
+                outline: none !important;
+            }
+            .ck-content h2 { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem; }
+            .ck-content h3 { font-size: 1.25rem; font-weight: 700; color: #1e293b; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+            .ck-content p { margin-bottom: 1rem; }
         </style>
     @endpush
 
     @push('scripts')
-        <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
+        <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
     @endpush
 </div>

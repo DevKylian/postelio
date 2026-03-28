@@ -140,13 +140,13 @@
 
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "Blog",
+        "@@context": "https://schema.org",
+        "@@type": "Blog",
         "name": "Blog Postelio",
         "description": "Conseils marketing pour artisans",
         "url": "{{ route('blog.index') }}",
         "publisher": {
-            "@type": "Organization",
+            "@@type": "Organization",
             "name": "Postelio",
             "url": "{{ url('/') }}"
         }

@@ -46,7 +46,9 @@
       <nav class="fixed top-4 inset-x-0 z-50 transition-all duration-500 flex justify-center px-4">
         <div class="w-full max-w-5xl transition-all duration-500 rounded-full px-4 sm:px-6 py-3 flex justify-between items-center border glass-card bg-white/70"
              :class="scrolled ? 'bg-white/95 shadow-lg' : 'bg-white/70 shadow-sm'">
-          <x-logo size="md" />
+          <a href="/" class="transition-opacity hover:opacity-80">
+            <x-logo size="md" />
+          </a>
           
           <!-- Desktop Nav -->
           <div class="hidden md:flex items-center gap-8">
@@ -165,52 +167,76 @@
         <!-- Motion Design Demo -->
         <style>
           .md-showcase{position:relative;width:100%;min-height:560px;border-radius:1.5rem;overflow:hidden;background:linear-gradient(145deg,#ffffff 0%,#f8fafc 100%);border:1px solid rgba(226,232,240,0.6);box-shadow:0 25px 60px -12px rgba(0,0,0,0.08),0 0 0 1px rgba(0,0,0,0.02)}
-          .md-scene{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.5s ease}
-          .md-scene.active{opacity:1;pointer-events:auto}
+          .md-scene{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;transform:translateY(15px);pointer-events:none;transition:all 0.6s cubic-bezier(0.34,1.56,0.64,1)}
+          .md-scene.active{opacity:1;transform:translateY(0);pointer-events:auto}
           .md-topbar{display:flex;align-items:center;gap:8px;padding:12px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;flex-shrink:0}
           .md-dot{width:8px;height:8px;border-radius:50%}
           .md-content{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative}
-          .md-cursor{position:absolute;width:20px;height:20px;z-index:50;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25))}
-          .md-click{position:absolute;width:32px;height:32px;border-radius:50%;background:rgba(245,158,11,0.25);border:2px solid rgba(245,158,11,0.5);pointer-events:none;z-index:49;opacity:0;transform:translate(-50%,-50%) scale(0)}
-          .md-click.pop{animation:mdPop 0.4s ease forwards}
-          @keyframes mdPop{0%{opacity:1;transform:translate(-50%,-50%) scale(0)}50%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.4)}}
-          .md-mic{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;color:white;box-shadow:0 8px 25px rgba(245,158,11,0.35);position:relative}
-          .md-mic.rec::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(245,158,11,0.3);animation:mdPulse 1.5s ease-in-out infinite}
-          @keyframes mdPulse{0%,100%{transform:scale(1);opacity:0}50%{transform:scale(1.15);opacity:1}}
+          .md-cursor{position:absolute;width:20px;height:20px;z-index:50;pointer-events:none;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.3));transform-origin:top left}
+          .md-click{position:absolute;width:40px;height:40px;border-radius:50%;background:rgba(217,119,6,0.2);border:2px solid #d97706;pointer-events:none;z-index:49;opacity:0;transform:translate(-50%,-50%) scale(0)}
+          .md-click.pop{animation:mdPop 0.6s cubic-bezier(0.25,1,0.5,1) forwards}
+          @keyframes mdPop{0%{opacity:1;transform:translate(-50%,-50%) scale(0.3);border-width:4px}100%{opacity:0;transform:translate(-50%,-50%) scale(2);border-width:0px}}
+          .md-mic{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;color:white;box-shadow:0 8px 30px rgba(245,158,11,0.4);position:relative;transition:all 0.3s}
+          .md-mic.rec{transform:scale(1.05);box-shadow:0 10px 40px rgba(245,158,11,0.6)}
+          .md-mic.rec::after{content:'';position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(245,158,11,0.5);animation:mdPulse 1s cubic-bezier(0.4,0,0.2,1) infinite}
+          @keyframes mdPulse{0%{transform:scale(1);opacity:1}100%{transform:scale(1.4);opacity:0}}
           .md-wave{display:flex;align-items:center;gap:3px;height:48px;justify-content:center}
           .md-wave-bar{width:4px;border-radius:4px;background:#f59e0b;transition:height 0.15s ease}
           .md-transcript{background:#f8fafc;border-radius:1rem;border:1px solid #e2e8f0;padding:12px 16px;font-size:14px;color:#1e293b;line-height:1.6;font-style:italic;width:100%;max-width:380px}
           .md-types{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:420px}
-          .md-type{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:12px;border:2px solid #e2e8f0;background:white;transition:all 0.3s}
-          .md-type.sel{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 0 3px rgba(245,158,11,0.15)}
-          .md-type-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f1f5f9;color:#64748b}
+          .md-type{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:12px;border:2px solid #e2e8f0;background:white;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+          .md-type.sel{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 0 3px rgba(245,158,11,0.15);transform:scale(1.05)}
+          .md-type-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f1f5f9;color:#64748b;transition:all 0.3s}
           .md-type.sel .md-type-ico{background:#fef3c7;color:#d97706}
-          .md-type-lbl{font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;text-align:center}
+          .md-type-lbl{font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;text-align:center;transition:all 0.3s}
           .md-type.sel .md-type-lbl{color:#d97706}
           .md-upload{width:100%;max-width:280px;aspect-ratio:1;border:2px dashed #cbd5e1;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;background:#fafbfc;transition:all 0.3s}
           .md-upload.filled{border-style:solid;border-color:#f59e0b}
           .md-upload img{position:absolute;inset:4px;border-radius:12px;object-fit:cover;opacity:0;transform:scale(0.9)}
-          .md-upload img.show{animation:mdDrop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards}
+          .md-upload img.show{animation:mdDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards}
           @keyframes mdDrop{to{opacity:1;transform:scale(1)}}
-          .md-spinner{width:48px;height:48px;border-radius:50%;border:3px solid #f1f5f9;border-top-color:#f59e0b;animation:mdSpin 0.8s linear infinite}
+          .md-spinner{width:64px;height:64px;border-radius:50%;border:4px solid #f8fafc;border-top-color:#d97706;animation:mdSpin 1s cubic-bezier(0.68,-0.55,0.26,1.55) infinite;box-shadow:0 0 20px rgba(217,119,6,0.15)}
           @keyframes mdSpin{to{transform:rotate(360deg)}}
-          .md-sparkle{position:absolute;width:5px;height:5px;background:#f59e0b;border-radius:50%;opacity:0}
-          .md-sparkle:nth-child(1){left:20%;top:30%;animation:mdFloat 2s 0.1s ease infinite}
-          .md-sparkle:nth-child(2){left:70%;top:20%;animation:mdFloat 2s 0.4s ease infinite}
-          .md-sparkle:nth-child(3){left:40%;top:65%;animation:mdFloat 2s 0.7s ease infinite}
-          .md-sparkle:nth-child(4){left:80%;top:50%;animation:mdFloat 2s 1s ease infinite}
-          @keyframes mdFloat{0%,100%{opacity:0;transform:translateY(0) scale(0)}30%{opacity:1;transform:translateY(-10px) scale(1)}70%{opacity:0;transform:translateY(-20px) scale(0.5)}}
-          .md-insta{width:100%;max-width:280px;background:white;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.08)}
+          .md-sparkle{position:absolute;width:6px;height:6px;background:#d97706;border-radius:50%;opacity:0;box-shadow:0 0 10px #f59e0b}
+          .md-sparkle:nth-child(1){left:25%;top:25%;animation:mdFloatSparkle 2s 0.1s ease infinite}
+          .md-sparkle:nth-child(2){left:75%;top:20%;animation:mdFloatSparkle 2s 0.4s ease infinite}
+          .md-sparkle:nth-child(3){left:35%;top:75%;animation:mdFloatSparkle 2s 0.7s ease infinite}
+          .md-sparkle:nth-child(4){left:80%;top:65%;animation:mdFloatSparkle 2s 1s ease infinite}
+          @keyframes mdFloatSparkle{0%,100%{opacity:0;transform:translateY(0) scale(0)}30%{opacity:1;transform:translateY(-15px) scale(1.5)}70%{opacity:0;transform:translateY(-30px) scale(0.5)}}
+          .md-insta{width:100%;max-width:280px;background:white;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.12);transform-origin:bottom center;opacity:0;transform:translateY(40px) scale(0.85) rotate(-3deg)}
+          .md-insta.show{animation:mdInstaPop 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards}
+          @keyframes mdInstaPop{to{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
           .md-insta-head{display:flex;align-items:center;gap:8px;padding:8px 10px}
           .md-insta-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706)}
           .md-insta-img{width:100%;aspect-ratio:1;object-fit:cover}
           .md-insta-badge{position:absolute;top:8px;right:8px;background:rgba(30,41,59,0.8);backdrop-filter:blur(8px);color:white;font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.08em}
           .md-insta-acts{display:flex;gap:10px;padding:8px 10px;align-items:center}
-          .md-toast{position:absolute;top:16px;right:16px;background:white;border-radius:12px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,0.1);border:1px solid #e2e8f0;z-index:30;opacity:0;transform:translateY(-10px);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275)}
-          .md-toast.show{opacity:1;transform:translateY(0)}
-          .md-trophy-stack{position:absolute;top:70px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:30}
-          .md-trophy{background:white;border-radius:12px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,0.1);border:1px solid #e2e8f0;opacity:0;transform:translateX(20px);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275)}
-          .md-trophy.show{opacity:1;transform:translateX(0)}
+          .md-toast{position:absolute;top:56px;right:16px;background:white;border-radius:12px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 15px 35px rgba(0,0,0,0.08);border:1px solid #e2e8f0;z-index:60;opacity:0;transform:translateY(-20px) scale(0.9);transition:all 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+          .md-toast.show{opacity:1;transform:translateY(0) scale(1)}
+          .md-trophy-stack{position:absolute;top:110px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:60}
+          .md-trophy{background:white;border-radius:12px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,0.08);border:1px solid #e2e8f0;opacity:0;transform:translateX(30px) scale(0.9);transition:all 0.6s cubic-bezier(0.34,1.56,0.64,1)}
+          .md-trophy.show{opacity:1;transform:translateX(0) scale(1)}
+          .md-c{position:absolute;width:8px;height:16px;border-radius:4px;opacity:0;left:50%;top:50%;margin-left:-4px;margin-top:-8px;z-index:99;box-shadow:0 0 10px rgba(0,0,0,0.1)}
+          .md-c.burst{animation:mdCBurst 2.5s ease-in-out forwards}
+          @keyframes mdCBurst{0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(0)}40%{opacity:1;transform:translate(var(--tx),var(--ty)) rotate(var(--rot)) scale(1.5)}100%{opacity:0;transform:translate(calc(var(--tx)*1.2),calc(var(--ty) + 400px)) rotate(calc(var(--rot) + 400deg)) scale(1)}}
+          .md-c-1{background:#ef4444;--tx:-180px;--ty:-220px;--rot:120deg;}
+          .md-c-2{background:#f59e0b;--tx:180px;--ty:-240px;--rot:240deg; animation-delay:0.05s;}
+          .md-c-3{background:#10b981;--tx:-120px;--ty:-280px;--rot:400deg;}
+          .md-c-4{background:#3b82f6;--tx:120px;--ty:-250px;--rot:180deg; animation-delay:0.02s;}
+          .md-c-5{background:#a855f7;--tx:-220px;--ty:-100px;--rot:310deg;}
+          .md-c-6{background:#ef4444;--tx:220px;--ty:-80px;--rot:90deg; animation-delay:0.08s;}
+          .md-c-7{background:#f59e0b;--tx:-150px;--ty:-150px;--rot:420deg;}
+          .md-c-8{background:#10b981;--tx:150px;--ty:-150px;--rot:270deg; animation-delay:0.04s;}
+          .md-c-9{background:#3b82f6;--tx:-80px;--ty:-320px;--rot:200deg;}
+          .md-c-10{background:#a855f7;--tx:80px;--ty:-320px;--rot:250deg; animation-delay:0.06s;}
+          .md-c-11{background:#ef4444;--tx:-250px;--ty:-180px;--rot:150deg; animation-delay:0.02s;}
+          .md-c-12{background:#f59e0b;--tx:260px;--ty:-160px;--rot:320deg; animation-delay:0.09s;}
+          .md-c-13{background:#10b981;--tx:-100px;--ty:-380px;--rot:410deg; animation-delay:0.05s;}
+          .md-c-14{background:#3b82f6;--tx:140px;--ty:-360px;--rot:130deg; animation-delay:0.11s;}
+          .md-c-15{background:#a855f7;--tx:-190px;--ty:-290px;--rot:340deg; animation-delay:0.07s;}
+          .md-c-16{background:#ef4444;--tx:210px;--ty:-260px;--rot:110deg; animation-delay:0.03s;}
+          .md-c-17{background:#f59e0b;--tx:-50px;--ty:-220px;--rot:460deg; animation-delay:0.06s;}
+          .md-c-18{background:#10b981;--tx:40px;--ty:-250px;--rot:210deg; animation-delay:0.04s;}
           @media(max-width:768px){
             .md-showcase{min-height:560px;max-width:340px;margin:0 auto;border:10px solid #1e293b;border-radius:3rem;height:620px}
              .md-topbar{padding:18px 20px 10px;justify-content:center;background:transparent;border:0}
@@ -225,7 +251,7 @@
             .md-upload{max-width:220px}
             .md-insta{transform:scale(0.8);margin-top:-30px}
             .md-cursor{width:16px;height:16px}
-            .md-trophy-stack{top:70px;bottom:auto;right:16px;left:auto;flex-direction:column;align-items:flex-end;pointer-events:none}
+            .md-trophy-stack{top:110px;bottom:auto;right:16px;left:auto;flex-direction:column;align-items:flex-end;pointer-events:none}
             .md-trophy{padding:6px 10px;font-size:10px}
           }
           @media(max-width:480px){
@@ -240,29 +266,50 @@
                  x-intersect:enter.half="startAnimation()"
                  x-intersect:leave="stopAnimation()">
           <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="md-showcase" x-ref="showcase">
+            <div class="md-showcase flex flex-col" x-ref="showcase">
+
+              <!-- Persistent Safari UI -->
+              <div class="md-topbar relative z-20">
+                <div class="md-dots-wrap" style="display:flex;gap:6px">
+                  <div class="md-dot" style="background:#f87171"></div>
+                  <div class="md-dot" style="background:#fbbf24"></div>
+                  <div class="md-dot" style="background:#4ade80"></div>
+                </div>
+                <div class="md-notch"></div>
+                <span style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-left:auto;transition:opacity 0.3s" x-text="sceneLabel"></span>
+              </div>
+              <div class="md-home-indicator z-50"></div>
+
+              <!-- Alerts outside of scenes to fix stacking context -->
+              <div class="md-toast" :class="showSuccessToast ? 'show' : ''">
+                <div style="width:28px;height:28px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;color:#16a34a;flex-shrink:0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <span style="font-size:12px;font-weight:600;color:#1e293b;white-space:nowrap">Publié sur Instagram ✓</span>
+              </div>
+              <div class="md-trophy-stack">
+                <template x-for="(t, index) in trophyToasts" :key="index">
+                  <div class="md-trophy" :class="t.show ? 'show' : ''">
+                    <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:18px">🏆</div>
+                    <span style="font-size:12px;font-weight:700;color:#1e293b;white-space:nowrap">Nouveau devis !</span>
+                  </div>
+                </template>
+              </div>
 
               <!-- Cursor -->
               <div class="md-cursor" x-show="cursorVisible"
-                   :style="`left:${cursorX}px;top:${cursorY}px;transition:left ${cursorSpeed}s cubic-bezier(0.4,0,0.2,1),top ${cursorSpeed}s cubic-bezier(0.4,0,0.2,1)`">
-                <svg viewBox="0 0 24 24" fill="none"><path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87a.5.5 0 0 0 .35-.85L6.35 2.86a.5.5 0 0 0-.85.35Z" fill="#1E293B" stroke="white" stroke-width="1.5"/></svg>
+                   :style="`left:${cursorX}px;top:${cursorY}px;transform:rotate(${cursorRot}deg);transition:left ${cursorSpeed}s cubic-bezier(0.34,1.56,0.64,1),top ${cursorSpeed}s cubic-bezier(0.34,1.56,0.64,1),transform 0.5s cubic-bezier(0.34,1.56,0.64,1)`">
+                <div :class="showClick ? 'scale-75 -rotate-12' : 'scale-100 rotate-0'" style="transition:transform 0.15s cubic-bezier(0.4,0,0.2,1);transform-origin:top left">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87a.5.5 0 0 0 .35-.85L6.35 2.86a.5.5 0 0 0-.85.35Z" fill="#1E293B" stroke="white" stroke-width="1.5"/></svg>
+                </div>
               </div>
 
               <!-- Click -->
               <div class="md-click" :style="`left:${clickX}px;top:${clickY}px`" :class="showClick ? 'pop' : ''"></div>
 
+              <div class="relative flex-1 w-full z-10 overflow-hidden">
               <!-- SCENE 1: Vocal -->
               <div class="md-scene" :class="currentScene === 1 ? 'active' : ''">
-                <div class="md-topbar">
-                  <div class="md-dots-wrap" style="display:flex;gap:6px">
-                    <div class="md-dot" style="background:#f87171"></div>
-                    <div class="md-dot" style="background:#fbbf24"></div>
-                    <div class="md-dot" style="background:#4ade80"></div>
-                  </div>
-                  <div class="md-notch"></div>
-                  <span style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-left:auto" x-text="sceneLabel"></span>
-                </div>
-                <div class="md-home-indicator"></div>
                 <div class="md-content">
                   <div style="display:flex;flex-direction:column;align-items:center;gap:1.25rem;width:100%;max-width:380px">
                     <div style="font-size:13px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.08em">Étape 1 · Enregistrer un vocal</div>
@@ -281,16 +328,6 @@
 
               <!-- SCENE 2: Type -->
               <div class="md-scene" :class="currentScene === 2 ? 'active' : ''">
-                <div class="md-topbar">
-                  <div class="md-dots-wrap" style="display:flex;gap:6px">
-                    <div class="md-dot" style="background:#f87171"></div>
-                    <div class="md-dot" style="background:#fbbf24"></div>
-                    <div class="md-dot" style="background:#4ade80"></div>
-                  </div>
-                  <div class="md-notch"></div>
-                  <span style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-left:auto" x-text="sceneLabel"></span>
-                </div>
-                <div class="md-home-indicator"></div>
                 <div class="md-content">
                   <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;width:100%">
                     <div style="font-size:13px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.08em">Étape 2 · Choisir le type</div>
@@ -326,16 +363,6 @@
 
               <!-- SCENE 3: Photo -->
               <div class="md-scene" :class="currentScene === 3 ? 'active' : ''">
-                <div class="md-topbar">
-                  <div class="md-dots-wrap" style="display:flex;gap:6px">
-                    <div class="md-dot" style="background:#f87171"></div>
-                    <div class="md-dot" style="background:#fbbf24"></div>
-                    <div class="md-dot" style="background:#4ade80"></div>
-                  </div>
-                  <div class="md-notch"></div>
-                  <span style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-left:auto" x-text="sceneLabel"></span>
-                </div>
-                <div class="md-home-indicator"></div>
                 <div class="md-content">
                   <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;width:100%">
                     <div style="font-size:13px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.08em">Étape 3 · Ajouter une photo</div>
@@ -352,16 +379,6 @@
 
               <!-- SCENE 4: AI Loading -->
               <div class="md-scene" :class="currentScene === 4 ? 'active' : ''">
-                <div class="md-topbar">
-                  <div class="md-dots-wrap" style="display:flex;gap:6px">
-                    <div class="md-dot" style="background:#f87171"></div>
-                    <div class="md-dot" style="background:#fbbf24"></div>
-                    <div class="md-dot" style="background:#4ade80"></div>
-                  </div>
-                  <div class="md-notch"></div>
-                  <span style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-left:auto" x-text="sceneLabel"></span>
-                </div>
-                <div class="md-home-indicator"></div>
                 <div class="md-content">
                   <div class="md-sparkle"></div><div class="md-sparkle"></div><div class="md-sparkle"></div><div class="md-sparkle"></div>
                   <div style="display:flex;flex-direction:column;align-items:center;gap:1.25rem">
@@ -374,20 +391,29 @@
 
               <!-- SCENE 5: Instagram Post -->
               <div class="md-scene" :class="currentScene === 5 ? 'active' : ''">
-                <div class="md-topbar">
-                  <div class="md-dots-wrap" style="display:flex;gap:6px">
-                    <div class="md-dot" style="background:#f87171"></div>
-                    <div class="md-dot" style="background:#fbbf24"></div>
-                    <div class="md-dot" style="background:#4ade80"></div>
-                  </div>
-                  <div class="md-notch"></div>
-                  <span style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-left:auto" x-text="sceneLabel"></span>
-                </div>
-                <div class="md-home-indicator"></div>
-                <div class="md-content" style="justify-content:center">
-                  <div class="md-insta"
-                       :style="showInstaPost ? 'opacity:1;transform:translateY(0) scale(1)' : 'opacity:0;transform:translateY(20px) scale(0.95)'"
-                       style="transition:all 0.6s cubic-bezier(0.175,0.885,0.32,1.275)">
+                <div class="md-content" style="justify-content:center;position:relative;">
+
+                  <!-- Confettis -->
+                  <div class="md-c md-c-1" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-2" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-3" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-4" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-5" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-6" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-7" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-8" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-9" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-10" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-11" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-12" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-13" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-14" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-15" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-16" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-17" :class="showInstaPost ? 'burst' : ''"></div>
+                  <div class="md-c md-c-18" :class="showInstaPost ? 'burst' : ''"></div>
+
+                  <div class="md-insta relative z-20" :class="showInstaPost ? 'show' : ''">
                     <div class="md-insta-head">
                       <div class="md-insta-av"></div>
                       <div>
@@ -411,24 +437,10 @@
                     </div>
                     <div style="font-size:8px;color:#94a3b8;padding:0 10px 8px;text-transform:uppercase;letter-spacing:0.05em">Il y a quelques secondes</div>
                   </div>
-
-                  <div class="md-toast" :class="showSuccessToast ? 'show' : ''">
-                    <div style="width:28px;height:28px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;color:#16a34a;flex-shrink:0">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    </div>
-                    <span style="font-size:12px;font-weight:600;color:#1e293b;white-space:nowrap">Publié sur Instagram ✓</span>
-                  </div>
-
-                  <div class="md-trophy-stack">
-                    <template x-for="(t, index) in trophyToasts" :key="index">
-                      <div class="md-trophy" :class="t.show ? 'show' : ''">
-                        <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:18px">🏆</div>
-                        <span style="font-size:12px;font-weight:700;color:#1e293b;white-space:nowrap">Nouveau devis !</span>
-                      </div>
-                    </template>
-                  </div>
                 </div>
               </div>
+              
+              </div> <!-- End Scenes Container -->
 
             </div>
           </div>
@@ -465,8 +477,10 @@
                         await this.wait(2000);
                     }
                 },
+                cursorRot: 0,
                 async reset() {
                     this.currentScene = 0; this.cursorVisible = false; this.isRecording = false;
+                    this.cursorRot = 0;
                     this.transcriptText = ''; this.selectedType = ''; this.hasPhoto = false;
                     this.showInstaPost = false; this.showSuccessToast = false; this.likeCount = 0;
                     this.sceneLabel = ''; this.waveformHeights = Array(20).fill(15); this.trophyToasts = [];
@@ -478,11 +492,10 @@
                     await this.wait(500);
                     this.cursorVisible = true;
                     const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
-                    this.cursorX = sw * 0.3; this.cursorY = sh * 0.3;
-                    await this.wait(100);
-                    this.cursorSpeed = 0.6; this.cursorX = sw * 0.5;
-                    this.cursorY = sw < 600 ? sh * 0.52 : sh * 0.54;
-                    await this.wait(700);
+                    await this.moveCursor(sw * 0.3, sh * 0.3, 0);
+                    await this.wait(150);
+                    await this.moveCursor(sw * 0.5, sw < 600 ? sh * 0.52 : sh * 0.54, 0.55);
+                    await this.wait(150);
                     await this.doClick(this.cursorX, this.cursorY);
                     this.isRecording = true;
                     this.waveformInterval = setInterval(() => {
@@ -503,10 +516,8 @@
                     this.currentScene = 2; this.sceneLabel = '02 · Type de post';
                     await this.wait(500);
                     const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
-                    this.cursorSpeed = 0.5; 
-                    this.cursorX = sw < 600 ? sw * 0.28 : sw * 0.35;
-                    this.cursorY = sw < 600 ? sh * 0.42 : sh * 0.45;
-                    await this.wait(600);
+                    await this.moveCursor(sw < 600 ? sw * 0.28 : sw * 0.35, sw < 600 ? sh * 0.42 : sh * 0.45, 0.45);
+                    await this.wait(150);
                     await this.doClick(this.cursorX, this.cursorY);
                     this.selectedType = 'avant-apres'; await this.wait(1000);
                 },
@@ -514,20 +525,24 @@
                     this.currentScene = 3; this.sceneLabel = '03 · Photo du chantier';
                     await this.wait(500);
                     const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
-                    this.cursorSpeed = 0.4; this.cursorX = sw * 0.5; this.cursorY = sh * 0.55;
-                    await this.wait(500);
+                    await this.moveCursor(sw * 0.5, sh * 0.55, 0.4);
+                    await this.wait(100);
                     await this.doClick(this.cursorX, this.cursorY);
                     this.hasPhoto = true; await this.wait(1000);
                 },
                 async scene4() {
                     this.currentScene = 4; this.sceneLabel = '04 · Génération IA';
-                    this.cursorVisible = false; await this.wait(2300);
+                    const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
+                    this.moveCursor(sw * 0.8, sh * 0.8, 1.2);
+                    await this.wait(1400);
                 },
                 async scene5() {
                     this.currentScene = 5; this.sceneLabel = '05 · Publication IG';
+                    const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
                     await this.wait(500);
                     this.showInstaPost = true;
-                    const target = 42; const steps = 20;
+                    this.moveCursor(sw > 600 ? sw - 80 : sw - 50, 80, 2.0);
+                    const target = 142; const steps = 20;
                     for (let i = 0; i <= steps; i++) {
                         if (!this.animationRunning) return;
                         this.likeCount = Math.round((target / steps) * i); await this.wait(35);
@@ -544,6 +559,17 @@
                     this.clickX = x; this.clickY = y; this.showClick = false;
                     await this.wait(50); this.showClick = true; await this.wait(350);
                     this.showClick = false;
+                },
+                async moveCursor(nx, ny, speed) {
+                    this.cursorSpeed = speed;
+                    let dx = nx - this.cursorX;
+                    if (speed > 0) this.cursorRot = Math.max(-20, Math.min(20, dx * 0.08));
+                    else this.cursorRot = 0;
+                    this.cursorX = nx; this.cursorY = ny;
+                    if (speed > 0) {
+                        await this.wait(speed * 1000);
+                        if (this.cursorX === nx) this.cursorRot = 0;
+                    }
                 },
                 wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
             };
@@ -1078,37 +1104,70 @@
               <p class="text-xl font-light text-slate-600">Conseils, stratégies et retours d'expérience pour les artisans qui veulent se démarquer.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              @foreach($latestPosts as $blogPost)
-                <article class="group bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                  <a href="{{ route('blog.show', $blogPost->slug) }}">
-                    <div class="aspect-[16/10] overflow-hidden bg-slate-50">
+            @if($latestPosts->count() === 1)
+              @php $blogPost = $latestPosts->first(); @endphp
+              <div class="max-w-5xl mx-auto">
+                <article class="group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  <a href="{{ route('blog.show', $blogPost->slug) }}" class="flex flex-col md:flex-row items-stretch">
+                    <div class="md:w-1/2 aspect-[16/10] md:aspect-auto overflow-hidden bg-slate-50">
                       @if($blogPost->featured_image)
                         <img src="{{ Storage::url($blogPost->featured_image) }}" alt="{{ $blogPost->title }}"
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                       @else
                         <div class="w-full h-full bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
-                          <svg class="w-12 h-12 text-copper/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                          <svg class="w-16 h-16 text-copper/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
                         </div>
                       @endif
                     </div>
-                    <div class="p-6">
-                      <div class="flex items-center gap-3 mb-4">
-                        <time class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{{ $blogPost->published_at->translatedFormat('d M Y') }}</time>
+                    <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+                      <div class="flex items-center gap-3 mb-6">
+                        <time class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ $blogPost->published_at->translatedFormat('d M Y') }}</time>
                         <span class="text-slate-200">|</span>
-                        <span class="text-[11px] font-bold text-slate-400">{{ $blogPost->read_time }} min</span>
+                        <span class="text-xs font-bold text-slate-400">{{ $blogPost->read_time }} min de lecture</span>
                       </div>
-                      <h3 class="font-display font-bold text-midnight text-lg leading-snug mb-3 group-hover:text-copper transition-colors line-clamp-2">{{ $blogPost->title }}</h3>
-                      <p class="text-sm text-slate-500 font-light leading-relaxed line-clamp-3">{{ $blogPost->excerpt }}</p>
-                      <div class="mt-5 flex items-center gap-2 text-copper text-xs font-bold uppercase tracking-widest group-hover:gap-3 transition-all">
-                        Lire l'article
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                      <h3 class="font-display font-bold text-midnight text-2xl lg:text-3xl leading-tight mb-4 group-hover:text-copper transition-colors">{{ $blogPost->title }}</h3>
+                      <p class="text-base text-slate-500 font-light leading-relaxed mb-8 line-clamp-3">{{ $blogPost->excerpt }}</p>
+                      <div class="flex items-center gap-2 text-copper text-sm font-bold uppercase tracking-widest group-hover:gap-3 transition-all">
+                        Lire l'article complet
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                       </div>
                     </div>
                   </a>
                 </article>
-              @endforeach
-            </div>
+              </div>
+            @else
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                @foreach($latestPosts as $blogPost)
+                  <article class="group bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <a href="{{ route('blog.show', $blogPost->slug) }}">
+                      <div class="aspect-[16/10] overflow-hidden bg-slate-50">
+                        @if($blogPost->featured_image)
+                          <img src="{{ Storage::url($blogPost->featured_image) }}" alt="{{ $blogPost->title }}"
+                               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        @else
+                          <div class="w-full h-full bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
+                            <svg class="w-12 h-12 text-copper/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                          </div>
+                        @endif
+                      </div>
+                      <div class="p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                          <time class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{{ $blogPost->published_at->translatedFormat('d M Y') }}</time>
+                          <span class="text-slate-200">|</span>
+                          <span class="text-[11px] font-bold text-slate-400">{{ $blogPost->read_time }} min</span>
+                        </div>
+                        <h3 class="font-display font-bold text-midnight text-lg leading-snug mb-3 group-hover:text-copper transition-colors line-clamp-2">{{ $blogPost->title }}</h3>
+                        <p class="text-sm text-slate-500 font-light leading-relaxed line-clamp-3">{{ $blogPost->excerpt }}</p>
+                        <div class="mt-5 flex items-center gap-2 text-copper text-xs font-bold uppercase tracking-widest group-hover:gap-3 transition-all">
+                          Lire l'article
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                        </div>
+                      </div>
+                    </a>
+                  </article>
+                @endforeach
+              </div>
+            @endif
 
             <div class="text-center mt-12">
               <a href="{{ route('blog.index') }}" class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl border border-slate-200 bg-white text-midnight font-bold text-sm uppercase tracking-widest hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm">
@@ -1203,10 +1262,10 @@
             <div>
               <h4 class="font-display font-semibold text-midnight mb-6">Légal</h4>
               <ul class="space-y-4 text-sm">
-                <li><a href="#" class="hover:text-copper transition-colors font-light">Mentions légales</a></li>
-                <li><a href="#" class="hover:text-copper transition-colors font-light">CGV</a></li>
-                <li><a href="#" class="hover:text-copper transition-colors font-light">Confidentialité</a></li>
-                <li><a href="#" class="hover:text-copper transition-colors font-light">Contact</a></li>
+                <li><a href="{{ route('legal.mentions') }}" class="hover:text-copper transition-colors font-light">Mentions légales</a></li>
+                <li><a href="{{ route('legal.cgv') }}" class="hover:text-copper transition-colors font-light">CGV</a></li>
+                <li><a href="{{ route('legal.confidentialite') }}" class="hover:text-copper transition-colors font-light">Confidentialité</a></li>
+                <li><a href="mailto:hello@postelio.fr" class="hover:text-copper transition-colors font-light">Contact</a></li>
               </ul>
             </div>
 

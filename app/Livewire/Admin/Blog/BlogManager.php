@@ -83,9 +83,9 @@ class BlogManager extends Component
         $data = [
             'title' => $this->title,
             'content' => $this->content,
-            'excerpt' => $this->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($this->content), 200),
+            'excerpt' => strip_tags($this->excerpt) ?: \Illuminate\Support\Str::limit(strip_tags($this->content), 200),
             'meta_title' => $this->meta_title ?: $this->title,
-            'meta_description' => $this->meta_description ?: \Illuminate\Support\Str::limit(strip_tags($this->content), 155),
+            'meta_description' => strip_tags($this->meta_description) ?: \Illuminate\Support\Str::limit(strip_tags($this->content), 155),
             'meta_keywords' => $this->meta_keywords,
             'status' => $this->status,
             'published_at' => $this->status === 'published' ? ($this->published_at ?? now()) : null,

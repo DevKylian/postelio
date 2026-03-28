@@ -15,6 +15,11 @@ Route::view('/', 'welcome');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
+// Legal pages (public)
+Route::view('/mentions-legales', 'legal.mentions')->name('legal.mentions');
+Route::view('/cgv', 'legal.cgv')->name('legal.cgv');
+Route::view('/politique-confidentialite', 'legal.confidentialite')->name('legal.confidentialite');
+
 // Stripe webhooks (no CSRF verification)
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])
     ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class)

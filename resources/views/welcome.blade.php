@@ -118,7 +118,7 @@
                 </div>
               <h1 class="text-5xl sm:text-6xl lg:text-8xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.05]">
                 Votre chantier travaille <br class="hidden sm:block" />
-                <span class="text-gradient-copper italic pr-3 pb-1">pour vous.</span>
+                <span class="text-gradient-copper italic">pour vous.</span>
               </h1>
               <p class="text-xl sm:text-2xl font-light text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
                 Attirez des clients haut de gamme et mieux payés, sans négociation ni effort supplémentaire.
@@ -588,7 +588,7 @@
                   L'IA qui rédige pour vous
                 </div>
                 <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">
-                  Un rendu <span class="text-gradient-copper italic pr-2 pb-1">impeccable</span>, à chaque fois.
+                  Un rendu <span class="text-gradient-copper italic">impeccable</span>, à chaque fois.
                 </h2>
                 <p class="text-lg text-slate-600 font-light leading-relaxed mb-12">
                   Fini le syndrome de la page blanche. Postelio transforme votre simple note vocale en une publication professionnelle, engageante, avec les bons hashtags et emojis.
@@ -740,7 +740,7 @@
         <section id="methode" class="py-32">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-20">
-              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Prouvez votre expertise en <span class="text-gradient-copper italic pr-2 pb-1">30 secondes.</span></h2>
+              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Prouvez votre expertise en <span class="text-gradient-copper italic">30 secondes.</span></h2>
               <p class="text-xl font-light text-slate-600">Pas besoin de devenir un pro du digital. Montrez simplement ce que vous savez faire de mieux, directement depuis le chantier.</p>
             </div>
 
@@ -829,7 +829,7 @@
         <section class="py-24">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-20">
-              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Ils ont choisi <span class="text-gradient-copper italic pr-2 pb-1">leurs clients.</span></h2>
+              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Ils ont choisi <span class="text-gradient-copper italic">leurs clients.</span></h2>
             </div>
 
             <div class="grid md:grid-cols-3 gap-6">
@@ -883,7 +883,7 @@
         <section id="tarifs" class="py-32 relative" x-data="{ billingPeriod: 'monthly' }">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-10">
-              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Un investissement dérisoire pour <span class="text-gradient-copper italic pr-2 pb-1">monter en gamme.</span></h2>
+              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Un investissement dérisoire pour <span class="text-gradient-copper italic">monter en gamme.</span></h2>
               <p class="text-xl font-light text-slate-600">Rentabilisé dès votre premier chantier haut de gamme signé.</p>
             </div>
 

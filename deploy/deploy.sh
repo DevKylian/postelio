@@ -72,7 +72,7 @@ FRONTEND_CHANGED=${FRONTEND_CHANGED:-0}
 
 if [ "$FRONTEND_CHANGED" -gt 0 ]; then
     log "Frontend modifié — rebuild npm..."
-    npm ci --silent
+    npm install --no-audit --no-fund
     npm run build
 else
     log "Pas de changements frontend."

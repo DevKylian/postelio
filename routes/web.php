@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\FacebookController;
 use App\Http\Controllers\InstagramController;
 use App\Http\Controllers\PostController;
@@ -9,6 +10,10 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::view('/', 'welcome');
+
+// Blog (public)
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // Stripe webhooks (no CSRF verification)
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])
@@ -53,6 +58,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
         Route::get('/admin/users/{user}', \App\Livewire\Admin\Users\UserShow::class)->name('admin.users.show');
         Route::get('/admin/templates', \App\Livewire\Admin\Templates\TemplateManager::class)->name('admin.templates.index');
         Route::get('/admin/changelog', \App\Livewire\Admin\Changelog\ChangelogManager::class)->name('admin.changelog.index');
+        Route::get('/admin/blog', \App\Livewire\Admin\Blog\BlogManager::class)->name('admin.blog.index');
     });
 
     // Social & Sync routes (Premium only)

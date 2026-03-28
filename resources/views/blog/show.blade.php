@@ -189,8 +189,8 @@
 
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
+        "@@context": "https://schema.org",
+        "@@type": "BlogPosting",
         "headline": "{{ $post->meta_title ?: $post->title }}",
         "description": "{{ $post->meta_description ?: $post->excerpt }}",
         "url": "{{ route('blog.show', $post->slug) }}",
@@ -200,17 +200,17 @@
         "datePublished": "{{ $post->published_at->toIso8601String() }}",
         "dateModified": "{{ $post->updated_at->toIso8601String() }}",
         "author": {
-            "@type": "Organization",
+            "@@type": "Organization",
             "name": "Postelio"
         },
         "publisher": {
-            "@type": "Organization",
+            "@@type": "Organization",
             "name": "Postelio",
             "url": "{{ url('/') }}"
         },
         "mainEntityOfPage": {
-            "@type": "WebPage",
-            "@id": "{{ route('blog.show', $post->slug) }}"
+            "@@type": "WebPage",
+            "@@id": "{{ route('blog.show', $post->slug) }}"
         }
     }
     </script>

@@ -15,8 +15,9 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         
-        <!-- Alpine.js Collapse Plugin + Alpine.js -->
+        <!-- Alpine.js Plugins + Alpine.js -->
         <script defer src="https://unpkg.com/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+        <script defer src="https://unpkg.com/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
         <!-- Lucide Icons -->
@@ -159,65 +160,421 @@
           </div>
         </section>
 
-        <!-- Mini Demo -->
-        <section class="relative z-20 pb-16 -mt-8 sm:-mt-12">
-          <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="glass-card p-4 sm:p-8 flex items-center justify-between gap-2 sm:gap-8 shadow-xl shadow-slate-200/50">
-              
-              <!-- Step 1: Photo -->
-              <div class="flex-1 flex flex-col items-center gap-3 sm:gap-4">
-                <div class="w-full max-w-[80px] sm:max-w-[140px] aspect-square rounded-2xl overflow-hidden relative shadow-sm border border-slate-100 group">
-                  <img src="https://picsum.photos/seed/chantier/200/200" alt="Photo chantier" class="w-full h-full object-cover">
-                  <div class="absolute inset-0 bg-slate-900/20 flex items-center justify-center">
-                    <div class="w-8 h-8 sm:w-12 sm:h-12 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center border border-white/50">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 sm:w-6 sm:h-6 drop-shadow-md"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+        <!-- Motion Design Demo -->
+        <style>
+          .md-showcase{position:relative;width:100%;min-height:560px;border-radius:1.5rem;overflow:hidden;background:linear-gradient(145deg,#ffffff 0%,#f8fafc 100%);border:1px solid rgba(226,232,240,0.6);box-shadow:0 25px 60px -12px rgba(0,0,0,0.08),0 0 0 1px rgba(0,0,0,0.02)}
+          .md-scene{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.5s ease}
+          .md-scene.active{opacity:1;pointer-events:auto}
+          .md-topbar{display:flex;align-items:center;gap:8px;padding:12px 20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;flex-shrink:0}
+          .md-dot{width:8px;height:8px;border-radius:50%}
+          .md-content{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative}
+          .md-cursor{position:absolute;width:20px;height:20px;z-index:50;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.25))}
+          .md-click{position:absolute;width:32px;height:32px;border-radius:50%;background:rgba(245,158,11,0.25);border:2px solid rgba(245,158,11,0.5);pointer-events:none;z-index:49;opacity:0;transform:translate(-50%,-50%) scale(0)}
+          .md-click.pop{animation:mdPop 0.4s ease forwards}
+          @keyframes mdPop{0%{opacity:1;transform:translate(-50%,-50%) scale(0)}50%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.4)}}
+          .md-mic{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;color:white;box-shadow:0 8px 25px rgba(245,158,11,0.35);position:relative}
+          .md-mic.rec::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(245,158,11,0.3);animation:mdPulse 1.5s ease-in-out infinite}
+          @keyframes mdPulse{0%,100%{transform:scale(1);opacity:0}50%{transform:scale(1.15);opacity:1}}
+          .md-wave{display:flex;align-items:center;gap:3px;height:48px;justify-content:center}
+          .md-wave-bar{width:4px;border-radius:4px;background:#f59e0b;transition:height 0.15s ease}
+          .md-transcript{background:#f8fafc;border-radius:1rem;border:1px solid #e2e8f0;padding:12px 16px;font-size:14px;color:#1e293b;line-height:1.6;font-style:italic;width:100%;max-width:380px}
+          .md-types{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:420px}
+          .md-type{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px;border-radius:12px;border:2px solid #e2e8f0;background:white;transition:all 0.3s}
+          .md-type.sel{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 0 3px rgba(245,158,11,0.15)}
+          .md-type-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#f1f5f9;color:#64748b}
+          .md-type.sel .md-type-ico{background:#fef3c7;color:#d97706}
+          .md-type-lbl{font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;text-align:center}
+          .md-type.sel .md-type-lbl{color:#d97706}
+          .md-upload{width:100%;max-width:280px;aspect-ratio:1;border:2px dashed #cbd5e1;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;background:#fafbfc;transition:all 0.3s}
+          .md-upload.filled{border-style:solid;border-color:#f59e0b}
+          .md-upload img{position:absolute;inset:4px;border-radius:12px;object-fit:cover;opacity:0;transform:scale(0.9)}
+          .md-upload img.show{animation:mdDrop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards}
+          @keyframes mdDrop{to{opacity:1;transform:scale(1)}}
+          .md-spinner{width:48px;height:48px;border-radius:50%;border:3px solid #f1f5f9;border-top-color:#f59e0b;animation:mdSpin 0.8s linear infinite}
+          @keyframes mdSpin{to{transform:rotate(360deg)}}
+          .md-sparkle{position:absolute;width:5px;height:5px;background:#f59e0b;border-radius:50%;opacity:0}
+          .md-sparkle:nth-child(1){left:20%;top:30%;animation:mdFloat 2s 0.1s ease infinite}
+          .md-sparkle:nth-child(2){left:70%;top:20%;animation:mdFloat 2s 0.4s ease infinite}
+          .md-sparkle:nth-child(3){left:40%;top:65%;animation:mdFloat 2s 0.7s ease infinite}
+          .md-sparkle:nth-child(4){left:80%;top:50%;animation:mdFloat 2s 1s ease infinite}
+          @keyframes mdFloat{0%,100%{opacity:0;transform:translateY(0) scale(0)}30%{opacity:1;transform:translateY(-10px) scale(1)}70%{opacity:0;transform:translateY(-20px) scale(0.5)}}
+          .md-insta{width:100%;max-width:280px;background:white;border-radius:10px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.08)}
+          .md-insta-head{display:flex;align-items:center;gap:8px;padding:8px 10px}
+          .md-insta-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706)}
+          .md-insta-img{width:100%;aspect-ratio:1;object-fit:cover}
+          .md-insta-badge{position:absolute;top:8px;right:8px;background:rgba(30,41,59,0.8);backdrop-filter:blur(8px);color:white;font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.08em}
+          .md-insta-acts{display:flex;gap:10px;padding:8px 10px;align-items:center}
+          .md-toast{position:absolute;top:16px;right:16px;background:white;border-radius:12px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,0.1);border:1px solid #e2e8f0;z-index:30;opacity:0;transform:translateY(-10px);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275)}
+          .md-toast.show{opacity:1;transform:translateY(0)}
+          .md-trophy-stack{position:absolute;top:70px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:30}
+          .md-trophy{background:white;border-radius:12px;padding:8px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,0.1);border:1px solid #e2e8f0;opacity:0;transform:translateX(20px);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275)}
+          .md-trophy.show{opacity:1;transform:translateX(0)}
+          @media(max-width:768px){
+            .md-showcase{min-height:560px;max-width:340px;margin:0 auto;border:10px solid #1e293b;border-radius:3rem;height:620px}
+             .md-topbar{padding:18px 20px 10px;justify-content:center;background:transparent;border:0}
+             .md-topbar .md-dots-wrap, .md-topbar span{display:none !important}
+             .md-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:24px;background:#1e293b;border-bottom-left-radius:1rem;border-bottom-right-radius:1rem;z-index:60}
+            .md-home-indicator{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:100px;height:4px;background:#e2e8f0;border-radius:2px;z-index:60}
+            .md-content{padding:1rem}
+            .md-mic{width:64px;height:64px}
+            .md-wave{height:40px}
+            .md-types{grid-template-columns:repeat(2,1fr);max-width:280px;gap:10px}
+            .md-type{padding:12px 8px}
+            .md-upload{max-width:220px}
+            .md-insta{transform:scale(0.8);margin-top:-30px}
+            .md-cursor{width:16px;height:16px}
+            .md-trophy-stack{top:70px;bottom:auto;right:16px;left:auto;flex-direction:column;align-items:flex-end;pointer-events:none}
+            .md-trophy{padding:6px 10px;font-size:10px}
+          }
+          @media(max-width:480px){
+            .md-showcase{height:600px;max-width:300px;border-width:8px}
+            .md-notch{width:100px;height:20px}
+            .md-insta{transform:scale(0.7);margin-top:-50px}
+          }
+        </style>
+        <section class="relative z-20 pb-20 -mt-8 sm:-mt-16"
+                 x-data="demoShowcase()"
+                 x-init="$nextTick(() => { setTimeout(() => startAnimation(), 800) })"
+                 x-intersect:enter.half="startAnimation()"
+                 x-intersect:leave="stopAnimation()">
+          <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="md-showcase" x-ref="showcase">
+
+              <!-- Cursor -->
+              <div class="md-cursor" x-show="cursorVisible"
+                   :style="`left:${cursorX}px;top:${cursorY}px;transition:left ${cursorSpeed}s cubic-bezier(0.4,0,0.2,1),top ${cursorSpeed}s cubic-bezier(0.4,0,0.2,1)`">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87a.5.5 0 0 0 .35-.85L6.35 2.86a.5.5 0 0 0-.85.35Z" fill="#1E293B" stroke="white" stroke-width="1.5"/></svg>
+              </div>
+
+              <!-- Click -->
+              <div class="md-click" :style="`left:${clickX}px;top:${clickY}px`" :class="showClick ? 'pop' : ''"></div>
+
+              <!-- SCENE 1: Vocal -->
+              <div class="md-scene" :class="currentScene === 1 ? 'active' : ''">
+                <div class="md-topbar">
+                  <div class="md-dots-wrap" style="display:flex;gap:6px">
+                    <div class="md-dot" style="background:#f87171"></div>
+                    <div class="md-dot" style="background:#fbbf24"></div>
+                    <div class="md-dot" style="background:#4ade80"></div>
+                  </div>
+                  <div class="md-notch"></div>
+                  <span style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-left:auto" x-text="sceneLabel"></span>
+                </div>
+                <div class="md-home-indicator"></div>
+                <div class="md-content">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:1.25rem;width:100%;max-width:380px">
+                    <div style="font-size:13px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.08em">Étape 1 · Enregistrer un vocal</div>
+                    <div class="md-mic" :class="isRecording ? 'rec' : ''">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                    </div>
+                    <div class="md-wave" x-show="isRecording" x-transition>
+                      <template x-for="(h,i) in waveformHeights" :key="i"><div class="md-wave-bar" :style="`height:${h}%`"></div></template>
+                    </div>
+                    <div class="md-transcript" x-show="transcriptText.length > 0" x-transition>
+                      <span x-text="transcriptText"></span><span style="display:inline-block;width:2px;height:16px;background:#f59e0b;margin-left:2px;animation:mdPulse 1s infinite" x-show="isRecording"></span>
                     </div>
                   </div>
                 </div>
-                <span class="text-[10px] sm:text-sm font-semibold text-slate-700 uppercase tracking-wider">1. Photo</span>
               </div>
 
-              <i data-lucide="arrow-right" class="w-4 h-4 sm:w-8 sm:h-8 text-slate-300 flex-shrink-0"></i>
-
-              <!-- Step 2: Vocal -->
-              <div class="flex-1 flex flex-col items-center gap-3 sm:gap-4">
-                <div class="w-full max-w-[80px] sm:max-w-[140px] aspect-square rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 flex flex-col items-center justify-center shadow-sm relative overflow-hidden">
-                  <div class="w-8 h-8 sm:w-12 sm:h-12 bg-amber-100 rounded-full flex items-center justify-center mb-1 sm:mb-2 text-amber-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 sm:w-6 sm:h-6"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+              <!-- SCENE 2: Type -->
+              <div class="md-scene" :class="currentScene === 2 ? 'active' : ''">
+                <div class="md-topbar">
+                  <div class="md-dots-wrap" style="display:flex;gap:6px">
+                    <div class="md-dot" style="background:#f87171"></div>
+                    <div class="md-dot" style="background:#fbbf24"></div>
+                    <div class="md-dot" style="background:#4ade80"></div>
                   </div>
-                  <div class="flex items-center gap-0.5 sm:gap-1 h-4 sm:h-6">
-                     @foreach([40, 80, 60, 100, 50, 70, 40] as $h)
-                       <div class="w-1 sm:w-1.5 bg-amber-400 rounded-full" style="height: {{ $h }}%"></div>
-                     @endforeach
+                  <div class="md-notch"></div>
+                  <span style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-left:auto" x-text="sceneLabel"></span>
+                </div>
+                <div class="md-home-indicator"></div>
+                <div class="md-content">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;width:100%">
+                    <div style="font-size:13px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.08em">Étape 2 · Choisir le type</div>
+                    <div class="md-types">
+                      <div class="md-type" :class="selectedType==='avant-apres'?'sel':''">
+                        <div class="md-type-ico"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="12" x2="12" y1="3" y2="21"/></svg></div>
+                        <span class="md-type-lbl">Avant / Après</span>
+                      </div>
+                      <div class="md-type" :class="selectedType==='conseil'?'sel':''">
+                        <div class="md-type-ico"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+                        <span class="md-type-lbl">Conseil</span>
+                      </div>
+                      <div class="md-type" :class="selectedType==='citation'?'sel':''">
+                        <div class="md-type-ico"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3"/></svg></div>
+                        <span class="md-type-lbl">Citation</span>
+                      </div>
+                      <div class="md-type" :class="selectedType==='astuce'?'sel':''">
+                        <div class="md-type-ico"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></div>
+                        <span class="md-type-lbl">Astuce</span>
+                      </div>
+                      <div class="md-type" :class="selectedType==='faq'?'sel':''">
+                        <div class="md-type-ico"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></div>
+                        <span class="md-type-lbl">FAQ</span>
+                      </div>
+                      <div class="md-type" :class="selectedType==='chiffre'?'sel':''">
+                        <div class="md-type-ico"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg></div>
+                        <span class="md-type-lbl">Chiffre clé</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <span class="text-[10px] sm:text-sm font-semibold text-slate-700 uppercase tracking-wider">2. Vocal</span>
               </div>
 
-              <i data-lucide="arrow-right" class="w-4 h-4 sm:w-8 sm:h-8 text-slate-300 flex-shrink-0"></i>
-
-              <!-- Step 3: Publié -->
-              <div class="flex-1 flex flex-col items-center gap-3 sm:gap-4">
-                <div class="w-full max-w-[80px] sm:max-w-[140px] aspect-square rounded-2xl bg-white border border-slate-100 shadow-sm flex flex-col p-2 sm:p-3">
-                  <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
-                    <div class="w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-slate-200"></div>
-                    <div class="w-10 sm:w-16 h-1.5 sm:h-2 rounded-full bg-slate-200"></div>
+              <!-- SCENE 3: Photo -->
+              <div class="md-scene" :class="currentScene === 3 ? 'active' : ''">
+                <div class="md-topbar">
+                  <div class="md-dots-wrap" style="display:flex;gap:6px">
+                    <div class="md-dot" style="background:#f87171"></div>
+                    <div class="md-dot" style="background:#fbbf24"></div>
+                    <div class="md-dot" style="background:#4ade80"></div>
                   </div>
-                  <div class="flex-1 rounded sm:rounded-lg bg-slate-100 mb-1.5 sm:mb-2 overflow-hidden relative">
-                     <img src="https://picsum.photos/seed/chantier/200/200" alt="Post" class="w-full h-full object-cover">
-                     <div class="absolute bottom-1 left-1 bg-slate-900/60 backdrop-blur-sm px-1 sm:px-1.5 py-0.5 rounded text-[5px] sm:text-[7px] text-white font-medium">Avant / Après</div>
-                  </div>
-                  <div class="flex gap-1 sm:gap-1.5 items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#EF4444" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-                    <div class="w-8 sm:w-12 h-1 sm:h-1.5 rounded-full bg-slate-200"></div>
+                  <div class="md-notch"></div>
+                  <span style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-left:auto" x-text="sceneLabel"></span>
+                </div>
+                <div class="md-home-indicator"></div>
+                <div class="md-content">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;width:100%">
+                    <div style="font-size:13px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.08em">Étape 3 · Ajouter une photo</div>
+                    <div class="md-upload" :class="hasPhoto ? 'filled' : ''" style="display:flex;align-items:center;justify-content:center">
+                      <div x-show="!hasPhoto" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#94a3b8;width:100%">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        <span style="display:block;width:100%;font-size:13px;font-weight:500;text-align:center">Cliquez pour importer</span>
+                      </div>
+                      <img src="https://picsum.photos/seed/verriere-final/500/500" alt="Photo chantier" :class="hasPhoto ? 'show' : ''">
+                    </div>
                   </div>
                 </div>
-                <span class="text-[10px] sm:text-sm font-semibold text-amber-600 uppercase tracking-wider">3. Publié</span>
+              </div>
+
+              <!-- SCENE 4: AI Loading -->
+              <div class="md-scene" :class="currentScene === 4 ? 'active' : ''">
+                <div class="md-topbar">
+                  <div class="md-dots-wrap" style="display:flex;gap:6px">
+                    <div class="md-dot" style="background:#f87171"></div>
+                    <div class="md-dot" style="background:#fbbf24"></div>
+                    <div class="md-dot" style="background:#4ade80"></div>
+                  </div>
+                  <div class="md-notch"></div>
+                  <span style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-left:auto" x-text="sceneLabel"></span>
+                </div>
+                <div class="md-home-indicator"></div>
+                <div class="md-content">
+                  <div class="md-sparkle"></div><div class="md-sparkle"></div><div class="md-sparkle"></div><div class="md-sparkle"></div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:1.25rem">
+                    <div class="md-spinner"></div>
+                    <div style="font-size:15px;font-weight:500;color:#1e293b">Postelio rédige votre post<span style="animation:mdDots 1.5s steps(4) infinite">&nbsp;</span></div>
+                    <div style="font-size:12px;color:#94a3b8">Rédaction du texte, choix des hashtags, mise en page...</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SCENE 5: Instagram Post -->
+              <div class="md-scene" :class="currentScene === 5 ? 'active' : ''">
+                <div class="md-topbar">
+                  <div class="md-dots-wrap" style="display:flex;gap:6px">
+                    <div class="md-dot" style="background:#f87171"></div>
+                    <div class="md-dot" style="background:#fbbf24"></div>
+                    <div class="md-dot" style="background:#4ade80"></div>
+                  </div>
+                  <div class="md-notch"></div>
+                  <span style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-left:auto" x-text="sceneLabel"></span>
+                </div>
+                <div class="md-home-indicator"></div>
+                <div class="md-content" style="justify-content:center">
+                  <div class="md-insta"
+                       :style="showInstaPost ? 'opacity:1;transform:translateY(0) scale(1)' : 'opacity:0;transform:translateY(20px) scale(0.95)'"
+                       style="transition:all 0.6s cubic-bezier(0.175,0.885,0.32,1.275)">
+                    <div class="md-insta-head">
+                      <div class="md-insta-av"></div>
+                      <div>
+                        <div style="font-size:11px;font-weight:700;color:#1e293b">Menuiserie Thomas</div>
+                        <div style="font-size:9px;color:#94a3b8">Lyon, France</div>
+                      </div>
+                    </div>
+                    <div style="position:relative">
+                      <img src="https://picsum.photos/seed/verriere-final/500/500" alt="Post" class="md-insta-img">
+                      <div class="md-insta-badge">Avant / Après</div>
+                    </div>
+                    <div class="md-insta-acts">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#EF4444" stroke="#EF4444" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e293b" stroke-width="2"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e293b" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                    </div>
+                    <div style="font-size:11px;font-weight:700;color:#1e293b;padding:0 10px"><span x-text="likeCount"></span> J'aime</div>
+                    <div style="font-size:10px;color:#334155;padding:4px 10px 8px;line-height:1.6">
+                      <strong style="color:#1e293b">Menuiserie Thomas</strong> Création et pose d'une verrière sur-mesure en acier thermolaqué noir. Une transformation lumineuse ! 🔨✨
+                      <br><span style="color:#3b82f6;font-weight:500">#menuiserie #artisan #verriere #lyon #renovation</span>
+                    </div>
+                    <div style="font-size:8px;color:#94a3b8;padding:0 10px 8px;text-transform:uppercase;letter-spacing:0.05em">Il y a quelques secondes</div>
+                  </div>
+
+                  <div class="md-toast" :class="showSuccessToast ? 'show' : ''">
+                    <div style="width:28px;height:28px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;color:#16a34a;flex-shrink:0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span style="font-size:12px;font-weight:600;color:#1e293b;white-space:nowrap">Publié sur Instagram ✓</span>
+                  </div>
+
+                  <div class="md-trophy-stack">
+                    <template x-for="(t, index) in trophyToasts" :key="index">
+                      <div class="md-trophy" :class="t.show ? 'show' : ''">
+                        <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:18px">🏆</div>
+                        <span style="font-size:12px;font-weight:700;color:#1e293b;white-space:nowrap">Nouveau devis !</span>
+                      </div>
+                    </template>
+                  </div>
+                </div>
               </div>
 
             </div>
           </div>
         </section>
+
+        <script>
+        function demoShowcase() {
+            return {
+                currentScene: 0, cursorX: 100, cursorY: 100, cursorSpeed: 0.6, cursorVisible: false,
+                clickX: 0, clickY: 0, showClick: false, sceneLabel: '',
+                isRecording: false, waveformHeights: Array(20).fill(15), transcriptText: '',
+                selectedType: '', hasPhoto: false, showInstaPost: false, showSuccessToast: false,
+                likeCount: 0, trophyToasts: [], animationRunning: false, animationTimer: null, waveformInterval: null,
+                fullTranscript: "On a terminé la pose de la verrière chez le client, du sur-mesure en acier noir, le rendu est super propre.",
+
+                startAnimation() {
+                    if (this.animationRunning) return;
+                    this.animationRunning = true;
+                    this.runLoop();
+                },
+                stopAnimation() {
+                    this.animationRunning = false;
+                    if (this.animationTimer) clearTimeout(this.animationTimer);
+                    if (this.waveformInterval) clearInterval(this.waveformInterval);
+                },
+                async runLoop() {
+                    while (this.animationRunning) {
+                        await this.reset();
+                        await this.scene1(); if (!this.animationRunning) break;
+                        await this.scene2(); if (!this.animationRunning) break;
+                        await this.scene3(); if (!this.animationRunning) break;
+                        await this.scene4(); if (!this.animationRunning) break;
+                        await this.scene5(); if (!this.animationRunning) break;
+                        await this.wait(2000);
+                    }
+                },
+                async reset() {
+                    this.currentScene = 0; this.cursorVisible = false; this.isRecording = false;
+                    this.transcriptText = ''; this.selectedType = ''; this.hasPhoto = false;
+                    this.showInstaPost = false; this.showSuccessToast = false; this.likeCount = 0;
+                    this.sceneLabel = ''; this.waveformHeights = Array(20).fill(15); this.trophyToasts = [];
+                    if (this.waveformInterval) clearInterval(this.waveformInterval);
+                    await this.wait(300);
+                },
+                async scene1() {
+                    this.currentScene = 1; this.sceneLabel = '01 · Enregistrement vocal';
+                    await this.wait(500);
+                    this.cursorVisible = true;
+                    const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
+                    this.cursorX = sw * 0.3; this.cursorY = sh * 0.3;
+                    await this.wait(100);
+                    this.cursorSpeed = 0.6; this.cursorX = sw * 0.5;
+                    this.cursorY = sw < 600 ? sh * 0.52 : sh * 0.54;
+                    await this.wait(700);
+                    await this.doClick(this.cursorX, this.cursorY);
+                    this.isRecording = true;
+                    this.waveformInterval = setInterval(() => {
+                        this.waveformHeights = this.waveformHeights.map(() => Math.floor(Math.random() * 70) + 20);
+                    }, 150);
+                    const words = this.fullTranscript.split(' ');
+                    for (let i = 0; i < words.length; i++) {
+                        if (!this.animationRunning) return;
+                        this.transcriptText += (i > 0 ? ' ' : '"') + words[i];
+                        await this.wait(70);
+                    }
+                    this.transcriptText += '"'; await this.wait(300);
+                    this.isRecording = false;
+                    if (this.waveformInterval) clearInterval(this.waveformInterval);
+                    await this.wait(500);
+                },
+                async scene2() {
+                    this.currentScene = 2; this.sceneLabel = '02 · Type de post';
+                    await this.wait(500);
+                    const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
+                    this.cursorSpeed = 0.5; 
+                    this.cursorX = sw < 600 ? sw * 0.28 : sw * 0.35;
+                    this.cursorY = sw < 600 ? sh * 0.42 : sh * 0.45;
+                    await this.wait(600);
+                    await this.doClick(this.cursorX, this.cursorY);
+                    this.selectedType = 'avant-apres'; await this.wait(1000);
+                },
+                async scene3() {
+                    this.currentScene = 3; this.sceneLabel = '03 · Photo du chantier';
+                    await this.wait(500);
+                    const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
+                    this.cursorSpeed = 0.4; this.cursorX = sw * 0.5; this.cursorY = sh * 0.55;
+                    await this.wait(500);
+                    await this.doClick(this.cursorX, this.cursorY);
+                    this.hasPhoto = true; await this.wait(1000);
+                },
+                async scene4() {
+                    this.currentScene = 4; this.sceneLabel = '04 · Génération IA';
+                    this.cursorVisible = false; await this.wait(2300);
+                },
+                async scene5() {
+                    this.currentScene = 5; this.sceneLabel = '05 · Publication IG';
+                    await this.wait(500);
+                    this.showInstaPost = true;
+                    const target = 42; const steps = 20;
+                    for (let i = 0; i <= steps; i++) {
+                        if (!this.animationRunning) return;
+                        this.likeCount = Math.round((target / steps) * i); await this.wait(35);
+                    }
+                    await this.wait(400); this.showSuccessToast = true;
+                    await this.wait(700); this.trophyToasts.push({show: false}); 
+                    setTimeout(() => { if(this.trophyToasts[0]) this.trophyToasts[0].show = true; }, 10);
+                    await this.wait(500); this.trophyToasts.push({show: false});
+                    setTimeout(() => { if(this.trophyToasts[1]) this.trophyToasts[1].show = true; }, 10);
+                    await this.wait(500); this.trophyToasts.push({show: false});
+                    setTimeout(() => { if(this.trophyToasts[2]) this.trophyToasts[2].show = true; }, 10);
+                },
+                async doClick(x, y) {
+                    this.clickX = x; this.clickY = y; this.showClick = false;
+                    await this.wait(50); this.showClick = true; await this.wait(350);
+                    this.showClick = false;
+                },
+                wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+            };
+        }
+
+        function audioPreview() {
+            return {
+                progress: 0, isPlaying: false, displayedText: '',
+                fullText: "Euh voilà, on a fini la pose de la verrière chez le client à Lyon, c'est du sur-mesure en acier noir, le rendu est super propre.",
+                waveform: [30, 40, 60, 80, 100, 70, 50, 40, 60, 90, 80, 50, 30, 40, 70, 100, 80, 60, 40, 30, 50, 70, 90, 60, 40, 35, 25, 35, 45, 25],
+                start() {
+                    if (this.isPlaying) { this.isPlaying = false; return; }
+                    this.isPlaying = true; this.run();
+                },
+                run() {
+                    this.progress = 0; this.displayedText = '';
+                    const words = this.fullText.split(' ');
+                    const duration = 3000; const startTime = Date.now();
+                    const interval = setInterval(() => {
+                        if (!this.isPlaying) { clearInterval(interval); return; }
+                        const elapsed = Date.now() - startTime;
+                        this.progress = Math.min((elapsed / duration) * 100, 100);
+                        const wordCount = Math.floor((this.progress / 100) * words.length);
+                        this.displayedText = words.slice(0, wordCount + 1).join(' ');
+                        if (this.progress >= 100) { 
+                            clearInterval(interval);
+                            setTimeout(() => { if (this.isPlaying) this.run(); }, 2000);
+                        }
+                    }, 30);
+                }
+            }
+        }
+        </script>
 
         <!-- Phone Mockup Section -->
         <section class="py-24 overflow-hidden relative">
@@ -237,34 +594,36 @@
                   Fini le syndrome de la page blanche. Postelio transforme votre simple note vocale en une publication professionnelle, engageante, avec les bons hashtags et emojis.
                 </p>
                 
-                <div class="max-w-md mx-auto lg:mx-0 bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-200/60 relative">
+                <div class="max-w-md mx-auto lg:mx-0 bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-200/60 relative"
+                     x-data="audioPreview()"
+                     x-intersect:enter="start()">
                   <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center shadow-sm cursor-pointer hover:scale-105 transition-transform text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-0.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      <div @click="start()" class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center shadow-sm cursor-pointer hover:scale-105 transition-transform text-white">
+                        <svg x-show="!isPlaying" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-0.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        <svg x-show="isPlaying" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="10" y1="4" y2="20"/><line x1="14" x2="14" y1="4" y2="20"/></svg>
                       </div>
                       <div class="text-left">
                         <span class="block text-sm font-semibold text-midnight">Note vocale</span>
                         <span class="block text-xs text-slate-500">00:12</span>
                       </div>
                     </div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" :style="isPlaying ? 'color:#f59e0b;animation:mdPulse 1.5s infinite' : ''"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
                   </div>
                   
-                  <!-- Fake Waveform -->
+                  <!-- Animated Waveform -->
                   <div class="flex items-center gap-1.5 mb-6 h-10 w-full px-2">
-                    @foreach([30, 40, 60, 80, 100, 70, 50, 40, 60, 90, 80, 50, 30, 40, 70, 100, 80, 60, 40, 30] as $h)
-                      <div class="flex-1 bg-amber-500/40 rounded-full min-w-[2px]" style="height: {{ $h }}%"></div>
-                    @endforeach
-                    <div class="flex-1 h-full bg-amber-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)] min-w-[4px]"></div>
-                    @foreach([50, 70, 90, 60, 40, 30, 20, 30, 40, 20] as $h)
-                      <div class="flex-1 bg-slate-300 rounded-full min-w-[2px]" style="height: {{ $h }}%"></div>
-                    @endforeach
+                    <template x-for="(h, i) in waveform" :key="i">
+                        <div class="flex-1 rounded-full min-w-[2px] transition-colors duration-300" 
+                             :style="`height: ${h}%; background-color: ${ (i / waveform.length * 100) <= progress ? '#f59e0b' : '#e2e8f0' }`">
+                        </div>
+                    </template>
                   </div>
 
-                  <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left">
+                  <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left min-h-[80px] flex align-center">
                     <p class="text-midnight font-medium leading-relaxed text-sm">
-                      "Euh voilà, on a fini la pose de la verrière chez le client à Lyon, c'est du sur-mesure en acier noir, le rendu est super propre."
+                      "<span x-text="displayedText"></span>"
+                      <span class="inline-block w-0.5 h-4 bg-amber-500 ml-1" style="vertical-align: middle; animation: mdPulse 1s infinite" x-show="isPlaying"></span>
                     </p>
                   </div>
                 </div>
@@ -321,12 +680,21 @@
                   </div>
                 </div>
                 
-                <div class="absolute -right-4 sm:-right-8 top-24 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-20 animate-bounce" style="animation-duration: 3s;">
+                <div class="absolute right-0 sm:right-4 top-40 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-30 animate-bounce" style="animation-duration: 3s;">
                   <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                       <i data-lucide="check" class="w-4 h-4"></i>
                     </div>
                     <div class="text-xs font-medium text-slate-700">Publié avec succès</div>
+                  </div>
+                </div>
+
+                <div class="absolute left-0 sm:left-4 top-[45%] -translate-y-1/2 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-30 animate-bounce" style="animation-duration: 4s;">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                      <i data-lucide="file-text" class="w-4 h-4"></i>
+                    </div>
+                    <div class="text-xs font-medium text-slate-700">Nouveau devis ! 🏆</div>
                   </div>
                 </div>
               </div>

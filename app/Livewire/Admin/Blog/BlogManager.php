@@ -1,0 +1,164 @@
+<?php
+
+namespace App\Livewire\Admin\Blog;
+
+use App\Models\BlogPost;
+use Livewire\Attributes\Layout;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+use Livewire\WithPagination;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+#[Layout('layouts.app')]
+class BlogManager extends Component
+{
+    use WithFileUploads, WithPagination;
+
+    public $title = '';
+    public $content = '';
+    public $excerpt = '';
+    public $meta_title = '';
+    public $meta_description = '';
+    public $meta_keywords = '';
+    public $status = 'draft';
+    public $published_at;
+    public $featured_image_upload;
+    public $existing_featured_image = '';
+
+    public $isEditing = false;
+    public $editingId = null;
+    public $showForm = false;
+    public $search = '';
+
+    protected function rules()
+    {
+        return [
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'excerpt' => 'nullable|string|max:500',
+            'meta_title' => 'nullable|string|max:70',
+            'meta_description' => 'nullable|string|max:160',
+            'meta_keywords' => 'nullable|string|max:255',
+            'status' => 'required|in:draft,published',
+            'published_at' => 'nullable|date',
+            'featured_image_upload' => 'nullable|image|max:2048',
+        ];
+    }
+
+    public function mount()
+    {
+        $this->published_at = Carbon::now()->format('Y-m-d');
+    }
+
+    public function toggleForm()
+    {
+        $this->showForm = !$this->showForm;
+        if (!$this->showForm) {
+            $this->resetFields();
+        }
+    }
+
+    public function resetFields()
+    {
+        $this->title = '';
+        $this->content = '';
+        $this->excerpt = '';
+        $this->meta_title = '';
+        $this->meta_description = '';
+        $this->meta_keywords = '';
+        $this->status = 'draft';
+        $this->published_at = Carbon::now()->format('Y-m-d');
+        $this->featured_image_upload = null;
+        $this->existing_featured_image = '';
+        $this->isEditing = false;
+        $this->editingId = null;
+    }
+
+    public function save()
+    {
+        $this->validate();
+
+        $data = [
+            'title' => $this->title,
+            'content' => $this->content,
+            'excerpt' => $this->excerpt ?: \Illuminate\Support\Str::limit(strip_tags($this->content), 200),
+            'meta_title' => $this->meta_title ?: $this->title,
+            'meta_description' => $this->meta_description ?: \Illuminate\Support\Str::limit(strip_tags($this->content), 155),
+            'meta_keywords' => $this->meta_keywords,
+            'status' => $this->status,
+            'published_at' => $this->status === 'published' ? ($this->published_at ?? now()) : null,
+            'read_time' => BlogPost::estimateReadTime($this->content),
+        ];
+
+        if ($this->featured_image_upload) {
+            if ($this->isEditing && $this->existing_featured_image) {
+                Storage::disk('public')->delete($this->existing_featured_image);
+            }
+            $data['featured_image'] = $this->featured_image_upload->store('blog', 'public');
+        }
+
+        if ($this->isEditing) {
+            $post = BlogPost::findOrFail($this->editingId);
+            $data['slug'] = BlogPost::generateSlug($this->title, $this->editingId);
+            $post->update($data);
+            $this->dispatch('notify', 'Article mis à jour.');
+        } else {
+            $data['user_id'] = Auth::id();
+            $data['slug'] = BlogPost::generateSlug($this->title);
+            BlogPost::create($data);
+            $this->dispatch('notify', 'Article créé.');
+        }
+
+        $this->resetFields();
+        $this->showForm = false;
+    }
+
+    public function edit($id)
+    {
+        $post = BlogPost::findOrFail($id);
+        $this->editingId = $id;
+        $this->title = $post->title;
+        $this->content = $post->content;
+        $this->excerpt = $post->excerpt;
+        $this->meta_title = $post->meta_title;
+        $this->meta_description = $post->meta_description;
+        $this->meta_keywords = $post->meta_keywords;
+        $this->status = $post->status;
+        $this->published_at = $post->published_at ? Carbon::parse($post->published_at)->format('Y-m-d') : Carbon::now()->format('Y-m-d');
+        $this->existing_featured_image = $post->featured_image;
+        $this->isEditing = true;
+        $this->showForm = true;
+    }
+
+    public function delete($id)
+    {
+        $post = BlogPost::findOrFail($id);
+        if ($post->featured_image) {
+            Storage::disk('public')->delete($post->featured_image);
+        }
+        $post->delete();
+        $this->dispatch('notify', 'Article supprimé.');
+    }
+
+    public function toggleStatus($id)
+    {
+        $post = BlogPost::findOrFail($id);
+        if ($post->status === 'draft') {
+            $post->update(['status' => 'published', 'published_at' => $post->published_at ?? now()]);
+        } else {
+            $post->update(['status' => 'draft']);
+        }
+    }
+
+    public function render()
+    {
+        $posts = BlogPost::query()
+            ->when($this->search, fn($q) => $q->where('title', 'like', "%{$this->search}%"))
+            ->orderByDesc('created_at')
+            ->paginate(15);
+
+        return view('livewire.admin.blog.blog-manager', compact('posts'));
+    }
+}

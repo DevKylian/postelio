@@ -42,7 +42,7 @@ if [ "$LOCAL" = "$REMOTE" ]; then
 fi
 
 PREV_COMMIT=$(git rev-parse --short HEAD)
-git pull origin "$GITHUB_BRANCH" --quiet
+git reset --hard "origin/${GITHUB_BRANCH}" --quiet
 NEW_COMMIT=$(git rev-parse --short HEAD)
 log "Mise à jour : ${PREV_COMMIT} → ${NEW_COMMIT}"
 

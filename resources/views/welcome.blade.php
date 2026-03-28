@@ -1117,11 +1117,9 @@
                 La solution intelligente pour les artisans qui veulent transformer leurs chantiers en aimants à clients.
               </p>
               <div class="flex gap-4">
-                @foreach(['instagram', 'facebook', 'linkedin'] as $social)
-                  <a href="#" class="w-9 h-9 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-copper hover:border-copper/20 hover:bg-amber-50 transition-all">
-                    <i data-lucide="{{ $social }}" class="w-4 h-4"></i>
-                  </a>
-                @endforeach
+                <a href="https://instagram.com/postelio.app" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-copper hover:border-copper/20 hover:bg-amber-50 transition-all">
+                  <i data-lucide="instagram" class="w-4 h-4"></i>
+                </a>
               </div>
             </div>
 

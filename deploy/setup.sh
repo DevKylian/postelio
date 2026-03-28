@@ -587,9 +587,24 @@ git reset --hard "origin/${GITHUB_BRANCH}" --quiet
 NEW_COMMIT=\$(git rev-parse --short HEAD)
 log "Mise à jour : \${PREV_COMMIT} → \${NEW_COMMIT}"
 
+# --- Vérification extensions PHP requises ------------------------------------
+REQUIRED_EXTS="bcmath mbstring xml curl gd zip intl tokenizer fileinfo"
+MISSING_EXTS=""
+for ext in \$REQUIRED_EXTS; do
+    if ! \$PHP -m 2>/dev/null | grep -qi "^\${ext}\$"; then
+        MISSING_EXTS="\${MISSING_EXTS} php8.3-\${ext}"
+    fi
+done
+if [ -n "\$MISSING_EXTS" ]; then
+    fail "Extensions PHP manquantes :\${MISSING_EXTS} — Installer avec : sudo apt-get install\${MISSING_EXTS}"
+fi
+
 # --- Dépendances PHP ---------------------------------------------------------
 log "composer install..."
-composer install --no-dev --optimize-autoloader --no-interaction --quiet
+if ! composer install --no-dev --optimize-autoloader --no-interaction --quiet 2>&1; then
+    log "composer install échoué — tentative composer update..."
+    composer update --no-dev --optimize-autoloader --no-interaction --quiet
+fi
 
 # --- Frontend (seulement si des fichiers JS/CSS ont changé) -----------------
 FRONTEND_CHANGED=\$(git diff "\${PREV_COMMIT}" "\${NEW_COMMIT}" --name-only 2>/dev/null \

@@ -82,28 +82,54 @@
                         @error('excerpt') <span class="text-rose-500 text-xs font-bold px-1">{{ $message }}</span> @enderror
                     </div>
 
-                    {{-- Content (Trix Editor) --}}
+                    {{-- Content (Trix Editor + HTML Mode) --}}
                     <div class="space-y-2"
                          x-data="{
                             content: @entangle('content'),
+                            htmlMode: false,
                             isFocused: false
                          }"
                          x-init="
                             $refs.trix.editor.loadHTML(content);
                             $watch('content', value => {
-                                if (value !== $refs.trix.editor.getHTML()) {
+                                if (!htmlMode && value !== $refs.trix.editor.getHTML()) {
                                     $refs.trix.editor.loadHTML(value);
                                 }
                             })
                          "
-                         @trix-change="content = $event.target.value"
+                         @trix-change="if (!htmlMode) content = $event.target.value"
                          wire:ignore>
-                        <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">Contenu de l'article</label>
+                        <div class="flex items-center justify-between px-1">
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Contenu de l'article</label>
+                            <button type="button"
+                                    @click="
+                                        htmlMode = !htmlMode;
+                                        if (!htmlMode) {
+                                            $refs.trix.editor.loadHTML($refs.htmlTextarea.value);
+                                            content = $refs.trix.editor.getHTML();
+                                        } else {
+                                            $refs.htmlTextarea.value = content;
+                                        }
+                                    "
+                                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all"
+                                    :class="htmlMode ? 'bg-copper/10 text-copper' : 'bg-slate-100 text-slate-400 hover:text-slate-600'">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                                <span x-text="htmlMode ? 'Mode visuel' : 'Mode HTML'"></span>
+                            </button>
+                        </div>
                         <input id="blog-content" type="hidden" name="content">
-                        <trix-editor input="blog-content"
-                                     x-ref="trix"
-                                     placeholder="Rédigez votre article ici..."
-                                     class="w-full bg-white/50 border-slate-100 rounded-[2rem] p-6 text-sm font-medium text-slate-600 focus:ring-2 focus:ring-copper/20 focus:border-copper transition-all outline-none leading-relaxed min-h-[400px]"></trix-editor>
+                        <div x-show="!htmlMode">
+                            <trix-editor input="blog-content"
+                                         x-ref="trix"
+                                         placeholder="Rédigez votre article ici..."
+                                         class="w-full bg-white/50 border-slate-100 rounded-[2rem] p-6 text-sm font-medium text-slate-600 focus:ring-2 focus:ring-copper/20 focus:border-copper transition-all outline-none leading-relaxed min-h-[400px]"></trix-editor>
+                        </div>
+                        <div x-show="htmlMode" x-cloak>
+                            <textarea x-ref="htmlTextarea"
+                                      @input="content = $event.target.value"
+                                      placeholder="Collez votre code HTML ici..."
+                                      class="w-full bg-slate-900 text-green-400 border-slate-700 rounded-[2rem] p-6 text-sm font-mono focus:ring-2 focus:ring-copper/20 focus:border-copper transition-all outline-none leading-relaxed min-h-[400px] resize-y"></textarea>
+                        </div>
                         @error('content') <span class="text-rose-500 text-xs font-bold px-1">{{ $message }}</span> @enderror
                     </div>
 

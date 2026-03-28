@@ -73,9 +73,11 @@
     }
 
     .text-gradient-copper {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600;
-        padding-bottom: 0.15em;
-        padding-right: 0.05em;
+        @apply bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
         box-decoration-break: clone;
         -webkit-box-decoration-break: clone;
     }

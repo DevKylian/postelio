@@ -953,11 +953,7 @@
               </div>
 
               {{-- Offre Basic --}}
-              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ring-2 ring-copper/20">
-                <div class="absolute top-0 right-0 bg-copper text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm">
-                  Populaire
-                </div>
-
+              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                 <div class="p-8 flex flex-col flex-grow">
                   <div class="mb-8">
                     <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-midnight/5 text-midnight">
@@ -996,11 +992,11 @@
 
                   <div class="mt-auto">
                     @auth
-                      <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
+                      <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl">
                         Accéder à mon compte
                       </a>
                     @else
-                      <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
+                      <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl">
                         Commencer gratuitement
                       </a>
                     @endauth
@@ -1009,7 +1005,11 @@
               </div>
 
               {{-- Offre Professionnel --}}
-              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ring-2 ring-copper/20">
+                <div class="absolute top-0 right-0 bg-copper text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm">
+                  Meilleure offre
+                </div>
+
                 <div class="p-8 flex flex-col flex-grow">
                   <div class="mb-8">
                     <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-amber-100 text-copper rotate-3">
@@ -1040,11 +1040,11 @@
 
                   <div class="mt-auto">
                     @auth
-                      <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl">
+                      <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
                         Accéder à mon compte
                       </a>
                     @else
-                      <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl">
+                      <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
                         Commencer gratuitement
                       </a>
                     @endauth

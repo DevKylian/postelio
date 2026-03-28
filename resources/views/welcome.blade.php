@@ -1060,7 +1060,11 @@
 
         <!-- Blog Articles -->
         @php
-            $latestPosts = \App\Models\BlogPost::published()->orderByDesc('published_at')->limit(3)->get();
+            try {
+                $latestPosts = \App\Models\BlogPost::published()->orderByDesc('published_at')->limit(3)->get();
+            } catch (\Exception $e) {
+                $latestPosts = collect();
+            }
         @endphp
         @if($latestPosts->count())
         <section class="py-32 border-t border-slate-200/40">

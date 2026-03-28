@@ -616,7 +616,7 @@
                   L'IA qui rédige pour vous
                 </div>
                 <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">
-                  Un rendu <span class="text-gradient-copper italic">impeccable</span>, à chaque fois.
+                  Un rendu <span class="text-gradient-copper italic pr-1 -mr-1">impeccable</span>, à chaque fois.
                 </h2>
                 <p class="text-lg text-slate-600 font-light leading-relaxed mb-12">
                   Fini le syndrome de la page blanche. Postelio transforme votre simple note vocale en une publication professionnelle, engageante, avec les bons hashtags et emojis.

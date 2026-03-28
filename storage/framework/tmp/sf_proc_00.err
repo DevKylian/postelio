@@ -1,13 +1,13 @@
-[Sat Mar 28 18:31:00 2026] PHP 8.4.12 Development Server (http://127.0.0.1:8000) started
-[Sat Mar 28 18:31:03 2026] 127.0.0.1:46811 Accepted
-[Sat Mar 28 18:31:03 2026] 127.0.0.1:46812 Accepted
-[Sat Mar 28 18:31:04 2026] 127.0.0.1:46811 Closing
-[Sat Mar 28 18:31:04 2026] 127.0.0.1:46812 Closing
-[Sat Mar 28 18:31:05 2026] 127.0.0.1:46822 Accepted
-[Sat Mar 28 18:31:05 2026] 127.0.0.1:46822 [200]: GET /images/postelio-logo-gradient.svg
-[Sat Mar 28 18:31:05 2026] 127.0.0.1:46822 Closing
-[Sat Mar 28 18:31:07 2026] 127.0.0.1:46825 Accepted
-[Sat Mar 28 18:31:07 2026] 127.0.0.1:46826 Accepted
-[Sat Mar 28 18:31:07 2026] 127.0.0.1:46825 Closing
-[Sat Mar 28 18:31:07 2026] 127.0.0.1:46826 Closing
+[Sat Mar 28 18:35:35 2026] PHP 8.4.12 Development Server (http://127.0.0.1:8000) started
+[Sat Mar 28 18:48:27 2026] 127.0.0.1:47946 Accepted
+[Sat Mar 28 18:48:27 2026] 127.0.0.1:47947 Accepted
+[Sat Mar 28 18:48:27 2026] 127.0.0.1:47946 Closing
+[Sat Mar 28 18:48:27 2026] 127.0.0.1:47947 Closing
+[Sat Mar 28 18:48:27 2026] 127.0.0.1:47957 Accepted
+[Sat Mar 28 18:48:27 2026] 127.0.0.1:47957 [200]: GET /images/postelio-logo-gradient.svg
+[Sat Mar 28 18:48:27 2026] 127.0.0.1:47957 Closing
+[Sat Mar 28 18:48:28 2026] 127.0.0.1:47960 Accepted
+[Sat Mar 28 18:48:28 2026] 127.0.0.1:47961 Accepted
+[Sat Mar 28 18:48:28 2026] 127.0.0.1:47960 Closing
+[Sat Mar 28 18:48:28 2026] 127.0.0.1:47961 Closing
 ^C

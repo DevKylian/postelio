@@ -1,4 +1,4 @@
-[Sat Mar 28 17:31:03 2026] 127.0.0.1:46811 [GET] URI: /
-[Sat Mar 28 17:31:04 2026] 127.0.0.1:46812 [GET] URI: /.well-known/appspecific/com.chrome.devtools.json
-[Sat Mar 28 17:31:07 2026] 127.0.0.1:46825 [GET] URI: /mentions-legales
-[Sat Mar 28 17:31:07 2026] 127.0.0.1:46826 [GET] URI: /.well-known/appspecific/com.chrome.devtools.json
+[Sat Mar 28 17:48:27 2026] 127.0.0.1:47946 [GET] URI: /mentions-legales
+[Sat Mar 28 17:48:27 2026] 127.0.0.1:47947 [GET] URI: /.well-known/appspecific/com.chrome.devtools.json
+[Sat Mar 28 17:48:28 2026] 127.0.0.1:47960 [GET] URI: /
+[Sat Mar 28 17:48:28 2026] 127.0.0.1:47961 [GET] URI: /.well-known/appspecific/com.chrome.devtools.json

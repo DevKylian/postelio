@@ -89,4 +89,8 @@ Route::view('profile', 'profile')
 
 Route::get('/render/post/{post}', [\App\Http\Controllers\RenderPostController::class, 'show'])->name('render.post');
 
+// Social Auth
+Route::get('/auth/google', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
 require __DIR__.'/auth.php';

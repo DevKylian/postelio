@@ -220,8 +220,12 @@ $logout = function (Logout $logout) {
             <x-dropdown align="top" width="w-full">
                 <x-slot name="trigger">
                     <button class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.06] transition-all duration-150 group">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-copper to-amber-600 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg">
-                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-copper to-amber-600 flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg overflow-hidden">
+                            @if(auth()->user()->avatar)
+                                <img src="{{ auth()->user()->avatar }}" alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
+                            @else
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            @endif
                         </div>
                         <div class="flex-1 text-left min-w-0 hidden lg:block">
                             <p class="text-[13px] font-semibold text-slate-200 truncate leading-tight"

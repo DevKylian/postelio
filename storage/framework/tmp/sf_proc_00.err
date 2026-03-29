@@ -1,2 +1,14 @@
-[Sun Mar 29 17:21:48 2026] PHP 8.4.12 Development Server (http://127.0.0.1:8000) started
+[Sun Mar 29 17:32:46 2026] PHP 8.4.12 Development Server (http://127.0.0.1:8000) started
+[Sun Mar 29 17:32:46 2026] 127.0.0.1:10204 Accepted
+[Sun Mar 29 17:32:47 2026] 127.0.0.1:10204 Closing
+[Sun Mar 29 17:32:47 2026] 127.0.0.1:10205 Accepted
+[Sun Mar 29 17:32:47 2026] 127.0.0.1:10206 Accepted
+[Sun Mar 29 17:32:47 2026] 127.0.0.1:10205 Closing
+[Sun Mar 29 17:32:47 2026] 127.0.0.1:10206 [200]: GET /images/postelio-logo-gradient.svg
+[Sun Mar 29 17:32:47 2026] 127.0.0.1:10206 Closing
+[Sun Mar 29 17:32:48 2026] 127.0.0.1:10222 Accepted
+[Sun Mar 29 17:32:48 2026] 127.0.0.1:10223 Accepted
+[Sun Mar 29 17:32:48 2026] 127.0.0.1:10222 Closing
+[Sun Mar 29 17:32:52 2026] 127.0.0.1:10226 Accepted
+[Sun Mar 29 17:32:52 2026] 127.0.0.1:10223 Closing
 ^C

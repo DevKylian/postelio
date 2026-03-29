@@ -47,7 +47,7 @@
                 @if($imageUrl)
                     <div class="absolute inset-0">
                         <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-slate-900/40"></div>
+                        <div class="absolute inset-0 bg-gray-900/40"></div>
                     </div>
                 @endif
 
@@ -63,14 +63,14 @@
                                  style="background-color: {{ $isCurrentStep ? $brandColor : 'rgb(15, 23, 42)' }}">
                                 {{ str_pad($stepIndex + 1, 2, '0', STR_PAD_LEFT) }}
                             </div>
-                            <div class="flex-1 bg-white border-2 border-slate-900 p-3 shadow-[4px_4px_0px_0px_rgba(15,23,42,0.1)] max-h-[70px] overflow-hidden">
+                            <div class="flex-1 bg-white border-2 border-gray-900 p-3 shadow-[4px_4px_0px_0px_rgba(15,23,42,0.1)] max-h-[70px] overflow-hidden">
                                 @php
                                     $sLen = mb_strlen($stepText);
                                     $sFontSize = 'text-[9px]';
                                     if ($sLen > 80) $sFontSize = 'text-[7px]';
                                     elseif ($sLen > 40) $sFontSize = 'text-[8px]';
                                 @endphp
-                                <p class="text-slate-900 {{ $sFontSize }} font-black font-mono-technical uppercase leading-tight">
+                                <p class="text-gray-900 {{ $sFontSize }} font-black font-mono-technical uppercase leading-tight">
                                     {{ $stepText }}
                                 </p>
                             </div>
@@ -78,7 +78,7 @@
                     @endforeach
                     
                     @if($index === 0)
-                        <div class="bg-slate-900 p-6 border-4 border-white shadow-2xl rotate-1">
+                        <div class="bg-gray-900 p-6 border-4 border-white shadow-2xl rotate-1">
                              <span class="text-white/40 text-[8px] font-black uppercase tracking-[0.2em] mb-1 block">TECHNICAL WORKFLOW</span>
                              <h2 class="text-white text-2xl font-black font-montserrat leading-none uppercase tracking-tighter">LES ÉTAPES DU CHANTIER</h2>
                         </div>
@@ -87,7 +87,7 @@
             </div>
         @endforeach
 
-        <div class="absolute inset-x-0 bottom-0 h-16 px-10 bg-slate-900 flex items-center justify-between border-t-4 z-30" style="border-color: {{ $brandColor }}">
+        <div class="absolute inset-x-0 bottom-0 h-16 px-10 bg-gray-900 flex items-center justify-between border-t-4 z-30" style="border-color: {{ $brandColor }}">
              <span class="text-white text-[10px] font-black font-mono-technical uppercase tracking-widest italic">{{ $companyLabel }}</span>
              <div class="flex items-center gap-2">
                   @for($i=0; $i<$total; $i++)
@@ -101,10 +101,10 @@
 
         @if($preview)
             <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40">
-                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-slate-900/50 text-white flex items-center justify-center hover:bg-slate-900">
+                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-gray-900/50 text-white flex items-center justify-center hover:bg-gray-900">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
-                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-slate-900/50 text-white flex items-center justify-center hover:bg-slate-900">
+                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-gray-900/50 text-white flex items-center justify-center hover:bg-gray-900">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
             </div>

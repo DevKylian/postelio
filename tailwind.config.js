@@ -18,8 +18,8 @@ export default {
                 logo: ['Plus Jakarta Sans', 'Inter', ...defaultTheme.fontFamily.sans],
             },
             colors: {
-                midnight: '#1E293B',
-                chalk: '#F8FAFC',
+                midnight: '#111827', // Gray 900
+                chalk: '#F9FAFB',    // Gray 50
                 copper: '#F59E0B',
             },
             boxShadow: {

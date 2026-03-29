@@ -18,10 +18,10 @@
     @if ($imageUrl)
         <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover">
     @else
-        <div class="absolute inset-0 w-full h-full bg-slate-200 flex items-center justify-center text-slate-400 select-none pointer-events-none">
+        <div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 select-none pointer-events-none">
             <div class="text-center">
                 <svg class="w-14 h-14 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Détail Matière</p>
+                <p class="text-xs font-bold uppercase tracking-widest text-gray-500">Détail Matière</p>
             </div>
         </div>
     @endif

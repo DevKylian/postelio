@@ -21,7 +21,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-square bg-slate-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/20 group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full aspect-square bg-gray-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/20 group-hover:-translate-y-2' : '' }}">
     
     <div class="flex-1 flex min-h-0 relative">
         {{-- Slide 0: Glass Split --}}
@@ -31,12 +31,12 @@
             $slide0Style = !$isSlide0 ? 'display: none;' : '';
         @endphp
         <div class="absolute inset-0 flex" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
-            <div class="w-1/2 relative overflow-hidden bg-slate-800">
+            <div class="w-1/2 relative overflow-hidden bg-gray-800">
                 @if ($imageBeforeUrl)
                     <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 @endif
             </div>
-            <div class="w-1/2 relative overflow-hidden bg-slate-700">
+            <div class="w-1/2 relative overflow-hidden bg-gray-700">
                 @if ($imageAfterUrl)
                     <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 @endif
@@ -51,7 +51,7 @@
             $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
             $slide1Style = $slideIndex !== 1 ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-0 bg-slate-800" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
+        <div class="absolute inset-0 bg-gray-800" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if ($imageBeforeUrl)
                 <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 <div class="absolute top-6 left-6 backdrop-blur-xl bg-white/10 border border-white/20 px-4 py-2 rounded-xl z-20 shadow-2xl">
@@ -66,7 +66,7 @@
             $slide2Alpine = $slideIndex === null ? "x-show=\"current === 2\" style=\"display: none;\"" : '';
             $slide2Style = $slideIndex !== 2 ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-0 bg-slate-700" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
+        <div class="absolute inset-0 bg-gray-700" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if ($imageAfterUrl)
                 <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 <div class="absolute top-6 right-6 backdrop-blur-xl bg-white/20 border border-white/30 px-4 py-2 rounded-xl z-20 shadow-2xl">

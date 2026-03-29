@@ -32,7 +32,7 @@
 @endphp
 
 <div {!! $alpineData !!} class="w-full relative">
-    <div class="w-full aspect-square bg-slate-900 flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
+    <div class="w-full aspect-square bg-gray-900 flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
         
         @foreach($slides as $index => $imageUrl)
             @php
@@ -47,7 +47,7 @@
                 @if($imageUrl)
                     <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 @else
-                    <div class="absolute inset-0 flex items-center justify-center bg-slate-800">
+                    <div class="absolute inset-0 flex items-center justify-center bg-gray-800">
                         <span class="text-white/10 text-xs font-black uppercase tracking-widest">Photo {{ $index + 1 }}</span>
                     </div>
                 @endif

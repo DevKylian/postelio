@@ -12,7 +12,7 @@
     @endphp
 @endif
 
-<div class="w-full aspect-square bg-slate-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-red-500/20 group-hover:-translate-y-2' : '' }}">
+<div class="w-full aspect-square bg-gray-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-red-500/20 group-hover:-translate-y-2' : '' }}">
     
     {{-- Danger glow --}}
     <div class="absolute -top-24 -left-24 w-64 h-64 rounded-full blur-[100px] opacity-20 bg-red-600"></div>

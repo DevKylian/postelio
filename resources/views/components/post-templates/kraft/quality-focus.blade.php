@@ -19,7 +19,7 @@
     <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
     
     <div class="flex-1 relative flex items-center justify-center p-16">
-        <div class="relative w-full h-full border-[6px] border-slate-900 p-4 bg-white shadow-2xl -rotate-1">
+        <div class="relative w-full h-full border-[6px] border-neutral-900 p-4 bg-white shadow-2xl -rotate-1">
             @if($imageUrl)
                 <img src="{{ $imageUrl }}" class="w-full h-full object-contain">
             @else
@@ -32,13 +32,13 @@
                 if ($len > 30) $fontSize = 'text-[6px]';
                 elseif ($len > 20) $fontSize = 'text-[7px]';
             @endphp
-            <div class="absolute bottom-6 left-6 bg-slate-900 text-white px-3 py-1 {{ $fontSize }} font-black uppercase tracking-widest font-mono-technical max-w-[80%] truncate">
+            <div class="absolute bottom-6 left-6 bg-gray-900 text-white px-3 py-1 {{ $fontSize }} font-black uppercase tracking-widest font-mono-technical max-w-[80%] truncate">
                 {{ $text ?: 'DÉTAIL TECHNIQUE' }}
             </div>
         </div>
     </div>
 
-    <div class="h-16 px-10 bg-slate-900 flex items-center justify-between z-20">
+    <div class="h-16 px-10 bg-gray-900 flex items-center justify-between z-20">
          <span class="text-white text-[11px] font-black uppercase tracking-[0.2em] font-montserrat">{{ $companyLabel }}</span>
          <div class="flex items-center gap-4">
               <div class="w-12 h-1.5" style="background-color: {{ $brandColor }}"></div>

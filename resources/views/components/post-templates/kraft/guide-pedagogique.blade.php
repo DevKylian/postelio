@@ -37,21 +37,21 @@
         <div class="absolute inset-0" {!! $coverAlpine !!} style="{{ $coverStyle }}">
             <div class="flex-1 flex flex-col p-8 pb-20 justify-center gap-4 relative z-10 h-full">
                 <div class="flex items-center gap-4 mb-2">
-                    <div class="w-12 h-12 bg-slate-900 border-2 border-white flex items-center justify-center p-2 shadow-2xl -rotate-3 shrink-0">
+                    <div class="w-12 h-12 bg-gray-900 border-2 border-white flex items-center justify-center p-2 shadow-2xl -rotate-3 shrink-0">
                         <svg class="w-full h-full text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
                     </div>
-                    <div class="bg-white border-2 border-slate-900 p-3 shadow-[4px_4px_0px_0px_rgba(15,23,42,0.1)] flex-1">
-                        <h3 class="text-slate-900 text-sm font-black font-montserrat leading-tight uppercase tracking-tighter">{{ $title }}</h3>
+                    <div class="bg-white border-2 border-gray-900 p-3 shadow-[4px_4px_0px_0px_rgba(15,23,42,0.1)] flex-1">
+                        <h3 class="text-gray-900 text-sm font-black font-montserrat leading-tight uppercase tracking-tighter">{{ $title }}</h3>
                     </div>
                 </div>
 
                 <div class="space-y-2">
                     <div class="flex items-center gap-3 mt-2">
-                        <div class="h-px flex-1 bg-slate-900/20"></div>
-                        <span class="text-slate-900/40 text-[9px] font-black font-mono-technical uppercase tracking-widest">{{ count($slideContents) }} conseils</span>
-                        <div class="h-px flex-1 bg-slate-900/20"></div>
+                        <div class="h-px flex-1 bg-gray-900/20"></div>
+                        <span class="text-gray-900/40 text-[9px] font-black font-mono-technical uppercase tracking-widest">{{ count($slideContents) }} conseils</span>
+                        <div class="h-px flex-1 bg-gray-900/20"></div>
                     </div>
                 </div>
             </div>
@@ -67,8 +67,8 @@
             @endphp
             <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
                 <div class="flex-1 flex flex-col p-10 pb-20 justify-center relative z-10 h-full">
-                    <div class="bg-white border-2 border-slate-900 p-8 shadow-2xl relative rotate-1">
-                        <div class="absolute -top-6 -left-4 w-12 h-12 bg-slate-900 flex items-center justify-center font-black text-white text-xl shadow-2xl border-2 border-white -rotate-3" style="background-color: {{ $brandColor }}">
+                    <div class="bg-white border-2 border-gray-900 p-8 shadow-2xl relative rotate-1">
+                        <div class="absolute -top-6 -left-4 w-12 h-12 bg-gray-900 flex items-center justify-center font-black text-white text-xl shadow-2xl border-2 border-white -rotate-3" style="background-color: {{ $brandColor }}">
                             {{ $realIdx }}
                         </div>
                         @php
@@ -79,7 +79,7 @@
                             elseif ($cLen > 40) $cFontSize = 'text-base';
                         @endphp
                         <div class="max-h-[180px] overflow-hidden">
-                            <p class="text-slate-900 {{ $cFontSize }} font-black font-montserrat leading-tight uppercase pt-2">
+                            <p class="text-gray-900 {{ $cFontSize }} font-black font-montserrat leading-tight uppercase pt-2">
                                 {{ $content }}
                             </p>
                         </div>
@@ -88,7 +88,7 @@
             </div>
         @endforeach
 
-        <div class="absolute inset-x-0 bottom-0 h-16 px-10 bg-slate-900 flex items-center justify-between border-t-4 z-30" style="border-color: {{ $brandColor }}">
+        <div class="absolute inset-x-0 bottom-0 h-16 px-10 bg-gray-900 flex items-center justify-between border-t-4 z-30" style="border-color: {{ $brandColor }}">
              <span class="text-white text-xs font-black font-montserrat uppercase tracking-widest">{{ $companyLabel }}</span>
              @if($total > 1)
                 <div class="text-white/20 text-[10px] font-black" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
@@ -99,10 +99,10 @@
 
         @if($preview)
             <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40">
-                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-slate-900/50 text-white flex items-center justify-center hover:bg-slate-900">
+                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-gray-900/50 text-white flex items-center justify-center hover:bg-gray-900">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
-                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-slate-900/50 text-white flex items-center justify-center hover:bg-slate-900">
+                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-gray-900/50 text-white flex items-center justify-center hover:bg-gray-900">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
             </div>

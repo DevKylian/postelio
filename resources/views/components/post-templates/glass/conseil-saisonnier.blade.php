@@ -12,11 +12,11 @@
     @endphp
 @endif
 
-<div class="w-full aspect-square bg-slate-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
+<div class="w-full aspect-square bg-gray-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
     
     {{-- Background Season Glow --}}
     <div class="absolute -top-20 -right-20 w-80 h-80 rounded-full blur-[120px] opacity-20" style="background-color: {{ $brandColor }}"></div>
-    <div class="absolute -bottom-20 -left-20 w-64 h-64 rounded-full blur-[100px] opacity-10 bg-blue-500"></div>
+    <div class="absolute -bottom-20 -left-20 w-64 h-64 rounded-full blur-[100px] opacity-10 bg-gray-500"></div>
 
     <div class="flex-1 flex flex-col items-center justify-center p-8 relative z-10">
         

@@ -21,7 +21,7 @@
     {{-- Main Content --}}
     <div class="flex-1 p-10 flex flex-col items-center justify-center relative z-10">
         
-        <div class="bg-white border-4 border-slate-900 p-10 shadow-[15px_15px_0px_0px_rgba(15,23,42,0.1)] relative w-full max-w-[380px] -rotate-1">
+        <div class="bg-white border-4 border-gray-900 p-10 shadow-[15px_15px_0px_0px_rgba(15,23,42,0.1)] relative w-full max-w-[380px] -rotate-1">
             
             @php
                 $len = mb_strlen($text);
@@ -32,16 +32,16 @@
             @endphp
 
             <div class="max-h-[220px] overflow-hidden">
-                <p class="text-slate-900 {{ $fontSize }} font-black leading-[1.1] font-montserrat uppercase text-center">
+                <p class="text-gray-900 {{ $fontSize }} font-black leading-[1.1] font-montserrat uppercase text-center">
                     "{{ $text }}"
                 </p>
             </div>
 
-            <div class="pt-8 border-t-2 border-dashed border-slate-200 flex items-center justify-between">
+            <div class="pt-8 border-t-2 border-dashed border-gray-800 flex items-center justify-between">
                 <div>
-                    <span class="text-slate-900 text-sm font-black uppercase font-montserrat">{{ $customerName }}</span>
+                    <span class="text-gray-900 text-sm font-black uppercase font-montserrat">{{ $customerName }}</span>
                 </div>
-                <div class="w-10 h-10 border-2 border-slate-900 flex items-center justify-center">
+                <div class="w-10 h-10 border-2 border-gray-900 flex items-center justify-center">
                     <div class="w-6 h-6 rounded-full" style="background-color: {{ $brandColor }}"></div>
                 </div>
             </div>
@@ -49,7 +49,7 @@
     </div>
 
     {{-- Bottom Branding --}}
-    <div class="h-16 px-10 bg-slate-900 flex items-center justify-between z-20">
+    <div class="h-16 px-10 bg-gray-900 flex items-center justify-between z-20">
          <span class="text-white text-xs font-black font-mono-technical uppercase tracking-[0.3em]">{{ $companyLabel }}</span>
          <div class="flex gap-1">
               <div class="w-2 h-2" style="background-color: {{ $brandColor }}"></div>

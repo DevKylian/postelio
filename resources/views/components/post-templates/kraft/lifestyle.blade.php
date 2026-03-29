@@ -19,7 +19,7 @@
 
     {{-- Image area --}}
     <div class="flex-1 min-h-0 relative flex items-center justify-center p-10 pb-4">
-        <div class="relative w-full h-full border-[8px] border-slate-900 p-3 bg-white shadow-2xl rotate-1 overflow-hidden">
+        <div class="relative w-full h-full border-[8px] border-neutral-800 p-3 bg-white shadow-2xl rotate-1 overflow-hidden">
              <div class="w-full h-full overflow-hidden relative">
                  @if($imageUrl)
                      <img src="{{ $imageUrl }}" class="w-full h-full object-contain">
@@ -32,7 +32,7 @@
     </div>
 
     {{-- Footer with text + company --}}
-    <div class="h-[72px] shrink-0 bg-[#CBB198] border-t-[6px] border-slate-900 px-8 flex items-center justify-between z-20">
+    <div class="h-[72px] shrink-0 bg-[#CBB198] border-t-[6px] border-gray-900 px-8 flex items-center justify-between z-20">
         @php
             $displayText = $text ?: 'LIFESTYLE';
             $len = mb_strlen($displayText);
@@ -41,8 +41,8 @@
             elseif ($len > 18) $fontSize = 'text-[10px]';
         @endphp
         <div class="flex flex-col max-w-[200px] overflow-hidden">
-             <span class="text-slate-900 {{ $fontSize }} font-black uppercase tracking-[0.1em] font-montserrat leading-tight truncate">{{ $displayText }}</span>
-             <span class="text-slate-900/40 text-[8px] font-black uppercase font-mono-technical mt-0.5 truncate">{{ $companyLabel }}</span>
+             <span class="text-gray-900 {{ $fontSize }} font-black uppercase tracking-[0.1em] font-montserrat leading-tight truncate">{{ $displayText }}</span>
+             <span class="text-gray-900/40 text-[8px] font-black uppercase font-mono-technical mt-0.5 truncate">{{ $companyLabel }}</span>
         </div>
         <div class="flex items-center gap-4">
         </div>

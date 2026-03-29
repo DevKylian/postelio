@@ -30,10 +30,10 @@
 @endphp
 
 <div {!! $alpineData !!} class="w-full relative">
-    <div class="w-full aspect-square bg-slate-900 flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
+    <div class="w-full aspect-square bg-gray-900 flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
         
         <div class="absolute inset-0 opacity-10">
-            <div class="absolute inset-0 bg-gradient-to-br from-midnight via-slate-800 to-midnight" style="background-image: linear-gradient(30deg, #1e293b 12%, transparent 12.5%, transparent 87%, #1e293b 87.5%, #1e293b), linear-gradient(150deg, #1e293b 12%, transparent 12.5%, transparent 87%, #1e293b 87.5%, #1e293b), linear-gradient(30deg, #1e293b 12%, transparent 12.5%, transparent 87%, #1e293b 87.5%, #1e293b), linear-gradient(150deg, #1e293b 12%, transparent 12.5%, transparent 87%, #1e293b 87.5%, #1e293b), linear-gradient(60deg, #334155 25%, transparent 25.5%, transparent 75%, #334155 75%, #334155), linear-gradient(60deg, #334155 25%, transparent 25.5%, transparent 75%, #334155 75%, #334155); background-size: 80px 140px; background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-midnight via-gray-800 to-midnight" style="background-image: linear-gradient(30deg, #111827 12%, transparent 12.5%, transparent 87%, #111827 87.5%, #111827), linear-gradient(150deg, #111827 12%, transparent 12.5%, transparent 87%, #111827 87.5%, #111827), linear-gradient(30deg, #111827 12%, transparent 12.5%, transparent 87%, #111827 87.5%, #111827), linear-gradient(150deg, #111827 12%, transparent 12.5%, transparent 87%, #111827 87.5%, #111827), linear-gradient(60deg, #1f2937 25%, transparent 25.5%, transparent 75%, #1f2937 75%, #1f2937), linear-gradient(60deg, #1f2937 25%, transparent 25.5%, transparent 75%, #1f2937 75%, #1f2937); background-size: 80px 140px; background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;"></div>
         </div>
 
         @foreach($slides as $index => $imageUrl)

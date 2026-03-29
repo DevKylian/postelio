@@ -13,7 +13,7 @@
     @endphp
 @endif
 
-<div class="w-full aspect-square bg-[#CBD5E1] relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+<div class="w-full aspect-square bg-[#D1D5DB] relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Full Image --}}
     <div class="absolute inset-0">
         @if($imageUrl)
@@ -21,7 +21,7 @@
         @else
             <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600" class="w-full h-full object-cover">
         @endif
-        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent"></div>
     </div>
 
     {{-- Company badge — top right --}}

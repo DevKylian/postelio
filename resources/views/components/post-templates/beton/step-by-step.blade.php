@@ -30,7 +30,7 @@
 @endphp
 
 <div {!! $alpineData !!} class="w-full relative">
-    <div class="w-full aspect-square bg-[#CBD5E1] relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+    <div class="w-full aspect-square bg-[#D1D5DB] relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
         {{-- Concrete Texture --}}
         <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay z-20" style="background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');"></div>
 
@@ -47,7 +47,7 @@
                 @if($imageUrl)
                     <div class="absolute inset-0">
                         <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-slate-900/40"></div>
+                        <div class="absolute inset-0 bg-gray-900/40"></div>
                     </div>
                 @endif
 
@@ -58,18 +58,18 @@
                             $isPastStep = $index > ($stepIndex + 1);
                         @endphp
                         <div class="flex items-center gap-3 transition-all duration-300 {{ $isCurrentStep ? 'scale-105' : ($isPastStep ? 'opacity-50 grayscale' : 'opacity-30') }}">
-                            <div class="w-8 h-8 rounded bg-slate-900 flex items-center justify-center font-black text-white text-xs shadow-xl shrink-0"
+                            <div class="w-8 h-8 rounded bg-gray-900 flex items-center justify-center font-black text-white text-xs shadow-xl shrink-0"
                                  @if($isCurrentStep) style="background-color: {{ $brandColor }}" @endif>
                                 {{ str_pad($stepIndex + 1, 2, '0', STR_PAD_LEFT) }}
                             </div>
-                            <div class="flex-1 bg-white border-2 border-slate-900 p-2.5 rounded shadow-lg max-h-[60px] overflow-hidden">
+                            <div class="flex-1 bg-white border-2 border-gray-900 p-2.5 rounded shadow-lg max-h-[60px] overflow-hidden">
                                 @php
                                     $sLen = mb_strlen($stepText);
                                     $sFontSize = 'text-[9px]';
                                     if ($sLen > 80) $sFontSize = 'text-[7px]';
                                     elseif ($sLen > 40) $sFontSize = 'text-[8px]';
                                 @endphp
-                                <p class="text-slate-900 {{ $sFontSize }} font-black font-montserrat uppercase leading-tight">
+                                <p class="text-gray-900 {{ $sFontSize }} font-black font-montserrat uppercase leading-tight">
                                     {{ $stepText }}
                                 </p>
                             </div>
@@ -77,7 +77,7 @@
                     @endforeach
                     
                     @if($index === 0)
-                        <div class="bg-slate-900 p-5 rounded-xl border-t-4 shadow-2xl" style="border-color: {{ $brandColor }}">
+                        <div class="bg-gray-900 p-5 rounded-xl border-t-4 shadow-2xl" style="border-color: {{ $brandColor }}">
                              <span class="text-white/40 text-[8px] font-black uppercase tracking-[0.2em] mb-1 block">DÉROULÉ TECHNIQUE</span>
                              <h2 class="text-white text-2xl font-black font-montserrat leading-none uppercase tracking-tighter">ÉTAPES DU PROJET</h2>
                         </div>
@@ -86,7 +86,7 @@
             </div>
         @endforeach
 
-        <div class="absolute inset-x-0 bottom-0 h-16 px-10 bg-slate-900 flex items-center justify-between border-t border-white/10 z-30">
+        <div class="absolute inset-x-0 bottom-0 h-16 px-10 bg-gray-900 flex items-center justify-between border-t border-white/10 z-30">
              <span class="text-white text-[10px] font-black font-montserrat uppercase tracking-widest">{{ $companyLabel }}</span>
              <div class="flex gap-1.5" @if($preview) x-show="total > 1" @endif>
                   @for($i=0; $i<$total; $i++)
@@ -100,10 +100,10 @@
 
         @if($preview)
             <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40">
-                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-slate-900/50 text-white flex items-center justify-center hover:bg-slate-900">
+                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-gray-900/50 text-white flex items-center justify-center hover:bg-gray-900">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
-                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-slate-900/50 text-white flex items-center justify-center hover:bg-slate-900">
+                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-gray-900/50 text-white flex items-center justify-center hover:bg-gray-900">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
             </div>

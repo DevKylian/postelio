@@ -32,7 +32,7 @@
     // Helper for style colors
     $styles = [
         'dark_branded' => [
-            'bg' => '#0B1426',
+            'bg' => '#111827',
             'title' => $brandColor,
             'text' => '#FFFFFF',
             'label' => $brandColor,
@@ -40,9 +40,9 @@
             'ghost' => 'rgba(255,255,255,0.03)'
         ],
         'light_branded' => [
-            'bg' => '#F8FAFC',
+            'bg' => '#F9FAFB',
             'title' => $brandColor,
-            'text' => '#1E293B',
+            'text' => '#111827',
             'label' => $brandColor,
             'sep' => 'rgba(0,0,0,0.08)',
             'ghost' => 'rgba(0,0,0,0.02)'
@@ -60,7 +60,7 @@
     $currentStyle = $styles[$visualStyle] ?? $styles['dark_branded'];
 @endphp
 
-<div class="w-full aspect-square flex flex-col relative overflow-hidden font-montserrat {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}"
+<div class="w-full aspect-square bg-gray-50 relative overflow-hidden font-montserrat {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}"
      style="background-color: {{ $currentStyle['bg'] }}">
 
     {{-- Decor elements (Ghost circles) --}}
@@ -160,7 +160,7 @@
                     <h3 class="font-black uppercase tracking-tight mb-6" style="color: {{ $brandColor }}; font-size: 1.3rem;">{{ $name }}</h3>
                     <div class="w-full h-px bg-gray-100 mb-8"></div>
                     <div class="max-h-[160px] overflow-hidden">
-                        <p class="font-semibold text-slate-700 leading-relaxed" style="font-size: {{ $fSize }};">{{ $displayText }}</p>
+                        <p class="font-semibold text-gray-700 leading-relaxed" style="font-size: {{ $fSize }};">{{ $displayText }}</p>
                     </div>
                 </div>
             </div>
@@ -203,7 +203,7 @@
 
     @elseif($isSingle)
         {{-- PHOTO SINGLE MODE --}}
-        <div class="absolute inset-0 bg-slate-700 flex items-center justify-center">
+        <div class="absolute inset-0 bg-gray-700 flex items-center justify-center">
             @if($preview)
                 <div class="text-center text-white/30 uppercase tracking-[0.2em]">
                     <svg class="w-16 h-16 mx-auto mb-3 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -223,13 +223,14 @@
         {{-- PHOTO CAROUSEL MODE --}}
         @php
             $slidesToRender = $slideIndex !== null ? [$slideIndex] : [0, 1, 2];
+            $cFontSize = 'text-lg';
         @endphp
 
         @foreach($slidesToRender as $idx)
             <div class="absolute inset-0" 
                  @if($slideIndex === null) x-show="slide === {{ $idx }}" @endif>
                 
-                <div class="absolute inset-0 bg-slate-800 flex items-center justify-center">
+                <div class="absolute inset-0 bg-gray-800 flex items-center justify-center">
                     @if($preview)
                         <div class="text-center text-white/20 uppercase tracking-[0.2em]">
                             <p class="text-[10px] font-black">Slide {{ $idx + 1 }} / 3</p>

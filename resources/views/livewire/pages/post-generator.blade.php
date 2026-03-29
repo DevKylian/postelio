@@ -21,6 +21,31 @@
     @elseif ($status === 'idle')
         <div class="py-8 px-4 sm:px-6 lg:px-8">
             <div class="max-w-4xl mx-auto space-y-8">
+                {{-- STEPPER --}}
+                <div class="mb-10">
+                    <div class="relative flex items-center justify-between px-2">
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-gray-100 -z-10">
+                            <div class="h-full bg-copper transition-all duration-500" style="width: {{ (($currentStep - 1) / 3) * 100 }}%"></div>
+                        </div>
+                        @foreach([1 => 'Modèle', 2 => 'Brief', 3 => 'Design', 4 => 'Envoi'] as $stepNum => $stepLabel)
+                            <button type="button" 
+                                    wire:click="goToStep({{ $stepNum }})"
+                                    class="flex flex-col items-center group transition-all duration-300 {{ $currentStep < $stepNum ? 'cursor-not-allowed opacity-50' : 'cursor-pointer' }}"
+                                    @if($currentStep < $stepNum) disabled @endif>
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border-2 
+                                    {{ $currentStep === $stepNum ? 'bg-copper border-copper text-white shadow-lg shadow-copper/20' : ($currentStep > $stepNum ? 'bg-white border-copper text-copper' : 'bg-white border-gray-200 text-gray-400') }}">
+                                    @if($currentStep > $stepNum)
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                    @else
+                                        <span class="text-sm font-bold">{{ $stepNum }}</span>
+                                    @endif
+                                </div>
+                                {{-- <span class="hidden sm:block absolute mt-12 text-[10px] font-bold uppercase tracking-widest {{ $currentStep === $stepNum ? 'text-midnight' : 'text-gray-400' }}">{{ $stepLabel }}</span> --}}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+
                 <form wire:submit.prevent="generate" class="space-y-6">
 
             @php
@@ -95,8 +120,12 @@
             $templateDescription = $templateSpec['description'] ?? null;
             @endphp
 
+            @if($currentStep === 1)
             {{-- ── STEP 1 : Choix du gabarit ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
                     <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">1</div>
                     <div>
@@ -108,7 +137,7 @@
                 <div class="p-6 space-y-3"
                      x-data="{
                          openGroups: {
-                             carousel: @js(in_array($template, ['chantier_detail','step_by_step','guide_pedagogique'])),
+                             carousel: true,
                              custom:   @js($template === 'custom')
                          }
                      }">
@@ -214,9 +243,15 @@
                     @endforeach
                 </div>
             </div>
+            @endif
 
+            @if($currentStep === 2)
             {{-- ── STEP 2 : Votre mémo vocal (contextuel au gabarit choisi) ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" x-data="voiceRecorder">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" 
+                 x-data="voiceRecorder"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
                     <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">2</div>
                     <div>
@@ -453,71 +488,6 @@
                 </div>
             </div>
 
-            {{-- ── STEP 3 : Style Visuel ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-full bg-midnight flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
-                    <div>
-                        <h3 class="font-semibold text-midnight text-base">Choisissez votre ambiance</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Quel univers visuel souhaitez-vous projeter ?</p>
-                    </div>
-                </div>
-
-                <div class="p-6">
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                        @php
-                            $availableStyles = [
-                                ['id' => 'standard',  'label' => 'Classique',   'icon' => 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z', 'color' => 'gray'],
-                                ['id' => 'glass',     'label' => 'Glass',      'icon' => 'M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-3', 'color' => 'sky'],
-                                ['id' => 'blueprint', 'label' => 'Blueprint',  'icon' => 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7', 'color' => 'blue'],
-                                ['id' => 'kraft',     'label' => 'Kraft',      'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'color' => 'amber'],
-                                ['id' => 'beton',     'label' => 'Béton Brut', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', 'color' => 'slate'],
-                            ];
-                            $styleColors = [
-                                'gray'  => ['bg' => 'bg-gray-50',  'text' => 'text-gray-600', 'border' => 'border-gray-200', 'active' => 'border-gray-600 bg-gray-50'],
-                                'sky'   => ['bg' => 'bg-sky-50',   'text' => 'text-sky-600',  'border' => 'border-sky-200',  'active' => 'border-sky-500 bg-sky-50'],
-                                'blue'  => ['bg' => 'bg-blue-50',  'text' => 'text-blue-600', 'border' => 'border-blue-200', 'active' => 'border-blue-600 bg-blue-50'],
-                                'amber' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-600','border' => 'border-amber-200','active' => 'border-amber-600 bg-amber-50'],
-                                'slate' => ['bg' => 'bg-slate-50', 'text' => 'text-slate-600','border' => 'border-slate-200','active' => 'border-slate-600 bg-slate-50'],
-                            ];
-                        @endphp
-
-                        @foreach($availableStyles as $sty)
-                        @php $c = $styleColors[$sty['color']]; @endphp
-                        <button type="button"
-                                wire:click="$set('visualStyle', '{{ $sty['id'] }}')"
-                                class="group relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200
-                                    {{ $visualStyle === $sty['id'] 
-                                        ? $c['active'] . ' shadow-sm' 
-                                        : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50' }}">
-                            
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200
-                                {{ $visualStyle === $sty['id'] 
-                                    ? 'bg-midnight text-white' 
-                                    : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $sty['icon'] }}" />
-                                </svg>
-                            </div>
-
-                            <div class="text-center">
-                                <p class="text-[11px] font-bold uppercase tracking-wider {{ $visualStyle === $sty['id'] ? 'text-midnight' : 'text-gray-500' }}">
-                                    {{ $sty['label'] }}
-                                </p>
-                            </div>
-
-                            @if($visualStyle === $sty['id'])
-                            <div class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-midnight flex items-center justify-center shadow-sm">
-                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            @endif
-                        </button>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
 
             {{-- ── PERSONNALISATION DU GABARIT ── --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" x-data="{ expanded: false }">
@@ -525,7 +495,7 @@
                         @click="expanded = !expanded" 
                         class="w-full px-6 py-5 border-b border-gray-50 flex items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors group">
                     <div class="flex items-center gap-4">
-                        <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>
+                        <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">2</div>
                         <div class="text-left">
                             <h3 class="font-semibold text-midnight text-base leading-tight">
                                 Personnaliser le gabarit 
@@ -779,17 +749,86 @@
 
                 </div>
             </div>
+            @endif
 
-            {{-- REMOVED OLD STEP 2 POSITION --}}
+            @if($currentStep === 3)
+            {{-- ── STEP 3 : Style Visuel ── --}}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0">
+                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
+                    <div>
+                        <h3 class="font-semibold text-midnight text-base">Choisissez votre ambiance</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Quel univers visuel souhaitez-vous projeter ?</p>
+                    </div>
+                </div>
 
-            {{-- ── STEP 5 : Photos (conditionnel) ── --}}
+                <div class="p-6">
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                        @php
+                            $availableStyles = [
+                                ['id' => 'standard',  'label' => 'Classique',   'icon' => 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z', 'color' => 'gray'],
+                                ['id' => 'glass',     'label' => 'Glass',      'icon' => 'M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-3', 'color' => 'sky'],
+                                ['id' => 'blueprint', 'label' => 'Blueprint',  'icon' => 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7', 'color' => 'blue'],
+                                ['id' => 'kraft',     'label' => 'Kraft',      'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'color' => 'amber'],
+                                ['id' => 'beton',     'label' => 'Béton Brut', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', 'color' => 'slate'],
+                            ];
+                            $styleColors = [
+                                'gray'  => ['bg' => 'bg-gray-50',  'text' => 'text-gray-600', 'border' => 'border-gray-200', 'active' => 'border-gray-600 bg-gray-50'],
+                                'sky'   => ['bg' => 'bg-sky-50',   'text' => 'text-sky-600',  'border' => 'border-sky-200',  'active' => 'border-sky-500 bg-sky-50'],
+                                'blue'  => ['bg' => 'bg-blue-50',  'text' => 'text-blue-600', 'border' => 'border-blue-200', 'active' => 'border-blue-600 bg-blue-50'],
+                                'amber' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-600','border' => 'border-amber-200','active' => 'border-amber-600 bg-amber-50'],
+                                'slate' => ['bg' => 'bg-slate-50', 'text' => 'text-slate-600','border' => 'border-slate-200','active' => 'border-slate-600 bg-slate-50'],
+                            ];
+                        @endphp
+
+                        @foreach($availableStyles as $sty)
+                        @php $c = $styleColors[$sty['color']]; @endphp
+                        <button type="button"
+                                wire:click="$set('visualStyle', '{{ $sty['id'] }}')"
+                                class="group relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200
+                                    {{ $visualStyle === $sty['id'] 
+                                        ? $c['active'] . ' shadow-sm' 
+                                        : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50' }}">
+                            
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200
+                                {{ $visualStyle === $sty['id'] 
+                                    ? 'bg-copper text-white' 
+                                    : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $sty['icon'] }}" />
+                                </svg>
+                            </div>
+
+                            <div class="text-center">
+                                <p class="text-[11px] font-bold uppercase tracking-wider {{ $visualStyle === $sty['id'] ? 'text-copper' : 'text-gray-500' }}">
+                                    {{ $sty['label'] }}
+                                </p>
+                            </div>
+
+                            @if($visualStyle === $sty['id'])
+                            <div class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-copper flex items-center justify-center shadow-sm">
+                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            @endif
+                        </button>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            {{-- ── STEP 3 bis : Photos ── --}}
             @if(in_array($template, ['project', 'lifestyle', 'quality_focus']) || ($template === 'custom' && $customPhotoMode === 'single'))
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">5</div>
+                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
                     <div>
                         <h3 class="font-semibold text-midnight text-base">
-                            {{ $template === 'project' ? 'Photos Avant & Après' : ($template === 'quality_focus' ? 'Photo du matériel' : ($template === 'custom' ? 'Photo requise' : 'Photo Lifestyle')) }}
+                            {{ $template === 'project' ? 'Photos Avant & Après' : (in_array($template, ['quality_focus','chantier_detail','step_by_step']) ? 'Photos du chantier' : ($template === 'custom' ? 'Photo requise' : 'Photo Lifestyle')) }}
                         </h3>
                         <p class="text-xs text-gray-400 mt-0.5">
                             {{ $template === 'project' ? 'Uploadez les deux photos pour le split Avant / Après.' : 'Uploadez la photo principale du post.' }}
@@ -871,7 +910,7 @@
             @if(in_array($template, ['chantier_detail', 'step_by_step']) || ($template === 'custom' && $customPhotoMode === 'carousel'))
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">5</div>
+                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
                     <div class="flex items-center justify-between flex-1">
                         <div>
                             <h3 class="font-semibold text-midnight text-base">Photos du chantier</h3>
@@ -933,8 +972,14 @@
             </div>
             @endif
 
+            @endif
+
+            @if($currentStep === 4)
             {{-- ── Plateformes ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0">
                 @if(!$igConnected && !$fbConnected)
                     <div class="absolute inset-0 bg-white/60 backdrop-blur-sm z-20 flex flex-col items-center justify-center p-6 text-center">
                         <div class="flex flex-col items-center gap-2">
@@ -949,11 +994,7 @@
                     </div>
                 @endif
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 shrink-0">
-                        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                        </svg>
-                    </div>
+                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>
                     <div>
                         <h3 class="font-semibold text-midnight text-base">Où publier ?</h3>
                         <p class="text-xs text-gray-400 mt-0.5">Choisissez les plateformes de diffusion. Les dimensions seront adaptées automatiquement.</p>
@@ -1054,7 +1095,7 @@
                         <div class="flex flex-col items-center gap-2">
                             <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                             <p class="text-sm font-semibold text-midnight mt-1">Connexion requise</p>
-                            <p class="text-[11px] text-gray-500 max-w-[220px] mx-auto mb-2">Connectez un compte social en premier pour diffuser vos posts.</p>
+                            <p class="text-[11px] text-gray-500 max-w-[220px] mx-auto mb-2">Pour configurer la diffusion, veuillez lier un compte social.</p>
                             <a href="{{ route('post-settings') }}" wire:navigate class="px-3.5 py-1.5 bg-white border border-gray-200 shadow-sm hover:border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                                 Paramétrer
@@ -1063,11 +1104,7 @@
                     </div>
                 @endif
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 shrink-0">
-                        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                    </div>
+                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">4</div>
                     <div>
                         <h3 class="font-semibold text-midnight text-base">Planification</h3>
                         <p class="text-xs text-gray-400 mt-0.5">Publiez maintenant ou programmez pour plus tard.</p>
@@ -1213,18 +1250,70 @@
                 </div>
             </div>
 
-            {{-- ── Submit ── --}}
-            <button type="submit"
-                    wire:loading.attr="disabled"
-                    wire:target="generate"
-                    class="w-full relative group overflow-hidden bg-copper text-white font-bold text-sm py-5 rounded-2xl shadow-lg shadow-copper/25 hover:shadow-xl hover:shadow-copper/30 hover:bg-amber-500 transition-all duration-300 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed">
-                <div class="flex items-center justify-center gap-3">
-                    <svg wire:loading.remove wire:target="generate" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    <svg wire:loading wire:target="generate" class="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    <span wire:loading.remove wire:target="generate">Lancer la génération</span>
-                    <span wire:loading wire:target="generate">Analyse en cours...</span>
+            {{-- ── Connection Warning (if none connected) ── --}}
+            @if(!$igConnected && !$fbConnected)
+                <div class="bg-amber-50 border border-amber-100 rounded-2xl p-5 flex items-start gap-4 mt-6"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0">
+                    <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-bold text-amber-900">Pas de compte lié</p>
+                        <p class="text-xs text-amber-700 mt-1 leading-relaxed">
+                            Le post sera généré et enregistré dans vos créations, mais <span class="font-bold">il ne sera pas publié automatiquement</span> car aucun compte social n'est connecté.
+                        </p>
+                        <p class="text-xs text-amber-600 mt-2">
+                            Vous pourrez le publier manuellement plus tard depuis vos créations.
+                        </p>
+                        <a href="{{ route('post-settings') }}" wire:navigate class="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-copper hover:text-amber-700 transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            Lier un compte maintenant
+                        </a>
+                    </div>
                 </div>
-            </button>
+            @endif
+            @endif
+
+            {{-- ── NAVIGATION FOOTER ── --}}
+            <div class="flex items-center gap-4 pt-4">
+                @if($currentStep > 1)
+                    <button type="button" 
+                            wire:click="previousStep"
+                            class="flex-1 bg-white border-2 border-gray-100 text-midnight font-bold py-4 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98]">
+                        Précédent
+                    </button>
+                @endif
+
+                @if($currentStep < 4)
+                    <button type="button" 
+                            wire:click="nextStep"
+                            wire:loading.attr="disabled"
+                            class="flex-[2] bg-copper text-white font-bold py-4 rounded-2xl shadow-lg shadow-copper/20 hover:bg-amber-500 hover:shadow-xl hover:shadow-copper/30 transition-all active:scale-[0.98] disabled:opacity-50">
+                        <span wire:loading.remove wire:target="nextStep">Continuer</span>
+                        <span wire:loading wire:target="nextStep" class="flex items-center justify-center gap-2">
+                            <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                            Validation...
+                        </span>
+                    </button>
+                @else
+                    {{-- ── Submit ── --}}
+                    <button type="submit"
+                            wire:loading.attr="disabled"
+                            wire:target="generate"
+                            class="flex-[2] relative group overflow-hidden bg-copper text-white font-bold text-sm py-4 rounded-2xl shadow-lg shadow-copper/25 hover:shadow-xl hover:shadow-copper/30 hover:bg-amber-500 transition-all active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed">
+                        <div class="flex items-center justify-center gap-3">
+                            <svg wire:loading.remove wire:target="generate" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            <svg wire:loading wire:target="generate" class="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <span wire:loading.remove wire:target="generate">Lancer la génération</span>
+                            <span wire:loading wire:target="generate">Analyse en cours...</span>
+                        </div>
+                    </button>
+                @endif
+            </div>
 
         </form>
 
@@ -1507,6 +1596,10 @@
         timer: null,
 
         init() {
+            window.addEventListener('scroll-to-top', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
             // Quand la transcription Livewire est prête, basculer vers l'onglet "Écrire"
             window.addEventListener('switch-to-text-mode', () => {
                 this.mode = 'text';

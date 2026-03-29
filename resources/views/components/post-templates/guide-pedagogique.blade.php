@@ -25,7 +25,7 @@
 @endphp
 
 <div {!! $alpineData !!} class="w-full relative">
-    <div class="w-full aspect-square bg-slate-50 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
+    <div class="w-full aspect-square bg-gray-50 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
         
         <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 2px 2px, black 1px, transparent 0); background-size: 24px 24px;"></div>
         <div class="absolute inset-x-0 top-0 h-1.5 z-10" style="background-color: {{ $brandColor }}"></div>
@@ -81,7 +81,7 @@
                          elseif ($cLen > 40) $cFontSize = 'text-lg';
                      @endphp
                      <div class="max-h-[180px] overflow-hidden">
-                         <p class="text-[#1E293B] font-black {{ $cFontSize }} uppercase tracking-tight leading-tight font-montserrat">
+                         <p class="text-gray-800 font-black {{ $cFontSize }} uppercase tracking-tight leading-tight font-montserrat">
                              {{ $content }}
                          </p>
                      </div>

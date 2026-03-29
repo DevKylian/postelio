@@ -14,10 +14,10 @@
     @endphp
 @endif
 
-<div class="w-full aspect-square bg-slate-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full aspect-square bg-neutral-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
     
     {{-- Background image with focus --}}
-    <div class="absolute inset-0 bg-slate-800">
+    <div class="absolute inset-0 bg-neutral-800">
         @if($imageUrl)
             <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover blur-[2px]">
         @else

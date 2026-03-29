@@ -45,6 +45,7 @@ class PostGenerator extends Component
     public $analysisSuccess  = false;
     public $visualStyle     = 'standard'; // standard | glass | blueprint | kraft | beton
     public bool $isFeatureDisabled = false;
+    public int $currentStep = 1;
 
     // Carousel templates
     const CAROUSEL_TEMPLATES  = ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq'];
@@ -163,7 +164,62 @@ class PostGenerator extends Component
             'tone'          => 'required|in:professionnel,chaleureux,expert,dynamique',
             'customNote'    => 'nullable|string|max:300',
             'visualStyle'   => 'required|in:standard,glass,blueprint,kraft,beton',
-        ];
+    ];
+    }
+
+    public function nextStep()
+    {
+        if ($this->currentStep === 1) {
+            $this->validateOnly('template');
+        } elseif ($this->currentStep === 2) {
+            // Either audio or text is required
+            if (!$this->audio && empty(trim($this->textContent))) {
+                $this->addError('textContent', 'Enregistrez un mémo, importez un fichier audio, ou saisissez votre texte.');
+                return;
+            }
+            $this->validateOnly('textContent');
+            $this->validateOnly('tone');
+        } elseif ($this->currentStep === 3) {
+            $this->validateOnly('visualStyle');
+            
+            $needsPhoto = in_array($this->template, self::PHOTO_TEMPLATES);
+            if ($this->template === 'custom' && $this->customTemplateId) {
+                $ct = CustomTemplate::query()->find($this->customTemplateId);
+                if ($ct && ($ct->photo_mode === 'single' || $ct->photo_mode === 'carousel')) {
+                    $needsPhoto = true;
+                }
+            }
+            
+            if ($needsPhoto) {
+                if (in_array($this->template, self::BEFORE_AFTER_TEMPLATES)) {
+                    $this->validateOnly('imageBefore');
+                    $this->validateOnly('imageAfter');
+                } elseif (in_array($this->template, ['chantier_detail', 'step_by_step'])) {
+                    $this->validateOnly('extraImages');
+                } else {
+                    $this->validateOnly('imageBefore');
+                }
+            }
+        }
+
+        $this->currentStep++;
+        $this->dispatch('scroll-to-top');
+    }
+
+    public function previousStep()
+    {
+        if ($this->currentStep > 1) {
+            $this->currentStep--;
+            $this->dispatch('scroll-to-top');
+        }
+    }
+
+    public function goToStep(int $step)
+    {
+        if ($step < $this->currentStep) {
+            $this->currentStep = $step;
+            $this->dispatch('scroll-to-top');
+        }
     }
 
     public function selectCustomTemplate(int $id): void

@@ -64,6 +64,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
         Route::get('/admin/templates', \App\Livewire\Admin\Templates\TemplateManager::class)->name('admin.templates.index');
         Route::get('/admin/changelog', \App\Livewire\Admin\Changelog\ChangelogManager::class)->name('admin.changelog.index');
         Route::get('/admin/blog', \App\Livewire\Admin\Blog\BlogManager::class)->name('admin.blog.index');
+        Route::get('/admin/server', \App\Livewire\Admin\ServerMonitor::class)->name('admin.server');
     });
 
     // Social & Sync routes (Premium only)

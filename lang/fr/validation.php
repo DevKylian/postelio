@@ -126,7 +126,7 @@ return [
     'timezone' => 'Le champ :attribute doit être un fuseau horaire valide.',
     'unique' => 'La valeur du champ :attribute est déjà utilisée.',
     'uploaded' => "Le fichier :attribute n'a pu être téléversé.",
-    'url' => 'Le format de l\'URL de :attribute n'est pas valide.',
+    'url' => "Le format de l'URL de :attribute n'est pas valide.",
     'uuid' => 'Le champ :attribute doit être un UUID valide.',
 
     /*

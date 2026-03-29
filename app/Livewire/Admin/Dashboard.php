@@ -12,6 +12,12 @@ use Livewire\Component;
 class Dashboard extends Component
 {
     public ?\App\Models\Post $selectedPost = null;
+    public bool $postGenerationEnabled = true;
+
+    public function mount()
+    {
+        $this->postGenerationEnabled = \App\Models\Setting::get('post_generation_enabled', true);
+    }
 
     public function selectPost(\App\Models\Post $post)
     {
@@ -21,6 +27,15 @@ class Dashboard extends Component
     public function closeModal()
     {
         $this->selectedPost = null;
+    }
+
+    public function togglePostGeneration()
+    {
+        $this->postGenerationEnabled = !$this->postGenerationEnabled;
+        \App\Models\Setting::set('post_generation_enabled', $this->postGenerationEnabled);
+        
+        $status = $this->postGenerationEnabled ? 'activée' : 'désactivée';
+        session()->flash('success', "La génération de posts a été {$status}.");
     }
 
     public function render()

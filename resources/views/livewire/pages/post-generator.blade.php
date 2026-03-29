@@ -1,6 +1,27 @@
 <div>
-    @if ($status === 'idle')
-        <form wire:submit.prevent="generate" class="space-y-6">
+    @if($isFeatureDisabled)
+    <div class="py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto space-y-8">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-xl flex items-center justify-center bg-copper/10 text-copper">
+                    <svg class="w-10 h-10 overflow-visible" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="font-bold text-midnight text-lg mb-2">Fonctionnalité en maintenance</h3>
+                <p class="text-gray-400 text-sm mb-6 max-w-xs mx-auto">La génération de posts est temporairement suspendue pour une mise à jour technique. Nos équipes développent de nouvelles fonctionnalités.</p>
+                <a href="{{ route('dashboard') }}" wire:navigate
+                   class="inline-flex items-center gap-2 bg-midnight text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-midnight/90 transition-colors">
+                    Retour au Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+    @elseif ($status === 'idle')
+        <div class="py-8 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto space-y-8">
+                <form wire:submit.prevent="generate" class="space-y-6">
 
             @php
             $templateGroups = [
@@ -1416,7 +1437,7 @@
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                         Rejeter
                     </button>
-                </div>
+                </form>
             </div>
         </div>
 

@@ -44,6 +44,7 @@ class PostGenerator extends Component
     public $isAnalyzing     = false;
     public $analysisSuccess  = false;
     public $visualStyle     = 'standard'; // standard | glass | blueprint | kraft | beton
+    public bool $isFeatureDisabled = false;
 
     // Carousel templates
     const CAROUSEL_TEMPLATES  = ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq'];
@@ -54,6 +55,8 @@ class PostGenerator extends Component
 
     public function mount()
     {
+        $this->isFeatureDisabled = !\App\Models\Setting::get('post_generation_enabled', true);
+
         $company = Auth::user()->company;
         $this->platforms = [];
         if ($company?->instagram_connected) $this->platforms[] = 'instagram';
@@ -179,6 +182,11 @@ class PostGenerator extends Component
 
     public function generate()
     {
+        if (!\App\Models\Setting::get('post_generation_enabled', true)) {
+            $this->addError('quota', "La génération de posts est temporairement désactivée pour maintenance.");
+            return;
+        }
+
         $user = Auth::user();
         $user->checkAndResetQuota();
 

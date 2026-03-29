@@ -9,7 +9,7 @@
     </x-slot>
 
     <div class="py-8 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-7xl mx-auto space-y-8">
             <livewire:pages.post-generator />
         </div>
     </div>

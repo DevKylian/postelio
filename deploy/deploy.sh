@@ -31,6 +31,16 @@ cd "$APP_DIR" || fail "Impossible d'accéder à $APP_DIR"
 GITHUB_TOKEN="$(cat /etc/postelio-github-token)"
 git remote set-url origin "https://${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git"
 
+# --- Vérification Droits / Permissions ---------------------------------------
+# S'assurer que 'deploy' peut bien écrire dans .git
+if [ ! -w "${APP_DIR}/.git" ]; then
+    log "Problème de permissions détecté sur ${APP_DIR}/.git - tentative de correction..."
+    # On tente un fix silencieux si on a une permission partielle ou via sudo si configuré 
+    # (mais ici on assume que si on ne peut pas écrire, on log l'erreur pour maintenance)
+    log "ERREUR : L'utilisateur $(whoami) n'a pas les droits d'écriture sur .git"
+    fail "Permissions insuffisantes"
+fi
+
 # --- Vérifier si nouveaux commits -------------------------------------------
 git fetch origin "$GITHUB_BRANCH" --quiet
 LOCAL=$(git rev-parse HEAD)

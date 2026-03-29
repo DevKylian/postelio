@@ -178,6 +178,7 @@ fi
 
 # Marquer le dossier comme safe pour git (évite l'erreur dubious ownership)
 git config --global --add safe.directory "$APP_DIR"
+sudo -u deploy git config --global --add safe.directory "$APP_DIR"
 
 # Configurer git pour les pulls futurs
 cd "$APP_DIR"
@@ -276,7 +277,7 @@ sudo -u deploy $PHP artisan migrate --force
 chown -R deploy:www-data "$APP_DIR"
 find "$APP_DIR" -type f -exec chmod 644 {} \;
 find "$APP_DIR" -type d -exec chmod 755 {} \;
-chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/.git" 2>/dev/null || true
 chown -R deploy:www-data "$LOG_DIR" "$BACKUP_DIR"
 
 log "Application configurée."
@@ -571,6 +572,12 @@ cd "\$APP_DIR" || fail "Impossible d'accéder à \$APP_DIR"
 
 # Refresh token dans l'URL git au cas où
 git remote set-url origin "https://\${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git"
+
+# --- Vérification Droits / Permissions ---------------------------------------
+if [ ! -w "\$APP_DIR/.git" ]; then
+    log "ERREUR : L'utilisateur \$(whoami) n'a pas les droits d'écriture sur \$APP_DIR/.git"
+    fail "Permissions insuffisantes (échec .git writable)"
+fi
 
 # --- Vérifier s'il y a de nouveaux commits ----------------------------------
 git fetch origin ${GITHUB_BRANCH} --quiet

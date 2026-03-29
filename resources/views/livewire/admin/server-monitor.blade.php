@@ -49,9 +49,9 @@
                 <div class="relative z-10">
                     <div class="flex items-center justify-between mb-6">
                         <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a10.046 10.046 0 01-6.308.6l-2.313-.46a4.123 4.123 0 01-1.464-.543V1.644c.48.275.992.54 1.517.794.704.34 1.48.552 2.222.842 2.067.808 4.254.912 6.368.494l2.585-.516a8 8 0 014.653.64l1.628.814v10.743c0 .264-.047.525-.138.77z"></path></svg>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
                         </div>
-                        <span class="text-2xl font-bold text-midnight tabular-nums">{{ $stats['ram']['percentage'] }}%</span>
+                        <span class="text-2xl font-bold text-midnight tabular-nums">{{ number_format($stats['ram']['percentage'], 1) }}%</span>
                     </div>
                     <h3 class="font-bold text-midnight mb-1">Mémoire RAM</h3>
                     <p class="text-xs text-gray-400 mb-6">{{ number_format($stats['ram']['used'] / (1024*1024*1024), 2) }} Go / {{ number_format($stats['ram']['total'] / (1024*1024*1024), 1) }} Go</p>
@@ -70,7 +70,7 @@
                         <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
                         </div>
-                        <span class="text-2xl font-bold text-midnight tabular-nums">{{ $stats['disk']['percentage'] }}%</span>
+                        <span class="text-2xl font-bold text-midnight tabular-nums">{{ number_format($stats['disk']['percentage'], 1) }}%</span>
                     </div>
                     <h3 class="font-bold text-midnight mb-1">Stockage</h3>
                     <p class="text-xs text-gray-400 mb-6">{{ number_format($stats['disk']['used'] / (1024*1024*1024), 1) }} Go / {{ number_format($stats['disk']['total'] / (1024*1024*1024), 0) }} Go</p>
@@ -98,16 +98,16 @@
                             <dd class="mt-1 text-sm font-semibold text-midnight">{{ $stats['system']['os'] }}</dd>
                         </div>
                         <div>
-                            <dt class="text-sm font-medium text-gray-400">Uptime Serveur</dt>
-                            <dd class="mt-1 text-sm font-semibold text-midnight">{{ $stats['uptime'] }}</dd>
+                            <dt class="text-sm font-medium text-gray-400">Logiciel Serveur</dt>
+                            <dd class="mt-1 text-sm font-semibold text-midnight truncate">{{ $stats['system']['server'] }}</dd>
                         </div>
                         <div>
                             <dt class="text-sm font-medium text-gray-400">Version PHP</dt>
                             <dd class="mt-1 text-sm font-semibold text-midnight">{{ $stats['system']['php'] }}</dd>
                         </div>
                         <div>
-                            <dt class="text-sm font-medium text-gray-400">Logiciel Serveur</dt>
-                            <dd class="mt-1 text-sm font-semibold text-midnight truncate">{{ $stats['system']['server'] }}</dd>
+                            <dt class="text-sm font-medium text-gray-400">Heure Locale</dt>
+                            <dd class="mt-1 text-sm font-semibold text-midnight">{{ date('H:i:s') }}</dd>
                         </div>
                     </dl>
                 </div>
@@ -117,14 +117,16 @@
                 <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
                     <h3 class="font-bold text-midnight flex items-center gap-2">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Temps de calcul
+                        Uptime Serveur
                     </h3>
                 </div>
                 <div class="p-8 flex-1 flex flex-col justify-center text-center">
-                    <div class="text-5xl font-bold text-midnight tracking-tight tabular-nums mb-2">{{ date('H:i:s') }}</div>
-                    <p class="text-gray-400 text-sm">Heure système actuelle du serveur</p>
+                    <div class="text-5xl font-bold text-midnight tracking-tight tabular-nums mb-2">{{ $stats['uptime'] }}</div>
+                    <p class="text-gray-400 text-sm">Temps écoulé depuis le dernier redémarrage</p>
                 </div>
             </div>
         </div>
+    </div>
+</div>
     </div>
 </div>

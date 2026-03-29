@@ -32,11 +32,13 @@ class ServerMonitor extends Component
 
     private function getCpuUsage(): float
     {
+        $cores = $this->getCpuCoreCount();
+
         if (PHP_OS_FAMILY === 'Windows') {
             try {
                 $cmd = 'powershell -command "Get-CimInstance Win32_Processor | Select-Object -ExpandProperty LoadPercentage"';
                 $output = shell_exec($cmd);
-                return (float) trim($output);
+                return round((float) trim($output), 1);
             } catch (\Exception $e) {
                 return 0.0;
             }
@@ -44,11 +46,33 @@ class ServerMonitor extends Component
 
         if (function_exists('sys_getloadavg')) {
             $load = sys_getloadavg();
-            // sys_getloadavg gives [1min, 5min, 15min]. Return 1min.
-            return (float) ($load[0] ?? 0);
+            // sys_getloadavg [1min, 5min, 15min]
+            $percentage = ($load[0] / $cores) * 100;
+            return round($percentage, 1);
         }
 
         return 0.0;
+    }
+
+    private function getCpuCoreCount(): int
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            try {
+                $cmd = 'powershell -command "(Get-CimInstance Win32_Processor).NumberOfCores"';
+                $output = shell_exec($cmd);
+                return max(1, (int) trim($output));
+            } catch (\Exception $e) {
+                return 1;
+            }
+        }
+
+        if (is_file('/proc/cpuinfo')) {
+            $cpuinfo = file_get_contents('/proc/cpuinfo');
+            preg_match_all('/^processor/m', $cpuinfo, $matches);
+            return max(1, count($matches[0]));
+        }
+
+        return 1;
     }
 
     private function getMemoryUsage(): array

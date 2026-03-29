@@ -617,8 +617,9 @@ if ! composer install --no-dev --optimize-autoloader --no-interaction --quiet 2>
 fi
 
 # --- Frontend (si JS/CSS/Blade modifié — Tailwind scanne aussi les vues) ----
+FRONTEND_REGEX="^(resources/|lang/|app/View/|app/Livewire/|package|vite\.config|tailwind\.config|composer\.lock)"
 FRONTEND_CHANGED=\$(git diff "\${PREV_COMMIT}" "\${NEW_COMMIT}" --name-only 2>/dev/null \
-    | grep -cE "^(resources/js|resources/css|resources/views|package\.json|vite\.config|tailwind\.config)" || true)
+    | grep -cE "\$FRONTEND_REGEX" || echo "0")
 FRONTEND_CHANGED=\${FRONTEND_CHANGED:-0}
 
 # On force aussi si le dossier build est manquant
@@ -659,7 +660,8 @@ log "Rebuild des caches..."
 \$PHP artisan event:cache
 
 # --- Storage link ------------------------------------------------------------
-\$PHP artisan storage:link 2>/dev/null || true
+rm -f public/storage
+\$PHP artisan storage:link --quiet
 
 # --- Mode maintenance OFF ----------------------------------------------------
 log "Mode maintenance désactivé..."

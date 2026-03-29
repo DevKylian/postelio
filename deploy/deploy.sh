@@ -47,15 +47,20 @@ NEW_COMMIT=$(git rev-parse --short HEAD)
 log "Mise à jour : ${PREV_COMMIT} → ${NEW_COMMIT}"
 
 # --- Vérification extensions PHP requises ------------------------------------
-REQUIRED_EXTS="bcmath mbstring xml curl gd zip intl tokenizer fileinfo"
+REQUIRED_EXTS="bcmath mbstring xml curl gd zip intl tokenizer fileinfo openssl filter"
 MISSING_EXTS=""
 for ext in $REQUIRED_EXTS; do
-    if ! $PHP -m 2>/dev/null | grep -qi "^${ext}$"; then
+    if ! $PHP -r "exit(extension_loaded('$ext') ? 0 : 1);" 2>/dev/null; then
         MISSING_EXTS="${MISSING_EXTS} php8.3-${ext}"
     fi
 done
+
 if [ -n "$MISSING_EXTS" ]; then
-    fail "Extensions PHP manquantes :${MISSING_EXTS} — Installer avec : sudo apt-get install${MISSING_EXTS}"
+    log "Extensions PHP manquantes : ${MISSING_EXTS}"
+    log "Veuillez installer via : sudo apt-get install ${MISSING_EXTS} && sudo systemctl restart php8.3-fpm"
+    # Note: On ne fail pas forcément ici si l'app peut tourner en mode dégradé, 
+    # mais pour une prod Laravel il vaut mieux s'arrêter.
+    fail "Déploiement avorté : extensions manquantes."
 fi
 
 # --- PHP dependencies -------------------------------------------------------
@@ -70,12 +75,18 @@ FRONTEND_CHANGED=$(git diff "${PREV_COMMIT}" "${NEW_COMMIT}" --name-only 2>/dev/
     | grep -cE "^(resources/js|resources/css|resources/views|package\.json|vite\.config|tailwind\.config)" || true)
 FRONTEND_CHANGED=${FRONTEND_CHANGED:-0}
 
+# On force aussi si le dossier build est manquant
+if [ ! -d "public/build" ]; then
+    log "Dossier public/build manquant — forçage build npm..."
+    FRONTEND_CHANGED=1
+fi
+
 if [ "$FRONTEND_CHANGED" -gt 0 ]; then
-    log "Frontend modifié — rebuild npm..."
-    npm install --no-audit --no-fund
-    npm run build
+    log "Frontend modifié (ou build manquant) — rebuild npm..."
+    npm install --no-audit --no-fund --quiet
+    npm run build --quiet
 else
-    log "Pas de changements frontend."
+    log "Pas de changements frontend — skip npm build."
 fi
 
 # --- Mode maintenance -------------------------------------------------------

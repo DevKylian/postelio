@@ -1109,10 +1109,10 @@
               <div class="max-w-5xl mx-auto">
                 <article class="group bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                   <a href="{{ route('blog.show', $blogPost->slug) }}" class="flex flex-col md:flex-row items-stretch">
-                    <div class="md:w-1/2 aspect-[16/10] md:aspect-auto overflow-hidden bg-slate-50">
+                    <div class="md:w-1/2 overflow-hidden bg-slate-50" style="aspect-ratio: 16/8">
                       @if($blogPost->featured_image)
                         <img src="{{ Storage::url($blogPost->featured_image) }}" alt="{{ $blogPost->title }}"
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                             class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700 [backface-visibility:hidden] [transform:translateZ(0)]">
                       @else
                         <div class="w-full h-full bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
                           <svg class="w-16 h-16 text-copper/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
@@ -1140,10 +1140,10 @@
                 @foreach($latestPosts as $blogPost)
                   <article class="group bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <a href="{{ route('blog.show', $blogPost->slug) }}">
-                      <div class="aspect-[16/10] overflow-hidden bg-slate-50">
+                      <div class="overflow-hidden bg-slate-50" style="aspect-ratio: 16/8">
                         @if($blogPost->featured_image)
                           <img src="{{ Storage::url($blogPost->featured_image) }}" alt="{{ $blogPost->title }}"
-                               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                               class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700 [backface-visibility:hidden] [transform:translateZ(0)]">
                         @else
                           <div class="w-full h-full bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center">
                             <svg class="w-12 h-12 text-copper/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>

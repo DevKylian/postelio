@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Bannière Postelio</title>
+    <!-- Fonts - Outfit & Figtree -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Using dom-to-image for perfect CSS support (Gradients, Clip-text, etc.) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+
+    <style>
+        :root {
+            --midnight: #1e293b;
+            --copper-from: #f59e0b;
+            --copper-via: #fb923c;
+            --copper-to: #d97706;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px;
+            background-color: #f8fafc;
+            font-family: 'Figtree', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        /* CONTROLS */
+        .controls {
+            background: white;
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            display: flex;
+            gap: 20px;
+            width: 1200px;
+            box-sizing: border-box;
+            align-items: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .controls input {
+            flex: 1;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 16px;
+            color: var(--midnight);
+            outline: none;
+        }
+
+        .controls button {
+            background: var(--midnight);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-family: inherit;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .controls button:hover {
+            transform: translateY(-2px);
+            background: #0f172a;
+        }
+
+        /* BANNER CANVAS AREA */
+        #banner-canvas {
+            width: 1200px;
+            height: 630px;
+            background-color: #fcfcfc;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+            /* Important for dom-to-image rendering */
+            display: block; 
+        }
+
+        /* ULTRA SUBTLE GLOWS */
+        .glow {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .glow-1 {
+            width: 1200px;
+            height: 1200px;
+            top: -50%;
+            left: -30%;
+            background: radial-gradient(circle, rgba(253, 230, 138, 0.08) 0%, rgba(253, 230, 138, 0) 70%);
+        }
+
+        .glow-2 {
+            width: 1000px;
+            height: 1000px;
+            top: 20%;
+            right: -40%;
+            background: radial-gradient(circle, rgba(254, 215, 170, 0.05) 0%, rgba(254, 215, 170, 0) 70%);
+        }
+
+        /* MAIN CONTENT */
+        .banner-content {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 80px;
+            box-sizing: border-box;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(245, 158, 11, 0.04); 
+            color: #d97706; 
+            border: 1px solid rgba(245, 158, 11, 0.1); 
+            padding: 8px 20px;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        /* TITLE - EXACT LP GRADIENT */
+        .title {
+            color: var(--midnight);
+            font-family: 'Outfit', sans-serif;
+            font-size: 74px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.05;
+            letter-spacing: -0.05em;
+            max-width: 1060px; /* Slightly wider to avoid premature wrapping */
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: keep-all;
+            padding: 0 40px; /* Buffer for measuring errors */
+            box-sizing: border-box;
+        }
+        
+        .title span {
+            background: linear-gradient(to right, var(--copper-from), var(--copper-via), var(--copper-to));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent; 
+            font-style: italic;
+            font-weight: 700;
+            display: inline-block; /* Inline-block is better for gradient box but needs padding */
+            padding-right: 0.1em; 
+            margin-right: -0.05em;
+            letter-spacing: 0;
+        }
+
+        /* LOGO */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+
+        .logo-bar {
+            background: white;
+            width: 2.5px;
+            border-radius: 2px;
+        }
+
+        .logo-bar-1 { height: 10px; }
+        .logo-bar-2 { height: 18px; }
+        .logo-bar-3 { height: 13px; }
+        .logo-bar-4 { height: 8px; }
+
+        .logo-text {
+            color: var(--midnight);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <input type="text" id="titleInput" value="Facebook ou *Instagram* pour un entrepreneur du *bâtiment* ? 🔥" placeholder="Tapez le titre...">
+        <button onclick="exportBanner()">Exporter la bannière</button>
+    </div>
+
+    <div id="banner-canvas">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+
+        <div class="banner-content">
+            <div class="badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;color:#f59e0b;"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364-.707.707M6.343 17.657l-.707.707m12.728 0-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>
+                Article de blog
+            </div>
+            
+            <h1 class="title" id="bannerTitle"></h1>
+            
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <div class="logo-bar logo-bar-1"></div>
+                    <div class="logo-bar logo-bar-2"></div>
+                    <div class="logo-bar logo-bar-3"></div>
+                    <div class="logo-bar logo-bar-4"></div>
+                </div>
+                <div class="logo-text">Postelio</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const titleInput = document.getElementById('titleInput');
+        const bannerTitle = document.getElementById('bannerTitle');
+
+        function formatTitle(text) {
+            let html = text.replace(/\*([^*]+)\*/g, '<span>$1</span>');
+            // Fix emoji wrapping: attach emoji to previous word with non-breaking space
+            return html.replace(/\s([\u2700-\u27bf\u1f300-\u1f5ff\u1f600-\u1f64f\u1f680-\u1f6ff\u1f900-\u1f9ff\u1f1e6-\u1f1ff])/g, '&nbsp;$1');
+        }
+
+        function updateTitle() {
+            const rawValue = titleInput.value;
+            bannerTitle.dataset.raw = rawValue;
+            bannerTitle.innerHTML = formatTitle(rawValue);
+        }
+
+        titleInput.addEventListener('input', updateTitle);
+        updateTitle();
+
+        function exportBanner() {
+            const node = document.getElementById('banner-canvas');
+            const rawTitle = titleInput.value || 'banniere';
+            const filename = rawTitle.toLowerCase().replace(/[^a-z0-9]/g, '-') + '.png';
+            const scale = 2; // FIX: Define scale here
+
+            // Wait 100ms for everything to be ultra-stable
+            setTimeout(() => {
+                domtoimage.toPng(node, {
+                    width: node.clientWidth * scale,
+                    height: node.clientHeight * scale,
+                    style: {
+                        transform: 'scale(' + scale + ')',
+                        transformOrigin: 'top left',
+                        width: node.clientWidth + 'px',
+                        height: node.clientHeight + 'px'
+                    }
+                })
+                .then(function (dataUrl) {
+                    const link = document.createElement('a');
+                    link.download = filename;
+                    link.href = dataUrl;
+                    link.click();
+                })
+                .catch(function (error) {
+                    console.error('oops, something went wrong!', error);
+                });
+            }, 100);
+        }
+    </script>
+</body>
+</html>

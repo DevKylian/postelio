@@ -26,6 +26,8 @@ class BlogManager extends Component
     public $published_at;
     public $featured_image_upload;
     public $existing_featured_image = '';
+    public $json_pasted = '';
+    public $showAIPromptModal = false;
 
     public $isEditing = false;
     public $editingId = null;
@@ -60,6 +62,18 @@ class BlogManager extends Component
         }
     }
 
+    public function openAIModal()
+    {
+        $this->showAIPromptModal = true;
+        $this->json_pasted = '';
+    }
+
+    public function closeAIModal()
+    {
+        $this->showAIPromptModal = false;
+        $this->json_pasted = '';
+    }
+
     public function resetFields()
     {
         $this->title = '';
@@ -74,6 +88,39 @@ class BlogManager extends Component
         $this->existing_featured_image = '';
         $this->isEditing = false;
         $this->editingId = null;
+        $this->json_pasted = '';
+    }
+
+    public function processPastedJson()
+    {
+        $this->validate([
+            'json_pasted' => 'required|string'
+        ]);
+
+        $data = json_decode($this->json_pasted, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($data)) {
+            $this->resetFields();
+            $this->title = $data['titre'] ?? ($data['title'] ?? '');
+            $this->excerpt = $data['extrait'] ?? ($data['excerpt'] ?? '');
+            $this->content = $data['contenu_html'] ?? ($data['content'] ?? '');
+            $this->meta_title = $data['meta_title'] ?? '';
+            $this->meta_description = $data['meta_description'] ?? '';
+            $this->meta_keywords = isset($data['mots_cles']) && is_array($data['mots_cles']) 
+                                    ? implode(', ', $data['mots_cles']) 
+                                    : ($data['mots_cles'] ?? ($data['meta_keywords'] ?? ''));
+            $this->status = in_array($data['status'] ?? '', ['draft', 'published']) ? $data['status'] : 'draft';
+            
+            $this->isEditing = false;
+            $this->editingId = null;
+            $this->showForm = true;
+            $this->showAIPromptModal = false;
+            
+            $this->dispatch('notify', 'Article importé avec succès.');
+            $this->dispatch('json-imported'); // Event for Alpine to switch to HTML mode
+        } else {
+            $this->dispatch('notify', 'Erreur : Le texte collé n\'est pas un JSON valide.');
+        }
     }
 
     public function save()

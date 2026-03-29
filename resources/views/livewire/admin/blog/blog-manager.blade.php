@@ -26,13 +26,21 @@
                 <input type="text" wire:model.live.debounce.300ms="search" placeholder="Rechercher un article..."
                        class="w-full pl-11 pr-4 py-2.5 bg-white/50 border-slate-100 rounded-2xl text-sm font-medium text-midnight focus:ring-2 focus:ring-copper/20 focus:border-copper transition-all outline-none">
             </div>
-            <button wire:click="toggleForm"
-                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition-all shadow-lg {{ $showForm ? 'bg-slate-100 text-slate-600 hover:bg-slate-200 shadow-slate-200/50' : 'bg-midnight text-white hover:bg-slate-800 shadow-slate-900/10' }}">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{{ $showForm ? 'M6 18L18 6M6 6l12 12' : 'M12 4v16m8-8H4' }}" />
-                </svg>
-                {{ $showForm ? 'Fermer' : 'Nouvel article' }}
-            </button>
+            <div class="flex items-center gap-3">
+                @if(!$showForm)
+                <button wire:click="openAIModal" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition-all shadow-lg bg-gradient-to-r from-copper to-amber-500 text-white hover:shadow-copper/30 hover:-translate-y-0.5 border border-copper/20 active:translate-y-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    Générer avec l'IA
+                </button>
+                @endif
+                <button wire:click="toggleForm"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition-all shadow-lg {{ $showForm ? 'bg-slate-100 text-slate-600 hover:bg-slate-200 shadow-slate-200/50' : 'bg-midnight text-white hover:bg-slate-800 shadow-slate-900/10' }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{{ $showForm ? 'M6 18L18 6M6 6l12 12' : 'M12 4v16m8-8H4' }}" />
+                    </svg>
+                    {{ $showForm ? 'Fermer' : 'Nouvel article' }}
+                </button>
+            </div>
         </div>
 
         {{-- Form Section --}}
@@ -64,9 +72,13 @@
                         <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">Image de couverture</label>
                         <div class="flex items-center gap-6">
                             @if($featured_image_upload)
-                                <img src="{{ $featured_image_upload->temporaryUrl() }}" alt="Preview" class="w-32 h-20 object-cover rounded-xl border border-slate-100">
+                                <img src="{{ $featured_image_upload->temporaryUrl() }}" alt="Preview" class="w-40 object-cover rounded-xl border border-slate-100" style="aspect-ratio: 16/8">
                             @elseif($existing_featured_image)
-                                <img src="{{ Storage::url($existing_featured_image) }}" alt="Current" class="w-32 h-20 object-cover rounded-xl border border-slate-100">
+                                <img src="{{ Storage::url($existing_featured_image) }}" alt="Current" class="w-40 object-cover rounded-xl border border-slate-100" style="aspect-ratio: 16/8">
+                            @else
+                                <div class="w-40 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center" style="aspect-ratio: 16/8">
+                                    <svg class="w-8 h-8 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                </div>
                             @endif
                             <input type="file" wire:model="featured_image_upload" accept="image/*"
                                    class="text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-2xl file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-widest file:bg-copper/10 file:text-copper hover:file:bg-copper/20 transition-all">
@@ -120,6 +132,7 @@
                                     .catch(error => { console.error(error); });
                             }
                          }"
+                         x-on:json-imported.window="htmlMode = true"
                          wire:ignore>
                         <div class="flex items-center justify-between px-1 mb-2">
                             <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Contenu de l'article</label>
@@ -251,9 +264,13 @@
                             <td class="px-8 py-6">
                                 <div class="flex items-center gap-4">
                                     @if($post->featured_image)
-                                        <img src="{{ Storage::url($post->featured_image) }}" alt="" class="w-16 h-12 object-cover rounded-xl border border-slate-100 shrink-0">
+                                        <div class="w-24 overflow-hidden rounded-xl border border-slate-100 shrink-0" style="aspect-ratio: 16/8">
+                                            <img src="{{ Storage::url($post->featured_image) }}" alt="{{ $post->title }}" 
+                                                 class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700 [backface-visibility:hidden] [transform:translateZ(0)]">
+                                        </div>
                                     @else
-                                        <div class="w-16 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0">
+                                        <div class="w-24 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0" 
+                                             style="aspect-ratio: 16/8">
                                             <svg class="w-5 h-5 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                         </div>
                                     @endif
@@ -337,6 +354,299 @@
             </div>
             @endif
         </section>
+
+        {{-- AI Prompt Modal --}}
+        @if($showAIPromptModal)
+        <div class="fixed inset-0 z-[9999] flex items-center justify-center" 
+             x-data="{ 
+                copied: false, 
+                subject: '',
+                bannerTitle: '',
+                isExporting: false,
+                
+                formatBannerTitle(text) {
+                    if (!text) return '';
+                    let html = text.replace(/\*([^*]+)\*/g, '<span>$1</span>');
+                    return html.replace(/\s([\u2700-\u27bf\u1f300-\u1f5ff\u1f600-\u1f64f\u1f680-\u1f6ff\u1f900-\u1f9ff\u1f1e6-\u1f1ff])/g, '&nbsp;$1');
+                },
+
+                fitTitle() {
+                    this.$nextTick(() => {
+                        const el = this.$refs.bannerTitle;
+                        if (!el || !this.bannerTitle) return;
+
+                        let fontSize = 100;
+                        const minSize = 40;
+                        const maxSize = 220; // Even larger titles allowed
+                        
+                        // Start high and shrink until it reaches 2 lines max
+                        el.style.fontSize = fontSize + 'px';
+                        
+                        const getLineCount = () => {
+                            const style = window.getComputedStyle(el);
+                            const lh = parseFloat(style.lineHeight);
+                            if (isNaN(lh)) return Math.round(el.scrollHeight / (fontSize * 1.05));
+                            return Math.round(el.scrollHeight / lh);
+                        };
+
+                        el.style.maxWidth = '780px';
+                        
+                        let lineCount = getLineCount();
+                        
+                        while (getLineCount() > 2 && fontSize > minSize) {
+                            fontSize -= 1;
+                            el.style.fontSize = fontSize + 'px';
+                        }
+                        
+                        while (getLineCount() < 2 && fontSize < maxSize) {
+                            fontSize += 1;
+                            el.style.fontSize = fontSize + 'px';
+                            if (getLineCount() === 2) break;
+                        }
+                        
+                        let currentMaxWidth = 780;
+                        while (getLineCount() < 2 && currentMaxWidth > 400) {
+                            currentMaxWidth -= 10;
+                            el.style.maxWidth = currentMaxWidth + 'px';
+                        }
+                        
+                        while (getLineCount() === 2 && fontSize < maxSize) {
+                            fontSize += 1;
+                            el.style.fontSize = fontSize + 'px';
+                            if (getLineCount() > 2) {
+                                fontSize -= 1;
+                                el.style.fontSize = fontSize + 'px';
+                                break;
+                            }
+                        }
+                    });
+                },
+
+                exportBanner() {
+                    const node = this.$refs.bannerCanvas;
+                    const filename = (this.bannerTitle || 'banniere').toLowerCase().replace(/[^a-z0-9]/g, '-') + '.png';
+                    const scale = 2;
+                    this.isExporting = true;
+
+                    setTimeout(() => {
+                        domtoimage.toPng(node, {
+                            width: 1200,
+                            height: 630,
+                            style: {
+                                transform: 'scale(1)',
+                                transformOrigin: 'top left',
+                                width: '1200px',
+                                height: '630px'
+                            }
+                        })
+                        .then((dataUrl) => {
+                            const link = document.createElement('a');
+                            link.download = filename;
+                            link.href = dataUrl;
+                            link.click();
+                            this.isExporting = false;
+                        })
+                        .catch((error) => {
+                            console.error('oops, something went wrong!', error);
+                            this.isExporting = false;
+                        });
+                    }, 200);
+                },
+
+                syncTitleFromPastedJson(jsonString) {
+                    try {
+                        const data = JSON.parse(jsonString);
+                        if (data.titre || data.title) {
+                            this.bannerTitle = data.titre || data.title;
+                        }
+                    } catch (e) {}
+                }
+             }"
+             x-init="
+                $watch('$wire.json_pasted', value => syncTitleFromPastedJson(value));
+                $watch('bannerTitle', value => fitTitle());
+                window.addEventListener('resize', () => fitTitle());
+             "
+             x-on:json-imported.window="syncTitleFromPastedJson($wire.json_pasted); fitTitle();">
+            <div class="fixed inset-0 bg-slate-900/45 backdrop-blur-md" wire:click="closeAIModal"></div>
+            
+            <div class="relative w-full max-w-5xl mx-4 sm:mx-6 bg-white/95 backdrop-blur-md border border-white/40 shadow-2xl rounded-[2.5rem] overflow-hidden flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh] animate-in zoom-in-95 duration-300">
+                <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-white/50 shrink-0">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-copper to-amber-500 flex items-center justify-center text-white shadow-lg shadow-copper/20">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-display font-bold text-xl text-midnight">Générateur d'Article IA</h3>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">Prompt et Importation JSON</p>
+                        </div>
+                    </div>
+                    <button wire:click="closeAIModal" class="p-2 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {{-- Left side: Prompt Guide --}}
+                    <div class="space-y-5 flex flex-col h-full">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
+                                <span class="w-5 h-5 rounded-full bg-copper/20 text-copper flex items-center justify-center text-xs">1</span>
+                                Le Prompt à copier
+                            </h4>
+                            <button @click="
+                                navigator.clipboard.writeText($refs.promptText.innerText.replace('{INSERER_LE_SUJET_ICI}', subject || '[VOTRE SUJET]'));
+                                copied = true;
+                                setTimeout(() => copied = false, 2000);
+                            " class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-sm"
+                            :class="copied ? 'bg-green-100 text-green-600 border border-green-200' : 'bg-white text-slate-600 border border-slate-200 hover:border-copper/50 hover:text-copper'">
+                                <svg x-show="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                <svg x-cloak x-show="copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+                                <span x-text="copied ? 'Copié !' : 'Copier'"></span>
+                            </button>
+                        </div>
+                        
+                        <div>
+                            <input type="text" x-model="subject" placeholder="Sujet de l'article (ex: Rénover une salle de bain...)" 
+                                   class="w-full bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-midnight focus:border-copper focus:ring-2 focus:ring-copper/20 outline-none transition-all shadow-sm">
+                        </div>
+
+                        <div class="relative group flex-1 min-h-[300px]">
+                            <div class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none rounded-b-2xl"></div>
+                            <pre x-ref="promptText" class="absolute inset-0 text-[11px] sm:text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-2xl p-5 overflow-y-auto font-mono whitespace-pre-wrap leading-[1.8] shadow-inner selection:bg-copper/20">SUJET DE L'ARTICLE : <span x-text="subject || '{INSERER_LE_SUJET_ICI}'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
+
+TON RÔLE :
+Tu es un copywriter web d'élite spécialisé dans le B2B pour les artisans du bâtiment (plombiers, électriciens, menuisiers, paysagistes, maçons...). Tu parles "vrai". Pas de jargon marketing, pas de "bullshit corporate", pas de grandes théories abstraites. Tu t'adresses directement à l'artisan d'humain à humain (choisis le vouvoiement ou le tutoiement, mais sois constant et percutant). 
+
+Ton lecteur cible rentre à 19h le soir avec de la poussière sur les mains et souvent les genoux en vrac. Il n'a pas le temps de scroller l'infini sur son téléphone, il veut du concret, du pratique, et comprendre en 2 minutes chrono comment il peut trouver de meilleurs chantiers sans fournir d'effort supplémentaire.
+
+TON OBJECTIF :
+Rédiger un article de blog complet (format "Tunnel de vente") sur le sujet demandé pour éduquer l'artisan. À la fin de la lecture, cet article doit lui donner irrésistiblement et logiquement envie d'utiliser notre outil : Postelio.
+
+À PROPOS DE POSTELIO :
+C'est l'application qui permet à un artisan de prendre une simple photo de son chantier. L'IA s'occupe ensuite d'analyser l'image, de rédiger un texte expert qui rassure, et de le publier automatiquement sur tous ses réseaux sociaux. 100% sans effort, 100% pensé pour les pros pressés.
+
+STRUCTURE DE L'ARTICLE (Framework PAS à respecter obligatoirement) :
+1. Problème (Problem) : Accroche immédiate sur sa galère quotidienne en lien avec le sujet.
+2. Agitation (Agitate) : Retourne le couteau dans la plaie chiffrée ou émotionnelle.
+3. [CTA] : Insère exactement la balise `[CTA]` vers le milieu de ton texte, isolée sur une ligne seule.
+4. Solution et valeur ajoutée (Solution) : Donne de VRAIS conseils pratiques, puis explique que Postelio le fait entièrement à leur place.
+
+CONSIGNES POUR LE CONTENU HTML :
+- Longueur : Le texte de l'article doit faire au minimum 600 mots.
+- Format : Rédige le contenu en HTML brut.
+- Balises autorisées : &lt;h2&gt;, &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;.
+- Interdiction absolue : N'utilise JAMAIS de balise &lt;h1&gt;.
+
+FORMAT DE SORTIE EXIGÉ (JSON) :
+Tu dois impérativement et UNIQUEMENT répondre en format JSON valide, sans aucun texte avant ou après, en respectant scrupuleusement le schéma suivant :
+
+{
+  "titre": "Ton titre ultra percutant, max 60 caractères",
+  "extrait": "2 à 3 phrases choc ou chiffres clés pour donner immédiatement envie de lire",
+  "meta_title": "Le titre technique SEO optimisé, max 60 caractères",
+  "meta_description": "La description pour Google, max 150 caractères. PAS DE GUILLEMETS DOUBLE NI DE CODE HTML DEDANS.",
+  "mots_cles": ["mot-cle-1", "mot-cle-2", "mot-cle-3", "mot-cle-4", "mot-cle-5"],
+  "contenu_html": "Le texte complet de l'article formaté en HTML brut (Minimum 600 mots). N'oublie pas le shortcode [CTA] exact placé vers le milieu, isolé entre 2 paragrafes."
+}</pre>
+                        </div>
+                    </div>
+                    
+                    {{-- Right side: Paste Result --}}
+                    <div class="space-y-5 flex flex-col pt-6 lg:pt-0 lg:border-l lg:border-slate-100 lg:pl-8 h-full">
+                        <div class="flex items-center justify-between shrink-0">
+                            <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
+                                <span class="w-5 h-5 rounded-full bg-copper/20 text-copper flex items-center justify-center text-xs">2</span>
+                                Coller la réponse JSON
+                            </h4>
+                        </div>
+                        
+                        <div class="relative flex-1 min-h-[250px] lg:min-h-0">
+                            <textarea wire:model="json_pasted" placeholder="Collez le code JSON ici...
+{
+  &quot;titre&quot;: &quot;...&quot;,
+  ...
+}"
+                                      class="absolute inset-0 w-full h-full bg-slate-900 text-green-400/90 border-0 rounded-2xl p-6 text-xs sm:text-sm font-mono focus:ring-4 focus:ring-copper/30 transition-shadow outline-none resize-none shadow-inner shadow-slate-950/50 selection:bg-copper/30"></textarea>
+                            
+                            <div wire:loading wire:target="processPastedJson" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                                <svg class="animate-spin h-8 w-8 text-copper" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            </div>
+                        </div>
+                        @error('json_pasted') <span class="text-rose-500 text-[11px] font-bold tracking-tight bg-rose-50 px-3 py-1 rounded-lg shrink-0">{{ $message }}</span> @enderror
+                        
+                        <button wire:click="processPastedJson"
+                                class="w-full shrink-0 py-4 rounded-2xl bg-midnight text-white font-black text-sm uppercase tracking-[0.1em] hover:bg-slate-800 transition-all shadow-xl shadow-midnight/10 flex flex-col items-center justify-center gap-1 group">
+                             <div class="flex items-center gap-2">
+                                 <svg class="w-5 h-5 text-copper group-hover:-rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                 Importer dans l'éditeur
+                             </div>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Banner Section --}}
+                <div class="px-8 pb-8 shrink-0">
+                    <div class="pt-8 border-t border-slate-100 flex flex-col lg:flex-row items-center gap-8">
+                        <div class="flex-1 w-full space-y-4">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
+                                    <span class="w-5 h-5 rounded-full bg-copper/20 text-copper flex items-center justify-center text-xs">3</span>
+                                    Générer la bannière
+                                </h4>
+                                <button @click="exportBanner()" 
+                                        :disabled="isExporting"
+                                        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-copper text-white text-xs font-black uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg shadow-copper/20 disabled:opacity-50">
+                                    <svg x-show="!isExporting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                    <svg x-show="isExporting" class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <span x-text="isExporting ? 'Exportation...' : 'Exporter la bannière'"></span>
+                                </button>
+                            </div>
+                            
+                            <div class="relative">
+                                <input type="text" x-model="bannerTitle" placeholder="Titre de la bannière (*mot* pour l'effet orange)..." 
+                                       class="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-4 text-sm font-medium text-midnight focus:border-copper focus:ring-2 focus:ring-copper/10 outline-none transition-all">
+                            </div>
+                            
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Aperçu en temps réel (1200x630)</p>
+                        </div>
+
+                        {{-- Final Preview --}}
+                        <div class="w-full lg:w-[480px] shrink-0">
+                            <div class="relative rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100 banner-preview-container" style="aspect-ratio: 16/9">
+                                <div class="absolute inset-0 scale-[0.4] origin-top-left">
+                                    <div class="banner-canvas-wrapper" x-ref="bannerCanvas">
+                                        <div class="banner-glow banner-glow-1"></div>
+                                        <div class="banner-glow banner-glow-2"></div>
+                                        
+                                        <div class="banner-content-inner">
+                                            <div class="banner-badge">
+                                                Article de blog
+                                            </div>
+                                            
+                                            <div class="banner-title-text-wrap">
+                                                <h1 class="banner-title-text" x-ref="bannerTitle" x-html="formatBannerTitle(bannerTitle)"></h1>
+                                            </div>
+                                            
+                                            <div class="banner-logo-wrap">
+                                                <div class="banner-logo-ico">
+                                                    <div class="banner-logo-bar banner-logo-bar-1"></div>
+                                                    <div class="banner-logo-bar banner-logo-bar-2"></div>
+                                                    <div class="banner-logo-bar banner-logo-bar-3"></div>
+                                                    <div class="banner-logo-bar banner-logo-bar-4"></div>
+                                                </div>
+                                                <div class="banner-logo-txt">Postelio</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 
     <style>
@@ -348,7 +658,181 @@
     </style>
 
     @push('styles')
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
         <style>
+            /* --- Banner Generator Internal Styles --- */
+            .banner-preview-container {
+                --midnight: #1e293b;
+                --copper-from: #f59e0b;
+                --copper-via: #fb923c;
+                --copper-to: #d97706;
+            }
+
+            .banner-canvas-wrapper {
+                width: 1200px;
+                height: 630px;
+                background-color: #fcfcfc;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+                border-radius: 12px;
+                transform-origin: top left;
+            }
+
+            .banner-glow {
+                position: absolute;
+                border-radius: 50%;
+                z-index: 1;
+            }
+
+            .banner-glow-1 {
+                width: 1200px;
+                height: 1200px;
+                top: -50%;
+                left: -30%;
+                background: radial-gradient(circle, rgba(253, 230, 138, 0.15) 0%, rgba(253, 230, 138, 0) 70%);
+            }
+
+            .banner-glow-2 {
+                width: 1000px;
+                height: 1000px;
+                top: 20%;
+                right: -40%;
+                background: radial-gradient(circle, rgba(254, 215, 170, 0.08) 0%, rgba(254, 215, 170, 0) 70%);
+            }
+
+            .banner-content-inner {
+                position: absolute;
+                inset: 0;
+                z-index: 10;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-between; 
+                padding: 100px 80px 90px 80px; /* Increased top/bottom padding for branding */
+                box-sizing: border-box;
+            }
+
+            .banner-badge {
+                position: absolute;
+                top: 110px;
+                left: 50%;
+                transform: translateX(-50%);
+                display: inline-flex;
+                align-items: center;
+                background: rgba(245, 158, 11, 0.04); 
+                color: #d97706; 
+                border: 1px solid rgba(245, 158, 11, 0.18); 
+                padding: 10px 28px;
+                border-radius: 9999px;
+                font-weight: 700;
+                font-size: 16px; /* Smaller badge */
+                white-space: nowrap;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                z-index: 20;
+            }
+
+             .banner-title-text {
+                color: var(--midnight);
+                font-family: 'Outfit', sans-serif !important;
+                font-size: 90px; 
+                font-weight: 600;
+                text-align: center;
+                line-height: 1.05;
+                letter-spacing: -0.05em;
+                max-width: 780px; 
+                margin: 0;
+                white-space: pre-wrap;
+                word-break: keep-all;
+                box-sizing: border-box;
+                display: block; /* Reliable scrollHeight for line counting */
+                width: 100%;
+                overflow: visible !important;
+            }
+
+            .banner-content-inner {
+                position: absolute;
+                inset: 0;
+                z-index: 10;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center; /* Center main content */
+                padding: 60px; 
+                box-sizing: border-box;
+            }
+
+            .banner-title-text-wrap {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                overflow: visible;
+                padding: 40px;
+                flex: 1;
+            }
+            
+            .banner-title-text span {
+                background: linear-gradient(to right, #f59e0b, #fb923c, #d97706);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                color: transparent; 
+                font-style: italic;
+                font-weight: 700;
+                display: inline-block;
+                padding-right: 0.8em; /* Massive defensive buffer for italics */
+                padding-bottom: 0.1em; 
+                margin-right: -0.75em; /* Balanced to maintain spacing while providing buffer */
+                letter-spacing: 0;
+                overflow: visible !important;
+            }
+
+            .banner-logo-wrap {
+                position: absolute;
+                bottom: 80px;
+                right: 50px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                white-space: nowrap;
+            }
+
+            .banner-logo-ico {
+                width: 40px;
+                height: 40px; /* Refined logo size */
+                background: linear-gradient(135deg, #f59e0b, #d97706);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 3.5px;
+                box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.15);
+            }
+
+            .banner-logo-bar {
+                background: white;
+                width: 2.8px;
+                border-radius: 2px;
+            }
+
+            .banner-logo-bar-1 { height: 10px; }
+            .banner-logo-bar-2 { height: 20px; }
+            .banner-logo-bar-3 { height: 14px; }
+            .banner-logo-bar-4 { height: 9px; }
+
+            .banner-logo-txt {
+                color: var(--midnight);
+                font-size: 26px; /* Smaller name */
+                font-weight: 600; /* Less bold */
+                letter-spacing: -0.03em;
+            }
+
+            /* Editor specific styles */
             .ck-editor__separator { display: none !important; }
             .ck-editor__editable {
                 border-radius: 0 0 2rem 2rem !important;
@@ -379,5 +863,6 @@
 
     @push('scripts')
         <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
     @endpush
 </div>

@@ -24,9 +24,14 @@ $login = function () {
 
 <div>
     <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <x-auth-session-status class="mb-6" :status="session('status')" />
 
-    <form wire:submit="login">
+    <div class="mb-10">
+        <h1 class="text-3xl font-display font-bold text-midnight tracking-tight">Ravi de vous revoir !</h1>
+        <p class="text-slate-500 mt-2 font-light">Connectez-vous pour gérer vos chantiers.</p>
+    </div>
+
+    <form wire:submit="login" class="space-y-6">
         <!-- Email Address -->
         <div>
             <x-input-label for="email" :value="__('Adresse e-mail')" />
@@ -47,21 +52,22 @@ $login = function () {
         </div>
 
         <!-- Remember Me -->
-        <div class="block mt-4">
+        <!-- Remember Me & Forgot Password -->
+        <div class="flex items-center justify-between mt-4">
             <label for="remember" class="inline-flex items-center">
                 <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-copper shadow-sm focus:ring-copper" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Se souvenir de moi') }}</span>
+                <span class="ms-2 text-sm text-gray-700 font-medium">{{ __('Se souvenir de moi') }}</span>
             </label>
-        </div>
 
-        <div class="flex items-center justify-end mt-6">
             @if (Route::has('password.request'))
-                <a class="text-sm text-gray-500 hover:text-midnight transition-colors rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-copper" href="{{ route('password.request') }}" wire:navigate>
+                <a class="text-sm font-semibold text-copper hover:text-amber-600 transition-colors" href="{{ route('password.request') }}" wire:navigate>
                     {{ __('Mot de passe oublié ?') }}
                 </a>
             @endif
+        </div>
 
-            <x-primary-button class="ms-3">
+        <div class="mt-8">
+            <x-primary-button class="w-full justify-center py-4 text-base font-bold tracking-widest shadow-xl shadow-copper/20 hover:shadow-copper/40 transform active:scale-[0.98]">
                 {{ __('Se connecter') }}
             </x-primary-button>
         </div>

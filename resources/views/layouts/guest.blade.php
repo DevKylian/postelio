@@ -18,20 +18,45 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-chalk text-midnight">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
-            <!-- Logo -->
-            <div class="mb-8">
-                <a href="/" wire:navigate>
-                    <x-logo size="lg" />
-                </a>
+    <body class="font-sans antialiased bg-white text-midnight overflow-x-hidden">
+        <div class="min-h-screen flex flex-col md:flex-row shadow-2xl relative overflow-hidden">
+            <!-- Left Side: Auth Forms -->
+            <div class="flex-1 flex flex-col justify-center items-center p-8 sm:p-12 lg:p-20 bg-white relative z-10 overflow-y-auto">
+                <div class="w-full max-w-[480px]">
+                    <!-- Logo -->
+                    <div class="mb-12">
+                        <a href="/" wire:navigate class="inline-block transition-transform hover:scale-105 duration-300">
+                            <x-logo size="lg" />
+                        </a>
+                    </div>
+
+                    <div class="animate-fade-in">
+                        {{ $slot }}
+                    </div>
+
+                    <p class="mt-12 text-xs text-gray-400 font-medium tracking-wide text-center">
+                        &copy; {{ date('Y') }} Postelio.
+                    </p>
+                </div>
             </div>
 
-            <div class="w-full sm:max-w-md px-6 py-8 bg-white shadow-xl shadow-midnight/5 sm:rounded-2xl border border-gray-100">
-                {{ $slot }}
-            </div>
+            <!-- Right Side: Motion Design Panel -->
+            <div class="hidden md:flex flex-1 bg-midnight relative overflow-hidden items-center justify-center p-12">
+                <!-- Background Decorations -->
+                <div class="absolute inset-0 pointer-events-none">
+                    <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-copper/10 rounded-full blur-[100px]"></div>
+                    <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[100px]"></div>
+                </div>
 
-            <p class="mt-6 text-xs text-gray-400">&copy; {{ date('Y') }} Postelio. Tous droits réservés.</p>
+                <div class="relative z-10 w-full max-w-2xl flex items-center justify-center h-full">
+                    <livewire:auth-motion-design />
+                </div>
+            </div>
         </div>
+
+        <style>
+            .animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        </style>
     </body>
 </html>

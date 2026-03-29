@@ -88,10 +88,14 @@ $resetPassword = function () {
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
+        <div class="mt-8 space-y-4">
+            <x-primary-button class="w-full justify-center py-3 shadow-lg shadow-copper/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
                 {{ __('Réinitialiser le mot de passe') }}
             </x-primary-button>
+
+            <a href="{{ route('login') }}" wire:navigate class="block text-center text-sm text-gray-500 hover:text-midnight transition-colors font-medium">
+                {{ __('Retour à la connexion') }}
+            </a>
         </div>
     </form>
 </div>

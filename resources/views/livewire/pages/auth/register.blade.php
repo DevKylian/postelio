@@ -46,7 +46,12 @@ $register = function () {
 ?>
 
 <div>
-    <form wire:submit="register">
+    <div class="mb-10 text-left">
+        <h1 class="text-3xl font-display font-bold text-midnight tracking-tight">Bienvenue sur Postelio</h1>
+        <p class="text-slate-500 mt-2 font-light">Commencez à transformer vos chantiers en clients.</p>
+    </div>
+
+    <form wire:submit="register" class="space-y-5">
         <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Nom complet')" />
@@ -55,45 +60,43 @@ $register = function () {
         </div>
 
         <!-- Email Address -->
-        <div class="mt-4">
+        <div>
             <x-input-label for="email" :value="__('Adresse e-mail')" />
             <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Mot de passe')" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <x-input-label for="password" :value="__('Mot de passe')" />
+                <x-text-input wire:model="password" id="password" class="block mt-1 w-full"
+                                type="password"
+                                name="password"
+                                required autocomplete="new-password" />
+                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            </div>
 
-            <x-text-input wire:model="password" id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            <!-- Confirm Password -->
+            <div>
+                <x-input-label for="password_confirmation" :value="__('Confirmation')" />
+                <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full"
+                                type="password"
+                                name="password_confirmation" required autocomplete="new-password" />
+                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+            </div>
         </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirmer le mot de passe')" />
-
-            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-6">
-            <x-primary-button class="w-full justify-center">
+        <div class="pt-6">
+            <x-primary-button class="w-full justify-center py-4 text-base font-bold tracking-widest shadow-xl shadow-copper/20 hover:shadow-copper/40 transform active:scale-[0.98]">
                 {{ __('Créer mon compte') }}
             </x-primary-button>
         </div>
 
-        <div class="mt-6 pt-6 border-t border-gray-100 text-center">
-            <p class="text-sm text-gray-500">
+        <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+            <p class="text-sm text-gray-500 font-medium">
                 Déjà un compte ?
-                <a class="font-bold text-copper hover:text-amber-600 transition-colors rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-copper" href="{{ route('login') }}" wire:navigate>
+                <a class="font-bold text-copper hover:text-amber-600 transition-colors" href="{{ route('login') }}" wire:navigate>
                     {{ __('Se connecter') }}
                 </a>
             </p>

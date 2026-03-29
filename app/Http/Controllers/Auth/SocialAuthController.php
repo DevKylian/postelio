@@ -51,6 +51,11 @@ class SocialAuthController extends Controller
                     'google_refresh_token' => $googleUser->refreshToken,
                     'avatar' => $googleUser->avatar,
                 ]);
+
+                if (!$existingUser->hasVerifiedEmail()) {
+                    $existingUser->markEmailAsVerified();
+                }
+
                 $user = $existingUser;
             } else {
                 // Create a new user
@@ -62,8 +67,9 @@ class SocialAuthController extends Controller
                     'google_refresh_token' => $googleUser->refreshToken,
                     'avatar' => $googleUser->avatar,
                     'password' => Hash::make(Str::random(24)), // Random password for security
-                    'email_verified_at' => now(), // Google emails are pre-verified
                 ]);
+
+                $user->markEmailAsVerified();
 
                 // Create automatic company for new user (Postelio logic)
                 Company::create([

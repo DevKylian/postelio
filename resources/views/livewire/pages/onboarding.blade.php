@@ -417,7 +417,36 @@ $complete = function () {
 
                 {{-- ===== STEP 5 : C'est parti ! ===== --}}
                 @if($step === 5)
-                <div>
+                <div x-data="{ showConfetti: false }" x-init="setTimeout(() => showConfetti = true, 500)">
+                    {{-- Confetti Burst --}}
+                    <template x-if="showConfetti">
+                        <div class="absolute inset-x-0 top-1/2 flex items-center justify-center pointer-events-none z-[100]" x-cloak>
+                            <div class="onboarding-c c-1 burst"></div>
+                            <div class="onboarding-c c-2 burst"></div>
+                            <div class="onboarding-c c-3 burst"></div>
+                            <div class="onboarding-c c-4 burst"></div>
+                            <div class="onboarding-c c-5 burst"></div>
+                            <div class="onboarding-c c-6 burst"></div>
+                            <div class="onboarding-c c-7 burst"></div>
+                            <div class="onboarding-c c-8 burst"></div>
+                            <div class="onboarding-c c-9 burst"></div>
+                            <div class="onboarding-c c-10 burst"></div>
+                            <div class="onboarding-c c-11 burst"></div>
+                            <div class="onboarding-c c-12 burst"></div>
+                            <div class="onboarding-c c-13 burst"></div>
+                            <div class="onboarding-c c-14 burst"></div>
+                            <div class="onboarding-c c-15 burst"></div>
+                            <div class="onboarding-c c-16 burst"></div>
+                            <div class="onboarding-c c-17 burst"></div>
+                            <div class="onboarding-c c-18 burst"></div>
+                            <div class="onboarding-c c-19 burst"></div>
+                            <div class="onboarding-c c-20 burst"></div>
+                            <div class="onboarding-c c-21 burst"></div>
+                            <div class="onboarding-c c-22 burst"></div>
+                            <div class="onboarding-c c-23 burst"></div>
+                            <div class="onboarding-c c-24 burst"></div>
+                        </div>
+                    </template>
                     <div class="mb-6 text-center">
                         <div class="w-16 h-16 bg-amber-400 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -504,4 +533,39 @@ $complete = function () {
             Vous pourrez modifier ces informations à tout moment dans les paramètres.
         </p>
     </div>
+
+    <style>
+        .onboarding-c { position: absolute; width: 6px; height: 12px; border-radius: 2px; opacity: 0; left: 50%; top: 50%; z-index: 100; pointer-events: none; }
+        .onboarding-c.burst { animation: obCBurst 3.5s cubic-bezier(0.1, 1, 0.4, 1) forwards; }
+        @keyframes obCBurst { 
+            0% { opacity: 0; transform: translate(0,0) scale(0) rotate(0deg); } 
+            5% { opacity: 1; transform: translate(0,0) scale(1.2) rotate(45deg); }
+            30% { opacity: 1; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(1.3); } 
+            100% { opacity: 0; transform: translate(calc(var(--tx)*1.2), 400px) rotate(calc(var(--rot) + 400deg)) scale(0.7); } 
+        }
+        .c-1{background:#ef4444;--tx:-180px;--ty:-220px;--rot:120deg;}
+        .c-2{background:#f59e0b;--tx:180px;--ty:-240px;--rot:240deg; animation-delay:0.15s;}
+        .c-3{background:#10b981;--tx:-120px;--ty:-280px;--rot:400deg; animation-delay:0.35s;}
+        .c-4{background:#3b82f6;--tx:120px;--ty:-250px;--rot:180deg; animation-delay:0.12s;}
+        .c-5{background:#a855f7;--tx:-220px;--ty:-100px;--rot:310deg; animation-delay:0.45s;}
+        .c-6{background:#ef4444;--tx:220px;--ty:-80px;--rot:90deg; animation-delay:0.08s;}
+        .c-7{background:#f59e0b;--tx:-150px;--ty:-150px;--rot:420deg; animation-delay:0.25s;}
+        .c-8{background:#10b981;--tx:150px;--ty:-150px;--rot:270deg; animation-delay:0.04s;}
+        .c-9{background:#3b82f6;--tx:-80px;--ty:-320px;--rot:200deg; animation-delay:0.55s;}
+        .c-10{background:#a855f7;--tx:80px;--ty:-320px;--rot:250deg; animation-delay:0.18s;}
+        .c-11{background:#ef4444;--tx:-250px;--ty:-180px;--rot:150deg; animation-delay:0.32s;}
+        .c-12{background:#f59e0b;--tx:260px;--ty:-160px;--rot:320deg; animation-delay:0.09s;}
+        .c-13{background:#10b981;--tx:-100px;--ty:-380px;--rot:410deg; animation-delay:0.52s;}
+        .c-14{background:#3b82f6;--tx:140px;--ty:-360px;--rot:130deg; animation-delay:0.11s;}
+        .c-15{background:#a855f7;--tx:-190px;--ty:-290px;--rot:340deg; animation-delay:0.47s;}
+        .c-16{background:#ef4444;--tx:210px;--ty:-260px;--rot:110deg; animation-delay:0.03s;}
+        .c-17{background:#f59e0b;--tx:-50px;--ty:-220px;--rot:460deg; animation-delay:0.26s;}
+        .c-18{background:#10b981;--tx:40px;--ty:-250px;--rot:210deg; animation-delay:0.14s;}
+        .c-19{background:#3b82f6;--tx:-280px;--ty:-50px;--rot:80deg; animation-delay:0.38s;}
+        .c-20{background:#a855f7;--tx:280px;--ty:-40px;--rot:190deg; animation-delay:0.02s;}
+        .c-21{background:#ef4444;--tx:-150px;--ty:-350px;--rot:280deg; animation-delay:0.6s;}
+        .c-22{background:#f59e0b;--tx:150px;--ty:-350px;--rot:350deg; animation-delay:0.22s;}
+        .c-23{background:#10b981;--tx:-300px;--ty:-200px;--rot:140deg; animation-delay:0.41s;}
+        .c-24{background:#3b82f6;--tx:300px;--ty:-210px;--rot:60deg; animation-delay:0.13s;}
+    </style>
 </div>

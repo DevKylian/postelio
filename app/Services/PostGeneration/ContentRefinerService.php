@@ -219,7 +219,7 @@ class ContentRefinerService
         return "Ajoute exactement 5 hashtags à la fin de la légende, séparés par une ligne vide. "
             . "Structure : 2 métier" . ($tradeTag ? " (dont {$tradeTag})" : "")
             . " + 2 locaux" . ($locationTag ? " (dont {$locationTag} et #Artisan" . str_replace('#', '', $locationTag) . ")" : " (ville/département)")
-            . " + 1 valeur (ex: #SavoirFaire, #TravailSoigné). "
+            . " + 1 hashtag #Postelio (indispensable à la fin). "
             . "Sois pertinent et local pour attirer des clients de proximité.";
     }
 
@@ -272,7 +272,7 @@ class ContentRefinerService
                     . "{$customPrompt}"
                     . "\n\nCONTRAINTE TEXTE IMAGE : Le champ image_text doit faire {$imgConstraint}. Au-delà, le texte sera tronqué."
                     . "\n\n{$toneInstruction}"
-                    . "\n" . ($includeHashtags ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende." : "N'ajoute aucun hashtag.")
+                    . "\n" . ($includeHashtags ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende. Le dernier doit TOUJOURS être #Postelio." : "N'ajoute aucun hashtag.")
                     . ($extraNote ? "\n{$extraNote}" : "");
             }
             return $noHallucinateGlobal . $noMarkdownPrefix . $noRefuseRule . $textZoneRule

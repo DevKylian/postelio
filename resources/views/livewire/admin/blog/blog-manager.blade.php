@@ -628,15 +628,6 @@ Tu dois impérativement et UNIQUEMENT répondre en format JSON valide, sans aucu
                                                 <h1 class="banner-title-text" x-ref="bannerTitle" x-html="formatBannerTitle(bannerTitle)"></h1>
                                             </div>
                                             
-                                            <div class="banner-logo-wrap">
-                                                <div class="banner-logo-ico">
-                                                    <div class="banner-logo-bar banner-logo-bar-1"></div>
-                                                    <div class="banner-logo-bar banner-logo-bar-2"></div>
-                                                    <div class="banner-logo-bar banner-logo-bar-3"></div>
-                                                    <div class="banner-logo-bar banner-logo-bar-4"></div>
-                                                </div>
-                                                <div class="banner-logo-txt">Postelio</div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -792,45 +783,6 @@ Tu dois impérativement et UNIQUEMENT répondre en format JSON valide, sans aucu
                 overflow: visible !important;
             }
 
-            .banner-logo-wrap {
-                position: absolute;
-                bottom: 80px;
-                right: 50px;
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                white-space: nowrap;
-            }
-
-            .banner-logo-ico {
-                width: 40px;
-                height: 40px; /* Refined logo size */
-                background: linear-gradient(135deg, #f59e0b, #d97706);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 3.5px;
-                box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.15);
-            }
-
-            .banner-logo-bar {
-                background: white;
-                width: 2.8px;
-                border-radius: 2px;
-            }
-
-            .banner-logo-bar-1 { height: 10px; }
-            .banner-logo-bar-2 { height: 20px; }
-            .banner-logo-bar-3 { height: 14px; }
-            .banner-logo-bar-4 { height: 9px; }
-
-            .banner-logo-txt {
-                color: var(--midnight);
-                font-size: 26px; /* Smaller name */
-                font-weight: 600; /* Less bold */
-                letter-spacing: -0.03em;
-            }
 
             /* Editor specific styles */
             .ck-editor__separator { display: none !important; }

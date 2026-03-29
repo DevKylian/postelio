@@ -91,15 +91,15 @@
                         <div class="p-8 flex flex-col flex-grow">
                             {{-- Header --}}
                             <div class="mb-8">
-                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 {{ $isFree ? 'bg-slate-50 text-slate-400' : ($isPopular ? 'bg-amber-100 text-copper rotate-3' : 'bg-midnight/5 text-midnight') }}">
-                                    @if($isFree)
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                    @elseif($isPopular)
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
-                                    @else
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    @endif
-                                </div>
+                                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-sm {{ $isFree ? 'bg-slate-50 border border-slate-100' : ($isPopular ? 'bg-amber-50 border border-amber-100' : 'bg-blue-50 border border-blue-100') }}">
+                                        @if($isFree)
+                                            <span class="text-2xl">⚡</span>
+                                        @elseif($isPopular)
+                                            <span class="text-2xl">👑</span>
+                                        @else
+                                            <span class="text-2xl">🚀</span>
+                                        @endif
+                                    </div>
                                 <h3 class="text-xl font-bold text-midnight">{{ $plan['name'] }}</h3>
                                 <div class="mt-4 flex items-baseline gap-1">
                                     <span class="text-4xl font-black text-midnight tracking-tighter" x-text="billingPeriod === 'yearly' ? '{{ $plan['yearly_price'] > 0 ? number_format($plan['yearly_price'] / 12, 0, ',', '.') : 0 }}€' : '{{ number_format($plan['price'], 0, ',', '.') }}€'">{{ number_format($plan['price'], 0, ',', '.') }}€</span>
@@ -131,13 +131,13 @@
                                     </li>
                                 @endforeach
                                 @foreach($plan['disabled_features'] ?? [] as $feature)
-                                    <li class="flex items-start gap-3 opacity-40">
+                                    <li class="flex items-start gap-3 opacity-70">
                                         <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center">
-                                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
                                         </div>
-                                        <span class="text-xs font-medium text-slate-400 leading-relaxed line-through">{{ $feature }}</span>
+                                        <span class="text-xs font-medium text-slate-500 leading-relaxed line-through">{{ $feature }}</span>
                                     </li>
                                 @endforeach
                             </ul>

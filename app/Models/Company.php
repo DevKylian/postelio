@@ -12,6 +12,8 @@ class Company extends Model
         'city',
         'trade',
         'brand_color',
+        'bio_text',
+        'bio_audio_path',
         'logo_path',
         'instagram_access_token',
         'instagram_business_account_id',

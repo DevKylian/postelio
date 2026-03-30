@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Company;
+use App\Jobs\TranscribeBioAudio;
 use Illuminate\Support\Facades\Auth;
 
 use function Livewire\Volt\{layout, state};
@@ -14,6 +15,11 @@ state([
     'city'              => '',
     'brand_color'       => '#F59E0B',
     'weekly_posts_goal' => 3,
+    // Step 5: bio
+    'bio_mode'          => 'audio',   // 'audio' | 'text'
+    'bio_text'          => '',
+    'bio_audio_path'    => '',        // temp path after upload
+    'bio_transcribing'  => false,
     'trades'      => [
         ['key' => 'plombier',      'label' => 'Plombier',       'icon' => '🔧'],
         ['key' => 'electricien',   'label' => 'Électricien',    'icon' => '⚡'],
@@ -56,6 +62,10 @@ $prevStep = function () {
     $this->step--;
 };
 
+$setBioAudioPath = function (string $path) {
+    $this->bio_audio_path = $path;
+};
+
 $complete = function () {
     $this->validate([
         'name'        => ['required', 'string', 'min:2', 'max:255'],
@@ -72,12 +82,19 @@ $complete = function () {
         'trade'             => $this->trade,
         'brand_color'       => $this->brand_color,
         'weekly_posts_goal' => $this->weekly_posts_goal,
+        'bio_text'          => $this->bio_mode === 'text' ? trim($this->bio_text) : null,
+        'bio_audio_path'    => $this->bio_audio_path ?: null,
     ];
 
     if ($company) {
         $company->update($data);
     } else {
-        Company::create(array_merge($data, ['user_id' => $user->id]));
+        $company = Company::create(array_merge($data, ['user_id' => $user->id]));
+    }
+
+    // If bio via audio, dispatch async transcription job
+    if ($this->bio_audio_path && $this->bio_mode === 'audio') {
+        TranscribeBioAudio::dispatch($company->id, $this->bio_audio_path);
     }
 
     $user->update(['onboarding_completed' => true]);
@@ -102,18 +119,18 @@ $complete = function () {
             {{-- Progress bar --}}
             <div class="h-1.5 bg-gray-100">
                 <div class="h-full bg-amber-400 transition-all duration-500 ease-out"
-                     style="width: {{ ($step / 5) * 100 }}%"></div>
+                     style="width: {{ ($step / 6) * 100 }}%"></div>
             </div>
 
             {{-- Step indicators --}}
             <div class="px-4 sm:px-8 pt-5 pb-3">
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider">Progression</span>
-                    <span class="text-xs text-gray-400 font-medium">Étape {{ $step }} / 5</span>
+                    <span class="text-xs text-gray-400 font-medium">Étape {{ $step }} / 6</span>
                 </div>
                 <div class="flex items-center w-full">
-                    @foreach(range(1, 5) as $i)
-                        <div class="flex items-center {{ $i < 5 ? 'flex-1' : 'flex-none' }}">
+                    @foreach(range(1, 6) as $i)
+                        <div class="flex items-center {{ $i < 6 ? 'flex-1' : 'flex-none' }}">
                             <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-300 flex-shrink-0
                                 {{ $step > $i ? 'bg-amber-400 text-white' : ($step === $i ? 'bg-slate-800 text-white' : 'bg-gray-100 text-gray-400') }}">
                                 @if($step > $i)
@@ -124,7 +141,7 @@ $complete = function () {
                                     {{ $i }}
                                 @endif
                             </div>
-                            @if($i < 5)
+                            @if($i < 6)
                                 <div class="flex-1 h-px mx-1.5 sm:mx-2 {{ $step > $i ? 'bg-amber-400' : 'bg-gray-200' }} transition-colors duration-300"></div>
                             @endif
                         </div>
@@ -167,9 +184,9 @@ $complete = function () {
                         <button wire:click="nextStep"
                                 type="button"
                                 @if(!$trade) disabled @endif
-                                class="flex items-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm transition-all duration-200
+                                class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200
                                        {{ $trade
-                                          ? 'bg-slate-800 text-white hover:bg-slate-700 shadow-lg hover:shadow-xl cursor-pointer'
+                                          ? 'bg-copper text-white hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-copper/20 hover:shadow-lg hover:shadow-copper/30 cursor-pointer'
                                           : 'bg-gray-100 text-gray-400 cursor-not-allowed' }}">
                             Continuer
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -234,14 +251,14 @@ $complete = function () {
 
                     <div class="mt-8 flex items-center justify-between">
                         <button wire:click="prevStep" type="button"
-                                class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:text-slate-800 hover:bg-gray-100 transition-all duration-200">
+                                class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-gray-500 bg-white border-2 border-gray-100 hover:text-slate-800 hover:bg-gray-50 hover:border-gray-200 active:scale-[0.98] transition-all duration-200">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                             </svg>
                             Retour
                         </button>
                         <button wire:click="nextStep" type="button"
-                                class="flex items-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm bg-slate-800 text-white hover:bg-slate-700 shadow-lg hover:shadow-xl transition-all duration-200">
+                                class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm bg-copper text-white hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-copper/20 hover:shadow-lg hover:shadow-copper/30 transition-all duration-200">
                             Continuer
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -316,14 +333,14 @@ $complete = function () {
 
                     <div class="mt-8 flex items-center justify-between">
                         <button wire:click="prevStep" type="button"
-                                class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:text-slate-800 hover:bg-gray-100 transition-all duration-200">
+                                class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-gray-500 bg-white border-2 border-gray-100 hover:text-slate-800 hover:bg-gray-50 hover:border-gray-200 active:scale-[0.98] transition-all duration-200">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                             </svg>
                             Retour
                         </button>
                         <button wire:click="nextStep" type="button"
-                                class="flex items-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm bg-slate-800 text-white hover:bg-slate-700 shadow-lg hover:shadow-xl transition-all duration-200">
+                                class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm bg-copper text-white hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-copper/20 hover:shadow-lg hover:shadow-copper/30 transition-all duration-200">
                             Continuer
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -398,14 +415,14 @@ $complete = function () {
 
                     <div class="mt-8 flex items-center justify-between">
                         <button wire:click="prevStep" type="button"
-                                class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:text-slate-800 hover:bg-gray-100 transition-all duration-200">
+                                class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-gray-500 bg-white border-2 border-gray-100 hover:text-slate-800 hover:bg-gray-50 hover:border-gray-200 active:scale-[0.98] transition-all duration-200">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                             </svg>
                             Retour
                         </button>
                         <button wire:click="nextStep" type="button"
-                                class="flex items-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm bg-slate-800 text-white hover:bg-slate-700 shadow-lg hover:shadow-xl transition-all duration-200">
+                                class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm bg-copper text-white hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-copper/20 hover:shadow-lg hover:shadow-copper/30 transition-all duration-200">
                             Continuer
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -415,36 +432,268 @@ $complete = function () {
                 </div>
                 @endif
 
-                {{-- ===== STEP 5 : C'est parti ! ===== --}}
+                {{-- ===== STEP 5 : Votre présentation ===== --}}
                 @if($step === 5)
-                <div x-data="{ showConfetti: false }" x-init="setTimeout(() => showConfetti = true, 500)">
-                    {{-- Confetti Burst --}}
+                <div
+                    x-data="{
+                        mode: @entangle('bio_mode'),
+                        recording: false,
+                        recorded: false,
+                        audioUrl: null,
+                        mediaRecorder: null,
+                        chunks: [],
+                        stream: null,
+                        timer: 0,
+                        timerInterval: null,
+                        canvasCtx: null,
+                        animFrame: null,
+                        async startRecording() {
+                            try {
+                                this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                                const canvas = this.$refs.waveCanvas;
+                                if (canvas) {
+                                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                                    const source = audioCtx.createMediaStreamSource(this.stream);
+                                    const analyser = audioCtx.createAnalyser();
+                                    analyser.fftSize = 256;
+                                    source.connect(analyser);
+                                    const bufferLength = analyser.frequencyBinCount;
+                                    const dataArray = new Uint8Array(bufferLength);
+                                    this.canvasCtx = canvas.getContext('2d');
+                                    const draw = () => {
+                                        this.animFrame = requestAnimationFrame(draw);
+                                        analyser.getByteFrequencyData(dataArray);
+                                        const ctx = this.canvasCtx;
+                                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                        const barWidth = (canvas.width / bufferLength) * 2.5;
+                                        let x = 0;
+                                        for (let i = 0; i < bufferLength; i++) {
+                                            const barHeight = (dataArray[i] / 255) * canvas.height;
+                                            ctx.fillStyle = '#F59E0B';
+                                            ctx.beginPath();
+                                            ctx.roundRect(x, canvas.height - barHeight, barWidth - 2, barHeight, 2);
+                                            ctx.fill();
+                                            x += barWidth;
+                                        }
+                                    };
+                                    draw();
+                                }
+                                this.chunks = [];
+                                this.mediaRecorder = new MediaRecorder(this.stream);
+                                this.mediaRecorder.ondataavailable = e => { if (e.data.size > 0) this.chunks.push(e.data); };
+                                this.mediaRecorder.onstop = () => this.handleRecordingStop();
+                                this.mediaRecorder.start();
+                                this.recording = true;
+                                this.recorded = false;
+                                this.timer = 0;
+                                this.timerInterval = setInterval(() => this.timer++, 1000);
+                            } catch(e) {
+                                alert('Microphone non disponible. Vérifiez les permissions ou utilisez la saisie texte.');
+                                this.mode = 'text';
+                            }
+                        },
+                        stopRecording() {
+                            if (this.mediaRecorder && this.recording) {
+                                this.mediaRecorder.stop();
+                                this.stream?.getTracks().forEach(t => t.stop());
+                                this.recording = false;
+                                clearInterval(this.timerInterval);
+                                if (this.animFrame) cancelAnimationFrame(this.animFrame);
+                            }
+                        },
+                        async handleRecordingStop() {
+                            const blob = new Blob(this.chunks, { type: 'audio/webm' });
+                            this.audioUrl = URL.createObjectURL(blob);
+                            this.recorded = true;
+                            // Upload to server
+                            const formData = new FormData();
+                            formData.append('audio', blob, 'bio.webm');
+                            formData.append('_token', document.querySelector('meta[name=csrf-token]').content);
+                            try {
+                                const res = await fetch('/onboarding/upload-bio-audio', { method: 'POST', body: formData });
+                                const data = await res.json();
+                                if (data.path) $wire.setBioAudioPath(data.path);
+                            } catch(e) { console.warn('Bio audio upload failed', e); }
+                        },
+                        resetRecording() {
+                            this.recorded = false;
+                            this.audioUrl = null;
+                            this.chunks = [];
+                            this.timer = 0;
+                            $wire.setBioAudioPath('');
+                        },
+                        formatTime(s) {
+                            const m = Math.floor(s / 60);
+                            return (m > 0 ? m + 'm ' : '') + (s % 60) + 's';
+                        }
+                    }"
+                >
+                    <div class="mb-6">
+                        <h1 class="text-2xl font-bold text-slate-800">Présentez-vous</h1>
+                        <p class="text-gray-500 mt-1 text-sm">Cette présentation permettra à l'IA de mieux personnaliser vos posts. Parlez de vous, vos services, votre zone d'intervention…</p>
+                    </div>
+
+                    {{-- Mode toggle --}}
+                    <div class="flex items-center gap-1 p-1 bg-gray-100 rounded-xl mb-6">
+                        <button type="button"
+                                @click="mode = 'audio'"
+                                :class="mode === 'audio' ? 'bg-white shadow text-slate-800' : 'text-gray-400 hover:text-gray-600'"
+                                class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                            </svg>
+                            Mémo vocal
+                        </button>
+                        <button type="button"
+                                @click="mode = 'text'"
+                                :class="mode === 'text' ? 'bg-white shadow text-slate-800' : 'text-gray-400 hover:text-gray-600'"
+                                class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            Saisie texte
+                        </button>
+                    </div>
+
+                    {{-- Audio mode --}}
+                    <div x-show="mode === 'audio'" x-cloak>
+
+                        {{-- Not yet recorded --}}
+                        <div x-show="!recorded">
+
+                            {{-- Waveform canvas (visible during recording) --}}
+                            <div x-show="recording" class="mb-4 rounded-2xl bg-slate-800 p-6 flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-300">
+                                <canvas x-ref="waveCanvas" width="400" height="80" class="w-full max-w-sm h-16 rounded-lg opacity-80"></canvas>
+                                <div class="flex flex-col items-center gap-3">
+                                    <div class="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm border border-white/10">
+                                        <span class="flex h-3 w-3 relative">
+                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                        </span>
+                                        <span class="text-white text-xl font-bold font-mono tracking-tighter" x-text="formatTime(timer)"></span>
+                                    </div>
+                                    <p class="text-white/40 text-[10px] font-bold uppercase tracking-widest">Enregistrement en cours…</p>
+
+                                    {{-- Stop button (overlay/inside during record) --}}
+                                    <button type="button"
+                                            @click="stopRecording()"
+                                            class="mt-2 bg-white text-red-600 hover:bg-red-50 px-6 py-2.5 rounded-xl text-sm font-black shadow-xl transition-all active:scale-[0.98] flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+                                        Arrêter
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Idle state : Clickable area --}}
+                            <div x-show="!recording" 
+                                 @click="startRecording()"
+                                 class="group mb-4 p-8 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 hover:border-amber-400 hover:bg-amber-50/30 active:scale-[0.98] transition-all duration-300 flex flex-col items-center gap-5 cursor-pointer relative overflow-hidden">
+                                
+                                {{-- Hover background effect --}}
+                                <div class="absolute inset-0 bg-gradient-to-br from-amber-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+
+                                <div class="w-16 h-16 bg-copper rounded-full flex items-center justify-center text-white shadow-xl shadow-copper/25 group-hover:scale-105 group-hover:shadow-copper/40 transition-all duration-300 relative z-10">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                    </svg>
+                                </div>
+                                <div class="text-center relative z-10">
+                                    <p class="text-sm font-bold text-slate-800 tracking-tight">Appuyez pour vous présenter</p>
+                                    <p class="text-[11px] text-gray-500 mt-1 max-w-[280px] leading-relaxed mx-auto">Parlez de vos services, de vos chantiers et de ce qui vous passionne !</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Recorded state --}}
+                        <div x-show="recorded" class="space-y-4">
+                            <div class="p-4 rounded-2xl bg-green-50 border border-green-200 flex items-center gap-3">
+                                <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-green-800">Présentation enregistrée !</p>
+                                    <p class="text-xs text-green-600 mt-0.5">Durée : <span x-text="formatTime(timer)"></span> • Elle sera transcrite en arrière-plan</p>
+                                </div>
+                            </div>
+
+                            <audio :src="audioUrl" controls class="w-full rounded-xl"></audio>
+
+                            <button type="button" @click="resetRecording()"
+                                    class="flex items-center gap-2 text-sm text-gray-500 hover:text-red-500 transition-colors font-medium">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                                Recommencer l'enregistrement
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- Text mode --}}
+                    <div x-show="mode === 'text'" x-cloak>
+                        <textarea
+                            wire:model="bio_text"
+                            rows="6"
+                            placeholder="Ex : Je m'appelle Jean Dupont, je suis plombier depuis 15 ans à Lyon et environs. Je propose des services de plomberie générale, pose de sanitaires, recherche de fuites, dépannage urgent 24h/24…"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 text-sm leading-relaxed resize-none
+                                   focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200"
+                        ></textarea>
+                        <p class="mt-2 text-xs text-gray-400">Plus vous êtes précis, plus l'IA personnalisera vos posts.</p>
+                    </div>
+
+                    {{-- Skip link --}}
+                    <p class="text-center mt-4 text-xs text-gray-400">
+                        <span class="text-slate-400">Vous pouvez</span>
+                        <button wire:click="nextStep" type="button" class="underline underline-offset-2 text-gray-500 hover:text-slate-700 transition-colors ml-1">
+                            passer cette étape
+                        </button>
+                        <span class="text-slate-400">et compléter votre profil plus tard.</span>
+                    </p>
+
+                    <div class="mt-6 flex items-center justify-between">
+                        <button wire:click="prevStep" type="button"
+                                class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-gray-500 bg-white border-2 border-gray-100 hover:text-slate-800 hover:bg-gray-50 hover:border-gray-200 active:scale-[0.98] transition-all duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            Retour
+                        </button>
+                        <button wire:click="nextStep" type="button"
+                                class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm bg-copper text-white hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-copper/20 hover:shadow-lg hover:shadow-copper/30 transition-all duration-200">
+                            Continuer
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                @endif
+
+                {{-- ===== STEP 6 : C'est parti ! ===== --}}
+                @if($step === 6)
+                <div x-data="{ showConfetti: false }" x-init="showConfetti = true">
+                    {{-- Confetti Burst (Exact same as Welcome Hero) --}}
                     <template x-if="showConfetti">
                         <div class="absolute inset-x-0 top-1/2 flex items-center justify-center pointer-events-none z-[100]" x-cloak>
-                            <div class="onboarding-c c-1 burst"></div>
-                            <div class="onboarding-c c-2 burst"></div>
-                            <div class="onboarding-c c-3 burst"></div>
-                            <div class="onboarding-c c-4 burst"></div>
-                            <div class="onboarding-c c-5 burst"></div>
-                            <div class="onboarding-c c-6 burst"></div>
-                            <div class="onboarding-c c-7 burst"></div>
-                            <div class="onboarding-c c-8 burst"></div>
-                            <div class="onboarding-c c-9 burst"></div>
-                            <div class="onboarding-c c-10 burst"></div>
-                            <div class="onboarding-c c-11 burst"></div>
-                            <div class="onboarding-c c-12 burst"></div>
-                            <div class="onboarding-c c-13 burst"></div>
-                            <div class="onboarding-c c-14 burst"></div>
-                            <div class="onboarding-c c-15 burst"></div>
-                            <div class="onboarding-c c-16 burst"></div>
-                            <div class="onboarding-c c-17 burst"></div>
-                            <div class="onboarding-c c-18 burst"></div>
-                            <div class="onboarding-c c-19 burst"></div>
-                            <div class="onboarding-c c-20 burst"></div>
-                            <div class="onboarding-c c-21 burst"></div>
-                            <div class="onboarding-c c-22 burst"></div>
-                            <div class="onboarding-c c-23 burst"></div>
-                            <div class="onboarding-c c-24 burst"></div>
+                            <div class="md-c md-c-1 burst"></div>
+                            <div class="md-c md-c-2 burst"></div>
+                            <div class="md-c md-c-3 burst"></div>
+                            <div class="md-c md-c-4 burst"></div>
+                            <div class="md-c md-c-5 burst"></div>
+                            <div class="md-c md-c-6 burst"></div>
+                            <div class="md-c md-c-7 burst"></div>
+                            <div class="md-c md-c-8 burst"></div>
+                            <div class="md-c md-c-9 burst"></div>
+                            <div class="md-c md-c-10 burst"></div>
+                            <div class="md-c md-c-11 burst"></div>
+                            <div class="md-c md-c-12 burst"></div>
+                            <div class="md-c md-c-13 burst"></div>
+                            <div class="md-c md-c-14 burst"></div>
+                            <div class="md-c md-c-15 burst"></div>
+                            <div class="md-c md-c-16 burst"></div>
+                            <div class="md-c md-c-17 burst"></div>
+                            <div class="md-c md-c-18 burst"></div>
                         </div>
                     </template>
                     <div class="mb-6 text-center">
@@ -484,6 +733,29 @@ $complete = function () {
                                  style="background-color: {{ $brand_color }}"></div>
                         </div>
 
+                        {{-- Bio recap --}}
+                        @if($bio_text || $bio_audio_path)
+                        <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                            <div class="w-8 h-8 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                @if($bio_audio_path)
+                                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                @endif
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs font-semibold text-slate-700">Présentation ajoutée ✓</p>
+                                <p class="text-xs text-slate-400 truncate">
+                                    {{ $bio_audio_path ? 'Mémo vocal enregistré — transcription en cours' : Str::limit($bio_text, 60) }}
+                                </p>
+                            </div>
+                        </div>
+                        @endif
+
                         <div class="p-4 rounded-2xl bg-amber-50 border border-amber-100">
                             <p class="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-2.5">Ce qui vous attend</p>
                             <ul class="space-y-2">
@@ -506,7 +778,7 @@ $complete = function () {
 
                     <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 mt-8">
                         <button wire:click="prevStep" type="button"
-                                class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:text-slate-800 hover:bg-gray-100 transition-all duration-200">
+                                class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-gray-500 bg-white border-2 border-gray-100 hover:text-slate-800 hover:bg-gray-50 hover:border-gray-200 active:scale-[0.98] transition-all duration-200">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                             </svg>
@@ -515,7 +787,7 @@ $complete = function () {
                         <button wire:click="complete"
                                 wire:loading.attr="disabled"
                                 type="button"
-                                class="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-sm bg-amber-400 text-slate-900 hover:bg-amber-500 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-60">
+                                class="flex items-center justify-center gap-2 w-full sm:w-auto px-7 py-3 rounded-xl font-bold text-sm bg-copper text-white hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-copper/20 hover:shadow-lg hover:shadow-copper/30 transition-all duration-300 disabled:opacity-60">
                             <span wire:loading.remove wire:target="complete">Accéder à mon espace</span>
                             <span wire:loading wire:target="complete">Enregistrement…</span>
                             <svg wire:loading.remove wire:target="complete" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -535,37 +807,26 @@ $complete = function () {
     </div>
 
     <style>
-        .onboarding-c { position: absolute; width: 6px; height: 12px; border-radius: 2px; opacity: 0; left: 50%; top: 50%; z-index: 100; pointer-events: none; }
-        .onboarding-c.burst { animation: obCBurst 3.5s cubic-bezier(0.1, 1, 0.4, 1) forwards; }
-        @keyframes obCBurst { 
-            0% { opacity: 0; transform: translate(0,0) scale(0) rotate(0deg); } 
-            5% { opacity: 1; transform: translate(0,0) scale(1.2) rotate(45deg); }
-            30% { opacity: 1; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(1.3); } 
-            100% { opacity: 0; transform: translate(calc(var(--tx)*1.2), 400px) rotate(calc(var(--rot) + 400deg)) scale(0.7); } 
-        }
-        .c-1{background:#ef4444;--tx:-180px;--ty:-220px;--rot:120deg;}
-        .c-2{background:#f59e0b;--tx:180px;--ty:-240px;--rot:240deg; animation-delay:0.15s;}
-        .c-3{background:#10b981;--tx:-120px;--ty:-280px;--rot:400deg; animation-delay:0.35s;}
-        .c-4{background:#3b82f6;--tx:120px;--ty:-250px;--rot:180deg; animation-delay:0.12s;}
-        .c-5{background:#a855f7;--tx:-220px;--ty:-100px;--rot:310deg; animation-delay:0.45s;}
-        .c-6{background:#ef4444;--tx:220px;--ty:-80px;--rot:90deg; animation-delay:0.08s;}
-        .c-7{background:#f59e0b;--tx:-150px;--ty:-150px;--rot:420deg; animation-delay:0.25s;}
-        .c-8{background:#10b981;--tx:150px;--ty:-150px;--rot:270deg; animation-delay:0.04s;}
-        .c-9{background:#3b82f6;--tx:-80px;--ty:-320px;--rot:200deg; animation-delay:0.55s;}
-        .c-10{background:#a855f7;--tx:80px;--ty:-320px;--rot:250deg; animation-delay:0.18s;}
-        .c-11{background:#ef4444;--tx:-250px;--ty:-180px;--rot:150deg; animation-delay:0.32s;}
-        .c-12{background:#f59e0b;--tx:260px;--ty:-160px;--rot:320deg; animation-delay:0.09s;}
-        .c-13{background:#10b981;--tx:-100px;--ty:-380px;--rot:410deg; animation-delay:0.52s;}
-        .c-14{background:#3b82f6;--tx:140px;--ty:-360px;--rot:130deg; animation-delay:0.11s;}
-        .c-15{background:#a855f7;--tx:-190px;--ty:-290px;--rot:340deg; animation-delay:0.47s;}
-        .c-16{background:#ef4444;--tx:210px;--ty:-260px;--rot:110deg; animation-delay:0.03s;}
-        .c-17{background:#f59e0b;--tx:-50px;--ty:-220px;--rot:460deg; animation-delay:0.26s;}
-        .c-18{background:#10b981;--tx:40px;--ty:-250px;--rot:210deg; animation-delay:0.14s;}
-        .c-19{background:#3b82f6;--tx:-280px;--ty:-50px;--rot:80deg; animation-delay:0.38s;}
-        .c-20{background:#a855f7;--tx:280px;--ty:-40px;--rot:190deg; animation-delay:0.02s;}
-        .c-21{background:#ef4444;--tx:-150px;--ty:-350px;--rot:280deg; animation-delay:0.6s;}
-        .c-22{background:#f59e0b;--tx:150px;--ty:-350px;--rot:350deg; animation-delay:0.22s;}
-        .c-23{background:#10b981;--tx:-300px;--ty:-200px;--rot:140deg; animation-delay:0.41s;}
-        .c-24{background:#3b82f6;--tx:300px;--ty:-210px;--rot:60deg; animation-delay:0.13s;}
+        .md-c{position:absolute;width:8px;height:16px;border-radius:4px;opacity:0;left:50%;top:50%;margin-left:-4px;margin-top:-8px;z-index:99;box-shadow:0 0 10px rgba(0,0,0,0.1)}
+        .md-c.burst{animation:mdCBurst 2.5s ease-in-out forwards}
+        @keyframes mdCBurst{0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(0)}40%{opacity:1;transform:translate(var(--tx),var(--ty)) rotate(var(--rot)) scale(1.5)}100%{opacity:0;transform:translate(calc(var(--tx)*1.2),calc(var(--ty) + 400px)) rotate(calc(var(--rot) + 400deg)) scale(1)}}
+        .md-c-1{background:#ef4444;--tx:-180px;--ty:-220px;--rot:120deg;}
+        .md-c-2{background:#f59e0b;--tx:180px;--ty:-240px;--rot:240deg; animation-delay:0.05s;}
+        .md-c-3{background:#10b981;--tx:-120px;--ty:-280px;--rot:400deg;}
+        .md-c-4{background:#3b82f6;--tx:120px;--ty:-250px;--rot:180deg; animation-delay:0.02s;}
+        .md-c-5{background:#a855f7;--tx:-220px;--ty:-100px;--rot:310deg;}
+        .md-c-6{background:#ef4444;--tx:220px;--ty:-80px;--rot:90deg; animation-delay:0.08s;}
+        .md-c-7{background:#f59e0b;--tx:-150px;--ty:-150px;--rot:420deg;}
+        .md-c-8{background:#10b981;--tx:150px;--ty:-150px;--rot:270deg; animation-delay:0.04s;}
+        .md-c-9{background:#3b82f6;--tx:-80px;--ty:-320px;--rot:200deg;}
+        .md-c-10{background:#a855f7;--tx:80px;--ty:-320px;--rot:250deg; animation-delay:0.06s;}
+        .md-c-11{background:#ef4444;--tx:-250px;--ty:-180px;--rot:150deg; animation-delay:0.02s;}
+        .md-c-12{background:#f59e0b;--tx:260px;--ty:-160px;--rot:320deg; animation-delay:0.09s;}
+        .md-c-13{background:#10b981;--tx:-100px;--ty:-380px;--rot:410deg; animation-delay:0.05s;}
+        .md-c-14{background:#3b82f6;--tx:140px;--ty:-360px;--rot:130deg; animation-delay:0.11s;}
+        .md-c-15{background:#a855f7;--tx:-190px;--ty:-290px;--rot:340deg; animation-delay:0.07s;}
+        .md-c-16{background:#ef4444;--tx:210px;--ty:-260px;--rot:110deg; animation-delay:0.03s;}
+        .md-c-17{background:#f59e0b;--tx:-50px;--ty:-220px;--rot:460deg; animation-delay:0.06s;}
+        .md-c-18{background:#10b981;--tx:40px;--ty:-250px;--rot:210deg; animation-delay:0.04s;}
     </style>
 </div>

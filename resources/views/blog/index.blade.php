@@ -20,6 +20,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="antialiased font-sans bg-chalk text-slate-600 selection:bg-copper/30 selection:text-amber-900 leading-normal">
 
@@ -32,19 +33,52 @@
         </div>
 
         {{-- Navigation --}}
-        <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100">
+        <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100" x-data="{ isMenuOpen: false }">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <a href="/" class="flex items-center gap-2">
                         <x-logo size="md" />
                     </a>
-                    <div class="flex items-center gap-6">
+
+                    {{-- Desktop Menu --}}
+                    <div class="hidden md:flex items-center gap-6">
                         <a href="/" class="text-sm font-medium text-slate-500 hover:text-midnight transition-colors">Accueil</a>
                         <a href="{{ route('blog.index') }}" class="text-sm font-bold text-midnight">Blog</a>
                         @if(auth()->check())
                             <a href="{{ route('dashboard') }}" class="btn-primary px-5 py-2 text-xs">Dashboard</a>
                         @else
                             <a href="{{ route('login') }}" class="btn-primary px-5 py-2 text-xs">Se connecter</a>
+                        @endif
+                    </div>
+
+                    {{-- Mobile Toggle --}}
+                    <div class="md:hidden flex items-center">
+                        <button @click="isMenuOpen = !isMenuOpen" class="text-slate-500 p-2 outline-none">
+                            <svg x-show="!isMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                            <svg x-show="isMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Mobile Menu --}}
+            <div x-show="isMenuOpen" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 -translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 -translate-y-4"
+                 class="md:hidden bg-white border-b border-slate-100 shadow-xl overflow-hidden"
+                 style="display: none;">
+                <div class="px-4 py-6 space-y-3">
+                    <a href="/" class="block px-4 py-2 rounded-xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight">Accueil</a>
+                    <a href="{{ route('blog.index') }}" class="block px-4 py-2 rounded-xl text-base font-bold text-midnight bg-slate-50">Blog</a>
+                    <div class="pt-4 px-4">
+                        @if(auth()->check())
+                            <a href="{{ route('dashboard') }}" class="block w-full text-center btn-primary py-3">Dashboard</a>
+                        @else
+                            <a href="{{ route('login') }}" class="block w-full text-center btn-primary py-3">Se connecter</a>
                         @endif
                     </div>
                 </div>
@@ -54,7 +88,7 @@
         {{-- Hero --}}
         <header class="py-20 sm:py-28 relative z-10">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-copper/10 text-copper text-xs font-bold uppercase tracking-widest mb-6">
+                <span class="badge badge-copper gap-2 mb-6">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
                     Blog
                 </span>

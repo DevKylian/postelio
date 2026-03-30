@@ -69,6 +69,10 @@ class ProcessPostGeneration implements ShouldQueue
                 $templateOptions['company_city']  = $company->city;
                 $templateOptions['company_name']  = $company->name;
                 $templateOptions['company_trade'] = $company->trade;
+                // Inject artisan bio for personalized AI generation
+                if (!empty($company->bio_text)) {
+                    $templateOptions['artisan_bio'] = $company->bio_text;
+                }
             }
             $refined = $refiner->refine($transcript, $this->post->template, $photoCount, $templateOptions);
             Log::info("AI refinement finished");

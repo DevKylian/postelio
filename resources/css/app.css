@@ -140,7 +140,23 @@
     }
 
     .badge-copper {
-        @apply text-amber-700 bg-amber-50/80 border border-amber-200/50 backdrop-blur-sm;
+        @apply text-copper bg-copper/10 border border-copper/10 backdrop-blur-md;
+    }
+
+    .badge-success {
+        @apply text-emerald-600 bg-emerald-50 border border-emerald-100 backdrop-blur-md;
+    }
+
+    .badge-error {
+        @apply text-rose-600 bg-rose-50 border border-rose-100 backdrop-blur-md;
+    }
+
+    .badge-warning {
+        @apply text-amber-600 bg-amber-50 border border-amber-100 backdrop-blur-md;
+    }
+
+    .badge-gray {
+        @apply text-slate-500 bg-slate-50 border border-slate-100 backdrop-blur-md;
     }
 
     .badge-white {

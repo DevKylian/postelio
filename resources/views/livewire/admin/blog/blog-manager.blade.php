@@ -283,12 +283,12 @@
                             <td class="px-8 py-6">
                                 <button wire:click="toggleStatus({{ $post->id }})" class="cursor-pointer">
                                     @if($post->status === 'published')
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-green-50 text-green-600 border border-green-100">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                        <span class="badge badge-success gap-1.5 !text-[10px] uppercase tracking-widest">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                             Publié
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-50 text-slate-400 border border-slate-100">
+                                        <span class="badge badge-gray gap-1.5 !text-[10px] uppercase tracking-widest">
                                             <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
                                             Brouillon
                                         </span>

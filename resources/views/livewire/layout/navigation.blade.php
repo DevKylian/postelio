@@ -102,6 +102,13 @@ $logout = function (Logout $logout) {
                 <span>Nouveautés</span>
             </x-sidebar-link>
 
+            <x-sidebar-link :href="route('help.index')" :active="request()->routeIs('help.*')" wire:navigate>
+                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                </svg>
+                <span>Centre d'aide</span>
+            </x-sidebar-link>
+
             @if(auth()->user() && auth()->user()->is_admin)
             <!-- Section: Administration -->
             <div class="pt-5 pb-2 px-3">
@@ -134,6 +141,13 @@ $logout = function (Logout $logout) {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
                 <span>Changelog</span>
+            </x-sidebar-link>
+
+            <x-sidebar-link :href="route('admin.faq.index')" :active="request()->routeIs('admin.faq.*')" wire:navigate>
+                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                </svg>
+                <span>Centre d'Aide</span>
             </x-sidebar-link>
 
             <x-sidebar-link :href="route('admin.blog.index')" :active="request()->routeIs('admin.blog.*')" wire:navigate>

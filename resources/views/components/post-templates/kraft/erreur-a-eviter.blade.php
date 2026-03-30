@@ -17,6 +17,8 @@
     <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
     
     {{-- Safety Stripes Border Top --}}
+    <div class="h-6 w-full flex relative z-20">
+        @for($i=0; $i<20; $i++)
             <div class="flex-1 h-full skew-x-[35deg] {{ $i % 2 == 0 ? 'bg-orange-600' : 'bg-gray-900' }}"></div>
         @endfor
     </div>

@@ -162,9 +162,8 @@ class PostGenerator extends Component
             'scheduleType'  => 'required|in:now,scheduled',
             'scheduledAt'   => $this->scheduleType === 'scheduled' ? 'required|date|after:now' : 'nullable',
             'tone'          => 'required|in:professionnel,chaleureux,expert,dynamique',
-            'customNote'    => 'nullable|string|max:300',
-            'visualStyle'   => 'required|in:standard,glass,blueprint,kraft,beton',
-    ];
+            'visualStyle'   => 'required|in:' . (Auth::user()->hasFullTemplateAccess() ? 'standard,glass,blueprint,kraft,beton' : 'standard'),
+        ];
     }
 
     public function nextStep()
@@ -226,6 +225,20 @@ class PostGenerator extends Component
     {
         $this->template         = 'custom';
         $this->customTemplateId = $id;
+    }
+
+    public function selectNativeTemplate(string $id): void
+    {
+        $this->template         = $id;
+        $this->customTemplateId = null;
+    }
+
+    public function updatedVisualStyle($value)
+    {
+        if (!Auth::user()->hasFullTemplateAccess() && $value !== 'standard') {
+            $this->visualStyle = 'standard';
+            $this->dispatch('notify', ['type' => 'error', 'message' => 'Ce style est réservé aux membres Premium.']);
+        }
     }
 
     public function updatedPlatforms()
@@ -488,9 +501,6 @@ class PostGenerator extends Component
             ->orderByDesc('created_at')
             ->get();
 
-        $nativeSettings = \App\Models\NativeTemplateSetting::all()->pluck('is_active', 'slug');
-        $isNativeActive = fn($slug) => $nativeSettings[$slug] ?? true;
-
         $customPhotoMode = 'none';
         if ($this->template === 'custom' && $this->customTemplateId) {
             $ct = $customTemplates->firstWhere('id', $this->customTemplateId);
@@ -527,7 +537,16 @@ class PostGenerator extends Component
         return view('livewire.pages.post-generator', compact(
             'customTemplates', 'customPhotoMode',
             'company', 'brandColor', 'igUsername', 'igCity', 'hasLogo', 'igProfilePicture',
-            'igConnected', 'fbConnected', 'isNativeActive'
+            'igConnected', 'fbConnected'
         ));
+    }
+
+    public function isNativeActive($slug): bool
+    {
+        static $nativeSettings = null;
+        if ($nativeSettings === null) {
+            $nativeSettings = \App\Models\NativeTemplateSetting::all()->pluck('is_active', 'slug');
+        }
+        return $nativeSettings[$slug] ?? true;
     }
 }

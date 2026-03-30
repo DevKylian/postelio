@@ -7,9 +7,16 @@
 
         <title>{{ config('app.name', 'Postelio') }}</title>
 
+        <!-- PWA -->
+        <link rel="manifest" href="/manifest.webmanifest">
+        <meta name="theme-color" content="#F59E0B">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="Postelio">
+
         <!-- Favicon -->
         <link rel="icon" type="image/svg+xml" href="{{ asset('images/postelio-logo-gradient.svg') }}">
-        <link rel="apple-touch-icon" href="{{ asset('images/postelio-logo-gradient.svg') }}">
+        <link rel="apple-touch-icon" href="/images/pwa/icon-192.png">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -66,5 +73,6 @@
         </div>
 
         @stack('scripts')
+        <livewire:pwa.offline-indicator />
     </body>
 </html>

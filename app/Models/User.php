@@ -32,6 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'avatar',
         'is_admin',
         'is_premium',
+        'is_tester',
         'is_banned',
         'onboarding_completed',
         'total_credits',
@@ -61,6 +62,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'is_premium' => 'boolean',
+            'is_tester' => 'boolean',
             'is_banned' => 'boolean',
             'onboarding_completed' => 'boolean',
             'last_quota_reset_at' => 'datetime',
@@ -84,6 +86,15 @@ class User extends Authenticatable implements MustVerifyEmail
         }
     }
 
+    public function getTotalCreditsAttribute($value): int
+    {
+        if ($this->is_tester) {
+            return (int) \App\Models\Setting::get('tester_quota', 10);
+        }
+
+        return (int) $value;
+    }
+
     public function getRemainingCreditsAttribute(): int
     {
         return max(0, $this->total_credits - $this->used_credits);
@@ -102,6 +113,8 @@ class User extends Authenticatable implements MustVerifyEmail
         if ($this->is_admin || $this->is_premium) {
             return;
         }
+        
+        // Non-premium testers are still deducted if they have a shared quota limit
         $this->increment('used_credits', $amount);
     }
 
@@ -135,8 +148,12 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function planCredits(): int
     {
-        $planKey = $this->currentPlanKey();
+        if ($this->is_tester) {
+            return (int) \App\Models\Setting::get('tester_quota', 10);
+        }
 
+        $planKey = $this->currentPlanKey();
+        
         if (!$planKey) {
             return config('subscription.free_credits', 3);
         }
@@ -157,7 +174,27 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function canPublishToSocialMedia(): bool
     {
+        if ($this->is_tester) {
+            return (bool) \App\Models\Setting::get('tester_can_publish', false);
+        }
+
         return $this->is_premium || $this->hasActiveSubscription();
+    }
+
+    /**
+     * Whether the user can access all visual templates (premium ones).
+     */
+    public function hasFullTemplateAccess(): bool
+    {
+        if ($this->is_admin || $this->is_premium || $this->hasActiveSubscription()) {
+            return true;
+        }
+
+        if ($this->is_tester) {
+            return (bool) \App\Models\Setting::get('tester_all_templates', false);
+        }
+
+        return false;
     }
 
     public function company()

@@ -116,9 +116,9 @@
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-4xl mx-auto"
                  x-intersect="$el.classList.add('animate-fade-up')">
-                <div class="badge badge-copper inline-flex items-center mb-8 shadow-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-amber-500"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364-.707.707M6.343 17.657l-.707.707m12.728 0-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>
-                  Pour les artisans qui veulent évoluer
+                <div class="badge badge-copper gap-2 mb-8 shadow-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-copper"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364-.707.707M6.343 17.657l-.707.707m12.728 0-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>
+                  Pour les artisans qui veulent de meilleurs chantiers
                 </div>
               <h1 class="text-5xl sm:text-6xl lg:text-8xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.05]">
                 Votre chantier travaille <br class="hidden sm:block" />
@@ -130,12 +130,12 @@
               <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 @auth
                     <a href="{{ route('generate-post') }}" wire:navigate class="btn-primary w-full sm:w-auto flex justify-center items-center gap-2 text-base">
-                        Créer un post
+                        Créer mon 1er post (Gratuit)
                         <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </a>
                 @else
                     <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full sm:w-auto flex justify-center items-center gap-2 text-base">
-                        Essayer gratuitement
+                        Créer mon 1er post (Gratuit)
                         <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </a>
                 @endauth
@@ -145,13 +145,18 @@
               </div>
               <div class="flex flex-col items-center gap-6 mt-10">
                 <div class="flex items-center gap-3">
-                  <div class="flex -space-x-2">
-                    @foreach(['plumber', 'painter', 'carpenter', 'electrician'] as $avatar)
-                      <img src="https://picsum.photos/seed/{{ $avatar }}/100/100" alt="" class="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm">
+                  <div class="flex -space-x-3">
+                    @foreach(range(1, 4) as $i)
+                      <img src="{{ asset('images/customers/'.$i.'.png') }}" alt="Artisan {{ $i }}" class="w-9 h-9 rounded-full border-2 border-slate-50 object-cover shadow-md hover:scale-110 transition-transform relative z-[{{ 10 - $i }}]">
                     @endforeach
                   </div>
                   <div class="text-sm text-slate-600">
-                    <span class="font-semibold text-midnight">+200 artisans</span> nous font confiance
+                    <div class="flex items-center gap-1 mb-0.5">
+                        @foreach(range(1, 5) as $star)
+                            <svg class="w-3 h-3 text-amber-500 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                        @endforeach
+                    </div>
+                    <span class="font-bold text-midnight">+200 avis artisans</span> certifiés
                   </div>
                 </div>
                 <div class="flex flex-wrap justify-center items-center gap-4 text-xs font-medium text-slate-400 uppercase tracking-widest">
@@ -613,7 +618,7 @@
               <div class="flex-1 text-center lg:text-left">
                 <div class="badge badge-copper inline-flex items-center mb-6 shadow-sm">
                   <i data-lucide="wand-2" class="w-3.5 h-3.5 mr-2 text-amber-500"></i>
-                  L'IA qui rédige pour vous
+                  Votre texte professionnel généré en un clic
                 </div>
                 <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">
                   Un rendu <span class="text-gradient-copper italic pr-1 -mr-1">impeccable</span>, à chaque fois.
@@ -761,6 +766,12 @@
                 </div>
               @endforeach
             </div>
+
+            <div class="mt-12 text-center animate-fade-in" x-intersect="$el.classList.add('animate-fade-up')">
+                <p class="text-sm text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed px-4">
+                    <span class="text-copper mr-1">●</span> Aussi disponible pour : Maçons, Plombiers, Couvreurs, Carreleurs, Chauffagistes, Serruriers, Multi-services, et bien d'autres corps de métier.
+                </p>
+            </div>
           </div>
         </section>
 
@@ -785,7 +796,6 @@
                   <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-8 border border-slate-100 shadow-sm group-hover:scale-110 group-hover:border-copper group-hover:shadow-copper/10 transition-all duration-500 text-copper">
                     <i data-lucide="{{ $step['icon'] }}" class="w-6 h-6"></i>
                   </div>
-                  <div class="text-copper font-display font-bold text-xl mb-2">0{{ $idx + 1 }}</div>
                   <h3 class="text-2xl font-display font-semibold tracking-tight text-midnight mb-4">{{ $step['title'] }}</h3>
                   <p class="text-slate-600 font-light leading-relaxed">{{ $step['desc'] }}</p>
                 </div>
@@ -863,9 +873,9 @@
             <div class="grid md:grid-cols-3 gap-6">
               @php
                 $testimonials = [
-                  ['name' => 'Marc D.', 'job' => 'Plombier-Chauffagiste', 'text' => "Je refusais de perdre mon temps sur le digital. Aujourd'hui je ne fais plus que des rénovations complètes. Les clients voient mon exigence et acceptent mes devis sans discuter.", 'img' => 'plumber'],
-                  ['name' => 'Sophie L.', 'job' => 'Peintre en bâtiment', 'text' => "Mes photos Avant/Après publiées automatiquement m'ont apporté 30% de clients premium en plus ce mois-ci. L'outil est d'une simplicité enfantine.", 'img' => 'painter'],
-                  ['name' => 'Thomas B.', 'job' => 'Menuisier Agenceur', 'text' => "Fini le bouche-à-oreille irrégulier. Ma vitrine travaille pour moi. Je choisis mes chantiers et je ne me bats plus sur les prix.", 'img' => 'carpenter']
+                  ['name' => 'Marc D.', 'job' => 'Plombier-Chauffagiste', 'text' => "Avant, poster sur Facebook était une corvée. Aujourd'hui, je montre des finitions propres, et les clients négocient beaucoup moins mes devis.", 'img' => 'plumber'],
+                  ['name' => 'Sophie L.', 'job' => 'Peintre en bâtiment', 'text' => "C'est ultra simple. Je fais ma photo de fin de chantier, je parle dans le téléphone, et ça me ramène de belles rénovations sans y passer mes soirées.", 'img' => 'painter'],
+                  ['name' => 'Thomas B.', 'job' => 'Menuisier Agenceur', 'text' => "C'est devenu ma routine de fin de chantier. Je montre mon boulot, ça me ramène de bons clients et je ne me bats plus pour justifier mes prix.", 'img' => 'carpenter']
                 ];
               @endphp
               @foreach($testimonials as $t)
@@ -897,7 +907,7 @@
             <p class="text-xl font-light text-slate-600 mb-10">Prêt à transformer vos réalisations en aimants à clients premium ?</p>
             @auth
                 <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
-                  Démarrer maintenant <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                  Créer mon 1er post (Gratuit) <i data-lucide="arrow-right" class="w-5 h-5"></i>
                 </a>
             @else
                 <a href="{{ route('register') }}" wire:navigate class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
@@ -926,7 +936,7 @@
               </button>
               <div class="flex items-center gap-2">
                   <span class="text-sm font-bold transition-colors duration-300" :class="billingPeriod === 'yearly' ? 'text-midnight' : 'text-gray-400'">Annuel</span>
-                  <span class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter border border-green-200 shadow-sm animate-pulse">-20%</span>
+                  <span class="badge badge-success !text-[10px] !px-2 !py-0.5 animate-pulse">-20%</span>
               </div>
             </div>
 

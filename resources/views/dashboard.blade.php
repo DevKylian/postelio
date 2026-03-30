@@ -73,7 +73,7 @@
                         <h3 class="font-semibold text-midnight text-sm">Démarrez avec Postelio</h3>
                         <p class="text-xs text-gray-400 mt-0.5">Complétez votre configuration pour générer des posts professionnels</p>
                     </div>
-                    <span class="text-xs font-bold text-copper bg-copper/10 px-2.5 py-1 rounded-full">{{ $done }}/4</span>
+                    <span class="badge badge-copper !text-xs !px-2.5">{{ $done }}/4</span>
                 </div>
                 <div class="px-6 py-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
                     @php
@@ -115,7 +115,7 @@
                             </svg>
                         </div>
                         @if($totalPosts > 0)
-                            <span class="text-[11px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full">Total</span>
+                            <span class="badge badge-gray !bg-blue-50 !text-blue-500 !border-blue-100 !text-[11px] !px-2">Total</span>
                         @endif
                     </div>
                     <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Posts générés</p>
@@ -131,7 +131,7 @@
                             </svg>
                         </div>
                         @if($trend !== null)
-                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full {{ $trend >= 0 ? 'text-green-600 bg-green-50' : 'text-red-500 bg-red-50' }}">
+                            <span class="badge !text-[11px] !px-2 {{ $trend >= 0 ? 'badge-success' : 'badge-error' }}">
                                 {{ $trend >= 0 ? '+' : '' }}{{ $trend }}%
                             </span>
                         @endif
@@ -151,12 +151,12 @@
                         @php $weeklyGoal = $company?->weekly_posts_goal ?? 3; @endphp
                         @if($weeklyGoal > 0)
                             @if($thisWeek >= $weeklyGoal)
-                                <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Atteint 🎉</span>
+                                <span class="badge badge-success !text-[11px] !px-2">Atteint 🎉</span>
                             @else
-                                <span class="text-[11px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">En cours</span>
+                                <span class="badge badge-gray !text-[11px] !px-2">En cours</span>
                             @endif
                         @else
-                            <span class="text-[11px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Non défini</span>
+                            <span class="badge badge-gray !text-[11px] !px-2">Non défini</span>
                         @endif
                     </div>
                     <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Objectif hebdo</p>
@@ -196,9 +196,9 @@
                             </svg>
                         </div>
                         @if($hasFacebook)
-                            <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Connecté</span>
+                            <span class="badge badge-success !text-[11px] !px-2">Connecté</span>
                         @else
-                            <span class="text-[11px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Non lié</span>
+                            <span class="badge badge-gray !text-[11px] !px-2">Non lié</span>
                         @endif
                     </div>
                     <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Facebook</p>

@@ -22,6 +22,9 @@ class ContentRefinerService
         $spec = config("template-specs.{$template}");
         $isCarousel = $spec ? $spec['type'] === 'carousel' : in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq']);
 
+        // Inject artisan bio into options so prompt builders can use it
+        // bio_text is passed via options['artisan_bio'] from the Livewire component
+
         // Build the prompt from template spec or fall back to custom/default
         if ($spec) {
             $prompt = $this->buildPromptFromSpec($spec, $template, $photoCount, $options);
@@ -123,6 +126,16 @@ class ContentRefinerService
         if ($customNote) {
             $contextParts[] = "Note de l'artisan : {$customNote}";
         }
+
+        // ── Artisan bio context (from onboarding presentation) ──
+        $artisanBio = $options['artisan_bio'] ?? null;
+        if ($artisanBio) {
+            $prompt .= "PROFIL DE L'ARTISAN (extrait de sa présentation personnelle) :\n"
+                . "{$artisanBio}\n"
+                . "Utilise ces informations pour personnaliser le ton et les services mentionnés, "
+                . "mais UNIQUEMENT si elles sont cohérentes avec le mémo vocal.\n\n";
+        }
+
         if (!empty($contextParts)) {
             $prompt .= "CONTEXTE FOURNI PAR L'ARTISAN :\n" . implode("\n", $contextParts) . "\n\n";
         }

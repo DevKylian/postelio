@@ -37,7 +37,7 @@
                 <div class="relative p-8 sm:p-12 flex flex-col lg:flex-row gap-12 items-center">
                     <div class="flex-1 space-y-8">
                         <div class="flex flex-wrap items-center gap-4">
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] bg-{{ $latest->type_color }}-50 text-{{ $latest->type_color }}-600 border border-{{ $latest->type_color }}-100/50">
+                            <span class="badge badge-{{ $latest->type === 'feature' ? 'success' : ($latest->type === 'fix' ? 'error' : 'warning') }} !font-black uppercase tracking-[0.15em]">
                                 {{ $latest->type_label }}
                             </span>
                             <div class="flex items-center gap-1.5 text-slate-400 font-bold text-[11px] tracking-wide bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
@@ -117,7 +117,7 @@
                         <div class="flex-1 space-y-6">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-3">
-                                    <span class="text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-{{ $log->type_color }}-50 text-{{ $log->type_color }}-600 border border-{{ $log->type_color }}-100/50">
+                                    <span class="badge badge-{{ $log->type === 'feature' ? 'success' : ($latest->type === 'fix' ? 'error' : 'warning') }} !text-[9px] !font-black uppercase tracking-widest">
                                         {{ $log->type_label }}
                                     </span>
                                     @if($log->version)

@@ -61,7 +61,7 @@
                         ['id' => 'quality_focus',       'label' => 'Focus Qualité',        'desc' => 'Mettez en lumière vos matériaux ou équipements.',                          'icon' => 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z'],
                         ['id' => 'conseil_saisonnier',  'label' => 'Conseil Saisonnier',   'desc' => 'Un tip utile et saisonnier pour anticiper les besoins de vos clients.',    'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'],
                         ['id' => 'erreur_a_eviter',     'label' => 'Erreur à Éviter',      'desc' => 'Une erreur fréquente de vos clients — format alerte très engageant.',       'icon' => 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'],
-                    ])->filter(fn($t) => $isNativeActive($t['id']))->toArray(),
+                    ])->filter(fn($t) => $this->isNativeActive($t['id']))->toArray(),
                 ],
                 [
                     'key' => 'carousel',
@@ -72,7 +72,7 @@
                         ['id' => 'chantier_detail',   'label' => 'Chantier en Détail',  'desc' => 'Un chantier sous tous ses angles, slide par slide.',          'icon' => 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
                         ['id' => 'step_by_step',      'label' => 'Step-by-Step',        'desc' => 'Votre process de travail, étape par étape, rassurant.',       'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'],
                         ['id' => 'guide_pedagogique', 'label' => 'Guide Pédagogique',   'desc' => 'Carrousel éducatif — positionnez-vous expert de votre domaine.', 'icon' => 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'],
-                    ])->filter(fn($t) => $isNativeActive($t['id']))->toArray(),
+                    ])->filter(fn($t) => $this->isNativeActive($t['id']))->toArray(),
                 ],
             ];
 
@@ -200,7 +200,7 @@
                                     @if($isCustomTpl)
                                         wire:click="selectCustomTemplate({{ $tpl['custom_id'] }})"
                                     @else
-                                        wire:click="$set('template', '{{ $tpl['id'] }}'); $set('customTemplateId', null)"
+                                        wire:click="selectNativeTemplate('{{ $tpl['id'] }}')"
                                     @endif
                                     class="group relative flex flex-col gap-3 p-4 rounded-xl border-2 text-left transition-all duration-200
                                         {{ $isSelected
@@ -410,9 +410,9 @@
                                 }
                              }"
                              class="relative">
-                            <input type="file" wire:model.live="audio" id="audio-input-step1" class="hidden" accept="audio/*"
+                            <input type="file" wire:model.live="audio" id="audio-input-file" class="hidden" accept="audio/*"
                                    x-on:change="uploadError = false; console.log('[AUDIO DEBUG] File selected:', $event.target.files[0]?.name, $event.target.files[0]?.size, $event.target.files[0]?.type)">
-                            <label for="audio-input-step1"
+                            <label for="audio-input-file"
                                    class="flex flex-col items-center justify-center w-full min-h-[200px] border-2 border-dashed rounded-2xl transition-all duration-200 cursor-pointer
                                         {{ $audio ? 'border-green-400 bg-green-50' : 'border-gray-200 hover:border-copper hover:bg-copper/5 bg-gray-50' }}">
                                 @if ($audio && !$isAnalyzing)
@@ -785,30 +785,51 @@
                         @endphp
 
                         @foreach($availableStyles as $sty)
-                        @php $c = $styleColors[$sty['color']]; @endphp
+                        @php 
+                            $c = $styleColors[$sty['color']]; 
+                            $isPremium = $sty['id'] !== 'standard';
+                            $hasAccess = Auth::user()->hasFullTemplateAccess() || !$isPremium;
+                        @endphp
                         <button type="button"
-                                wire:click="$set('visualStyle', '{{ $sty['id'] }}')"
+                                @if($hasAccess)
+                                    wire:click="$set('visualStyle', '{{ $sty['id'] }}')"
+                                @else
+                                    x-on:click="$dispatch('notify', { type: 'error', message: 'Ce style est réservé aux membres Premium.' })"
+                                @endif
                                 class="group relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200
                                     {{ $visualStyle === $sty['id'] 
                                         ? $c['active'] . ' shadow-sm' 
-                                        : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50' }}">
+                                        : 'border-gray-100 bg-white' }}
+                                    {{ !$hasAccess ? 'opacity-60 cursor-not-allowed grayscale' : 'hover:border-gray-200 hover:bg-gray-50' }}">
                             
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200
                                 {{ $visualStyle === $sty['id'] 
                                     ? 'bg-copper text-white' 
                                     : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $sty['icon'] }}" />
-                                </svg>
+                                @if(!$hasAccess)
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                @else
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $sty['icon'] }}" />
+                                    </svg>
+                                @endif
                             </div>
 
                             <div class="text-center">
-                                <p class="text-[11px] font-bold uppercase tracking-wider {{ $visualStyle === $sty['id'] ? 'text-copper' : 'text-gray-500' }}">
+                                <p class="text-[10px] font-bold uppercase tracking-wider {{ $visualStyle === $sty['id'] ? 'text-copper' : 'text-gray-500' }}">
                                     {{ $sty['label'] }}
                                 </p>
                             </div>
 
-                            @if($visualStyle === $sty['id'])
+                            @if($isPremium && !$hasAccess)
+                                <div class="absolute -top-2 -right-1">
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black bg-amber-100 text-amber-700 border border-amber-200 uppercase tracking-tighter">Premium</span>
+                                </div>
+                            @endif
+
+                            @if($visualStyle === $sty['id'] && $hasAccess)
                             <div class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-copper flex items-center justify-center shadow-sm">
                                 <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
@@ -1301,17 +1322,64 @@
                     </button>
                 @else
                     {{-- ── Submit ── --}}
-                    <button type="submit"
-                            wire:loading.attr="disabled"
-                            wire:target="generate"
-                            class="flex-[2] relative group overflow-hidden bg-copper text-white font-bold text-sm py-4 rounded-2xl shadow-lg shadow-copper/25 hover:shadow-xl hover:shadow-copper/30 hover:bg-amber-500 transition-all active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed">
-                        <div class="flex items-center justify-center gap-3">
-                            <svg wire:loading.remove wire:target="generate" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                            <svg wire:loading wire:target="generate" class="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            <span wire:loading.remove wire:target="generate">Lancer la génération</span>
-                            <span wire:loading wire:target="generate">Analyse en cours...</span>
-                        </div>
-                    </button>
+                    <div class="flex-[2]" x-data="{
+                        submitOffline() {
+                            const formData = {
+                                template: @entangle('template'),
+                                tone: @entangle('tone'),
+                                includeHashtags: @entangle('includeHashtags'),
+                                clientName: @entangle('clientName'),
+                                serviceType: @entangle('serviceType'),
+                                workCategory: @entangle('workCategory'),
+                                jobDuration: @entangle('jobDuration'),
+                                faqCategory: @entangle('faqCategory'),
+                                season: @entangle('season'),
+                                targetSlides: @entangle('targetSlides'),
+                                customNote: @entangle('customNote'),
+                                visualStyle: @entangle('visualStyle'),
+                                scheduleType: @entangle('scheduleType'),
+                                scheduledAt: @entangle('scheduledAt'),
+                                textContent: @entangle('textContent'),
+                                platforms: @entangle('platforms'),
+                            };
+                            
+                            // Handle files
+                            const recorder = Alpine.$data(document.querySelector('[x-data=\"voiceRecorder\"]'));
+                            const audioInput = document.getElementById('audio-input-file');
+                            const imageBeforeInput = document.getElementById('before-input');
+                            const imageAfterInput = document.getElementById('after-input');
+                            
+                            if (recorder && recorder.audioBlob) {
+                                const type = recorder.audioBlob.type;
+                                const ext = type.includes('mp4') ? 'm4a' : type.includes('ogg') ? 'ogg' : 'webm';
+                                formData.audio = new File([recorder.audioBlob], `recording.${ext}`, { type });
+                            } else if (audioInput && audioInput.files && audioInput.files[0]) {
+                                formData.audio = audioInput.files[0];
+                            }
+
+                            if (imageBeforeInput && imageBeforeInput.files && imageBeforeInput.files[0]) formData.imageBefore = imageBeforeInput.files[0];
+                            if (imageAfterInput && imageAfterInput.files && imageAfterInput.files[0]) formData.imageAfter = imageAfterInput.files[0];
+                            
+                            $dispatch('pwa:offline-submit', {
+                                url: '/api/pwa/queue-generate',
+                                data: formData,
+                                redirectTo: '{{ route('posts.index') }}'
+                            });
+                        }
+                    }">
+                        <button type="button"
+                                @click="navigator.onLine ? $wire.generate() : submitOffline()"
+                                wire:loading.attr="disabled"
+                                wire:target="generate"
+                                class="w-full relative group overflow-hidden bg-copper text-white font-bold text-sm py-4 rounded-2xl shadow-lg shadow-copper/25 hover:shadow-xl hover:shadow-copper/30 hover:bg-amber-500 transition-all active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed">
+                            <div class="flex items-center justify-center gap-3">
+                                <svg wire:loading.remove wire:target="generate" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                <svg wire:loading wire:target="generate" class="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                <span wire:loading.remove wire:target="generate" x-text="navigator.onLine ? 'Lancer la génération' : 'Mettre en file d\'attente (Hors-ligne)'"></span>
+                                <span wire:loading wire:target="generate">Analyse en cours...</span>
+                            </div>
+                        </button>
+                    </div>
                 @endif
             </div>
 

@@ -3,7 +3,9 @@
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\FacebookController;
 use App\Http\Controllers\InstagramController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PwaController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +32,23 @@ Volt::route('onboarding', 'pages.onboarding')
     ->middleware(['auth', 'verified'])
     ->name('onboarding');
 
+// Onboarding bio audio upload
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/onboarding/upload-bio-audio', [OnboardingController::class, 'uploadBioAudio'])
+        ->name('onboarding.upload-bio-audio');
+    Route::post('/onboarding/transcribe-bio', [OnboardingController::class, 'transcribeBioAudio'])
+        ->name('onboarding.transcribe-bio');
+});
+
+// PWA offline support
+Route::view('/offline', 'pwa.offline')->name('pwa.offline');
+
+// PWA offline queue status & sync
+Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
+    Route::get('/pwa/pending-queue', [PwaController::class, 'pendingQueue'])->name('pwa.pending-queue');
+    Route::post('/api/pwa/queue-generate', [PwaController::class, 'queueGenerate'])->name('api.pwa.queue-generate');
+});
+
 // Subscription routes (auth required, but no subscription check)
 Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
     Route::get('/subscription/plans', [SubscriptionController::class, 'plans'])->name('subscription.plans');
@@ -53,6 +72,10 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
     Route::view('statistics', 'statistics')->name('statistics');
     Route::view('changelog', 'changelog')->name('changelog');
 
+    // Help Center
+    Route::get('centre-aide', [App\Http\Controllers\HelpController::class, 'index'])->name('help.index');
+    Route::get('centre-aide/{slug}', [App\Http\Controllers\HelpController::class, 'show'])->name('help.show');
+
     Route::get('posts', [PostController::class, 'index'])->name('posts.index');
     Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 
@@ -64,6 +87,8 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
         Route::get('/admin/templates', \App\Livewire\Admin\Templates\TemplateManager::class)->name('admin.templates.index');
         Route::get('/admin/changelog', \App\Livewire\Admin\Changelog\ChangelogManager::class)->name('admin.changelog.index');
         Route::get('/admin/blog', \App\Livewire\Admin\Blog\BlogManager::class)->name('admin.blog.index');
+        Route::get('/admin/faq', \App\Livewire\Admin\Faq\FaqManager::class)->name('admin.faq.index');
+        Route::get('/admin/testers', \App\Livewire\Admin\Users\TesterManager::class)->name('admin.testers');
         Route::get('/admin/server', \App\Livewire\Admin\ServerMonitor::class)->name('admin.server');
     });
 

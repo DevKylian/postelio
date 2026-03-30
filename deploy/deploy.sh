@@ -17,11 +17,25 @@ DEPLOY_LOG="${LOG_DIR}/deploy.log"
 exec >> "${DEPLOY_LOG}" 2>&1
 
 log()  { echo "[DEPLOY $(date '+%Y-%m-%d %H:%M:%S')] $1"; }
+
+rollback() {
+    log "ERREUR FATALE DÉTECTÉE ! Annulation du déploiement..."
+    if [ ! -z "${PREV_COMMIT:-}" ]; then
+        log "Retour au commit précédent : ${PREV_COMMIT}"
+        cd "$APP_DIR" && git reset --hard "$PREV_COMMIT" --quiet || true
+        log "Restructuration des caches pour l'ancien code..."
+        cd "$APP_DIR" && $PHP artisan optimize:clear 2>/dev/null || true
+    fi
+    cd "$APP_DIR" && $PHP artisan up 2>/dev/null || true
+}
+
 fail() {
     log "ERREUR : $1"
-    cd "$APP_DIR" && $PHP artisan up 2>/dev/null || true
     exit 1
 }
+
+# La trap catch n'importe quelle sortie non-0 (crash de bash due à `set -e`)
+trap 'if [ $? -ne 0 ]; then rollback; fi' EXIT
 
 log "====== DÉPLOIEMENT DÉMARRÉ ======"
 
@@ -132,4 +146,6 @@ $PHP artisan up
 log "Redémarrage queue worker..."
 sudo systemctl restart postelio-queue
 
+# --- Désactivation de l'annulation (Succès) -----------------------------------
+trap - EXIT
 log "====== DÉPLOIEMENT TERMINÉ ======"

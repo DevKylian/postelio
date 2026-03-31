@@ -14,7 +14,7 @@
 
     <div x-data="{ activeTab: 'instagram' }">
         {{-- Tab Navigation --}}
-        <div class="border-b border-gray-100 bg-white/60 backdrop-blur-sm sticky top-0 z-10">
+        <div class="border-b border-white/80 bg-white/60 backdrop-blur-xl sticky top-0 z-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex gap-1 py-2">
                     <button @click="activeTab = 'instagram'"

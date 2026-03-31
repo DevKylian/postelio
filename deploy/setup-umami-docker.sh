@@ -79,46 +79,53 @@ ufw allow 'Nginx Full' >/dev/null
 echo "y" | ufw enable >/dev/null
 log "Pare-feu configuré (SSH, HTTP, HTTPS)."
 
-# --- 4. Configuration MySQL --------------------------------------------------
-step "4/7 — Base de données"
-# Patch bind-address
-if [ -f /etc/mysql/mysql.conf.d/mysqld.cnf ]; then
-    sed -i "s/bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
-    systemctl restart mysql
-fi
-
-# Création DB et User (Local + Remote pour Docker)
-mysql -u root << MYSQL_SCRIPT
-CREATE DATABASE IF NOT EXISTS \`${UMAMI_DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS '${UMAMI_DB_USER}'@'localhost' IDENTIFIED BY '${UMAMI_DB_PASSWORD}';
-CREATE USER IF NOT EXISTS '${UMAMI_DB_USER}'@'%' IDENTIFIED BY '${UMAMI_DB_PASSWORD}';
-GRANT ALL PRIVILEGES ON \`${UMAMI_DB_NAME}\`.* TO '${UMAMI_DB_USER}'@'localhost';
-GRANT ALL PRIVILEGES ON \`${UMAMI_DB_NAME}\`.* TO '${UMAMI_DB_USER}'@'%';
-FLUSH PRIVILEGES;
-MYSQL_SCRIPT
-log "MySQL prêt (accès bridge Docker ouvert)."
-
-# --- 5. Docker Compose -------------------------------------------------------
-step "5/7 — Lancement Umami (Docker v3)"
+# --- 4. Docker Compose (Stack v3 avec PostgreSQL) ---------------------------
+step "4/7 — Lancement Umami v3 (Stack PostgreSQL)"
 mkdir -p "$UMAMI_DOCKER_DIR"
+
+# On genere des mots de passe pour Postgres si nouveaux
+DB_PASS=$(openssl rand -base64 12 | tr -dc 'a-zA-Z0-9' | head -c 12)
+
 cat > "$UMAMI_DOCKER_DIR/docker-compose.yml" << EOF
 services:
   umami:
-    image: $UMAMI_IMAGE
+    image: ghcr.io/umami-software/umami:latest
     restart: always
     environment:
-      DATABASE_URL: mysql://$UMAMI_DB_USER:$UMAMI_DB_PASSWORD@host.docker.internal:3306/$UMAMI_DB_NAME
+      DATABASE_URL: postgresql://umami_user:$DB_PASS@db:5432/umami_db
       APP_SECRET: $UMAMI_APP_SECRET
-      DATABASE_TYPE: mysql
+      DATABASE_TYPE: postgresql
     ports:
       - "127.0.0.1:3000:3000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: umami_db
+      POSTGRES_USER: umami_user
+      POSTGRES_PASSWORD: $DB_PASS
+    volumes:
+      - umami-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umami_user -d umami_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  umami-db-data:
 EOF
 
 cd "$UMAMI_DOCKER_DIR"
+docker compose pull
 docker compose up -d --remove-orphans
-log "Conteneur Umami v3 lancé."
+
+info "Attente du démarrage (Postgres + Umami v3)..."
+sleep 10
+docker compose logs --tail 20 umami
 
 # --- 6. Nginx ----------------------------------------------------------------
 step "6/7 — Configuration Nginx"

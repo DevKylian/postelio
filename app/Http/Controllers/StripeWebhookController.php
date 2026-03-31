@@ -9,6 +9,32 @@ use Laravel\Cashier\Http\Controllers\WebhookController as CashierController;
 class StripeWebhookController extends CashierController
 {
     /**
+     * Handle customer subscription created.
+     */
+    public function handleCustomerSubscriptionCreated(array $payload): void
+    {
+        parent::handleCustomerSubscriptionCreated($payload);
+
+        $stripeCustomerId = $payload['data']['object']['customer'] ?? null;
+
+        if (!$stripeCustomerId) return;
+
+        $user = User::where('stripe_id', $stripeCustomerId)->first();
+
+        if (!$user) return;
+
+        // Send Premium Welcome Email
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\PremiumSubscriptionMail($user));
+        } catch (\Exception $e) {
+            Log::error('Failed to send premium welcome email', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
      * Handle customer subscription updated.
      */
     public function handleCustomerSubscriptionUpdated(array $payload): void

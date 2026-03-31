@@ -1365,6 +1365,9 @@
                                 data: formData,
                                 redirectTo: '{{ route('posts.index') }}'
                             });
+                            
+                            // Local immediate feedback
+                            alert('Post mis en file d\'attente ! Il sera généré automatiquement dès que vous aurez du réseau.');
                         }
                     }">
                         <button type="button"

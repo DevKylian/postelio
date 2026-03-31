@@ -27,7 +27,7 @@
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto 20px;">
                                 <tr>
                                     <td style="vertical-align: middle;">
-                                        <img src="{{ asset('images/postelio-logo-email.png') }}" width="44" height="44" alt="Postelio" style="display: block; border-radius: 12px;" />
+                                        <img src="{{ asset('images/logo_png.PNG') }}" width="44" height="44" alt="Postelio" style="display: block; border-radius: 100px;" />
                                     </td>
                                     <td style="padding-left: 12px; font-size: 26px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.5px; font-family: 'Plus Jakarta Sans', 'Segoe UI', Tahoma, sans-serif;">
                                         Postelio
@@ -37,7 +37,7 @@
                             <h1 style="margin: 0; font-size: 28px; font-weight: 600; color: #FFFFFF; line-height: 1.3;">
                                 Activez votre compte {{ $userName }} ! 🚀
                             </h1>
-                            <p style="margin: 12px 0 0; font-size: 16px; color: rgba(255,255,255,0.85); font-weight: 300; line-height: 1.5;">
+                            <p style="margin: 12px 0 0; font-size: 17px; color: rgba(255,255,255,0.85); font-weight: 400; line-height: 1.5;">
                                 Votre vitrine professionnelle est presque prête.<br>Activez votre compte pour commencer à publier.
                             </p>
                         </td>
@@ -48,7 +48,7 @@
                         <td style="padding: 40px;">
 
                             <!-- Welcome text -->
-                            <p style="margin: 0 0 24px; font-size: 16px; color: #475569; line-height: 1.7; font-weight: 300;">
+                            <p style="margin: 0 0 24px; font-size: 17px; color: #475569; line-height: 1.7; font-weight: 400;">
                                 Vous avez fait le premier pas pour attirer des clients haut de gamme sans effort supplémentaire. Voici comment démarrer en quelques minutes&nbsp;:
                             </p>
 
@@ -66,7 +66,7 @@
                                                 </td>
                                                 <td style="padding-left: 12px; vertical-align: top;">
                                                     <div style="font-size: 15px; font-weight: 600; color: #1E293B; margin-bottom: 4px;">Prenez une photo de votre réalisation</div>
-                                                    <div style="font-size: 14px; color: #64748B; font-weight: 300; line-height: 1.5;">Capturez votre travail directement depuis le terrain.</div>
+                                                    <div style="font-size: 14px; color: #64748B; font-weight: 400; line-height: 1.5;">Capturez votre travail directement depuis le terrain.</div>
                                                 </td>
                                             </tr>
                                         </table>
@@ -84,7 +84,7 @@
                                                 </td>
                                                 <td style="padding-left: 12px; vertical-align: top;">
                                                     <div style="font-size: 15px; font-weight: 600; color: #1E293B; margin-bottom: 4px;">Dictez une note vocale</div>
-                                                    <div style="font-size: 14px; color: #64748B; font-weight: 300; line-height: 1.5;">Décrivez votre travail en quelques mots. L'IA rédige la publication pour vous.</div>
+                                                    <div style="font-size: 14px; color: #64748B; font-weight: 400; line-height: 1.5;">Décrivez votre travail en quelques mots. L'IA rédige la publication pour vous.</div>
                                                 </td>
                                             </tr>
                                         </table>
@@ -102,7 +102,7 @@
                                                 </td>
                                                 <td style="padding-left: 12px; vertical-align: top;">
                                                     <div style="font-size: 15px; font-weight: 600; color: #1E293B; margin-bottom: 4px;">C'est publié automatiquement</div>
-                                                    <div style="font-size: 14px; color: #64748B; font-weight: 300; line-height: 1.5;">Votre post est directement publié sur Instagram et Facebook.</div>
+                                                    <div style="font-size: 14px; color: #64748B; font-weight: 400; line-height: 1.5;">Votre post est directement publié sur Instagram et Facebook.</div>
                                                 </td>
                                             </tr>
                                         </table>
@@ -116,7 +116,7 @@
                                     <td align="center">
                                         <a href="{{ $activationUrl }}"
                                            target="_blank"
-                                           style="display: inline-block; padding: 16px 40px; background-color: #1E293B; color: #FFFFFF; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 20px -6px rgba(15,23,42,0.3); letter-spacing: -0.2px;">
+                                           style="display: inline-block; padding: 16px 40px; background-color: #1E293B; color: #FFFFFF; font-size: 17px; font-weight: 600; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 20px -6px rgba(15,23,42,0.3); letter-spacing: -0.2px;">
                                             Activer mon compte &rarr;
                                         </a>
                                     </td>
@@ -146,10 +146,10 @@
                     <!-- Footer -->
                     <tr>
                         <td style="padding: 24px 40px 32px; text-align: center;">
-                            <p style="margin: 0 0 8px; font-size: 13px; color: #94A3B8; font-weight: 300;">
+                            <p style="margin: 0 0 8px; font-size: 13px; color: #94A3B8; font-weight: 400;">
                                 Postelio — La vitrine digitale des artisans passionnés
                             </p>
-                            <p style="margin: 0; font-size: 12px; color: #CBD5E1; font-weight: 300;">
+                            <p style="margin: 0; font-size: 12px; color: #CBD5E1; font-weight: 400;">
                                 Vous recevez cet email car vous avez créé un compte sur Postelio.
                             </p>
                         </td>
@@ -161,7 +161,7 @@
                 <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; width: 100%; margin-top: 24px;">
                     <tr>
                         <td align="center" style="padding: 0 16px;">
-                            <p style="margin: 0; font-size: 11px; color: #CBD5E1; font-weight: 300;">
+                            <p style="margin: 0; font-size: 11px; color: #CBD5E1; font-weight: 400;">
                                 &copy; {{ date('Y') }} Postelio. Tous droits réservés.
                             </p>
                         </td>

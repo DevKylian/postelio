@@ -4,13 +4,19 @@ const OFFLINE_URL = '/offline'; // We should probably create this view
 const ASSETS_TO_CACHE = [
   '/',
   '/offline',
+  '/dashboard',
+  '/generate-post',
+  '/posts',
+  '/calendar',
+  '/post-settings',
+  '/statistics',
+  '/centre-aide',
+  '/profile',
   '/manifest.webmanifest',
   '/images/pwa/icon-192.png',
   '/images/pwa/icon-512.png',
   '/favicon.ico',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-  // You might want to add build artifacts here too, but they are usually hashed by Vite.
-  // We can use a simpler approach for now.
 ];
 
 self.addEventListener('install', (event) => {

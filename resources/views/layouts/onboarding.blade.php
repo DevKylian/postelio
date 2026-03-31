@@ -22,6 +22,11 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- Umami Analytics -->
+        @if(config('services.umami.id'))
+            <script async src="{{ config('services.umami.url') }}/script.js" data-website-id="{{ config('services.umami.id') }}"></script>
+        @endif
     </head>
     <body class="font-sans antialiased min-h-screen" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);">
         {{ $slot }}

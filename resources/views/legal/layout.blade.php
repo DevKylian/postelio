@@ -8,6 +8,11 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Umami Analytics -->
+    @if(config('services.umami.id'))
+        <script async src="{{ config('services.umami.url') }}/script.js" data-website-id="{{ config('services.umami.id') }}"></script>
+    @endif
 </head>
 <body class="font-sans antialiased text-midnight bg-chalk selection:bg-copper/20 selection:text-copper min-h-screen flex flex-col">
     

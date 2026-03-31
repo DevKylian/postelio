@@ -19,28 +19,39 @@
         </div>
     </div>
     @elseif ($status === 'idle')
-        <div class="py-8 px-4 sm:px-6 lg:px-8">
+        <div class="py-8 px-4 sm:px-6 lg:px-8" 
+             x-data="{ 
+                step: @entangle('currentStep'), 
+                template: @entangle('template'), 
+                customTemplateId: @entangle('customTemplateId'),
+                isOffline: !navigator.onLine,
+                init() {
+                    window.addEventListener('online', () => this.isOffline = false);
+                    window.addEventListener('offline', () => this.isOffline = true);
+                }
+             }">
             <div class="max-w-4xl mx-auto space-y-8">
                 {{-- STEPPER --}}
                 <div class="mb-10">
                     <div class="relative flex items-center justify-between px-2">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-gray-100 -z-10">
-                            <div class="h-full bg-copper transition-all duration-500" style="width: {{ (($currentStep - 1) / 3) * 100 }}%"></div>
+                            <div class="h-full bg-copper transition-all duration-500" :style="'width: ' + ((step - 1) / 3) * 100 + '%'"></div>
                         </div>
                         @foreach([1 => 'Modèle', 2 => 'Brief', 3 => 'Design', 4 => 'Envoi'] as $stepNum => $stepLabel)
                             <button type="button" 
-                                    wire:click="goToStep({{ $stepNum }})"
-                                    class="flex flex-col items-center group transition-all duration-300 {{ $currentStep < $stepNum ? 'cursor-not-allowed opacity-50' : 'cursor-pointer' }}"
-                                    @if($currentStep < $stepNum) disabled @endif>
+                                    @click="if (step >= {{ $stepNum }}) step = {{ $stepNum }}"
+                                    :class="step < {{ $stepNum }} ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'"
+                                    :disabled="step < {{ $stepNum }}"
+                                    class="flex flex-col items-center group transition-all duration-300">
                                 <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border-2 
-                                    {{ $currentStep === $stepNum ? 'bg-copper border-copper text-white shadow-lg shadow-copper/20' : ($currentStep > $stepNum ? 'bg-white border-copper text-copper' : 'bg-white border-gray-200 text-gray-400') }}">
-                                    @if($currentStep > $stepNum)
+                                    :class="step === {{ $stepNum }} ? 'bg-copper border-copper text-white shadow-lg shadow-copper/20' : (step > {{ $stepNum }} ? 'bg-white border-copper text-copper' : 'bg-white border-gray-200 text-gray-400')">
+                                    <template x-if="step > {{ $stepNum }}">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                    @else
+                                    </template>
+                                    <template x-if="step <= {{ $stepNum }}">
                                         <span class="text-sm font-bold">{{ $stepNum }}</span>
-                                    @endif
+                                    </template>
                                 </div>
-                                {{-- <span class="hidden sm:block absolute mt-12 text-[10px] font-bold uppercase tracking-widest {{ $currentStep === $stepNum ? 'text-midnight' : 'text-gray-400' }}">{{ $stepLabel }}</span> --}}
                             </button>
                         @endforeach
                     </div>
@@ -120,9 +131,9 @@
             $templateDescription = $templateSpec['description'] ?? null;
             @endphp
 
-            @if($currentStep === 1)
             {{-- ── STEP 1 : Choix du gabarit ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" 
+            <div x-show="step === 1" x-cloak
+                 class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" 
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0">
@@ -198,36 +209,36 @@
                             @endphp
                             <button type="button"
                                     @if($isCustomTpl)
-                                        wire:click="selectCustomTemplate({{ $tpl['custom_id'] }})"
+                                        @click="template = 'custom'; customTemplateId = {{ $tpl['custom_id'] }}"
                                     @else
-                                        wire:click="selectNativeTemplate('{{ $tpl['id'] }}')"
+                                        @click="template = '{{ $tpl['id'] }}'; customTemplateId = null"
                                     @endif
-                                    class="group relative flex flex-col gap-3 p-4 rounded-xl border-2 text-left transition-all duration-200
-                                        {{ $isSelected
+                                    :class="(template === '{{ $tpl['id'] }}' || (template === 'custom' && customTemplateId == {{ $tpl['custom_id'] ?? 'null' }}))
                                             ? 'border-copper bg-copper/[0.04] shadow-sm'
-                                            : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/50' }}">
+                                            : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/50'"
+                                    class="group relative flex flex-col gap-3 p-4 rounded-xl border-2 text-left transition-all duration-200">
 
                                 <div class="flex items-start justify-between">
-                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200
-                                        {{ $isSelected
+                                    <div :class="(template === '{{ $tpl['id'] }}' || (template === 'custom' && customTemplateId == {{ $tpl['custom_id'] ?? 'null' }}))
                                             ? 'bg-copper text-white'
-                                            : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
+                                            : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600'"
+                                         class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $tpl['icon'] }}" />
                                         </svg>
                                     </div>
-                                    @if($isSelected)
-                                    <div class="w-5 h-5 rounded-full bg-copper flex items-center justify-center">
+                                    <div x-show="template === '{{ $tpl['id'] }}' || (template === 'custom' && customTemplateId == {{ $tpl['custom_id'] ?? 'null' }})"
+                                         class="w-5 h-5 rounded-full bg-copper flex items-center justify-center">
                                         <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </div>
-                                    @endif
                                 </div>
 
                                 <div>
                                     <div class="flex items-center gap-1.5">
-                                        <p class="font-semibold text-sm leading-tight {{ $isSelected ? 'text-copper' : 'text-midnight' }}">
+                                        <p :class="(template === '{{ $tpl['id'] }}' || (template === 'custom' && customTemplateId == {{ $tpl['custom_id'] ?? 'null' }})) ? 'text-copper' : 'text-midnight'"
+                                           class="font-semibold text-sm leading-tight">
                                             {{ $tpl['label'] }}
                                         </p>
                                         @if($isCustomTpl)
@@ -243,11 +254,10 @@
                     @endforeach
                 </div>
             </div>
-            @endif
 
-            @if($currentStep === 2)
             {{-- ── STEP 2 : Votre mémo vocal (contextuel au gabarit choisi) ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" 
+            <div x-show="step === 2" x-cloak
+                 class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" 
                  x-data="voiceRecorder"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
@@ -749,11 +759,10 @@
 
                 </div>
             </div>
-            @endif
 
-            @if($currentStep === 3)
             {{-- ── STEP 3 : Style Visuel ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6"
+            <div x-show="step === 3" x-cloak
+                 class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0">
@@ -991,13 +1000,10 @@
                     <p class="text-blue-600 text-sm mt-0.5 leading-relaxed">Le Guide Pédagogique est un carrousel 100% textuel. L'IA génère toutes les slides à partir de votre mémo vocal uniquement.</p>
                 </div>
             </div>
-            @endif
 
-            @endif
-
-            @if($currentStep === 4)
-            {{-- ── Plateformes ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative"
+            {{-- ── STEP 4 : Plateformes ── --}}
+            <div x-show="step === 4" x-cloak
+                 class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0">
@@ -1297,26 +1303,23 @@
                     </div>
                 </div>
             @endif
-            @endif
 
             {{-- ── NAVIGATION FOOTER ── --}}
             <div class="flex items-center gap-4 pt-4">
-                @if($currentStep > 1)
-                    <button type="button" 
-                            wire:click="previousStep"
-                            class="flex-1 bg-white border-2 border-gray-100 text-midnight font-bold py-4 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98]">
-                        Précédent
-                    </button>
-                @endif
-
-                @if($currentStep < 4)
-                    <button type="button" 
-                            wire:click="nextStep"
-                            wire:loading.attr="disabled"
-                            class="flex-[2] bg-copper text-white font-bold py-4 rounded-2xl shadow-lg shadow-copper/20 hover:bg-amber-500 hover:shadow-xl hover:shadow-copper/30 transition-all active:scale-[0.98] disabled:opacity-50">
-                        <span wire:loading.remove wire:target="nextStep">Continuer</span>
-                        <span wire:loading wire:target="nextStep" class="flex items-center justify-center gap-2">
-                            <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                <button type="button" 
+                        x-show="step > 1"
+                        @click="step--"
+                        class="flex-1 bg-white border-2 border-gray-100 text-midnight font-bold py-4 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98]">
+                    Précédent
+                </button>
+ 
+                <button type="button" 
+                        x-show="step < 4"
+                        @click="step++"
+                        class="flex-[2] bg-copper text-white font-bold py-4 rounded-2xl shadow-lg shadow-copper/20 hover:bg-amber-500 hover:shadow-xl hover:shadow-copper/30 transition-all active:scale-[0.98] disabled:opacity-50">
+                    <span>Continuer</span>
+                </button>
+rrentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
                             Validation...
                         </span>
                     </button>

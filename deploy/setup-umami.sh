@@ -191,16 +191,29 @@ sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && npx prisma migrate deploy" \
     >> "${LOG_DIR}/build.log" 2>&1 || warn "Prisma migrate a échoué/déjà fait."
 
 if [ ! -d "$UMAMI_DIR/.next" ] || [ "$FORCE_REBUILD" = true ]; then
-    info "npm run build (3-5 min — peut être long)..."
-    # Désactivation de --turbo (si présent dans package.json) via NODE_OPTIONS et forçage de RAM
-    # SKIP_DB_CHECK=1 est vital pour Umami v3 (évite l'erreur 5b au build)
+    info "Système Info (Debug) :"
+    free -m
+    swapon -s
+    df -h /
+    ulimit -a | grep "memory"
+
+    info "Nettoyage du cache .next..."
+    sudo -u "$UMAMI_USER" rm -rf "$UMAMI_DIR/.next"
+
+    info "npm run build (3-5 min — CPU limited)..."
+    # NEXT_CPU_COUNT=1 + limitation RAM + Bypass DB check
     sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && \
         NODE_OPTIONS='--max-old-space-size=4096' \
         NEXT_CPU_COUNT=1 \
         SKIP_DB_CHECK=1 \
         DATABASE_URL=mysql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@127.0.0.1:3306/${UMAMI_DB_NAME} \
         npm run build" \
-        >> "${LOG_DIR}/build.log" 2>&1 || fail "Build échoué. Vérifie la RAM (free -m et swapon -s) ou le log : ${LOG_DIR}/build.log"
+        >> "${LOG_DIR}/build.log" 2>&1 || {
+            warn "ERREUR FATALE détectée. Analyse des logs système..."
+            dmesg | tail -n 20
+            journalctl -u umami -n 50 --no-pager
+            fail "Build échoué. Vérifie les sorties dmesg ci-dessus ou le log : ${LOG_DIR}/build.log"
+        }
     log "Umami compilé."
 else
     log "Build présent, skip."

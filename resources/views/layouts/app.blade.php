@@ -15,7 +15,7 @@
         <meta name="apple-mobile-web-app-title" content="Postelio">
 
         <!-- Favicon -->
-        <link rel="icon" type="image/png" href="/images/pwa/icon-192.png">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('images/postelio-logo-gradient.svg') }}">
         <link rel="apple-touch-icon" href="/images/pwa/icon-192.png">
 
         <!-- Fonts -->

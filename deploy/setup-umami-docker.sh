@@ -59,6 +59,7 @@ fi
 
 info "Mise à jour des privilèges MySQL pour l'utilisateur Docker..."
 mysql -u root << MYSQL_SCRIPT
+CREATE USER IF NOT EXISTS '${UMAMI_DB_USER}'@'%' IDENTIFIED BY '${UMAMI_DB_PASSWORD}';
 GRANT ALL PRIVILEGES ON \`${UMAMI_DB_NAME}\`.* TO '${UMAMI_DB_USER}'@'%';
 FLUSH PRIVILEGES;
 MYSQL_SCRIPT

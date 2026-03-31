@@ -170,7 +170,7 @@ if [ "$TOTAL_SWAP" -lt 4000 ]; then
     swapoff -a 2>/dev/null || true
     fallocate -l 4G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=4096
     chmod 600 /swapfile
-    mkswap /swapfile /dev/null 2>&1
+    mkswap /swapfile > /dev/null 2>&1
     swapon /swapfile
     grep -q "/swapfile" /etc/fstab || echo "/swapfile none swap sw 0 0" >> /etc/fstab
     log "Fichier Swap de 4Go activé."

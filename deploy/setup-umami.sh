@@ -109,9 +109,9 @@ step "1/7 — Paquets système"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 
-if ! command -v node &>/dev/null || [[ "$(node -v | grep -oP '\d+' | head -1)" -lt 18 ]]; then
-    info "Installation Node.js 20..."
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - > /dev/null 2>&1
+if ! command -v node &>/dev/null || [[ "$(node -v | grep -oP '\d+' | head -1)" -ne 18 ]]; then
+    info "Installation Node.js 18 (LTS stable)..."
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - > /dev/null 2>&1
     apt-get install -y -qq nodejs
 fi
 
@@ -201,16 +201,21 @@ if [ ! -d "$UMAMI_DIR/.next" ] || [ "$FORCE_REBUILD" = true ]; then
     sudo -u "$UMAMI_USER" rm -rf "$UMAMI_DIR/.next"
 
     info "npm run build (3-5 min — CPU limited)..."
-    # NEXT_CPU_COUNT=1 + limitation RAM + Bypass DB check
+    # UV_THREADPOOL_SIZE=1 + NEXT_CPU_COUNT=1 + limitation RAM + Bypass DB check
+    # ulimit -s unlimited pour eviter les Bus error sur la pile
     sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && \
+        ulimit -s unlimited && \
         NODE_OPTIONS='--max-old-space-size=4096' \
+        UV_THREADPOOL_SIZE=1 \
         NEXT_CPU_COUNT=1 \
+        NEXT_TELEMETRY_DISABLED=1 \
         SKIP_DB_CHECK=1 \
         DATABASE_URL=mysql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@127.0.0.1:3306/${UMAMI_DB_NAME} \
-        npm run build" \
+        npx next build" \
         >> "${LOG_DIR}/build.log" 2>&1 || {
             warn "ERREUR FATALE détectée. Analyse des logs système..."
             dmesg | tail -n 20
+            hostnamectl
             journalctl -u umami -n 50 --no-pager
             fail "Build échoué. Vérifie les sorties dmesg ci-dessus ou le log : ${LOG_DIR}/build.log"
         }

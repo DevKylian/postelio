@@ -165,16 +165,17 @@ chown "$UMAMI_USER:$UMAMI_USER" "${UMAMI_DIR}/.env"
 # =============================================================================
 step "0/7 — Vérification de la mémoire (Swap)"
 TOTAL_SWAP=$(free -m | grep -i swap | awk '{print $2}')
-if [ "$TOTAL_SWAP" -eq 0 ]; then
-    info "Aucun Swap détecté. Création d'un fichier Swap de 2Go pour stabiliser le build..."
-    fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048
+if [ "$TOTAL_SWAP" -lt 4000 ]; then
+    info "Swap insuffisant (<4Go). Augmentation pour stabiliser le build..."
+    swapoff -a 2>/dev/null || true
+    fallocate -l 4G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=4096
     chmod 600 /swapfile
-    mkswap /swapfile > /dev/null
+    mkswap /swapfile /dev/null 2>&1
     swapon /swapfile
-    echo "/swapfile none swap sw 0 0" >> /etc/fstab
-    log "Fichier Swap de 2Go créé et activé."
+    grep -q "/swapfile" /etc/fstab || echo "/swapfile none swap sw 0 0" >> /etc/fstab
+    log "Fichier Swap de 4Go activé."
 else
-    log "Mémoire Swap déjà présente (${TOTAL_SWAP}MB)."
+    log "Mémoire Swap suffisante (${TOTAL_SWAP}MB)."
 fi
 
 info "npm install..."
@@ -192,6 +193,10 @@ sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && \
     else \
         echo \"[!] next.config.* non trouve\"; \
     fi"
+
+# FORCE BABEL FALLBACK (Désactive le compilateur natif Rust qui crash)
+info "Force Babel fallback (Bye bye SIGBUS)..."
+sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && echo '{\"presets\": [\"next/babel\"]}' > .babelrc"
 
 sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && npm install --legacy-peer-deps --quiet" \
     >> "${LOG_DIR}/build.log" 2>&1 || fail "npm install échoué."
@@ -211,17 +216,17 @@ if [ ! -d "$UMAMI_DIR/.next" ] || [ "$FORCE_REBUILD" = true ]; then
     info "Nettoyage du cache .next..."
     sudo -u "$UMAMI_USER" rm -rf "$UMAMI_DIR/.next"
 
-    info "npm run build (3-5 min — CPU limited)..."
-    # UV_THREADPOOL_SIZE=1 + NEXT_CPU_COUNT=1 + limitation RAM + Bypass DB check
-    # ulimit -s unlimited pour eviter les Bus error sur la pile
+    info "npm run build (Babel mode — stable)..."
+    # MALLOC_ARENA_MAX=2 + UV_THREADPOOL_SIZE=1 + limitation RAM + Babel
     sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && \
         ulimit -s unlimited && \
-        NODE_OPTIONS='--max-old-space-size=4096' \
-        UV_THREADPOOL_SIZE=1 \
-        NEXT_CPU_COUNT=1 \
-        NEXT_TELEMETRY_DISABLED=1 \
-        SKIP_DB_CHECK=1 \
-        DATABASE_URL=mysql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@127.0.0.1:3306/${UMAMI_DB_NAME} \
+        export MALLOC_ARENA_MAX=2 && \
+        export NODE_OPTIONS='--max-old-space-size=4096' && \
+        export UV_THREADPOOL_SIZE=1 && \
+        export NEXT_CPU_COUNT=1 && \
+        export NEXT_TELEMETRY_DISABLED=1 && \
+        export SKIP_DB_CHECK=1 && \
+        export DATABASE_URL=mysql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@127.0.0.1:3306/${UMAMI_DB_NAME} && \
         npx next build" \
         >> "${LOG_DIR}/build.log" 2>&1 || {
             warn "ERREUR FATALE détectée. Analyse des logs système..."

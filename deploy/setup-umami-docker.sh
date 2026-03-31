@@ -62,9 +62,9 @@ fi
 log "Domaine : $UMAMI_DOMAIN"
 
 # --- 2. Installation Dépendances ---------------------------------------------
-step "2/7 — Installation Docker & MySQL"
+step "2/8 — Installation Docker & MySQL"
 apt-get update -qq
-apt-get install -y -qq curl gnupg mysql-server certbot python3-certbot-nginx ufw >/dev/null
+apt-get install -y -qq curl gnupg mysql-server certbot python3-certbot-nginx ufw jq >/dev/null
 
 if ! command -v docker &>/dev/null; then
     curl -fsSL https://get.docker.com | sh >/dev/null
@@ -149,14 +149,47 @@ ln -sf /etc/nginx/sites-available/umami /etc/nginx/sites-enabled/umami
 nginx -t && systemctl reload nginx
 log "Nginx configuré."
 
-# --- 7. SSL ------------------------------------------------------------------
-step "7/7 — SSL (Let's Encrypt)"
-EMAIL=$(grep "LE Email" "$CREDS_FILE" | awk '{print $4}' || echo "admin@$UMAMI_DOMAIN")
-certbot --nginx -d "$UMAMI_DOMAIN" --non-interactive --agree-tos --email "$EMAIL" --redirect --quiet || warn "SSL auto echoué (verifie DNS)."
+# --- 8. Auto-Enregistrement du site -------------------------------------------
+step "8/8 — Enregistrement du site"
+info "Attente que l'API Umami soit prête..."
+RETRIES=0
+while ! curl -s "http://127.0.0.1:3000/api/heartbeat" | grep -q "ok"; do
+    ((RETRIES++))
+    if [ $RETRIES -gt 30 ]; then fail "Umami n'a pas demarre a temps."; fi
+    sleep 2
+done
+
+info "Connexion à l'API..."
+TOKEN=$(curl -s -X POST "http://127.0.0.1:3000/api/auth/login" \
+    -H "Content-Type: application/json" \
+    -d '{"username":"admin","password":"umami"}' | jq -r '.token')
+
+if [ "$TOKEN" == "null" ] || [ -z "$TOKEN" ]; then
+    warn "Impossible de se connecter a l'API (mot de passe deja change ?)."
+else
+    # On cree le site principal (postelio.fr par exemple)
+    read -p "Domaine du site à tracker (ex: postelio.fr) : " SITE_DOMAIN
+    SITE_NAME="Postelio"
+    
+    info "Création du site dans Umami..."
+    SITE_DATA=$(curl -s -X POST "http://127.0.0.1:3000/api/websites" \
+        -H "Authorization: Bearer $TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{\"name\":\"$SITE_NAME\",\"domain\":\"$SITE_DOMAIN\"}")
+    
+    WEBSITE_ID=$(echo "$SITE_DATA" | jq -r '.id')
+    
+    if [ "$WEBSITE_ID" != "null" ]; then
+        log "Site '$SITE_NAME' créé avec succès !"
+        info "Voici ton code de tracking a inserer dans ton <head> :"
+        echo -e "${YELLOW}<script async src=\"https://$UMAMI_DOMAIN/script.js\" data-website-id=\"$WEBSITE_ID\"></script>${NC}"
+    else
+        warn "Le site existe peut-etre déjà : $(echo $SITE_DATA | jq -r '.message')"
+    fi
+fi
 
 hr
-echo -e "${BOLD}${GREEN}✅ Umami v3 Déployé avec succès !${NC}"
+echo -e "${BOLD}${GREEN}✅ Umami v3 Déployé et Site Configuré !${NC}"
 echo -e "URL : https://$UMAMI_DOMAIN"
-echo -e "Accès : admin / umami"
 echo -e "Credentials : $CREDS_FILE"
 hr

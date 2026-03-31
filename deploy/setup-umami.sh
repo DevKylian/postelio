@@ -161,6 +161,8 @@ printf 'APP_SECRET=%s\n' "$UMAMI_APP_SECRET" >> "${UMAMI_DIR}/.env"
 chown "$UMAMI_USER:$UMAMI_USER" "${UMAMI_DIR}/.env"
 
 info "npm install..."
+# Nettoyage de --turbo dans package.json (cause souvent des Bus error sur VPS)
+sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && sed -i 's/--turbo//g' package.json"
 sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && npm install --legacy-peer-deps --quiet" \
     >> "${LOG_DIR}/build.log" 2>&1 || fail "npm install échoué."
 

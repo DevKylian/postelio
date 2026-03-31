@@ -1,4 +1,4 @@
-const CACHE_NAME = 'postelio-pwa-v1';
+const CACHE_NAME = 'postelio-pwa-v2';
 const OFFLINE_URL = '/offline'; // We should probably create this view
 
 const ASSETS_TO_CACHE = [

@@ -1,1 +1,194 @@
 [Tue Mar 31 11:09:50 2026] PHP 8.4.12 Development Server (http://127.0.0.1:8000) started
+[Tue Mar 31 11:09:55 2026] 127.0.0.1:56085 Accepted
+[Tue Mar 31 11:09:55 2026] 127.0.0.1:56085 [200]: GET /images/logo_png.PNG
+[Tue Mar 31 11:09:55 2026] 127.0.0.1:56085 Closing
+[Tue Mar 31 11:10:01 2026] 127.0.0.1:56089 Accepted
+[Tue Mar 31 11:10:01 2026] 127.0.0.1:56089 Closing
+[Tue Mar 31 11:10:05 2026] 127.0.0.1:56094 Accepted
+[Tue Mar 31 11:10:05 2026] 127.0.0.1:56094 Closing
+[Tue Mar 31 11:10:05 2026] 127.0.0.1:56097 Accepted
+[Tue Mar 31 11:10:05 2026] 127.0.0.1:56097 Closing
+[Tue Mar 31 11:10:05 2026] 127.0.0.1:56099 Accepted
+[Tue Mar 31 11:10:05 2026] 127.0.0.1:56099 Closing
+[Tue Mar 31 11:10:07 2026] 127.0.0.1:56102 Accepted
+[Tue Mar 31 11:10:07 2026] 127.0.0.1:56102 [200]: GET /images/logo_png.PNG
+[Tue Mar 31 11:10:07 2026] 127.0.0.1:56102 Closing
+[Tue Mar 31 11:10:08 2026] 127.0.0.1:56103 Accepted
+[Tue Mar 31 11:10:08 2026] 127.0.0.1:56104 Accepted
+[Tue Mar 31 11:10:08 2026] 127.0.0.1:56103 Closing
+[Tue Mar 31 11:10:08 2026] 127.0.0.1:56104 Closing
+[Tue Mar 31 11:10:08 2026] 127.0.0.1:56109 Accepted
+[Tue Mar 31 11:10:08 2026] 127.0.0.1:56109 [200]: GET /manifest.webmanifest
+[Tue Mar 31 11:10:08 2026] 127.0.0.1:56109 Closing
+[Tue Mar 31 11:10:08 2026] 127.0.0.1:56112 Accepted
+[Tue Mar 31 11:10:08 2026] 127.0.0.1:56112 [200]: GET /images/pwa/icon-192.png
+[Tue Mar 31 11:10:08 2026] 127.0.0.1:56112 Closing
+[Tue Mar 31 11:10:10 2026] 127.0.0.1:56113 Accepted
+[Tue Mar 31 11:10:10 2026] 127.0.0.1:56113 Closing
+[Tue Mar 31 11:10:10 2026] 127.0.0.1:56115 Accepted
+[Tue Mar 31 11:10:10 2026] 127.0.0.1:56115 Closing
+[Tue Mar 31 11:10:10 2026] 127.0.0.1:56117 Accepted
+[Tue Mar 31 11:10:10 2026] 127.0.0.1:56117 [200]: GET /sw.js
+[Tue Mar 31 11:10:10 2026] 127.0.0.1:56117 Closing
+[Tue Mar 31 11:10:11 2026] 127.0.0.1:56119 Accepted
+[Tue Mar 31 11:10:11 2026] 127.0.0.1:56119 Closing
+[Tue Mar 31 11:10:12 2026] 127.0.0.1:56122 Accepted
+[Tue Mar 31 11:10:12 2026] 127.0.0.1:56122 Closing
+[Tue Mar 31 11:10:12 2026] 127.0.0.1:56124 Accepted
+[Tue Mar 31 11:10:12 2026] 127.0.0.1:56124 Closing
+[Tue Mar 31 11:10:13 2026] 127.0.0.1:56127 Accepted
+[Tue Mar 31 11:10:13 2026] 127.0.0.1:56127 Closing
+[Tue Mar 31 11:10:14 2026] 127.0.0.1:56135 Accepted
+[Tue Mar 31 11:10:14 2026] 127.0.0.1:56135 Closing
+[Tue Mar 31 11:10:14 2026] 127.0.0.1:56140 Accepted
+[Tue Mar 31 11:10:14 2026] 127.0.0.1:56140 Closing
+[Tue Mar 31 11:10:14 2026] 127.0.0.1:56142 Accepted
+[Tue Mar 31 11:10:14 2026] 127.0.0.1:56142 Closing
+[Tue Mar 31 11:10:14 2026] 127.0.0.1:56144 Accepted
+[Tue Mar 31 11:10:14 2026] 127.0.0.1:56144 [200]: GET /manifest.webmanifest
+[Tue Mar 31 11:10:14 2026] 127.0.0.1:56144 Closing
+[Tue Mar 31 11:10:14 2026] 127.0.0.1:56145 Accepted
+[Tue Mar 31 11:10:14 2026] 127.0.0.1:56145 [200]: GET /images/pwa/icon-192.png
+[Tue Mar 31 11:10:14 2026] 127.0.0.1:56145 Closing
+[Tue Mar 31 11:10:19 2026] 127.0.0.1:56148 Accepted
+[Tue Mar 31 11:10:19 2026] 127.0.0.1:56148 Closing
+[Tue Mar 31 11:10:19 2026] 127.0.0.1:56150 Accepted
+[Tue Mar 31 11:10:19 2026] 127.0.0.1:56150 [200]: GET /manifest.webmanifest
+[Tue Mar 31 11:10:19 2026] 127.0.0.1:56150 Closing
+[Tue Mar 31 11:10:19 2026] 127.0.0.1:56151 Accepted
+[Tue Mar 31 11:10:19 2026] 127.0.0.1:56151 [200]: GET /images/pwa/icon-192.png
+[Tue Mar 31 11:10:19 2026] 127.0.0.1:56151 Closing
+[Tue Mar 31 11:10:20 2026] 127.0.0.1:56152 Accepted
+[Tue Mar 31 11:10:21 2026] 127.0.0.1:56152 Closing
+[Tue Mar 31 11:10:21 2026] 127.0.0.1:56153 Accepted
+[Tue Mar 31 11:10:37 2026] 127.0.0.1:56183 Accepted
+[Tue Mar 31 11:10:37 2026] 127.0.0.1:56153 Closing
+[Tue Mar 31 11:10:37 2026] 127.0.0.1:56183 Closing
+[Tue Mar 31 11:10:37 2026] 127.0.0.1:56190 Accepted
+[Tue Mar 31 11:10:37 2026] 127.0.0.1:56190 [200]: GET /manifest.webmanifest
+[Tue Mar 31 11:10:37 2026] 127.0.0.1:56190 Closing
+[Tue Mar 31 11:10:37 2026] 127.0.0.1:56192 Accepted
+[Tue Mar 31 11:10:37 2026] 127.0.0.1:56192 [200]: GET /images/pwa/icon-192.png
+[Tue Mar 31 11:10:37 2026] 127.0.0.1:56192 Closing
+[Tue Mar 31 11:10:39 2026] 127.0.0.1:56196 Accepted
+[Tue Mar 31 11:10:39 2026] 127.0.0.1:56196 [200]: GET /sw.js
+[Tue Mar 31 11:10:39 2026] 127.0.0.1:56196 Closing
+[Tue Mar 31 11:14:14 2026] 127.0.0.1:56385 Accepted
+[Tue Mar 31 11:14:14 2026] 127.0.0.1:56385 [200]: GET /images/logo_png.PNG
+[Tue Mar 31 11:14:14 2026] 127.0.0.1:56385 Closing
+[Tue Mar 31 11:14:14 2026] 127.0.0.1:56386 Accepted
+[Tue Mar 31 11:14:14 2026] 127.0.0.1:56386 [200]: GET /images/logo_png.PNG
+[Tue Mar 31 11:14:14 2026] 127.0.0.1:56386 Closing
+[Tue Mar 31 11:14:14 2026] 127.0.0.1:56387 Accepted
+[Tue Mar 31 11:14:14 2026] 127.0.0.1:56387 Closing
+[Tue Mar 31 11:14:15 2026] 127.0.0.1:56388 Accepted
+[Tue Mar 31 11:14:15 2026] 127.0.0.1:56388 Closing
+[Tue Mar 31 11:14:15 2026] 127.0.0.1:56389 Accepted
+[Tue Mar 31 11:14:15 2026] 127.0.0.1:56389 Closing
+[Tue Mar 31 11:14:15 2026] 127.0.0.1:56390 Accepted
+[Tue Mar 31 11:14:15 2026] 127.0.0.1:56390 Closing
+[Tue Mar 31 11:28:19 2026] 127.0.0.1:56986 Accepted
+[Tue Mar 31 11:28:19 2026] 127.0.0.1:56987 Accepted
+[Tue Mar 31 11:28:19 2026] 127.0.0.1:56986 Closing
+[Tue Mar 31 11:28:20 2026] 127.0.0.1:56993 Accepted
+[Tue Mar 31 11:28:20 2026] 127.0.0.1:56993 [200]: GET /manifest.webmanifest
+[Tue Mar 31 11:28:20 2026] 127.0.0.1:56993 Closing
+[Tue Mar 31 11:28:20 2026] 127.0.0.1:56987 [200]: GET /images/pwa/icon-192.png
+[Tue Mar 31 11:28:20 2026] 127.0.0.1:56987 Closing
+[Tue Mar 31 11:28:20 2026] 127.0.0.1:56995 Accepted
+[Tue Mar 31 11:28:20 2026] 127.0.0.1:56996 Accepted
+[Tue Mar 31 11:28:20 2026] 127.0.0.1:56995 [200]: GET /images/pwa/icon-512.png
+[Tue Mar 31 11:28:20 2026] 127.0.0.1:56996 [200]: GET /images/pwa/icon-192.png
+[Tue Mar 31 11:28:20 2026] 127.0.0.1:56995 Closing
+[Tue Mar 31 11:28:20 2026] 127.0.0.1:56996 Closing
+[Tue Mar 31 11:28:21 2026] 127.0.0.1:56997 Accepted
+[Tue Mar 31 11:28:21 2026] 127.0.0.1:56997 [200]: GET /sw.js
+[Tue Mar 31 11:28:21 2026] 127.0.0.1:56997 Closing
+[Tue Mar 31 11:31:39 2026] 127.0.0.1:57147 Accepted
+[Tue Mar 31 11:31:39 2026] 127.0.0.1:57148 Accepted
+[Tue Mar 31 11:31:39 2026] 127.0.0.1:57147 Closing
+[Tue Mar 31 11:31:39 2026] 127.0.0.1:57148 Closing
+[Tue Mar 31 11:31:39 2026] 127.0.0.1:57155 Accepted
+[Tue Mar 31 11:31:39 2026] 127.0.0.1:57155 [200]: GET /manifest.webmanifest
+[Tue Mar 31 11:31:39 2026] 127.0.0.1:57155 Closing
+[Tue Mar 31 11:31:39 2026] 127.0.0.1:57159 Accepted
+[Tue Mar 31 11:31:39 2026] 127.0.0.1:57159 [200]: GET /images/pwa/icon-192.png
+[Tue Mar 31 11:31:39 2026] 127.0.0.1:57159 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57163 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57163 [200]: GET /sw.js
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57163 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57164 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57164 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57165 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57166 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57165 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57168 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57166 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57170 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57168 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57172 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57170 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57174 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57172 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57176 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57174 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57178 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57176 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57180 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57178 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57182 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57180 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57184 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57182 [200]: GET /manifest.webmanifest
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57184 [200]: GET /images/pwa/icon-192.png
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57182 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57184 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57186 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57186 [200]: GET /images/pwa/icon-512.png
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57186 Closing
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57187 Accepted
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57187 [200]: GET /favicon.ico
+[Tue Mar 31 11:31:42 2026] 127.0.0.1:57187 Closing
+[Tue Mar 31 11:32:14 2026] 127.0.0.1:57208 Accepted
+[Tue Mar 31 11:32:14 2026] 127.0.0.1:57209 Accepted
+[Tue Mar 31 11:32:14 2026] 127.0.0.1:57208 Closing
+[Tue Mar 31 11:32:14 2026] 127.0.0.1:57209 Closing
+[Tue Mar 31 11:32:14 2026] 127.0.0.1:57215 Accepted
+[Tue Mar 31 11:32:14 2026] 127.0.0.1:57215 [200]: GET /manifest.webmanifest
+[Tue Mar 31 11:32:14 2026] 127.0.0.1:57215 Closing
+[Tue Mar 31 11:32:14 2026] 127.0.0.1:57217 Accepted
+[Tue Mar 31 11:32:14 2026] 127.0.0.1:57217 Closing
+[Tue Mar 31 11:32:14 2026] 127.0.0.1:57219 Accepted
+[Tue Mar 31 11:32:14 2026] 127.0.0.1:57219 [200]: GET /images/pwa/icon-192.png
+[Tue Mar 31 11:32:14 2026] 127.0.0.1:57219 Closing
+[Tue Mar 31 11:32:17 2026] 127.0.0.1:57220 Accepted
+[Tue Mar 31 11:32:17 2026] 127.0.0.1:57220 [200]: GET /sw.js
+[Tue Mar 31 11:32:17 2026] 127.0.0.1:57220 Closing
+[Tue Mar 31 11:32:21 2026] 127.0.0.1:57226 Accepted
+[Tue Mar 31 11:32:21 2026] 127.0.0.1:57227 Accepted
+[Tue Mar 31 11:32:21 2026] 127.0.0.1:57226 Closing
+[Tue Mar 31 11:32:21 2026] 127.0.0.1:57227 Closing
+[Tue Mar 31 11:32:21 2026] 127.0.0.1:57233 Accepted
+[Tue Mar 31 11:32:21 2026] 127.0.0.1:57233 [200]: GET /manifest.webmanifest
+[Tue Mar 31 11:32:21 2026] 127.0.0.1:57233 Closing
+[Tue Mar 31 11:32:21 2026] 127.0.0.1:57234 Accepted
+[Tue Mar 31 11:32:21 2026] 127.0.0.1:57234 Closing
+[Tue Mar 31 11:32:21 2026] 127.0.0.1:57236 Accepted
+[Tue Mar 31 11:32:21 2026] 127.0.0.1:57236 [200]: GET /images/pwa/icon-192.png
+[Tue Mar 31 11:32:21 2026] 127.0.0.1:57236 Closing
+[Tue Mar 31 11:32:23 2026] 127.0.0.1:57238 Accepted
+[Tue Mar 31 11:32:23 2026] 127.0.0.1:57238 [200]: GET /sw.js
+[Tue Mar 31 11:32:23 2026] 127.0.0.1:57238 Closing
+[Tue Mar 31 11:34:25 2026] 127.0.0.1:57389 Accepted
+[Tue Mar 31 11:34:25 2026] 127.0.0.1:57390 Accepted
+[Tue Mar 31 11:34:25 2026] 127.0.0.1:57389 Closing
+[Tue Mar 31 11:34:25 2026] 127.0.0.1:57397 Accepted
+[Tue Mar 31 11:34:25 2026] 127.0.0.1:57397 [200]: GET /manifest.webmanifest
+[Tue Mar 31 11:34:25 2026] 127.0.0.1:57397 Closing
+[Tue Mar 31 11:34:25 2026] 127.0.0.1:57390 Closing
+[Tue Mar 31 11:34:25 2026] 127.0.0.1:57401 Accepted
+[Tue Mar 31 11:34:25 2026] 127.0.0.1:57401 [200]: GET /images/pwa/icon-192.png
+[Tue Mar 31 11:34:25 2026] 127.0.0.1:57401 Closing
+[Tue Mar 31 11:34:27 2026] 127.0.0.1:57404 Accepted
+[Tue Mar 31 11:34:27 2026] 127.0.0.1:57404 [200]: GET /sw.js
+[Tue Mar 31 11:34:27 2026] 127.0.0.1:57404 Closing

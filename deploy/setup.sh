@@ -273,11 +273,12 @@ sudo -u deploy $PHP artisan storage:link 2>/dev/null || true
 sudo -u deploy $PHP artisan queue:table 2>/dev/null || true
 sudo -u deploy $PHP artisan migrate --force
 
-# Permissions
+# Permissions robustes
 chown -R deploy:www-data "$APP_DIR"
 find "$APP_DIR" -type f -exec chmod 644 {} \;
 find "$APP_DIR" -type d -exec chmod 755 {} \;
-chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/.git" 2>/dev/null || true
+# Dossiers nécessitant des droits d'écriture pour l'utilisateur ET le groupe
+chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/.git" "$APP_DIR/public" 2>/dev/null || true
 chown -R deploy:www-data "$LOG_DIR" "$BACKUP_DIR"
 
 log "Application configurée."
@@ -628,10 +629,14 @@ if [ ! -d "public/build" ]; then
     FRONTEND_CHANGED=1
 fi
 
-if [ "\$FRONTEND_CHANGED" -gt 0 ]; then
+if [ "$FRONTEND_CHANGED" -gt 0 ]; then
     log "Changements frontend détectés (ou build manquant) — rebuild npm..."
+    # Nettoyage manuel car Vite peut échouer sur rmdir (EACCES) si les permissions sont strictes
+    rm -rf public/build
     npm install --no-audit --no-fund --quiet
     npm run build --quiet
+    # Ajustement permissions après build
+    chmod -R 775 public/build 2>/dev/null || true
 else
     log "Pas de changements frontend — skip npm build."
 fi

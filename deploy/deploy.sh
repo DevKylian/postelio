@@ -108,8 +108,13 @@ fi
 
 if [ "$FRONTEND_CHANGED" -gt 0 ]; then
     log "Frontend modifié (ou build manquant) — rebuild npm..."
+    # On vide le dossier de build manuellement avant car Vite peut échouer (EACCES rmdir) 
+    # si les permissions sont strictes lors de son nettoyage interne.
+    rm -rf public/build
     npm install --no-audit --no-fund --quiet
     npm run build --quiet
+    # Fix permissions post-build immédiat
+    chmod -R 775 public/build 2>/dev/null || true
 else
     log "Pas de changements frontend — skip npm build."
 fi

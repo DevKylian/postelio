@@ -134,8 +134,9 @@ sleep 10
 docker compose logs --tail 20 umami
 
 # --- 6. Nginx ----------------------------------------------------------------
-step "6/7 — Configuration Nginx"
-cat > "/etc/nginx/sites-available/umami" << NGINXEOF
+step "6/8 — Configuration Nginx"
+NGINX_CONF="/etc/nginx/sites-available/umami"
+cat > "$NGINX_CONF" << NGINXEOF
 server {
     listen 80;
     server_name $UMAMI_DOMAIN;

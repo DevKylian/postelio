@@ -170,10 +170,15 @@ sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && npx prisma migrate deploy" \
     >> "${LOG_DIR}/build.log" 2>&1 || warn "Prisma migrate a échoué/déjà fait."
 
 if [ ! -d "$UMAMI_DIR/.next" ] || [ "$FORCE_REBUILD" = true ]; then
-    info "npm run build (3-5 min)..."
+    info "npm run build (3-5 min — peut être long)..."
+    # Désactivation de --turbo (si présent dans package.json) via NODE_OPTIONS et forçage de RAM
     # SKIP_DB_CHECK=1 est vital pour Umami v3 (évite l'erreur 5b au build)
-    sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && SKIP_DB_CHECK=1 DATABASE_URL=mysql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@127.0.0.1:3306/${UMAMI_DB_NAME} npm run build" \
-        >> "${LOG_DIR}/build.log" 2>&1 || fail "Build échoué."
+    sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && \
+        NODE_OPTIONS='--max-old-space-size=3072' \
+        SKIP_DB_CHECK=1 \
+        DATABASE_URL=mysql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@127.0.0.1:3306/${UMAMI_DB_NAME} \
+        npm run build" \
+        >> "${LOG_DIR}/build.log" 2>&1 || fail "Build échoué. Vérifie la RAM (free -m) ou le log : ${LOG_DIR}/build.log"
     log "Umami compilé."
 else
     log "Build présent, skip."

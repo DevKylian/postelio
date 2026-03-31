@@ -182,10 +182,16 @@ info "npm install..."
 sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && sed -i 's/--turbo//g' package.json"
 sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && sed -i 's/provider = \"postgresql\"/provider = \"mysql\"/g' prisma/schema.prisma"
 
-# Patch next.config.js pour desactiver SWC minify (cause frequent de Bus error/SIGBUS)
-info "Patching next.config.js (anti-SIGBUS)..."
+# Patch next.config.* pour desactiver SWC minify (cause frequent de Bus error/SIGBUS)
+info "Patching next.config.* (anti-SIGBUS)..."
 sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && \
-    sed -i \"s/swcMinify: true/swcMinify: false/g\" next.config.js || true"
+    CONFIG_FILE=\$(find . -maxdepth 1 -name \"next.config.*\" | head -n 1) && \
+    if [ -n \"\$CONFIG_FILE\" ]; then \
+        sed -i \"s/swcMinify: true/swcMinify: false/g\" \"\$CONFIG_FILE\"; \
+        log \"Patched \$CONFIG_FILE\"; \
+    else \
+        warn \"next.config.* non trouve\"; \
+    fi"
 
 sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && npm install --legacy-peer-deps --quiet" \
     >> "${LOG_DIR}/build.log" 2>&1 || fail "npm install échoué."

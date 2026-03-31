@@ -160,9 +160,28 @@ printf 'DATABASE_URL=mysql://%s:%s@127.0.0.1:3306/%s\n' "$UMAMI_DB_USER" "$UMAMI
 printf 'APP_SECRET=%s\n' "$UMAMI_APP_SECRET" >> "${UMAMI_DIR}/.env"
 chown "$UMAMI_USER:$UMAMI_USER" "${UMAMI_DIR}/.env"
 
+# =============================================================================
+# 0. SÉCURITÉ MÉMOIRE (SWAP)
+# =============================================================================
+step "0/7 — Vérification de la mémoire (Swap)"
+TOTAL_SWAP=$(free -m | grep -i swap | awk '{print $2}')
+if [ "$TOTAL_SWAP" -eq 0 ]; then
+    info "Aucun Swap détecté. Création d'un fichier Swap de 2Go pour stabiliser le build..."
+    fallocate -l 2G /swapfile 2>/dev/null || dd if=/dev/zero of=/swapfile bs=1M count=2048
+    chmod 600 /swapfile
+    mkswap /swapfile > /dev/null
+    swapon /swapfile
+    echo "/swapfile none swap sw 0 0" >> /etc/fstab
+    log "Fichier Swap de 2Go créé et activé."
+else
+    log "Mémoire Swap déjà présente (${TOTAL_SWAP}MB)."
+fi
+
 info "npm install..."
-# Nettoyage de --turbo dans package.json (cause souvent des Bus error sur VPS)
+# Nettoyage de --turbo et patch Prisma pour MySQL
 sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && sed -i 's/--turbo//g' package.json"
+sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && sed -i 's/provider = \"postgresql\"/provider = \"mysql\"/g' prisma/schema.prisma"
+
 sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && npm install --legacy-peer-deps --quiet" \
     >> "${LOG_DIR}/build.log" 2>&1 || fail "npm install échoué."
 

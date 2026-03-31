@@ -188,9 +188,9 @@ sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && \
     CONFIG_FILE=\$(find . -maxdepth 1 -name \"next.config.*\" | head -n 1) && \
     if [ -n \"\$CONFIG_FILE\" ]; then \
         sed -i \"s/swcMinify: true/swcMinify: false/g\" \"\$CONFIG_FILE\"; \
-        log \"Patched \$CONFIG_FILE\"; \
+        echo \"[✓] Patched \$CONFIG_FILE\"; \
     else \
-        warn \"next.config.* non trouve\"; \
+        echo \"[!] next.config.* non trouve\"; \
     fi"
 
 sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && npm install --legacy-peer-deps --quiet" \

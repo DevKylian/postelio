@@ -50,8 +50,8 @@ return [
         ],
         'caption' => [
             'purpose' => 'Légende Instagram complète avec storytelling autour de l\'avis client.',
-            'idealChars' => [200, 400],
-            'maxChars' => 500,
+            'idealChars' => [400, 800],
+            'maxChars' => 1200,
         ],
     ],
 
@@ -90,8 +90,8 @@ return [
         ],
         'caption' => [
             'purpose' => 'Légende Instagram qui résume la FAQ et invite à interagir.',
-            'idealChars' => [250, 450],
-            'maxChars' => 600,
+            'idealChars' => [400, 800],
+            'maxChars' => 1200,
         ],
     ],
 
@@ -116,8 +116,8 @@ return [
         ],
         'caption' => [
             'purpose' => 'Légende Instagram qui développe pourquoi ce matériau/équipement garantit qualité et durabilité.',
-            'idealChars' => [200, 400],
-            'maxChars' => 500,
+            'idealChars' => [400, 800],
+            'maxChars' => 1200,
         ],
     ],
 
@@ -142,8 +142,8 @@ return [
         ],
         'caption' => [
             'purpose' => 'Légende Instagram avec contexte saisonnier développé.',
-            'idealChars' => [200, 400],
-            'maxChars' => 500,
+            'idealChars' => [400, 800],
+            'maxChars' => 1200,
         ],
     ],
 
@@ -168,8 +168,8 @@ return [
         ],
         'caption' => [
             'purpose' => 'Légende Instagram qui décrit l\'erreur en détail et explique comment l\'éviter.',
-            'idealChars' => [200, 400],
-            'maxChars' => 500,
+            'idealChars' => [400, 800],
+            'maxChars' => 1200,
         ],
     ],
 
@@ -198,8 +198,8 @@ return [
         ],
         'caption' => [
             'purpose' => 'Légende Instagram complète avec storytelling lifestyle.',
-            'idealChars' => [200, 400],
-            'maxChars' => 500,
+            'idealChars' => [400, 800],
+            'maxChars' => 1200,
         ],
     ],
 
@@ -234,8 +234,8 @@ return [
         ],
         'caption' => [
             'purpose' => 'Légende Instagram qui raconte la transformation avec storytelling.',
-            'idealChars' => [250, 450],
-            'maxChars' => 600,
+            'idealChars' => [400, 800],
+            'maxChars' => 1200,
         ],
     ],
 
@@ -277,8 +277,8 @@ return [
         ],
         'caption' => [
             'purpose' => 'Légende Instagram qui résume le chantier et invite à découvrir les détails.',
-            'idealChars' => [250, 450],
-            'maxChars' => 600,
+            'idealChars' => [400, 800],
+            'maxChars' => 1200,
         ],
     ],
 
@@ -316,8 +316,8 @@ return [
         ],
         'caption' => [
             'purpose' => 'Légende Instagram qui présente le processus et valorise le savoir-faire.',
-            'idealChars' => [250, 450],
-            'maxChars' => 600,
+            'idealChars' => [400, 800],
+            'maxChars' => 1200,
         ],
     ],
 
@@ -356,8 +356,8 @@ return [
         ],
         'caption' => [
             'purpose' => 'Légende Instagram qui résume le guide et invite à sauvegarder/partager.',
-            'idealChars' => [250, 450],
-            'maxChars' => 600,
+            'idealChars' => [400, 800],
+            'maxChars' => 1200,
         ],
     ],
 

@@ -1,6 +1,11 @@
 @props([
     'brandColor' => '#F59E0B',
     'companyLabel' => 'Votre Société',
+    'phone' => null,
+    'email' => null,
+    'website' => null,
+    'trade' => null,
+    'city' => null,
     'title' => 'Guide Pratique',
     'slideContents' => [], // array of steps (text)
     'preview' => false,
@@ -15,11 +20,17 @@
             'Évaluer la puissance nécessaire selon votre surface.',
             'Bénéficier des aides de l\'État pour votre installation.'
         ];
+        $phone = $phone ?? '01 23 45 67 89';
+        $email = $email ?? 'contact@votre-artisan.fr';
+        $website = $website ?? 'www.votre-artisan.fr';
+        $trade = $trade ?? 'Artisan';
+        $city = $city ?? 'Ma Ville';
     @endphp
 @endif
 
 @php
-    $total = count($slideContents) + 1; // +1 for cover
+    $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
+    $total = count($slideContents) + 1 + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
@@ -30,9 +41,9 @@
 
         {{-- Cover Slide --}}
         @php
-            $isCoverVisible = $slideIndex === null || $slideIndex === 0;
+            $isCoverVisible = $slideIndex === null || (int)$slideIndex === 0;
             $coverAlpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
-            $coverStyle = !$isCoverVisible ? 'display: none;' : '';
+            $coverStyle = (int)$slideIndex !== 0 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         <div class="absolute inset-0" {!! $coverAlpine !!} style="{{ $coverStyle }}">
             <div class="flex-1 flex flex-col p-8 pb-20 justify-center gap-4 relative z-10 h-full">
@@ -43,7 +54,7 @@
                         </svg>
                     </div>
                     <div class="bg-white border-2 border-gray-900 p-3 shadow-[4px_4px_0px_0px_rgba(15,23,42,0.1)] flex-1">
-                        <h3 class="text-gray-900 text-sm font-black font-montserrat leading-tight uppercase tracking-tighter">{{ $title }}</h3>
+                        <h3 class="text-gray-900 text-sm font-black font-montserrat leading-tight uppercase tracking-tighter text-center">{{ $title }}</h3>
                     </div>
                 </div>
 
@@ -61,9 +72,9 @@
         @foreach($slideContents as $idx => $content)
             @php
                 $realIdx = $idx + 1;
-                $isSlideVisible = $slideIndex === null || $slideIndex === $realIdx;
+                $isSlideVisible = $slideIndex === null || (int)$slideIndex === $realIdx;
                 $slideAlpine = $slideIndex === null ? "x-show=\"current === $realIdx\" style=\"display: none;\"" : '';
-                $slideStyle = !$isSlideVisible ? 'display: none;' : '';
+                $slideStyle = (int)$slideIndex !== $realIdx && $slideIndex !== null ? 'display: none;' : '';
             @endphp
             <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
                 <div class="flex-1 flex flex-col p-10 pb-20 justify-center relative z-10 h-full">
@@ -79,7 +90,7 @@
                             elseif ($cLen > 40) $cFontSize = 'text-base';
                         @endphp
                         <div class="max-h-[180px] overflow-hidden">
-                            <p class="text-gray-900 {{ $cFontSize }} font-black font-montserrat leading-tight uppercase pt-2">
+                            <p class="text-gray-900 {{ $cFontSize }} font-black font-montserrat leading-tight uppercase pt-2 text-center">
                                 {{ $content }}
                             </p>
                         </div>
@@ -88,22 +99,60 @@
             </div>
         @endforeach
 
-        <div class="absolute inset-x-0 bottom-0 h-16 px-10 bg-gray-900 flex items-center justify-between border-t-4 z-30" style="border-color: {{ $brandColor }}">
-             <span class="text-white text-xs font-black font-montserrat uppercase tracking-widest">{{ $companyLabel }}</span>
-             @if($total > 1)
-                <div class="text-white/20 text-[10px] font-black" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
-                    @if(!$preview) {{ ($slideIndex ?? 0) + 1 }} / {{ $total }} @endif
-                </div>
-             @endif
+        {{-- Slide Contact (Final Slide) --}}
+        @php
+            $finalIndex = count($slideContents) + 1;
+            $isFinalVisible = (int)$slideIndex === $finalIndex;
+            $finalAlpine = $slideIndex === null ? "x-show=\"current === $finalIndex\" style=\"display: none;\"" : '';
+            $finalStyle = (int)$slideIndex !== $finalIndex && $slideIndex !== null ? 'display: none;' : '';
+        @endphp
+        @if($hasContactInfo)
+        <div class="absolute inset-0" {!! $finalAlpine !!} style="{{ $finalStyle }}">
+            <x-post-templates.contact-slide 
+                :brand-color="$brandColor" 
+                :company-label="$companyLabel"
+                :phone="$phone"
+                :email="$email"
+                :website="$website"
+                :trade="$trade"
+                :city="$city"
+                visualStyle="kraft"
+            />
         </div>
+        @endif
+
+        @php
+            $showFooter = $hasContactInfo ? ((int)$slideIndex < $finalIndex) : true;
+            $footerAlpine = $slideIndex === null ? ($hasContactInfo ? "x-show=\"current < $finalIndex\"" : "") : '';
+        @endphp
+        @if($showFooter)
+        <div {!! $footerAlpine !!} class="absolute inset-x-0 bottom-0 py-2.5 px-10 bg-gray-900 flex flex-col gap-1 border-t-4 z-30 min-h-16" style="border-color: {{ $brandColor }}">
+             <div class="flex items-center justify-between">
+                 <span class="text-white text-xs font-black font-montserrat uppercase tracking-widest truncate max-w-[200px]">{{ $companyLabel }}</span>
+                 @if($total > 1)
+                    <div class="text-white/20 text-[10px] font-black" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
+                        @if(!$preview) {{ (int)($slideIndex ?? 0) + 1 }} / {{ $total }} @endif
+                    </div>
+                 @endif
+             </div>
+             <div class="flex items-center gap-1.5 overflow-hidden font-mono-technical">
+                @if($trade)
+                    <span class="px-1.5 py-0.5 rounded-sm bg-white/5 text-white/40 text-[6px] font-black uppercase tracking-wider border border-white/10 whitespace-nowrap">{{ $trade }}</span>
+                @endif
+                @if($city)
+                    <span class="px-1.5 py-0.5 rounded-sm bg-white/5 text-white/40 text-[6px] font-black uppercase tracking-wider border border-white/10 whitespace-nowrap">{{ $city }}</span>
+                @endif
+             </div>
+        </div>
+        @endif
 
         @if($preview)
-            <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40">
-                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-gray-900/50 text-white flex items-center justify-center hover:bg-gray-900">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40 px-2 pointer-events-none">
+                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-gray-800 pointer-events-auto border-2 border-white shadow-xl">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
-                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-gray-900/50 text-white flex items-center justify-center hover:bg-gray-900">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-gray-800 pointer-events-auto border-2 border-white shadow-xl">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
             </div>
         @endif

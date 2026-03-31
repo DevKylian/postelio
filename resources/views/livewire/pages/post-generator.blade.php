@@ -121,6 +121,35 @@
             @endphp
 
             @if($currentStep === 1)
+            @if(auth()->user()->remaining_credits <= 0)
+                @php
+                    $planKey = auth()->user()->currentPlanKey();
+                    $isPro = ($planKey === 'pro');
+                    $resetDate = auth()->user()->last_quota_reset_at ? auth()->user()->last_quota_reset_at->addMonth()->format('d/m') : now()->addMonth()->format('d/m');
+                @endphp
+                <div class="bg-amber-50 border border-amber-100 rounded-2xl p-6 flex flex-col items-center text-center sm:flex-row sm:text-left gap-5 mb-8">
+                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 shrink-0 shadow-sm">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-bold text-amber-900 text-sm">Quota de posts atteint</h4>
+                        <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+                            @if($isPro)
+                                Vous avez utilisé tous vos posts pour ce mois-ci. Votre quota sera réinitialisé le <strong>{{ $resetDate }}</strong>.
+                            @else
+                                Vous avez utilisé tous vos posts pour ce mois-ci. Passez à l'offre supérieure pour continuer à générer des posts immédiatement.
+                            @endif
+                        </p>
+                    </div>
+                    @if(!$isPro)
+                        <div class="shrink-0 w-full sm:w-auto flex justify-center">
+                            <a href="{{ route('subscription.plans') }}" class="bg-white border border-amber-200 text-amber-700 text-xs font-bold px-6 py-2.5 rounded-xl hover:bg-amber-100 transition-all shadow-sm">
+                                Passer au Pro
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            @endif
             {{-- ── STEP 1 : Choix du gabarit ── --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" 
                  x-transition:enter="transition ease-out duration-300"
@@ -1313,7 +1342,8 @@
                     <button type="button" 
                             wire:click="nextStep"
                             wire:loading.attr="disabled"
-                            class="flex-[2] bg-copper text-white font-bold py-4 rounded-2xl shadow-lg shadow-copper/20 hover:bg-amber-500 hover:shadow-xl hover:shadow-copper/30 transition-all active:scale-[0.98] disabled:opacity-50">
+                            @if(auth()->user()->remaining_credits <= 0) disabled @endif
+                            class="flex-[2] bg-copper text-white font-bold py-4 rounded-2xl shadow-lg shadow-copper/20 hover:bg-amber-500 hover:shadow-xl hover:shadow-copper/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
                         <span wire:loading.remove wire:target="nextStep">Continuer</span>
                         <span wire:loading wire:target="nextStep" class="flex items-center justify-center gap-2">
                             <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
@@ -1374,6 +1404,7 @@
                                 @click="navigator.onLine ? $wire.generate() : submitOffline()"
                                 wire:loading.attr="disabled"
                                 wire:target="generate"
+                                @if(auth()->user()->remaining_credits <= 0) disabled @endif
                                 class="w-full relative group overflow-hidden bg-copper text-white font-bold text-sm py-4 rounded-2xl shadow-lg shadow-copper/25 hover:shadow-xl hover:shadow-copper/30 hover:bg-amber-500 transition-all active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed">
                             <div class="flex items-center justify-center gap-3">
                                 <svg wire:loading.remove wire:target="generate" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -1457,45 +1488,62 @@
                     </div>
 
                     {{-- Image / Carousel --}}
-                    @if(count($previewSlides) > 1)
-                        <div x-data="{ current: 0, total: {{ count($previewSlides) }} }"
-                             class="relative aspect-square select-none bg-black">
-                            <div class="relative w-full h-full overflow-hidden"
-                                 x-on:touchstart="$el._tx = $event.changedTouches[0].clientX"
-                                 x-on:touchend="let dx=$event.changedTouches[0].clientX-$el._tx; if(dx<-40&&current<total-1)current++; if(dx>40&&current>0)current--;">
-                                @foreach($previewSlides as $idx => $slideUrl)
-                                <div x-show="current === {{ $idx }}"
-                                     x-transition:enter="transition-opacity duration-200"
-                                     x-transition:enter-start="opacity-0"
-                                     x-transition:enter-end="opacity-100"
-                                     class="absolute inset-0">
-                                    <img src="{{ $slideUrl }}" alt="Slide {{ $idx + 1 }}" class="w-full h-full object-cover">
-                                </div>
-                                @endforeach
+                    @php
+                        $totalSlides = count($previewSlides) + 1;
+                    @endphp
+                    <div x-data="{ current: 0, total: {{ $totalSlides }} }"
+                         class="relative aspect-square select-none bg-black">
+                        <div class="relative w-full h-full overflow-hidden"
+                             x-on:touchstart="$el._tx = $event.changedTouches[0].clientX"
+                             x-on:touchend="let dx=$event.changedTouches[0].clientX-$el._tx; if(dx<-40&&current<total-1)current++; if(dx>40&&current>0)current--;">
+                            
+                            {{-- Generated Slides --}}
+                            @foreach($previewSlides as $idx => $slideUrl)
+                            <div x-show="current === {{ $idx }}"
+                                 x-transition:enter="transition-opacity duration-200"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 class="absolute inset-0">
+                                <img src="{{ $slideUrl }}" alt="Slide {{ $idx + 1 }}" class="w-full h-full object-cover">
                             </div>
-                            <button x-show="current > 0" @click="current--"
-                                    class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center z-10 backdrop-blur-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-                            </button>
-                            <button x-show="current < total - 1" @click="current++"
-                                    class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center z-10 backdrop-blur-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                            </button>
-                            {{-- Dots Instagram --}}
-                            <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1 z-10">
-                                @foreach($previewSlides as $idx => $slideUrl)
-                                <div :class="current === {{ $idx }} ? 'w-2 h-2 bg-[#3897f0]' : 'w-1.5 h-1.5 bg-white/50'"
-                                     class="rounded-full transition-all duration-200"></div>
-                                @endforeach
+                            @endforeach
+
+                            {{-- Final Contact Slide --}}
+                            <div x-show="current === {{ count($previewSlides) }}"
+                                 x-transition:enter="transition-opacity duration-200"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 class="absolute inset-0 bg-white">
+                                <x-post-templates.contact-slide 
+                                    :brand-color="$brandColor" 
+                                    :company-label="$company->name"
+                                    :phone="$company->phone"
+                                    :email="$company->email"
+                                    :website="$company->website"
+                                    :trade="$company->trade"
+                                    :preview="true"
+                                />
                             </div>
-                            <div class="absolute top-3 right-3 bg-black/40 backdrop-blur-sm text-white text-[11px] font-bold px-2 py-0.5 rounded-full z-10"
-                                 x-text="(current + 1) + '/' + total"></div>
                         </div>
-                    @elseif($previewImageUrl)
-                        <div class="aspect-square bg-black">
-                            <img src="{{ $previewImageUrl }}" alt="Post généré" class="w-full h-full object-cover">
+                        
+                        <button x-show="current > 0" @click="current--"
+                                class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center z-10 backdrop-blur-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <button x-show="current < total - 1" @click="current++"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center z-10 backdrop-blur-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                        {{-- Dots Instagram --}}
+                        <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1 z-10">
+                            @for($i = 0; $i < $totalSlides; $i++)
+                            <div :class="current === {{ $i }} ? 'w-2 h-2 bg-[#3897f0]' : 'w-1.5 h-1.5 bg-white/50'"
+                                 class="rounded-full transition-all duration-200"></div>
+                            @endfor
                         </div>
-                    @endif
+                        <div class="absolute top-3 right-3 bg-black/40 backdrop-blur-sm text-white text-[11px] font-bold px-2 py-0.5 rounded-full z-10"
+                             x-text="(current + 1) + '/' + total"></div>
+                    </div>
 
                     {{-- Actions Instagram --}}
                     <div class="px-3.5 pt-3 pb-5 space-y-2">

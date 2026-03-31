@@ -1,6 +1,11 @@
 @props([
     'brandColor' => '#F59E0B',
     'companyLabel' => 'Votre Société',
+    'phone' => null,
+    'email' => null,
+    'website' => null,
+    'trade' => null,
+    'city' => null,
     'title' => 'Zoom Chantier',
     'slides' => [null, null, null, null], // array of image URLs
     'slideContents' => [], // array of texts corresponding to slides
@@ -23,11 +28,17 @@
             'Finalisation des raccordements et test de chauffe.',
             'Contrôle final et mise en service.'
         ];
+        $phone = $phone ?? '01 23 45 67 89';
+        $email = $email ?? 'contact@votre-artisan.fr';
+        $website = $website ?? 'www.votre-artisan.fr';
+        $trade = $trade ?? 'Artisan';
+        $city = $city ?? 'Ma Ville';
     @endphp
 @endif
 
 @php
-    $total = count($slides);
+    $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
+    $total = count($slides) + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
@@ -36,11 +47,11 @@
         
         @foreach($slides as $index => $imageUrl)
             @php
-                $isSlideVisible = $slideIndex === null || $slideIndex === $index;
+                $isSlideVisible = $slideIndex === null || (int)$slideIndex === $index;
                 $slideAlpine = $slideIndex === null 
                     ? "x-show=\"current === $index\"" . ($index > 0 ? ' style="display: none;"' : '')
                     : '';
-                $slideStyle = !$isSlideVisible ? 'display: none;' : '';
+                $slideStyle = (int)$slideIndex !== $index && $slideIndex !== null ? 'display: none;' : '';
                 $currentText = ($index === 0) ? ($slideContents[0] ?? $title) : ($slideContents[$index] ?? '');
             @endphp
             <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
@@ -69,18 +80,56 @@
             </div>
         @endforeach
 
+        {{-- Slide Contact (Final Slide) --}}
+        @php
+            $finalIndex = count($slides);
+            $isFinalVisible = (int)$slideIndex === $finalIndex;
+            $finalAlpine = $slideIndex === null ? "x-show=\"current === $finalIndex\" style=\"display: none;\"" : '';
+            $finalStyle = (int)$slideIndex !== $finalIndex && $slideIndex !== null ? 'display: none;' : '';
+        @endphp
+        @if($hasContactInfo)
+        <div class="absolute inset-0" {!! $finalAlpine !!} style="{{ $finalStyle }}">
+            <x-post-templates.contact-slide 
+                :brand-color="$brandColor" 
+                :company-label="$companyLabel"
+                :phone="$phone"
+                :email="$email"
+                :website="$website"
+                :trade="$trade"
+                :city="$city"
+                visualStyle="glass"
+            />
+        </div>
+        @endif
+
         {{-- Center Floating Glass Badge / Branding --}}
-        <div class="absolute inset-x-0 bottom-0 h-20 backdrop-blur-2xl bg-slate-900/60 border-t border-white/10 px-8 flex items-center justify-between z-30">
-             <div class="flex flex-col">
-                 <span class="text-white/60 text-[8px] font-black uppercase tracking-[0.4em] font-montserrat mb-0.5">{{ $companyLabel }}</span>
-                 <span class="text-white text-xs font-black uppercase tracking-[0.2em] font-montserrat" style="color: {{ $brandColor }}">Zoom Chantier</span>
+        @php
+            $showFooter = $hasContactInfo ? ((int)$slideIndex < $finalIndex) : true;
+            $footerAlpine = $slideIndex === null ? ($hasContactInfo ? "x-show=\"current < $finalIndex\"" : "") : '';
+        @endphp
+        @if($showFooter)
+        <div {!! $footerAlpine !!} class="absolute inset-x-0 bottom-0 h-20 backdrop-blur-2xl bg-slate-900/60 border-t border-white/10 px-8 flex items-center justify-between z-30">
+         <div class="flex flex-col">
+             <div class="flex items-center gap-2 mb-1">
+                 <span class="text-white/70 text-[8px] font-black uppercase tracking-[0.4em] font-montserrat truncate max-w-[150px]">{{ $companyLabel }}</span>
+                 <div class="flex items-center gap-1 overflow-hidden">
+                    @if($trade)
+                        <span class="px-1 py-0.5 rounded-md bg-white/5 text-white/30 text-[5px] font-bold uppercase tracking-wider border border-white/5 whitespace-nowrap">{{ $trade }}</span>
+                    @endif
+                    @if($city)
+                        <span class="px-1 py-0.5 rounded-md bg-white/5 text-white/30 text-[5px] font-bold uppercase tracking-wider border border-white/5 whitespace-nowrap">{{ $city }}</span>
+                    @endif
+                 </div>
              </div>
+             <span class="text-white text-xs font-black uppercase tracking-[0.2em] font-montserrat" style="color: {{ $brandColor }}">Zoom Chantier</span>
+         </div>
              @if($total > 1)
                 <div class="text-white/20 text-[10px] font-black" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
                     @if(!$preview) {{ ($slideIndex ?? 0) + 1 }} / {{ $total }} @endif
                 </div>
              @endif
         </div>
+        @endif
 
         @if($preview)
             <div class="absolute top-1/2 -translate-y-1/2 inset-x-4 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40">

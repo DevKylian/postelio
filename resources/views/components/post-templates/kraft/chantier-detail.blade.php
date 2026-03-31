@@ -1,6 +1,11 @@
 @props([
     'brandColor' => '#F59E0B',
     'companyLabel' => 'Votre Société',
+    'phone' => null,
+    'email' => null,
+    'website' => null,
+    'trade' => null,
+    'city' => null,
     'title' => 'Zoom Chantier',
     'slides' => [null, null, null, null], // array of image URLs
     'slideContents' => [], // array of texts corresponding to slides
@@ -23,11 +28,17 @@
             'Finalisation des raccordements et test de chauffe.',
             'Contrôle final et mise en service.'
         ];
+        $phone = $phone ?? '01 23 45 67 89';
+        $email = $email ?? 'contact@votre-artisan.fr';
+        $website = $website ?? 'www.votre-artisan.fr';
+        $trade = $trade ?? 'Artisan';
+        $city = $city ?? 'Ma Ville';
     @endphp
 @endif
 
 @php
-    $total = count($slides);
+    $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
+    $total = count($slides) + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
@@ -38,11 +49,11 @@
 
         @foreach($slides as $index => $imageUrl)
             @php
-                $isSlideVisible = $slideIndex === null || $slideIndex === $index;
+                $isSlideVisible = $slideIndex === null || (int)$slideIndex === $index;
                 $slideAlpine = $slideIndex === null 
                     ? "x-show=\"current === $index\"" . ($index > 0 ? ' style="display: none;"' : '')
                     : '';
-                $slideStyle = !$isSlideVisible ? 'display: none;' : '';
+                $slideStyle = (int)$slideIndex !== $index && $slideIndex !== null ? 'display: none;' : '';
                 $currentText = ($index === 0) ? ($slideContents[0] ?? $title) : ($slideContents[$index] ?? '');
             @endphp
             <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
@@ -56,7 +67,7 @@
                             </div>
                         @endif
                         
-                        @if(!empty($currentText) && !$imageUrl)
+                        @if(!empty($currentText))
                             @php
                                 $cLen = mb_strlen($currentText);
                                 $cFontSize = 'text-[10px]';
@@ -65,7 +76,7 @@
                             @endphp
                             <div class="absolute inset-x-4 bottom-10 bg-white border-2 border-gray-900 p-4 shadow-xl shrink-0">
                                 <div class="max-h-[60px] overflow-hidden">
-                                     <p class="text-gray-900 font-black {{ $cFontSize }} uppercase leading-tight font-montserrat">{{ $currentText }}</p>
+                                     <p class="text-gray-900 font-black {{ $cFontSize }} uppercase leading-tight font-montserrat text-center">{{ $currentText }}</p>
                                 </div>
                             </div>
                         @endif
@@ -74,28 +85,66 @@
             </div>
         @endforeach
 
-        {{-- Footer/Branding --}}
-        <div class="absolute inset-x-0 bottom-0 h-16 px-10 bg-white border-t-4 border-gray-900 flex items-center justify-between z-30 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
-             <span class="text-gray-900 text-xs font-black font-montserrat uppercase tracking-[0.2em]">{{ $companyLabel }}</span>
-             <div class="flex items-center gap-4">
-                  @if($total > 1)
-                    <div class="text-gray-900/20 text-[10px] font-black" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
-                        @if(!$preview) {{ ($slideIndex ?? 0) + 1 }} / {{ $total }} @endif
-                    </div>
-                  @endif
-                  <div class="w-4 h-4" style="background-color: {{ $brandColor }}"></div>
-             </div>
+        {{-- Slide Contact (Final Slide) --}}
+        @php
+            $finalIndex = count($slides);
+            $isFinalVisible = (int)$slideIndex === $finalIndex;
+            $finalAlpine = $slideIndex === null ? "x-show=\"current === $finalIndex\" style=\"display: none;\"" : '';
+            $finalStyle = (int)$slideIndex !== $finalIndex && $slideIndex !== null ? 'display: none;' : '';
+        @endphp
+        @if($hasContactInfo)
+        <div class="absolute inset-0" {!! $finalAlpine !!} style="{{ $finalStyle }}">
+            <x-post-templates.contact-slide 
+                :brand-color="$brandColor" 
+                :company-label="$companyLabel"
+                :phone="$phone"
+                :email="$email"
+                :website="$website"
+                :trade="$trade"
+                :city="$city"
+                visualStyle="kraft"
+            />
         </div>
+        @endif
+
+        @php
+            $showFooter = $hasContactInfo ? ((int)$slideIndex < $finalIndex) : true;
+            $footerAlpine = $slideIndex === null ? ($hasContactInfo ? "x-show=\"current < $finalIndex\"" : "") : '';
+        @endphp
+        @if($showFooter)
+         <div {!! $footerAlpine !!} class="absolute bottom-0 inset-x-0 py-2.5 px-10 bg-white border-t-4 border-gray-900 flex flex-col gap-1 z-30 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] min-h-16">
+              <div class="flex items-center justify-between">
+                   <span class="text-gray-900 text-xs font-black font-montserrat uppercase tracking-[0.2em] truncate max-w-[200px]">{{ $companyLabel }}</span>
+                   <div class="flex items-center gap-4">
+                        @if($total > 1)
+                         <div class="text-gray-900/20 text-[10px] font-black" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
+                             @if(!$preview) {{ ($slideIndex ?? 0) + 1 }} / {{ $total }} @endif
+                         </div>
+                        @endif
+                        <div class="w-4 h-4" style="background-color: {{ $brandColor }}"></div>
+                   </div>
+              </div>
+              <div class="flex items-center gap-1.5 overflow-hidden">
+                @if($trade)
+                    <span class="px-1.5 py-0.5 rounded-sm bg-gray-900/5 text-gray-900/60 text-[6px] font-black uppercase tracking-wider border border-gray-900/10 whitespace-nowrap">{{ $trade }}</span>
+                @endif
+                @if($city)
+                    <span class="px-1.5 py-0.5 rounded-sm bg-gray-900/5 text-gray-900/60 text-[6px] font-black uppercase tracking-wider border border-gray-900/10 whitespace-nowrap">{{ $city }}</span>
+                @endif
+              </div>
+         </div>
+         @endif
 
         @if($preview)
-            <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40">
-                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-gray-900/50 text-white flex items-center justify-center hover:bg-gray-900">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40 px-2 pointer-events-none">
+                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-gray-800 pointer-events-auto border-2 border-white shadow-xl">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
-                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-gray-900/50 text-white flex items-center justify-center hover:bg-gray-900">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-gray-800 pointer-events-auto border-2 border-white shadow-xl">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
             </div>
         @endif
     </div>
+</div>
 </div>

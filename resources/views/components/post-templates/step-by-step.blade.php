@@ -1,10 +1,16 @@
 @props([
     'brandColor' => '#F59E0B',
     'companyLabel' => 'Votre Société',
-    'slides' => [null, null, null], // array of image URLs
-    'slideContents' => [], // array of texts corresponding to slides
-    'preview' => false,
+    'slides' => [],
+    'slideContents' => [],
+    'logoUrl' => null,
+    'phone' => null,
+    'email' => null,
+    'website' => null,
+    'trade' => null,
+    'city' => null,
     'slideIndex' => null,
+    'preview' => false,
 ])
 
 @if($preview)
@@ -21,11 +27,17 @@
             'Mise en œuvre des panneaux isolants avec fixation mécanique.',
             'Application de l\'enduit de finition et contrôle qualité.'
         ];
+        $phone = $phone ?? '01 23 45 67 89';
+        $email = $email ?? 'contact@votre-artisan.fr';
+        $website = $website ?? 'www.votre-artisan.fr';
+        $trade = $trade ?? 'Artisan';
+        $city = $city ?? 'Ma Ville';
     @endphp
 @endif
 
 @php
-    $total = count($slides);
+    $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
+    $total = count($slides) + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
@@ -43,8 +55,6 @@
                 if ($index === 0) {
                     $slideInlineStyle .= " background-color: $brandColor;";
                 }
-                // Only show text on the first slide (cover) if available
-                $currentText = ($index === 0) ? ($slideContents[0] ?? '') : '';
             @endphp
             
             <div class="absolute inset-0 {{ $index === 0 ? 'p-10 flex flex-col justify-center' : '' }}" {!! $slideCondition !!} style="{{ $slideInlineStyle }}">
@@ -103,9 +113,31 @@
             </div>
         @endforeach
 
+        {{-- Contact Slide --}}
+        @php
+            $contactIndex = count($slides);
+            $isContactVisible = $slideIndex === null || (int)$slideIndex === $contactIndex;
+            $contactCondition = $slideIndex === null 
+                ? "x-show=\"current === $contactIndex\"" . ' style="display: none;"'
+                : ($isContactVisible ? '' : 'style="display: none;"');
+        @endphp
+        @if($hasContactInfo)
+        <div class="absolute inset-0" {!! $contactCondition !!} style="{{ !$isContactVisible ? 'display: none;' : '' }}">
+            <x-post-templates.contact-slide 
+                :brand-color="$brandColor" 
+                :company-label="$companyLabel"
+                :phone="$phone"
+                :email="$email"
+                :website="$website"
+                :trade="$trade"
+                :city="$city"
+            />
+        </div>
+        @endif
+
         @if($preview)
             <div class="absolute bottom-0 inset-x-0 h-10 flex items-center justify-center px-4" :style="current === 0 ? 'background-color: rgba(0,0,0,0.2)' : 'background-color: transparent'">
-                <p class="font-bold text-[9px] uppercase tracking-widest font-montserrat" :class="current === 0 ? 'text-white/60' : 'text-white'">{{ $companyLabel }}</p>
+                <p class="font-bold text-[9px] uppercase tracking-widest font-montserrat" :class="current === 0 || current === {{ $contactIndex }} ? 'text-white/60' : 'text-white'" x-show="current !== {{ $contactIndex }}">{{ $companyLabel }}</p>
             </div>
             
             <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity">
@@ -120,9 +152,22 @@
             @php
                 $footerStyle = ($slideIndex === 0) ? 'background-color: rgba(0,0,0,0.2);' : 'background-color: transparent;';
             @endphp
-            <div class="absolute bottom-0 inset-x-0 h-10 flex items-center justify-center px-4" style="{{ $footerStyle }}">
-                <p class="font-bold text-[9px] uppercase tracking-widest font-montserrat {{ ($slideIndex === 0) ? 'text-white/60' : 'text-white' }}">{{ $companyLabel }}</p>
+            @php
+                $showFooter = $hasContactInfo ? ((int)$slideIndex !== $contactIndex) : true;
+            @endphp
+            @if($showFooter)
+            <div class="absolute bottom-0 inset-x-0 h-14 flex flex-col items-center justify-center px-4" style="{{ $footerStyle }}">
+                <p class="font-bold text-[9px] uppercase tracking-widest font-montserrat truncate mb-1 {{ ($slideIndex === 0) ? 'text-white/60' : 'text-white' }}">{{ $companyLabel }}</p>
+                <div class="flex items-center gap-1.5 overflow-hidden">
+                    @if($trade)
+                        <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $trade }}</span>
+                    @endif
+                    @if($city)
+                        <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $city }}</span>
+                    @endif
+                </div>
             </div>
+            @endif
         @endif
     </div>
 </div>

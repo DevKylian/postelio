@@ -4,6 +4,11 @@
     'imageBeforeUrl' => null,
     'imageAfterUrl' => null,
     'text' => 'TRANSFORMATION',
+    'phone' => null,
+    'email' => null,
+    'website' => null,
+    'trade' => null,
+    'city' => null,
     'preview' => false,
     'slideIndex' => null, // null = interactive alpine preview, int = render specific slide
 ])
@@ -13,11 +18,17 @@
         $imageBeforeUrl = $imageBeforeUrl ?? 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=800';
         $imageAfterUrl = $imageAfterUrl ?? 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?q=80&w=800';
         $text = ($text === 'TRANSFORMATION') ? 'Rénovation Complète d\'Intérieur' : $text;
+        $phone = $phone ?? '01 23 45 67 89';
+        $email = $email ?? 'contact@votre-artisan.fr';
+        $website = $website ?? 'www.votre-artisan.fr';
+        $trade = $trade ?? 'Artisan';
+        $city = $city ?? 'Ma Ville';
     @endphp
 @endif
 
 @php
-    $total = 3;
+    $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
+    $total = 3 + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
@@ -26,7 +37,7 @@
     <div class="flex-1 flex min-h-0 relative">
         {{-- Slide 0: Glass Split --}}
         @php
-            $isSlide0 = $slideIndex === null || $slideIndex === 0;
+            $isSlide0 = $slideIndex === null || (int)$slideIndex === 0;
             $slide0Alpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
             $slide0Style = !$isSlide0 ? 'display: none;' : '';
         @endphp
@@ -47,9 +58,9 @@
 
         {{-- Slide 1: Full Avant --}}
         @php
-            $isSlide1 = $slideIndex === 1;
+            $isSlide1 = (int)$slideIndex === 1;
             $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
-            $slide1Style = $slideIndex !== 1 ? 'display: none;' : '';
+            $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         <div class="absolute inset-0 bg-gray-800" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if ($imageBeforeUrl)
@@ -62,9 +73,9 @@
 
         {{-- Slide 2: Full Après --}}
         @php
-            $isSlide2 = $slideIndex === 2;
+            $isSlide2 = (int)$slideIndex === 2;
             $slide2Alpine = $slideIndex === null ? "x-show=\"current === 2\" style=\"display: none;\"" : '';
-            $slide2Style = $slideIndex !== 2 ? 'display: none;' : '';
+            $slide2Style = (int)$slideIndex !== 2 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         <div class="absolute inset-0 bg-gray-700" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if ($imageAfterUrl)
@@ -74,6 +85,27 @@
                 </div>
             @endif
         </div>
+
+        {{-- Slide 3: Contact --}}
+        @php
+            $isSlide3 = (int)$slideIndex === 3;
+            $slide3Alpine = $slideIndex === null ? "x-show=\"current === 3\" style=\"display: none;\"" : '';
+            $slide3Style = (int)$slideIndex !== 3 && $slideIndex !== null ? 'display: none;' : '';
+        @endphp
+        @if($hasContactInfo)
+        <div class="absolute inset-0" {!! $slide3Alpine !!} style="{{ $slide3Style }}">
+            <x-post-templates.contact-slide 
+                :brand-color="$brandColor" 
+                :company-label="$companyLabel"
+                :phone="$phone"
+                :email="$email"
+                :website="$website"
+                :trade="$trade"
+                :city="$city"
+                visualStyle="glass"
+            />
+        </div>
+        @endif
 
         {{-- Controls (Preview Only) --}}
         @if($preview)
@@ -86,17 +118,22 @@
                 </button>
             </div>
             <div class="absolute top-6 right-6 backdrop-blur-xl bg-black/40 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl z-30 border border-white/10" x-text="(current + 1) + ' / ' + total"></div>
-        @elseif($slideIndex !== null)
+        @elseif($slideIndex !== null && (int)$slideIndex !== 3)
+            @php
+                $showTotal = $hasContactInfo ? ((int)$slideIndex !== 3) : true;
+            @endphp
+            @if($showTotal)
             <div class="absolute top-6 right-6 backdrop-blur-xl bg-black/40 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl z-30 border border-white/10">
                 {{ $slideIndex + 1 }} / {{ $total }}
             </div>
+            @endif
         @endif
     </div>
 
 
     {{-- Glass Floor --}}
     @php
-        $showBranding = $slideIndex === null || $slideIndex === 0;
+        $showBranding = $slideIndex === null || (int)$slideIndex === 0;
         $brandingAlpine = $slideIndex === null ? 'x-show="current === 0"' : '';
     @endphp
     @if($showBranding)
@@ -113,7 +150,17 @@
             elseif ($tLen > 25) $tFontSize = 'text-xs';
         @endphp
         <div class="flex flex-col min-w-0 flex-1">
-            <span class="text-white/50 {{ $cFontSize }} font-bold uppercase tracking-[0.2em] font-montserrat truncate">{{ $companyLabel }}</span>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="text-white/70 {{ $cFontSize }} font-bold uppercase tracking-[0.2em] font-montserrat truncate">{{ $companyLabel }}</span>
+                <div class="flex items-center gap-1.5 overflow-hidden">
+                    @if($trade)
+                        <span class="px-1.5 py-0.5 rounded-md bg-white/5 text-white/30 text-[6px] font-black uppercase tracking-wider border border-white/5">{{ $trade }}</span>
+                    @endif
+                    @if($city)
+                        <span class="px-1.5 py-0.5 rounded-md bg-white/5 text-white/30 text-[6px] font-black uppercase tracking-wider border border-white/5">{{ $city }}</span>
+                    @endif
+                </div>
+            </div>
             <span class="text-white {{ $tFontSize }} font-black uppercase tracking-tighter font-montserrat truncate">{{ $text ?: 'TRANSFORMATION' }}</span>
         </div>
     </div>

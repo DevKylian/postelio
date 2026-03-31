@@ -66,9 +66,12 @@ class ProcessPostGeneration implements ShouldQueue
             $photoCount = count($this->post->extra_images ?? []);
             $templateOptions = $this->post->template_options ?? [];
             if ($company) {
+                $company->refresh(); // CRITICAL: Get latest city/phone from DB
                 $templateOptions['company_city']  = $company->city;
                 $templateOptions['company_name']  = $company->name;
                 $templateOptions['company_trade'] = $company->trade;
+                $templateOptions['company_phone'] = $company->phone;
+                $templateOptions['company_email'] = $company->email;
                 // Inject artisan bio for personalized AI generation
                 if (!empty($company->bio_text)) {
                     $templateOptions['artisan_bio'] = $company->bio_text;

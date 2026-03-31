@@ -1,6 +1,11 @@
 @props([
     'brandColor' => '#F59E0B',
     'companyLabel' => 'Votre Société',
+    'phone' => null,
+    'email' => null,
+    'website' => null,
+    'trade' => null,
+    'city' => null,
     'slides' => [null, null, null, null], // array of image URLs
     'slideContents' => [], // array of steps (text)
     'preview' => false,
@@ -21,11 +26,17 @@
             'Application de l\'enduit de finition.',
             'Contrôle final et nettoyage du chantier.'
         ];
+        $phone = $phone ?? '01 23 45 67 89';
+        $email = $email ?? 'contact@votre-artisan.fr';
+        $website = $website ?? 'www.votre-artisan.fr';
+        $trade = $trade ?? 'Artisan';
+        $city = $city ?? 'Ma Ville';
     @endphp
 @endif
 
 @php
-    $total = count($slides);
+    $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
+    $total = count($slides) + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
@@ -38,11 +49,11 @@
 
         @foreach($slides as $index => $imageUrl)
             @php
-                $isSlideVisible = $slideIndex === null || $slideIndex === $index;
+                $isSlideVisible = $slideIndex === null || (int)$slideIndex === $index;
                 $slideAlpine = $slideIndex === null 
                     ? "x-show=\"current === $index\"" . ($index > 0 ? ' style="display: none;"' : '')
                     : '';
-                $slideStyle = !$isSlideVisible ? 'display: none;' : '';
+                $slideStyle = (int)$slideIndex !== $index && $slideIndex !== null ? 'display: none;' : '';
             @endphp
             <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
                 {{-- Show image if available --}}
@@ -86,17 +97,55 @@
             </div>
         @endforeach
 
-        <div class="absolute inset-x-0 bottom-0 h-14 bg-white px-10 border-t-2 border-[#0047AB] flex items-center justify-between z-30">
-             <span class="text-[#0047AB] text-[9px] font-black font-mono-technical uppercase tracking-widest italic">{{ $companyLabel }}</span>
-             <div class="flex items-center gap-3">
-                  @for($i=0; $i<$total; $i++)
-                    <div class="w-4 h-1 border border-[#0047AB]" 
-                         @if($preview) :class="current === {{ $i }} ? '' : 'opacity-20'" :style="current === {{ $i }} ? 'background-color: {{ $brandColor }}' : ''"
-                         @else style="background-color: {{ ($slideIndex ?? 0) === $i ? $brandColor : 'rgba(0, 71, 171, 0.1)' }}" @endif>
-                    </div>
-                  @endfor
+        {{-- Slide Contact (Final Slide) --}}
+        @php
+            $finalIndex = count($slides);
+            $isFinalVisible = (int)$slideIndex === $finalIndex;
+            $finalAlpine = $slideIndex === null ? "x-show=\"current === $finalIndex\" style=\"display: none;\"" : '';
+            $finalStyle = (int)$slideIndex !== $finalIndex && $slideIndex !== null ? 'display: none;' : '';
+        @endphp
+        @if($hasContactInfo)
+        <div class="absolute inset-0" {!! $finalAlpine !!} style="{{ $finalStyle }}">
+            <x-post-templates.contact-slide 
+                :brand-color="$brandColor" 
+                :company-label="$companyLabel"
+                :phone="$phone"
+                :email="$email"
+                :website="$website"
+                :trade="$trade"
+                :city="$city"
+                visualStyle="blueprint"
+            />
+        </div>
+        @endif
+
+        @php
+            $showFooter = $hasContactInfo ? ((int)$slideIndex < $finalIndex) : true;
+            $footerAlpine = $slideIndex === null ? ($hasContactInfo ? "x-show=\"current < $finalIndex\"" : '') : '';
+        @endphp
+        @if($showFooter)
+        <div {!! $footerAlpine !!} class="absolute bottom-0 inset-x-0 py-2.5 bg-white px-10 border-t-2 border-[#0047AB] flex flex-col gap-1 z-30 min-h-14">
+             <div class="flex items-center justify-between">
+                 <span class="text-[#0047AB] text-[9px] font-black font-mono-technical uppercase tracking-widest italic truncate max-w-[200px]">{{ $companyLabel }}</span>
+                 <div class="flex items-center gap-3">
+                      @for($i=0; $i<$total; $i++)
+                        <div class="w-4 h-1 border border-[#0047AB]" 
+                             @if($preview) :class="current === {{ $i }} ? '' : 'opacity-20'" :style="current === {{ $i }} ? 'background-color: {{ $brandColor }}' : ''"
+                             @else style="background-color: {{ (int)($slideIndex ?? 0) === $i ? $brandColor : 'rgba(0, 71, 171, 0.1)' }}" @endif>
+                        </div>
+                      @endfor
+                 </div>
+             </div>
+             <div class="flex items-center gap-1.5 overflow-hidden">
+                @if($trade)
+                    <span class="px-1 py-0.5 rounded-sm bg-blue-50 text-[#0047AB]/50 text-[5px] font-black font-mono-technical uppercase border border-[#0047AB]/10 whitespace-nowrap">{{ $trade }}</span>
+                @endif
+                @if($city)
+                    <span class="px-1 py-0.5 rounded-sm bg-blue-50 text-[#0047AB]/50 text-[5px] font-black font-mono-technical uppercase border border-[#0047AB]/10 whitespace-nowrap">{{ $city }}</span>
+                @endif
              </div>
         </div>
+        @endif
 
         @if($preview)
             <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40">

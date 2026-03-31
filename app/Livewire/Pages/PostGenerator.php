@@ -99,6 +99,7 @@ class PostGenerator extends Component
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Starting field extraction');
             $refiner = app(\App\Services\PostGeneration\ContentRefinerService::class);
             $extracted = $refiner->extractFields($transcript);
+            \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Field extraction finished', ['extracted' => $extracted]);
 
             // 5. Update properties (only if not null)
             if (!empty($extracted['clientName']))    $this->clientName    = $extracted['clientName'];
@@ -168,8 +169,15 @@ class PostGenerator extends Component
 
     public function nextStep()
     {
+        $user = Auth::user();
+        $user->checkAndResetQuota();
+
         if ($this->currentStep === 1) {
             $this->validateOnly('template');
+            if ($user->remaining_credits <= 0) {
+                $this->addError('template', "Votre quota est épuisé. (0 post restant).");
+                return;
+            }
         } elseif ($this->currentStep === 2) {
             // Either audio or text is required
             if (!$this->audio && empty(trim($this->textContent))) {
@@ -251,15 +259,23 @@ class PostGenerator extends Component
 
     public function generate()
     {
+        \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] PostGenerator::generate() started');
+        
         if (!\App\Models\Setting::get('post_generation_enabled', true)) {
             $this->addError('quota', "La génération de posts est temporairement désactivée pour maintenance.");
             return;
         }
 
+        try {
+            $this->validate();
+            \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Validation PASSED');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Illuminate\Support\Facades\Log::warning('[AUDIO DEBUG] Validation FAILED', ['errors' => $e->errors()]);
+            throw $e;
+        }
+
         $user = Auth::user();
         $user->checkAndResetQuota();
-
-        $this->validate();
 
         // Generate 1 post = 1 unit from quota
         $cost = 1;
@@ -323,6 +339,11 @@ class PostGenerator extends Component
             'custom_photo_mode'      => $customPhotoModeOpt,
             'text_content'           => !empty(trim($this->textContent)) ? trim($this->textContent) : null,
             'visual_style'           => $this->visualStyle,
+            'company_phone'          => Auth::user()->company?->phone,
+            'company_email'          => Auth::user()->company?->email,
+            'company_website'        => Auth::user()->company?->website,
+            'company_city'           => Auth::user()->company?->city,
+            'company_trade'          => Auth::user()->company?->trade,
         ];
 
         // Sanitize platforms array (livewire might cast to string or bool if only one checkbox exists)

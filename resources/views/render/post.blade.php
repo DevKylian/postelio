@@ -102,10 +102,37 @@
             'logoUrl' => $logoUrl,
             'preview' => $preview,
             'slideIndex' => $slideIndexFinal,
+            'phone' => $post->template_options['company_phone'] ?? $company->phone,
+            'email' => $post->template_options['company_email'] ?? $company->email,
+            'website' => $post->template_options['company_website'] ?? $company->website,
+            'trade' => $post->template_options['company_trade'] ?? $company->trade,
+            'city' => $post->template_options['company_city'] ?? $company->city,
+            'visualStyle' => $visualStyle,
         ];
 
+        // Determine total slides for this template (logic must match ImageGeneratorService)
+        $totalSlidesBeforeContact = 1;
+        if ($template === 'guide_pedagogique') {
+            $totalSlidesBeforeContact = is_array($contentData) && isset($contentData['slides']) ? count($contentData['slides']) : 3;
+            $totalSlidesBeforeContact += 1;
+        } elseif ($template === 'project') {
+            $totalSlidesBeforeContact = 3;
+        } elseif ($template === 'faq') {
+            $faqSlides = (is_array($contentData) && isset($contentData['slides']) && is_array($contentData['slides'])) ? $contentData['slides'] : [];
+            $totalSlidesBeforeContact = 1 + count($faqSlides);
+        } elseif ($template === 'chantier_detail' || $template === 'step_by_step') {
+            $totalSlidesBeforeContact = count($post->extra_images ?? []) + 1;
+        }
+
+        $hasContactInfo = !empty($commonProps['phone']) || !empty($commonProps['email']) || !empty($commonProps['website']);
+        $totalSlides = $totalSlidesBeforeContact + ($hasContactInfo ? 1 : 0);
+        $isContactSlide = ($slideIndexFinal !== null && $slideIndexFinal >= $totalSlidesBeforeContact && $hasContactInfo);
+
         // Template specific data
-        if ($template === 'project') {
+        if ($isContactSlide) {
+            $componentName = 'post-templates.contact-slide';
+            $props = $commonProps;
+        } elseif ($template === 'project') {
             $props = array_merge($commonProps, [
                 'imageBeforeUrl' => $post->image_before_path ? asset(Storage::url($post->image_before_path)) : null,
                 'imageAfterUrl' => $post->image_after_path ? asset(Storage::url($post->image_after_path)) : null,
@@ -117,17 +144,14 @@
                 'customerName' => $contentData['customerName'] ?? ($contentData['clientName'] ?? 'Client'),
             ]);
         } elseif ($template === 'faq') {
-            // Extract FAQ answers from refined_content slides array
             $faqSlides = (is_array($contentData) && isset($contentData['slides']) && is_array($contentData['slides']))
                 ? $contentData['slides']
                 : [];
-            // slideIndex 0 = question, slideIndex 1+ = answers
             $answerIndex = ($slideIndexFinal !== null && $slideIndexFinal > 0) ? $slideIndexFinal - 1 : 0;
             $faqAnswer = $faqSlides[$answerIndex] ?? 'La réponse arrive bientôt...';
             $props = array_merge($commonProps, [
                 'question' => $rawText ?: 'Une question fréquente ?',
                 'answer' => $faqAnswer,
-                'slideIndex' => $slideIndexFinal,
             ]);
         } elseif (in_array($template, ['lifestyle', 'quality_focus'])) {
             $imgUrl = $post->image_path ? asset(Storage::url($post->image_path)) : ($post->image_before_path ? asset(Storage::url($post->image_before_path)) : null);
@@ -172,18 +196,13 @@
                     'photo_mode' => $post->template_options['custom_photo_mode'] ?? 'none',
                 ];
             }
-            $props = [
+            $props = array_merge($commonProps, [
                 'template' => $ct,
-                'brandColor' => $brandColor,
-                'companyLabel' => $companyLabel,
-                'logoUrl' => $logoUrl,
-                'preview' => false,
                 'text' => $rawText,
-                'slideIndex' => $slideIndexFinal,
                 'imageBeforeUrl' => $post->image_before_path ? asset(Storage::url($post->image_before_path)) : null,
                 'imageAfterUrl' => $post->image_after_path ? asset(Storage::url($post->image_after_path)) : null,
                 'imageUrl' => $post->image_path ? asset(Storage::url($post->image_path)) : null,
-            ];
+            ]);
             $componentName = 'post-templates.custom';
         } else {
             $props = null;
@@ -191,7 +210,19 @@
     @endphp
 
     <div style="width: 360px; height: 360px; overflow: hidden; position: relative;">
-    @if($template === 'lifestyle')
+    @if($isContactSlide)
+         <x-post-templates.contact-slide
+            :brand-color="$props['brandColor']"
+            :company-label="$props['companyLabel']"
+            :phone="$props['phone']"
+            :email="$props['email']"
+            :website="$props['website']"
+            :trade="$props['trade']"
+            :city="$props['city']"
+            :visual-style="$props['visualStyle']"
+        />
+    @elseif($template === 'lifestyle')
+        {{-- ... existing lifestyle code ... --}}
         {{-- INLINE lifestyle rendering — bypasses component system entirely --}}
         @php
             $lifestyleText = strtoupper($rawText ?: 'SUR LE TERRAIN');
@@ -223,9 +254,19 @@
                 </div>
 
                 {{-- Footer bar --}}
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 50px; background: white; border-top: 2px solid #0047AB; padding: 0 28px; display: flex; align-items: center; justify-content: space-between;">
-                    <span style="color: #0047AB; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; font-family: 'Courier New', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">{{ $companyLabel }}</span>
-                    <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
+                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: white; border-top: 2px solid #0047AB; padding: 0 28px; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: #0047AB; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; font-family: 'Courier New', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">{{ $companyLabel }}</span>
+                        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; overflow: hidden;">
+                        @if($props['trade'] ?? null)
+                            <span style="color: #0047AB; font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Courier New', monospace; opacity: 0.5; border: 1px solid rgba(0, 71, 171, 0.2); padding: 1px 4px; white-space: nowrap;">{{ $props['trade'] }}</span>
+                        @endif
+                        @if($props['city'] ?? null)
+                            <span style="color: #0047AB; font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Courier New', monospace; opacity: 0.5; border: 1px solid rgba(0, 71, 171, 0.2); padding: 1px 4px; white-space: nowrap;">{{ $props['city'] }}</span>
+                        @endif
+                    </div>
                 </div>
             </div>
 
@@ -245,10 +286,20 @@
                 </div>
 
                 {{-- Footer --}}
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 72px; background: #CBB198; border-top: 6px solid #1e293b; padding: 0 28px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 85px; background: #CBB198; border-top: 6px solid #1e293b; padding: 0 28px; display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; flex-direction: column; max-width: 200px; overflow: hidden;">
                         <span style="color: #1e293b; font-size: {{ $lifestyleFontSize }}; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $lifestyleText }}</span>
-                        <span style="color: rgba(30,41,59,0.4); font-size: 8px; font-weight: 900; text-transform: uppercase; font-family: 'Courier New', monospace; margin-top: 2px;">{{ $companyLabel }}</span>
+                        <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+                            <span style="color: rgba(30,41,59,0.4); font-size: 8px; font-weight: 900; text-transform: uppercase; font-family: 'Courier New', monospace;">{{ $companyLabel }}</span>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                @if($props['trade'] ?? null)
+                                    <span style="color: rgba(30,41,59,0.4); font-size: 6px; font-weight: 900; text-transform: uppercase; border: 1px solid rgba(30,41,59,0.2); padding: 0 3px; white-space: nowrap;">{{ $props['trade'] }}</span>
+                                @endif
+                                @if($props['city'] ?? null)
+                                    <span style="color: rgba(30,41,59,0.4); font-size: 6px; font-weight: 900; text-transform: uppercase; border: 1px solid rgba(30,41,59,0.2); padding: 0 3px; white-space: nowrap;">{{ $props['city'] }}</span>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                     <div style="width: 40px; height: 40px; border-radius: 50%; border: 4px solid #1e293b; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                         <div style="width: 16px; height: 16px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
@@ -276,9 +327,19 @@
                 </div>
 
                 {{-- Footer --}}
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 50px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 0 28px; display: flex; align-items: center; justify-content: space-between;">
-                    <span style="color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.9;">{{ $companyLabel }}</span>
-                    <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
+                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 0 28px; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.9;">{{ $companyLabel }}</span>
+                        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        @if($props['trade'] ?? null)
+                            <span style="color: white; font-size: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 1px 5px; white-space: nowrap;">{{ $props['trade'] }}</span>
+                        @endif
+                        @if($props['city'] ?? null)
+                            <span style="color: white; font-size: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 1px 5px; white-space: nowrap;">{{ $props['city'] }}</span>
+                        @endif
+                    </div>
                 </div>
             </div>
 
@@ -305,9 +366,19 @@
                 </div>
 
                 {{-- Footer --}}
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 50px; background: rgba(0,0,0,0.3); padding: 0 28px; display: flex; align-items: center; justify-content: space-between;">
-                    <span style="color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.8;">{{ $companyLabel }}</span>
-                    <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
+                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: rgba(0,0,0,0.3); padding: 0 28px; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.8;">{{ $companyLabel }}</span>
+                        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        @if($props['trade'] ?? null)
+                            <span style="color: white; font-size: 6px; font-weight: 800; text-transform: uppercase; opacity: 0.4; border: 1px solid rgba(255,255,255,0.15); padding: 1px 4px; white-space: nowrap;">{{ $props['trade'] }}</span>
+                        @endif
+                        @if($props['city'] ?? null)
+                            <span style="color: white; font-size: 6px; font-weight: 800; text-transform: uppercase; opacity: 0.4; border: 1px solid rgba(255,255,255,0.15); padding: 1px 4px; white-space: nowrap;">{{ $props['city'] }}</span>
+                        @endif
+                    </div>
                 </div>
             </div>
 
@@ -331,9 +402,19 @@
                 </div>
 
                 {{-- Footer --}}
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 50px; padding: 0 28px; display: flex; align-items: center; justify-content: space-between;">
-                    <span style="color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.7;">{{ $companyLabel }}</span>
-                    <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
+                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60px; padding: 0 28px; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.7;">{{ $companyLabel }}</span>
+                        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        @if($props['trade'] ?? null)
+                            <span style="color: white; font-size: 6px; font-weight: 800; text-transform: uppercase; opacity: 0.3; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 1px 6px; white-space: nowrap;">{{ $props['trade'] }}</span>
+                        @endif
+                        @if($props['city'] ?? null)
+                            <span style="color: white; font-size: 6px; font-weight: 800; text-transform: uppercase; opacity: 0.3; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 1px 6px; white-space: nowrap;">{{ $props['city'] }}</span>
+                        @endif
+                    </div>
                 </div>
             </div>
         @endif
@@ -356,6 +437,8 @@
             :slides="$props['slides'] ?? null"
             :slide-contents="$props['slideContents'] ?? null"
             :template="$props['template'] ?? null"
+            :trade="$props['trade'] ?? null"
+            :city="$props['city'] ?? null"
         />
     @else
         <div style="width: 360px; height: 360px; background: {{ $brandColor }}; color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 40px; text-align: center;">

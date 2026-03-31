@@ -2,8 +2,14 @@
     'brandColor' => '#F59E0B',
     'companyLabel' => 'Votre Société',
     'customerName' => 'Client',
+    'text' => '',
     'logoUrl' => null,
-    'text' => '"Travail impeccable ! L\'équipe a été ponctuelle, propre et le résultat dépasse nos attentes."',
+    'phone' => null,
+    'email' => null,
+    'website' => null,
+    'trade' => null,
+    'city' => null,
+    'slideIndex' => null,
     'preview' => false,
 ])
 
@@ -11,37 +17,96 @@
     @php
         $customerName = 'Jean-Pierre D.';
         $text = '"Une expérience parfaite de A à Z. L\'équipe a su transformer notre vision en réalité avec un professionnalisme exemplaire. Les délais ont été respectés et les finitions sont impeccables. Nous recommandons vivement pour vos projets !"';
+        $phone = $phone ?? '01 23 45 67 89';
+        $email = $email ?? 'contact@votre-artisan.fr';
+        $website = $website ?? 'www.votre-artisan.fr';
+        $trade = $trade ?? 'Artisan';
+        $city = $city ?? 'Ma Ville';
     @endphp
 @endif
 
-<div class="w-full aspect-square flex flex-col items-center justify-center p-10 text-center relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: {{ $brandColor }}">
-    <div class="flex space-x-2 mb-6">
-        @for ($i = 0; $i < 5; $i++)
-            <svg class="w-7 h-7 text-yellow-300 fill-current drop-shadow-md" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-        @endfor
-    </div>
+@php
+    $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
+    $total = 1 + ($hasContactInfo ? 1 : 0);
+    $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
+@endphp
+
+<div {!! $alpineData !!} class="w-full aspect-square relative overflow-hidden flex flex-col justify-end {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
+    
+    {{-- Slide 0 --}}
     @php
-        $len = mb_strlen($text);
-        $fontSize = 'text-2xl';
-        if ($len > 200) $fontSize = 'text-base';
-        elseif ($len > 120) $fontSize = 'text-lg';
-        elseif ($len > 60) $fontSize = 'text-xl';
+        $isSlide0 = (int)$slideIndex === 0 || $slideIndex === null;
+        $slide0Alpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
+        $slide0Style = (int)$slideIndex !== 0 && $slideIndex !== null ? 'display: none;' : '';
     @endphp
-    <div class="flex-1 flex items-center justify-center max-h-[280px] overflow-hidden">
-        <p class="text-white font-black uppercase tracking-tight {{ $fontSize }} leading-tight font-montserrat drop-shadow-sm">
-            {!! nl2br(e($text)) !!}
-        </p>
-    </div>
-    <div class="mt-6 pt-4 border-t border-white/20 w-full">
-        <div class="flex items-center justify-center gap-2">
-            @if ($logoUrl)
-                <img src="{{ $logoUrl }}" alt="Logo" class="h-6 w-6 object-contain rounded">
-            @endif
-            <p class="text-white/80 font-bold text-xs uppercase tracking-widest font-montserrat">{{ $companyLabel }} • {{ $customerName }}</p>
+    <div class="absolute inset-0 flex flex-col items-center justify-center p-10 text-center" {!! $slide0Alpine !!} style="{{ $slide0Style }}; background-color: {{ $brandColor }}">
+        <div class="flex space-x-2 mb-6">
+            @for ($i = 0; $i < 5; $i++)
+                <svg class="w-7 h-7 text-yellow-300 fill-current drop-shadow-md" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+            @endfor
         </div>
+        @php
+            $len = mb_strlen($text);
+            $fontSize = 'text-2xl';
+            if ($len > 200) $fontSize = 'text-base';
+            elseif ($len > 120) $fontSize = 'text-lg';
+            elseif ($len > 60) $fontSize = 'text-xl';
+        @endphp
+        <div class="flex-1 flex items-center justify-center max-h-[280px] overflow-hidden">
+            <p class="text-white font-black uppercase tracking-tight {{ $fontSize }} leading-tight font-montserrat drop-shadow-sm">
+                {!! nl2br(e($text)) !!}
+            </p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/20 w-full flex flex-col items-center gap-2">
+            <div class="flex items-center justify-center gap-2">
+                @if ($logoUrl)
+                    <img src="{{ $logoUrl }}" alt="Logo" class="h-6 w-6 object-contain rounded">
+                @endif
+                <p class="text-white/90 font-bold text-xs uppercase tracking-widest font-montserrat">{{ $companyLabel }} • {{ $customerName }}</p>
+            </div>
+            <div class="flex items-center gap-1.5 mt-0.5">
+                @if($trade)
+                    <span class="px-2 py-0.5 rounded bg-white/20 text-white/70 text-[7px] font-bold uppercase tracking-wider">{{ $trade }}</span>
+                @endif
+                @if($city)
+                    <span class="px-2 py-0.5 rounded bg-white/20 text-white/70 text-[7px] font-bold uppercase tracking-wider">{{ $city }}</span>
+                @endif
+            </div>
+        </div>
+        <div class="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-black/10 rounded-full blur-2xl pointer-events-none"></div>
     </div>
-    <div class="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-    <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-black/10 rounded-full blur-2xl pointer-events-none"></div>
+
+    {{-- Slide 1: Contact --}}
+    @php
+        $isSlide1 = (int)$slideIndex === 1;
+        $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
+        $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
+    @endphp
+    @if($hasContactInfo)
+    <div class="absolute inset-0 bg-white" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
+         <x-post-templates.contact-slide 
+            :brand-color="$brandColor" 
+            :company-label="$companyLabel"
+            :phone="$phone"
+            :email="$email"
+            :website="$website"
+            :trade="$trade"
+            :city="$city"
+        />
+    </div>
+    @endif
+
+    @if($preview)
+        <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-20">
+            <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+        </div>
+    @endif
 </div>

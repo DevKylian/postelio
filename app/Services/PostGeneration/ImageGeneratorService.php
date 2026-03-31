@@ -20,29 +20,13 @@ class ImageGeneratorService
     /**
      * Generate image(s) for a post.
      */
-    public function generate(Post $post, int $width = 1080, int $height = 1080): string|array
+    public function generate(Post $post, int $width = 1080, int $height = 1080): array
     {
-        $template = $post->template;
-
-        if ($template === 'custom') {
-            $photoMode = $post->template_options['custom_photo_mode'] ?? 'none';
-            if ($photoMode === 'carousel') {
-                return $this->generateCarouselViaBrowsershot($post);
-            }
-            return $this->generateSingleViaBrowsershot($post);
-        }
-
-        if (in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq'])) {
-            return $this->generateCarouselViaBrowsershot($post);
-        }
-
-        return $this->generateSingleViaBrowsershot($post);
+        return $this->generateCarouselViaBrowsershot($post);
     }
 
-    public function generateForFacebook(Post $post): string|array
+    public function generateForFacebook(Post $post): array
     {
-        // For Facebook, we can just reuse the existing generated images for now
-        // Facebook accepts square 1080x1080 which is what Browsershot creates.
         return $this->generate($post);
     }
 
@@ -57,34 +41,10 @@ class ImageGeneratorService
             ->timeout(60);
     }
 
-    private function generateSingleViaBrowsershot(Post $post): string
-    {
-        $html = view('render.post', ['post' => $post, 'slideIndex' => null])->render();
-        $fileName = 'posts/' . $post->id . '_generated.jpg';
-        $fullPath = storage_path('app/public/' . $fileName);
-        
-        // Ensure directory exists
-        if (!file_exists(dirname($fullPath))) {
-            mkdir(dirname($fullPath), 0755, true);
-        }
-
-        // Use Browsershot to get the image as a string, then force JPEG via Intervention Image
-        $imageData = $this->getBrowsershotInstance($html)->screenshot();
-
-        $manager = new ImageManager(new Driver());
-        $image = $manager->read($imageData);
-        $image->cover(1080, 1080);
-        $image->toJpeg(90)->save($fullPath);
-
-        Log::debug('Image Generator: Single image saved as JPEG', ['path' => $fullPath]);
-
-        return $fileName;
-    }
-
     private function generateCarouselViaBrowsershot(Post $post): array
     {
         $slides = [];
-        $totalSlides = 3;
+        $totalSlides = 1;
 
         if ($post->template === 'guide_pedagogique') {
             $contentData = json_decode($post->refined_content, true);
@@ -93,19 +53,26 @@ class ImageGeneratorService
         } elseif ($post->template === 'project') {
             $totalSlides = 3;
         } elseif ($post->template === 'faq') {
-            // 1 cover (question) + N answer slides
             $faqContentData = json_decode($post->refined_content, true);
             $faqSlideCount = (is_array($faqContentData) && isset($faqContentData['slides']) && is_array($faqContentData['slides']))
                 ? count($faqContentData['slides'])
                 : 1;
             $totalSlides = 1 + $faqSlideCount;
+        } elseif ($post->template === 'chantier_detail' || $post->template === 'step_by_step') {
+            $totalSlides = count($post->extra_images ?? []) + 1; // +1 for cover/intro
         } else {
-            $totalSlides = count($post->extra_images ?? []) + ($post->image_path ? 1 : 0);
-            if ($post->template === 'step_by_step') {
-                $totalSlides += 1; // +1 for the cover slide
-            }
-            // For custom carousel, ensure we have at least 1 slide if no images
-            if ($totalSlides < 1) $totalSlides = 1; 
+            // Single image templates (lifestyle, quality_focus, review, etc.)
+            $totalSlides = 1;
+        }
+
+        // Add final contact slide only if contact info is provided
+        $company = $post->company;
+        $hasContactInfo = !empty($post->template_options['company_phone'] ?? $company->phone) || 
+                          !empty($post->template_options['company_email'] ?? $company->email) || 
+                          !empty($post->template_options['company_website'] ?? $company->website);
+                          
+        if ($hasContactInfo) {
+            $totalSlides += 1;
         }
 
         for ($i = 0; $i < $totalSlides; $i++) {
@@ -124,7 +91,7 @@ class ImageGeneratorService
             $image->cover(1080, 1080);
             $image->toJpeg(90)->save($fullPath);
             
-            Log::debug("Image Generator: Carousel slide $i saved as JPEG", ['path' => $fullPath]);
+            Log::debug("Image Generator: Slide $i saved as JPEG", ['path' => $fullPath]);
             $slides[] = $fileName;
         }
         

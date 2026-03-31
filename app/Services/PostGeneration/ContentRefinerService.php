@@ -79,8 +79,9 @@ class ContentRefinerService
         $tone = $options['tone'] ?? 'professionnel';
         $includeHashtags = $options['includeHashtags'] ?? true;
         $customNote = $options['customNote'] ?? null;
+        $identity   = $this->identityInstruction($options);
 
-        $prompt = '';
+        $prompt = $identity . "\n\n";
 
         // ── 1. Global anti-hallucination rule ──
         $prompt .= "RÈGLE FONDAMENTALE — Anti-invention (priorité absolue) :\n"
@@ -109,7 +110,6 @@ class ContentRefinerService
         $prompt .= "RÈGLE ABSOLUE : Tu dois TOUJOURS générer le contenu demandé. Si certains champs de contexte "
             . "semblent ne pas correspondre au mémo vocal, ignore-les et travaille avec le transcript uniquement. Ne refuse jamais.\n\n";
 
-        // ── 5. AI role and content instructions ──
         $prompt .= $spec['ai_role'] . ' ' . $this->toneInstruction($tone) . "\n\n";
         $prompt .= "TYPE DE POST : " . $spec['description'] . "\n";
         $prompt .= "INSTRUCTIONS : " . $spec['ai_content_instructions'] . "\n\n";
@@ -147,10 +147,8 @@ class ContentRefinerService
 
         // Caption field
         $captionSpec = $spec['caption'];
-        $hashtagInstruction = $this->hashtagInstruction($includeHashtags, $options);
         $prompt .= "  \"caption\": \"" . $captionSpec['purpose']
-            . " ({$captionSpec['idealChars'][0]}-{$captionSpec['idealChars'][1]} caractères idéal, max {$captionSpec['maxChars']}). "
-            . "{$hashtagInstruction}\",\n";
+            . " ({$captionSpec['idealChars'][0]}-{$captionSpec['idealChars'][1]} caractères idéal, max {$captionSpec['maxChars']}).\",\n";
 
         // Template-specific fields
         foreach ($spec['fields'] as $field) {
@@ -180,8 +178,23 @@ class ContentRefinerService
         $prompt .= "- Chaque texte doit avoir du SENS seul — jamais une phrase coupée au milieu.\n";
 
         if ($photoCount > 0 && $spec['type'] === 'carousel') {
-            $prompt .= "- Nous avons {$photoCount} photos. Adapte le nombre de slides en conséquence.\n";
+             $prompt .= "- Nous avons {$photoCount} photos. Adapte le nombre de slides en conséquence.\n";
         }
+
+        $prompt .= "}\n\n";
+
+        // ── 9. Critical Global Constraints (High Priority) ──
+        $hashtagInstruction = $this->hashtagInstruction($includeHashtags, $options);
+        $captionStructure = empty($options['simplified']) ? $this->captionStructureInstruction($options) : "";
+        
+        if ($captionStructure || $hashtagInstruction) {
+            $prompt .= "CONSIGNES IMPÉRATIVES POUR LE CHAMP 'caption' :\n"
+                . $captionStructure . "\n"
+                . $hashtagInstruction . "\n"
+                . "!!! ATTENTION !!! : Les hashtags (Partie 7) DOIVENT être inclus À L'INTÉRIEUR de la valeur du champ 'caption'. Ne les oublie JAMAIS.\n\n";
+        }
+
+        $prompt .= "Réponds UNIQUEMENT par l'objet JSON ci-dessus, sans aucun texte avant ou après.";
 
         return $prompt;
     }
@@ -216,7 +229,7 @@ class ContentRefinerService
     }
 
     /**
-     * Build the hashtag instruction string.
+     * Build the hashtag instruction string (Part 7 of the structure).
      */
     private function hashtagInstruction(bool $includeHashtags, array $options): string
     {
@@ -229,11 +242,51 @@ class ContentRefinerService
         $locationTag = $city ? "#" . str_replace(' ', '', $city) : null;
         $tradeTag = $trade ? "#" . str_replace([' ', '/'], '', $trade) : null;
 
-        return "Ajoute exactement 5 hashtags à la fin de la légende, séparés par une ligne vide. "
-            . "Structure : 2 métier" . ($tradeTag ? " (dont {$tradeTag})" : "")
-            . " + 2 locaux" . ($locationTag ? " (dont {$locationTag} et #Artisan" . str_replace('#', '', $locationTag) . ")" : " (ville/département)")
-            . " + 1 hashtag #Postelio (indispensable à la fin). "
-            . "Sois pertinent et local pour attirer des clients de proximité.";
+        return "STRUCTURE DES HASHTAGS (Partie 7) : Ajoute exactement entre 5 et 8 hashtags maximum à la fin de la légende, séparés par une ligne vide. "
+            . "Trie-les par pertinence : "
+            . "1. Métier" . ($tradeTag ? " (priorité : {$tradeTag})" : "") . " "
+            . "> 2. Action spécifique "
+            . "> 3. Matériau/Technique "
+            . "> 4. Ville/Secteur OBLIGATOIRE : " . ($locationTag ? "Tu DOIS utiliser {$locationTag}." : "Ajoute un hashtag de ville (ex: #Lannion).") . " "
+            . "> 5. #Postelio (indispensable à la fin).";
+    }
+
+    /**
+     * Define the mandatory 7-part structure for Instagram captions.
+     */
+    private function captionStructureInstruction(array $options): string
+    {
+        $phone = $options['company_phone'] ?? null;
+        $email = $options['company_email'] ?? null;
+        
+        $ctaPart = "6. L'Appel à l'action (Le CTA de conversion) : Une phrase d'invitation au contact.";
+        if ($phone || $email) {
+            $ctaPart .= " Ajoute obligatoirement les coordonnées suivantes sur une nouvelle ligne :";
+            if ($phone) $ctaPart .= "\n📞 {$phone}";
+            if ($email) $ctaPart .= "\n📧 {$email}";
+        } else {
+            $ctaPart .= " Ne mets AUCUNE coordonnée (ni téléphone, ni email) si elles ne sont pas fournies dans le contexte.";
+        }
+
+        $city = $options['company_city'] ?? null;
+        $locationPart = "2. La Localisation (Le SEO Local) : Une simple mention de la ville ou du secteur pour attirer l'algorithme local d'Instagram.";
+        if ($city) {
+            $locationPart .= " Applique IMPÉRATIVEMENT la phrase suivante en utilisant la ville de l'identité ci-dessus : 📍 Intervention sur le secteur de {$city}.";
+        } else {
+            $locationPart .= " (ex: 📍 Intervention sur le secteur de [Ville]).";
+        }
+
+        $clientName = $options['clientName'] ?? null;
+        $clientPart = $clientName ? " (mentionne le client : {$clientName})" : "";
+
+        return "\nSTRUCTURE OBLIGATOIRE DE LA LÉGENDE (Respecte ces 7 points dans l'ordre, c'est CRUCIAL) :\n"
+            . "1. L'Accroche visuelle (Le Hook) : Un émoji lié au métier + une phrase courte annonçant la fin du projet ou le type de réalisation{$clientPart}.\n"
+            . "{$locationPart}\n"
+            . "3. Le Contexte et la Technique (Le Corps du texte) : Un court paragraphe (2-3 phrases) qui explique ce qui a été fait, les matériaux ou marques utilisés, la spécificité technique. Intègre ici les éléments clés du mémo vocal.\n"
+            . "4. Les Bénéfices pour le client (La Preuve de valeur) : Une courte phrase d'introduction puis une liste à puces de 3 ou 4 points (avec des emojis ✔️ ou ✨). Traduis la technique en avantages concrets pour le client final.\n"
+            . "5. La Conclusion humaine (La Fierté) : Une phrase chaleureuse sur le résultat final ou la satisfaction du client (ex: \"Une superbe transformation pour moderniser cette pièce de vie ! 👌\").\n"
+            . "{$ctaPart}\n"
+            . "7. Le Bloc de Hashtags : Ajoute OBLIGATOIREMENT le bloc de hashtags juste après une ligne vide. Ne l'oublie JAMAIS. Voir la consigne de hashtags ci-dessous.\n";
     }
 
     /**
@@ -269,7 +322,11 @@ class ContentRefinerService
         $noRefuseRule = "RÈGLE ABSOLUE : Tu dois TOUJOURS générer le contenu demandé. Ne refuse jamais.\n\n";
 
         $captionRange = "200-400 caractères";
+        $identity     = $this->identityInstruction($options);
 
+        $prompt = $identity . "\n\n" . $noHallucinateGlobal . $noMarkdownPrefix . $noRefuseRule . $textZoneRule;
+        
+        $imgConstraint = 'max 80 car.';
         if ($template === 'custom') {
             $customPrompt = $options['custom_template_prompt'] ?? null;
             $layout = $options['custom_layout_type'] ?? 'standard';
@@ -281,21 +338,23 @@ class ContentRefinerService
             $imgConstraint = "STRICTEMENT entre {$min} et {$max} caractères (maximum absolu : {$hard} car.)";
 
             if ($customPrompt) {
-                return $noHallucinateGlobal . $noMarkdownPrefix . $textZoneRule
-                    . "{$customPrompt}"
+                $prompt .= "{$customPrompt}"
                     . "\n\nCONTRAINTE TEXTE IMAGE : Le champ image_text doit faire {$imgConstraint}. Au-delà, le texte sera tronqué."
-                    . "\n\n{$toneInstruction}"
-                    . "\n" . ($includeHashtags ? "Ajoute 3 à 5 hashtags pertinents à la fin de la légende. Le dernier doit TOUJOURS être #Postelio." : "N'ajoute aucun hashtag.")
-                    . ($extraNote ? "\n{$extraNote}" : "");
+                    . "\n\n{$toneInstruction}";
+            } else {
+                $prompt .= "Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote}";
             }
-            return $noHallucinateGlobal . $noMarkdownPrefix . $noRefuseRule . $textZoneRule
-                . "Tu es un expert en marketing pour artisans. {$toneInstruction}{$extraNote} "
-                . "Tu dois répondre UNIQUEMENT par un objet JSON valide : {\"caption\": \"Légende Instagram ({$captionRange}). {$hashtagInstruction}\", \"image_text\": \"Titre accrocheur et concis ({$imgConstraint}, phrase complète). Sans hashtag.\"}";
+        } else {
+            $prompt .= "Tu es un expert en marketing pour artisans. Ton but est de générer une légende Instagram courte (150 caractères max) et un titre d'image concis (maximum 80 caractères).";
         }
 
-        // Unknown template — generic fallback
-        return $noHallucinateGlobal . $noMarkdownPrefix . $noRefuseRule . $textZoneRule
-            . "Tu dois répondre UNIQUEMENT par un objet JSON valide : {\"caption\": \"Légende Instagram courte (150 caractères max). {$hashtagInstruction}\", \"image_text\": \"Titre concis (maximum 80 caractères, complet)\"}";
+        $prompt .= "\n\n" . $this->captionStructureInstruction($options);
+        $prompt .= "\n\n" . $this->hashtagInstruction($includeHashtags, $options);
+        
+        $prompt .= "\n\nRÉPONDS UNIQUEMENT PAR CE JSON :\n";
+        $prompt .= "{\n  \"caption\": \"La légende suivant STRICTEMENT la structure ci-dessus.\",\n  \"image_text\": \"Titre accrocheur ({$imgConstraint})\"\n}";
+
+        return $prompt;
     }
 
     /**
@@ -371,6 +430,8 @@ class ContentRefinerService
 
     public function extractFields(string $transcript): array
     {
+        \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] ContentRefinerService::extractFields started');
+        
         $prompt = "Tu es un assistant expert en extraction de données pour artisans.
 À partir du transcript d'un mémo vocal, extrais les informations suivantes sous forme de JSON uniquement.
 Si une information n'est pas présente, mets null.
@@ -397,19 +458,52 @@ Structure JSON attendue :
 
 IMPORTANT : Ne sors RIEN d'autre que du JSON. Sois précis sur les catégories.";
 
-        $response = OpenAI::chat()->create([
-            'model' => 'gpt-4o',
-            'messages' => [
-                ['role' => 'system', 'content' => $prompt],
-                ['role' => 'user', 'content' => "Transcript : " . $transcript],
-            ],
-            'response_format' => ['type' => 'json_object'],
-            'temperature' => 0,
-        ]);
+        try {
+            \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Calling OpenAI for extraction...');
+            $response = OpenAI::chat()->create([
+                'model' => 'gpt-4o',
+                'messages' => [
+                    ['role' => 'system', 'content' => $prompt],
+                    ['role' => 'user', 'content' => "Transcript : " . $transcript],
+                ],
+                'response_format' => ['type' => 'json_object'],
+                'temperature' => 0,
+            ]);
+            \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] OpenAI Response received');
 
-        $data = json_decode($response->choices[0]->message->content, true);
+            $data = json_decode($response->choices[0]->message->content, true);
+            \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] JSON decoded', ['data' => $data]);
 
-        return is_array($data) ? $data : [];
+            return is_array($data) ? $data : [];
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('[AUDIO DEBUG] OpenAI Extraction Error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Build the identity block for the AI.
+     */
+    private function identityInstruction(array $options): string
+    {
+        $name = $options['company_name'] ?? 'Inconnu';
+        $city = $options['company_city'] ?? 'France';
+        $trade = $options['company_trade'] ?? 'Artisan';
+        $phone = $options['company_phone'] ?? null;
+        $email = $options['company_email'] ?? null;
+
+        $str = "═══ IDENTITÉ DE L'ARTISAN (CRITIQUE) ═══\n"
+            . "- ENTREPRISE : {$name}\n"
+            . "- VILLE/SECTEUR : {$city}\n"
+            . "- MÉTIER : {$trade}";
+        
+        if ($phone) $str .= "\n- TÉLÉPHONE : {$phone}";
+        if ($email) $str .= "\n- EMAIL : {$email}";
+
+        return $str;
     }
 
     private function toneInstruction(string $tone): string

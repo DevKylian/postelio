@@ -327,62 +327,6 @@
                         </div>
                     </div>
 
-                    {{-- Quick Nav --}}
-                    <div class="glass-panel rounded-2xl overflow-hidden">
-                        <div class="px-5 py-3.5 border-b border-gray-50">
-                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Accès rapide</p>
-                        </div>
-                        <div class="divide-y divide-gray-50">
-                            <a href="{{ route('posts.index') }}" wire:navigate
-                               class="flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors group">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
-                                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                        </svg>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Mes créations</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    @if($totalPosts > 0)
-                                        <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{{ $totalPosts }}</span>
-                                    @endif
-                                    <svg class="w-3.5 h-3.5 text-gray-300 group-hover:text-gray-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </div>
-                            </a>
-                            <a href="{{ route('templates-preview') }}" wire:navigate
-                               class="flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors group">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
-                                        <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-                                        </svg>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Gabarits</span>
-                                </div>
-                                <svg class="w-3.5 h-3.5 text-gray-300 group-hover:text-gray-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </a>
-                            <a href="{{ route('post-settings') }}" wire:navigate
-                               class="flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors group">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-7 h-7 rounded-lg bg-copper/10 flex items-center justify-center">
-                                        <svg class="w-3.5 h-3.5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-700">Paramètres</span>
-                                </div>
-                                <svg class="w-3.5 h-3.5 text-gray-300 group-hover:text-gray-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
 
                 </div>
 

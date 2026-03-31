@@ -155,7 +155,7 @@ $deleteTemplate = function (int $id) {
         $brandColor      = $company?->brand_color ?? '#F59E0B';
         $companyName     = $company?->name ?? 'Votre Société';
         $companyCity     = $company?->city ?? '';
-        $companyLabel    = $companyName . ($companyCity ? '  ·  ' . strtoupper($companyCity) : '');
+        $companyLabel    = $companyName;
         $hasLogo         = $company?->logo_path && Storage::disk('public')->exists($company->logo_path);
         
         // Custom templates: only active ones for regular users
@@ -246,7 +246,7 @@ $deleteTemplate = function (int $id) {
                 {{-- ── Avant/Après ── --}}
                 @if($isNativeActive('project'))
                 <div class="space-y-4 group">
-                    <x-post-templates.project :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                    <x-post-templates.project :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Avant / Après</h4><p class="text-gray-500 text-sm">Parfait pour valoriser vos rénovations et finitions.</p></div>
                 </div>
                 @endif
@@ -254,7 +254,7 @@ $deleteTemplate = function (int $id) {
                 {{-- ── Avis Client ── --}}
                 @if($isNativeActive('review'))
                 <div class="space-y-4 group">
-                    <x-post-templates.review :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
+                    <x-post-templates.review :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Avis Client</h4><p class="text-gray-500 text-sm">Transformez vos témoignages en preuves sociales fortes.</p></div>
                 </div>
                 @endif
@@ -262,7 +262,7 @@ $deleteTemplate = function (int $id) {
                 {{-- ── FAQ Artisan ── --}}
                 @if($isNativeActive('faq'))
                 <div class="space-y-4 group">
-                    <x-post-templates.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
+                    <x-post-templates.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">FAQ Artisan</h4><p class="text-gray-500 text-sm">Éduquez vos clients et affirmez votre professionnalisme.</p></div>
                 </div>
                 @endif
@@ -270,7 +270,7 @@ $deleteTemplate = function (int $id) {
                 {{-- ── Lifestyle ── --}}
                 @if($isNativeActive('lifestyle'))
                 <div class="space-y-4 group">
-                    <x-post-templates.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
+                    <x-post-templates.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Lifestyle</h4><p class="text-gray-500 text-sm">Une immersion brute dans votre métier, sans artifices.</p></div>
                 </div>
                 @endif
@@ -278,7 +278,7 @@ $deleteTemplate = function (int $id) {
                 {{-- ── Focus Qualité ── --}}
                 @if($isNativeActive('quality_focus'))
                 <div class="space-y-4 group">
-                    <x-post-templates.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
+                    <x-post-templates.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Focus Qualité</h4><p class="text-gray-500 text-sm">Valorisez la qualité de vos matériaux et équipements.</p></div>
                 </div>
                 @endif
@@ -286,7 +286,7 @@ $deleteTemplate = function (int $id) {
                 {{-- ── Chantier en Détail ── --}}
                 @if($isNativeActive('chantier_detail'))
                 <div class="space-y-4 group">
-                    <x-post-templates.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
+                    <x-post-templates.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Chantier en Détail</h4><p class="text-gray-500 text-sm">Une immersion complète avec plusieurs photos d'un même projet.</p></div>
                 </div>
                 @endif
@@ -294,7 +294,7 @@ $deleteTemplate = function (int $id) {
                 {{-- ── Step-by-Step ── --}}
                 @if($isNativeActive('step_by_step'))
                 <div class="space-y-4 group">
-                    <x-post-templates.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                    <x-post-templates.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Step-by-Step</h4><p class="text-gray-500 text-sm">Expliquez votre expertise étape par étape, didactique et rassurant.</p></div>
                 </div>
                 @endif
@@ -302,7 +302,7 @@ $deleteTemplate = function (int $id) {
                 {{-- ── Conseil Saisonnier ── --}}
                 @if($isNativeActive('conseil_saisonnier'))
                 <div class="space-y-4 group">
-                    <x-post-templates.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
+                    <x-post-templates.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Conseil Saisonnier</h4><p class="text-gray-500 text-sm">Anticipez les besoins de vos clients selon la saison.</p></div>
                 </div>
                 @endif
@@ -310,7 +310,7 @@ $deleteTemplate = function (int $id) {
                 {{-- ── Erreur à Éviter ── --}}
                 @if($isNativeActive('erreur_a_eviter'))
                 <div class="space-y-4 group">
-                    <x-post-templates.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
+                    <x-post-templates.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Erreur à Éviter</h4><p class="text-gray-500 text-sm">Un format alerte très engageant pour éduquer vos clients.</p></div>
                 </div>
                 @endif
@@ -318,7 +318,7 @@ $deleteTemplate = function (int $id) {
                 {{-- ── Guide Pédagogique ── --}}
                 @if($isNativeActive('guide_pedagogique'))
                 <div class="space-y-4 group">
-                    <x-post-templates.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                    <x-post-templates.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                     <div><h4 class="font-bold text-midnight text-lg">Guide Pédagogique</h4><p class="text-gray-500 text-sm">Apportez de la valeur et positionnez-vous en expert conseil.</p></div>
                 </div>
                 @endif
@@ -337,7 +337,7 @@ $deleteTemplate = function (int $id) {
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {{-- Glass Avant/Après --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.glass.project :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.glass.project :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Glass Avant / Après</h4>
                             <p class="text-gray-500 text-sm italic">Un style futuriste et épuré pour vos réalisations.</p>
@@ -346,7 +346,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Glass Review --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.glass.review :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.glass.review :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Glass Avis Client</h4>
                             <p class="text-gray-500 text-sm italic">Mettez en valeur vos retours clients avec élégance.</p>
@@ -355,7 +355,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Glass FAQ --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.glass.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.glass.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Glass FAQ</h4>
                             <p class="text-gray-500 text-sm italic">Répondez aux questions avec un design premium.</p>
@@ -364,7 +364,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Glass Lifestyle --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.glass.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" />
+                        <x-post-templates.glass.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Glass Lifestyle</h4>
                             <p class="text-gray-500 text-sm italic">Une immersion brute et moderne dans votre métier.</p>
@@ -373,7 +373,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Glass Quality Focus --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.glass.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.glass.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Glass Focus Qualité</h4>
                             <p class="text-gray-500 text-sm italic">Valorisez vos matériaux avec précision.</p>
@@ -382,7 +382,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Glass Chantier Détail --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.glass.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.glass.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Glass Chantier Détail</h4>
                             <p class="text-gray-500 text-sm italic">Explorez chaque recoin de vos projets.</p>
@@ -391,7 +391,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Glass Step-by-Step --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.glass.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.glass.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Glass Step-by-Step</h4>
                             <p class="text-gray-500 text-sm italic">Partagez votre expertise étape par étape.</p>
@@ -400,7 +400,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Glass Conseil Saisonnier --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.glass.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.glass.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Glass Conseil Saisonnier</h4>
                             <p class="text-gray-500 text-sm italic">Le bon conseil, pour le bon moment.</p>
@@ -409,7 +409,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Glass Erreur à Éviter --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.glass.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.glass.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Glass Erreur à Éviter</h4>
                             <p class="text-gray-500 text-sm italic">Éduquez avec un design d'alerte premium.</p>
@@ -418,7 +418,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Glass Guide Pédagogique --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.glass.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.glass.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Glass Guide Pédagogique</h4>
                             <p class="text-gray-500 text-sm italic">Devenez la référence conseil de votre secteur.</p>
@@ -440,7 +440,7 @@ $deleteTemplate = function (int $id) {
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {{-- Blueprint Project --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.blueprint.project :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.blueprint.project :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Blueprint Avant / Après</h4>
                             <p class="text-gray-500 text-sm italic">Le chantier vu comme un projet d'architecte.</p>
@@ -449,7 +449,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Blueprint Review --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.blueprint.review :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.blueprint.review :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Blueprint Avis</h4>
                             <p class="text-gray-500 text-sm italic">La validation technique de vos clients.</p>
@@ -458,7 +458,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Blueprint FAQ --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.blueprint.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.blueprint.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Blueprint FAQ</h4>
                             <p class="text-gray-500 text-sm italic">Des réponses claires et documentées.</p>
@@ -467,7 +467,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Blueprint Lifestyle --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.blueprint.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" />
+                        <x-post-templates.blueprint.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Blueprint Lifestyle</h4>
                             <p class="text-gray-500 text-sm italic">L'immersion brute dans vos réalisations.</p>
@@ -476,7 +476,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Blueprint Quality --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.blueprint.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.blueprint.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Blueprint Focus Qualité</h4>
                             <p class="text-gray-500 text-sm italic">L'analyse détaillée de vos matériaux.</p>
@@ -485,7 +485,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Blueprint Chantier --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.blueprint.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.blueprint.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Blueprint Zoom Chantier</h4>
                             <p class="text-gray-500 text-sm italic">Le dossier technique de vos chantiers.</p>
@@ -494,7 +494,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Blueprint Steps --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.blueprint.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.blueprint.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Blueprint Étapes</h4>
                             <p class="text-gray-500 text-sm italic">Votre méthodologie, étape par étape.</p>
@@ -503,7 +503,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Blueprint Seasonal --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.blueprint.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.blueprint.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Blueprint Saison</h4>
                             <p class="text-gray-500 text-sm italic">Le conseil expert, archivé et précis.</p>
@@ -512,7 +512,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Blueprint Alert --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.blueprint.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.blueprint.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Blueprint Alerte</h4>
                             <p class="text-gray-500 text-sm italic">Éduquez avec la rigueur d'un expert.</p>
@@ -521,7 +521,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Blueprint Guide --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.blueprint.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.blueprint.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Blueprint Guide</h4>
                             <p class="text-gray-500 text-sm italic">Votre base de connaissance technique.</p>
@@ -543,7 +543,7 @@ $deleteTemplate = function (int $id) {
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {{-- Kraft Project --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.kraft.project :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.kraft.project :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Kraft Avant / Après</h4>
                             <p class="text-gray-500 text-sm italic">L'authenticité du chantier, étape par étape.</p>
@@ -552,7 +552,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Kraft Review --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.kraft.review :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.kraft.review :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Kraft Avis Client</h4>
                             <p class="text-gray-500 text-sm italic">La validation brute de vos clients satisfaits.</p>
@@ -561,7 +561,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Kraft FAQ --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.kraft.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.kraft.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Kraft FAQ</h4>
                             <p class="text-gray-500 text-sm italic">Des réponses franches à vos clients.</p>
@@ -570,7 +570,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Kraft Lifestyle --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.kraft.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" />
+                        <x-post-templates.kraft.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Kraft Lifestyle</h4>
                             <p class="text-gray-500 text-sm italic">Votre métier au naturel, sans filtre.</p>
@@ -579,7 +579,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Kraft Quality --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.kraft.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.kraft.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Kraft Focus Qualité</h4>
                             <p class="text-gray-500 text-sm italic">La précision technique mise en avant.</p>
@@ -588,7 +588,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Kraft Chantier --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.kraft.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.kraft.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Kraft Zoom Chantier</h4>
                             <p class="text-gray-500 text-sm italic">Le rapport de chantier visuel et efficace.</p>
@@ -597,7 +597,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Kraft Steps --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.kraft.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.kraft.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Kraft Étapes</h4>
                             <p class="text-gray-500 text-sm italic">Une méthodologie claire et industrielle.</p>
@@ -606,7 +606,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Kraft Seasonal --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.kraft.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.kraft.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Kraft Saison</h4>
                             <p class="text-gray-500 text-sm italic">Le mémo technique pour chaque saison.</p>
@@ -615,7 +615,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Kraft Alert --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.kraft.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.kraft.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Kraft Alerte</h4>
                             <p class="text-gray-500 text-sm italic">Évitez les erreurs avec un design impactant.</p>
@@ -624,7 +624,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Kraft Guide --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.kraft.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.kraft.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Kraft Guide</h4>
                             <p class="text-gray-500 text-sm italic">Le guide pratique de votre savoir-faire.</p>
@@ -646,7 +646,7 @@ $deleteTemplate = function (int $id) {
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {{-- Béton Project --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.beton.project :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.beton.project :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Béton Avant / Après</h4>
                             <p class="text-gray-500 text-sm italic">Modernité et solidité visuelle.</p>
@@ -655,7 +655,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Béton Review --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.beton.review :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.beton.review :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Béton Avis Client</h4>
                             <p class="text-gray-500 text-sm italic">Le témoignage de confiance ancré dans le réel.</p>
@@ -664,7 +664,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Béton FAQ --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.beton.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.beton.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Béton FAQ</h4>
                             <p class="text-gray-500 text-sm italic">Réponses précises et professionnelles.</p>
@@ -673,7 +673,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Béton Lifestyle --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.beton.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.beton.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Béton Lifestyle</h4>
                             <p class="text-gray-500 text-sm italic">L'immersion moderne sur vos chantiers.</p>
@@ -682,7 +682,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Béton Quality --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.beton.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.beton.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Béton Focus Qualité</h4>
                             <p class="text-gray-500 text-sm italic">Le détail qui fait la différence.</p>
@@ -691,7 +691,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Béton Chantier --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.beton.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.beton.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Béton Zoom Chantier</h4>
                             <p class="text-gray-500 text-sm italic">Vue technique et multi-angle.</p>
@@ -700,7 +700,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Béton Steps --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.beton.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.beton.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Béton Étapes Pro</h4>
                             <p class="text-gray-500 text-sm italic">Votre méthodologie en 3 étapes claires.</p>
@@ -709,7 +709,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Béton Seasonal --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.beton.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.beton.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Béton Dossier</h4>
                             <p class="text-gray-500 text-sm italic">Le mémo technique indispensable.</p>
@@ -718,7 +718,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Béton Alert --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.beton.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.beton.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Béton Alerte Erreur</h4>
                             <p class="text-gray-500 text-sm italic">Prévention et conseils d'expert.</p>
@@ -727,7 +727,7 @@ $deleteTemplate = function (int $id) {
 
                     {{-- Béton Guide --}}
                     <div class="space-y-4 group">
-                        <x-post-templates.beton.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :preview="true" />
+                        <x-post-templates.beton.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" />
                         <div>
                             <h4 class="font-bold text-midnight text-lg">Béton Guide Pratique</h4>
                             <p class="text-gray-500 text-sm italic">L'accompagnement client par l'artisan.</p>

@@ -1,22 +1,34 @@
 @props([
     'brandColor' => '#F59E0B',
     'companyLabel' => 'Votre Société',
+    'title' => 'Vos questions, nos réponses',
+    'question' => '',
+    'answer' => '',
     'logoUrl' => null,
-    'question' => 'Pourquoi choisir une isolation par l\'extérieur ?',
-    'answer' => 'Cela permet de supprimer les ponts thermiques et de rafraîchir la façade sans perdre de surface habitable.',
-    'preview' => false,
+    'phone' => null,
+    'email' => null,
+    'website' => null,
+    'trade' => null,
+    'city' => null,
     'slideIndex' => null,
+    'preview' => false,
 ])
 
 @if($preview)
     @php
         $question = 'Quels sont les délais moyens pour une rénovation complète de toiture ?';
         $answer = 'Il faut compter entre 1 et 2 semaines selon la surface et la complexité de la charpente.';
+        $phone = $phone ?? '01 23 45 67 89';
+        $email = $email ?? 'contact@votre-artisan.fr';
+        $website = $website ?? 'www.votre-artisan.fr';
+        $trade = $trade ?? 'Artisan';
+        $city = $city ?? 'Ma Ville';
     @endphp
 @endif
 
 @php
-    $total = 2;
+    $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
+    $total = 2 + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
@@ -27,9 +39,9 @@
         
         {{-- Slide 0: Question --}}
         @php
-            $isSlide0 = $slideIndex === null || $slideIndex === 0;
+            $isSlide0 = (int)$slideIndex === 0 || $slideIndex === null;
             $slide0Alpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
-            $slide0Style = !$isSlide0 ? 'display: none;' : '';
+            $slide0Style = (int)$slideIndex !== 0 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         <div {!! $slide0Alpine !!} style="{{ $slide0Style }}">
             <h3 class="font-black uppercase tracking-widest text-sm mb-4" style="color: {{ $brandColor }}">FAQ Artisan</h3>
@@ -44,11 +56,11 @@
             </div>
         </div>
 
-        {{-- Slide 1+: Answer --}}
+        {{-- Slide 1: Answer --}}
         @php
-            $isSlide1 = $slideIndex !== null && $slideIndex >= 1;
+            $isSlide1 = (int)$slideIndex === 1;
             $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
-            $slide1Style = !$isSlide1 ? 'display: none;' : '';
+            $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         <div {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             <h3 class="font-black uppercase tracking-widest text-sm mb-4" style="color: {{ $brandColor }}">La Réponse</h3>
@@ -62,22 +74,58 @@
                 <p class="text-white font-bold {{ $aFontSize }} leading-relaxed font-montserrat">{!! nl2br(e($answer)) !!}</p>
             </div>
         </div>
+
+        {{-- Slide 2: Contact --}}
+        @php
+            $isSlide2 = (int)$slideIndex === 2;
+            $slide2Alpine = $slideIndex === null ? "x-show=\"current === 2\" style=\"display: none;\"" : '';
+            $slide2Style = (int)$slideIndex !== 2 && $slideIndex !== null ? 'display: none;' : '';
+        @endphp
+        @if($hasContactInfo)
+        <div class="absolute inset-x-10 inset-y-0 flex items-center justify-center bg-white rounded-xl my-10" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
+             <x-post-templates.contact-slide 
+                :brand-color="$brandColor" 
+                :company-label="$companyLabel"
+                :phone="$phone"
+                :email="$email"
+                :website="$website"
+                :trade="$trade"
+                :city="$city"
+                theme="light"
+            />
+        </div>
+        @endif
     </div>
 
     {{-- Footer --}}
-    <div class="pt-4 border-t border-white/10 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            @if ($logoUrl)
-                <img src="{{ $logoUrl }}" alt="Logo" class="h-5 w-5 object-contain rounded">
-            @endif
-            <p class="font-bold text-xs uppercase tracking-widest font-montserrat" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
-        </div>
-        
-        @if($preview || $slideIndex !== null)
-            <div class="text-white/40 text-[10px] font-bold" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
-                @if(!$preview) {{ $slideIndex + 1 }} / {{ $total }} @endif
+    <div class="pt-4 border-t border-white/10 flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                @if ($logoUrl)
+                    <img src="{{ $logoUrl }}" alt="Logo" class="h-5 w-5 object-contain rounded">
+                @endif
+                <p class="font-bold text-xs uppercase tracking-widest font-montserrat" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
             </div>
-        @endif
+            
+            @if($preview || $slideIndex !== null)
+                @php
+                    $showTotal = $hasContactInfo ? ((int)$slideIndex !== 2) : true;
+                @endphp
+                @if($showTotal)
+                <div class="text-white/40 text-[10px] font-bold" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
+                    @if(!$preview) {{ (int)$slideIndex + 1 }} / {{ $total }} @endif
+                </div>
+                @endif
+            @endif
+        </div>
+        <div class="flex items-center gap-1.5 overflow-hidden">
+            @if($trade)
+                <span class="px-1.5 py-0.5 rounded bg-white/5 text-white/30 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $trade }}</span>
+            @endif
+            @if($city)
+                <span class="px-1.5 py-0.5 rounded bg-white/5 text-white/30 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $city }}</span>
+            @endif
+        </div>
     </div>
 
     {{-- Controls (Preview Only) --}}

@@ -1,12 +1,17 @@
 @props([
     'brandColor' => '#F59E0B',
     'companyLabel' => 'Votre Société',
+    'title' => 'Détails du chantier',
+    'slides' => [],
+    'slideContents' => [],
     'logoUrl' => null,
-    'title' => 'Rénovation complète d\'une toiture à Nantes',
-    'slides' => [null, null, null], // array of image URLs
-    'slideContents' => [], // array of texts corresponding to slides
+    'phone' => null,
+    'email' => null,
+    'website' => null,
+    'trade' => null,
+    'city' => null,
+    'slideIndex' => null,
     'preview' => false,
-    'slideIndex' => null, // null = interactive alpine preview, int = render specific slide
 ])
 
 @if($preview)
@@ -22,11 +27,17 @@
             'Installation des collecteurs et mise en pression.',
             'Finalisation des raccordements et test de chauffe.'
         ];
+        $phone = $phone ?? '01 23 45 67 89';
+        $email = $email ?? 'contact@votre-artisan.fr';
+        $website = $website ?? 'www.votre-artisan.fr';
+        $trade = $trade ?? 'Artisan';
+        $city = $city ?? 'Ma Ville';
     @endphp
 @endif
 
 @php
-    $total = count($slides);
+    $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
+    $total = count($slides) + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
@@ -74,11 +85,40 @@
             </div>
         @endforeach
 
-        <div class="absolute inset-x-0 bottom-0 py-2.5 px-6 flex items-center justify-center" style="background-color: rgba(0,0,0,0.85)">
+        {{-- Slide Index (Contact) --}}
+        @php
+            $contactIdx = count($slides);
+            $isContactVisible = $slideIndex === null || (int)$slideIndex === $contactIdx;
+            $contactAlpine = $slideIndex === null ? "x-show=\"current === $contactIdx\" style=\"display: none;\"" : '';
+            $contactStyle = (int)$slideIndex !== $contactIdx && $slideIndex !== null ? 'display: none;' : '';
+        @endphp
+        @if($hasContactInfo)
+        <div class="absolute inset-0 bg-white" {!! $contactAlpine !!} style="{{ $contactStyle }}">
+             <x-post-templates.contact-slide 
+                :brand-color="$brandColor" 
+                :company-label="$companyLabel"
+                :phone="$phone"
+                :email="$email"
+                :website="$website"
+                :trade="$trade"
+                :city="$city"
+            />
+        </div>
+        @endif
+
+        <div class="absolute inset-x-0 bottom-0 py-2 px-6 flex flex-col items-center justify-center bg-black/85">
+            <p class="text-white font-bold uppercase tracking-widest text-[9px] font-montserrat mb-1">{{ $companyLabel }}</p>
+            <div class="flex items-center gap-1.5 overflow-hidden">
+                @if($trade)
+                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $trade }}</span>
+                @endif
+                @if($city)
+                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $city }}</span>
+                @endif
+            </div>
             @if ($logoUrl)
-                <img src="{{ $logoUrl }}" alt="Logo" class="h-5 w-5 object-contain rounded absolute right-6">
+                <img src="{{ $logoUrl }}" alt="Logo" class="h-4 w-4 object-contain rounded absolute right-6">
             @endif
-            <p class="text-white font-bold uppercase tracking-widest text-[10px] font-montserrat">{{ $companyLabel }}</p>
         </div>
 
         @if($preview)

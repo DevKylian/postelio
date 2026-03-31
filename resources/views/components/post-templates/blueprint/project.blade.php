@@ -1,6 +1,11 @@
 @props([
     'brandColor' => '#F59E0B',
     'companyLabel' => 'Votre Société',
+    'phone' => null,
+    'email' => null,
+    'website' => null,
+    'trade' => null,
+    'city' => null,
     'imageBeforeUrl' => null,
     'imageAfterUrl' => null,
     'text' => 'TRANSFORMATION',
@@ -13,11 +18,17 @@
         $imageBeforeUrl = $imageBeforeUrl ?? 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=800';
         $imageAfterUrl = $imageAfterUrl ?? 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?q=80&w=800';
         $text = ($text === 'TRANSFORMATION') ? 'Rénovation Complète d\'Intérieur' : $text;
+        $phone = $phone ?? '01 23 45 67 89';
+        $email = $email ?? 'contact@votre-artisan.fr';
+        $website = $website ?? 'www.votre-artisan.fr';
+        $trade = $trade ?? 'Artisan';
+        $city = $city ?? 'Ma Ville';
     @endphp
 @endif
 
 @php
-    $total = 3;
+    $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
+    $total = 3 + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
@@ -32,9 +43,9 @@
         
         {{-- Slide 0: Blueprint Split --}}
         @php
-            $isSlide0 = $slideIndex === null || $slideIndex === 0;
+            $isSlide0 = $slideIndex === null || (int)$slideIndex === 0;
             $slide0Alpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
-            $slide0Style = !$isSlide0 ? 'display: none;' : '';
+            $slide0Style = (int)$slideIndex !== 0 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         <div class="absolute inset-6 grid grid-cols-2 gap-px bg-white/20" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
             <div class="relative overflow-hidden bg-blue-900 border border-white/10">
@@ -61,9 +72,9 @@
 
         {{-- Slide 1: Full Avant --}}
         @php
-            $isSlide1 = $slideIndex === 1;
+            $isSlide1 = (int)$slideIndex === 1;
             $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
-            $slide1Style = $slideIndex !== 1 ? 'display: none;' : '';
+            $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         <div class="absolute inset-6 bg-blue-900 border-2 border-white/20" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if($imageBeforeUrl)
@@ -74,9 +85,9 @@
 
         {{-- Slide 2: Full Après --}}
         @php
-            $isSlide2 = $slideIndex === 2;
+            $isSlide2 = (int)$slideIndex === 2;
             $slide2Alpine = $slideIndex === null ? "x-show=\"current === 2\" style=\"display: none;\"" : '';
-            $slide2Style = $slideIndex !== 2 ? 'display: none;' : '';
+            $slide2Style = (int)$slideIndex !== 2 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         <div class="absolute inset-6 bg-blue-900 border-2 border-white/20" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if($imageAfterUrl)
@@ -84,6 +95,27 @@
                 <div class="absolute top-0 left-0 px-5 py-2 bg-white text-[#0047AB] text-xs font-black font-mono-technical uppercase tracking-[0.2em] shadow-2xl">PROJET FINALISÉ / APRÈS</div>
             @endif
         </div>
+
+        {{-- Slide 3: Contact --}}
+        @php
+            $isSlide3 = (int)$slideIndex === 3;
+            $slide3Alpine = $slideIndex === null ? "x-show=\"current === 3\" style=\"display: none;\"" : '';
+            $slide3Style = (int)$slideIndex !== 3 && $slideIndex !== null ? 'display: none;' : '';
+        @endphp
+        @if($hasContactInfo)
+        <div class="absolute inset-6" {!! $slide3Alpine !!} style="{{ $slide3Style }}">
+            <x-post-templates.contact-slide 
+                :brand-color="$brandColor" 
+                :company-label="$companyLabel"
+                :phone="$phone"
+                :email="$email"
+                :website="$website"
+                :trade="$trade"
+                :city="$city"
+                visualStyle="blueprint"
+            />
+        </div>
+        @endif
 
         {{-- Controls (Preview Only) --}}
         @if($preview)
@@ -98,7 +130,7 @@
             <div class="absolute top-10 right-10 bg-white text-[#0047AB] text-[10px] font-black font-mono-technical px-3 py-1.5 shadow-xl z-30" x-text="(current + 1) + ' / ' + total"></div>
         @elseif($slideIndex !== null)
              <div class="absolute top-10 right-10 bg-white text-[#0047AB] text-[10px] font-black font-mono-technical px-3 py-1.5 shadow-xl z-30">
-                {{ $slideIndex + 1 }} / {{ $total }}
+                {{ (int)$slideIndex + 1 }} / {{ $total }}
             </div>
         @endif
 
@@ -106,8 +138,8 @@
 
     {{-- Simplified Footer --}}
     @php
-        $showBranding = $slideIndex === null || $slideIndex === 0;
-        $brandingAlpine = $slideIndex === null ? 'x-show="current === 0"' : '';
+        $showBranding = $hasContactInfo ? ((int)$slideIndex < 3) : true;
+        $brandingAlpine = $slideIndex === null ? ($hasContactInfo ? 'x-show="current < 3"' : '') : '';
     @endphp
     @if($showBranding)
     <div {!! $brandingAlpine !!} class="h-20 bg-white px-10 flex items-center justify-between border-t-2 border-[#0047AB] relative z-20">
@@ -123,7 +155,17 @@
             elseif ($tLen > 25) $tFontSize = 'text-sm';
         @endphp
         <div class="flex flex-col max-w-[300px]">
-            <span class="text-[#0047AB] {{ $cFontSize }} font-black font-mono-technical tracking-widest uppercase mb-1 truncate">{{ $companyLabel }}</span>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="text-[#0047AB] {{ $cFontSize }} font-black font-mono-technical tracking-widest uppercase truncate">{{ $companyLabel }}</span>
+                <div class="flex items-center gap-1 overflow-hidden">
+                    @if($trade)
+                        <span class="px-1 py-0.5 rounded-sm bg-blue-50 text-[#0047AB]/60 text-[6px] font-black font-mono-technical uppercase border border-[#0047AB]/10 whitespace-nowrap">{{ $trade }}</span>
+                    @endif
+                    @if($city)
+                        <span class="px-1 py-0.5 rounded-sm bg-blue-50 text-[#0047AB]/60 text-[6px] font-black font-mono-technical uppercase border border-[#0047AB]/10 whitespace-nowrap">{{ $city }}</span>
+                    @endif
+                </div>
+            </div>
             <div class="max-h-[40px] overflow-hidden">
                 <span class="text-[#0047AB] {{ $tFontSize }} font-black font-mono-technical tracking-tighter uppercase leading-tight">{{ $text }}</span>
             </div>
@@ -131,9 +173,12 @@
         <div class="flex items-center gap-6">
              {{-- Progress dots for blueprint --}}
              <div class="flex gap-1.5">
-                 <div class="w-2 h-2 rounded-full transition-all" :class="current === 0 ? 'bg-[#0047AB]' : 'bg-blue-100'"></div>
-                 <div class="w-2 h-2 rounded-full transition-all" :class="current === 1 ? 'bg-[#0047AB]' : 'bg-blue-100'"></div>
-                 <div class="w-2 h-2 rounded-full transition-all" :class="current === 2 ? 'bg-[#0047AB]' : 'bg-blue-100'"></div>
+                 @for($i=0; $i<$total; $i++)
+                    <div class="w-2 h-2 rounded-full transition-all" 
+                         @if($preview) :class="current === {{ $i }} ? 'bg-[#0047AB]' : 'bg-blue-100'"
+                         @else class="{{ (int)($slideIndex ?? 0) === $i ? 'bg-[#0047AB]' : 'bg-blue-100' }}" @endif>
+                    </div>
+                 @endfor
              </div>
              <div class="w-8 h-8 rounded-full border-2 border-[#0047AB] flex items-center justify-center p-1">
                   <div class="w-full h-full rounded-full" style="background-color: {{ $brandColor }}"></div>

@@ -1,10 +1,16 @@
 @props([
     'brandColor' => '#F59E0B',
     'companyLabel' => 'Votre Société',
-    'title' => null,
-    'slideContents' => [], // array of text for each inner slide
-    'preview' => false,
+    'title' => '',
+    'slideContents' => [],
+    'logoUrl' => null,
+    'phone' => null,
+    'email' => null,
+    'website' => null,
+    'trade' => null,
+    'city' => null,
     'slideIndex' => null,
+    'preview' => false,
 ])
 
 @if($preview)
@@ -15,12 +21,17 @@
             'Évaluer la puissance nécessaire selon votre surface.',
             'Bénéficier des aides de l\'État pour votre installation.'
         ];
+        $phone = $phone ?? '01 23 45 67 89';
+        $email = $email ?? 'contact@votre-artisan.fr';
+        $website = $website ?? 'www.votre-artisan.fr';
+        $trade = $trade ?? 'Artisan';
+        $city = $city ?? 'Ma Ville';
     @endphp
 @endif
 
 @php
-    // Determine total slides. If preview without data, pretend there are 3 slides.
-    $total = (!empty($slideContents)) ? count($slideContents) + 1 : 3;
+    $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
+    $total = (!empty($slideContents)) ? count($slideContents) + 1 + ($hasContactInfo ? 1 : 0) : (4 + ($hasContactInfo ? 1 : 0));
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
@@ -88,10 +99,39 @@
                 </div>
             </div>
         @endforeach
+        
+        {{-- Slide Index (Contact) --}}
+        @php
+            $contactIdx = count($slideContents) + 1;
+            $isContactVisible = $slideIndex === null || (int)$slideIndex === $contactIdx;
+            $contactAlpine = $slideIndex === null ? "x-show=\"current === $contactIdx\" style=\"display: none;\"" : '';
+            $contactStyle = (int)$slideIndex !== $contactIdx && $slideIndex !== null ? 'display: none;' : '';
+        @endphp
+        @if($hasContactInfo)
+        <div class="absolute inset-0 bg-white" {!! $contactAlpine !!} style="{{ $contactStyle }}">
+             <x-post-templates.contact-slide 
+                :brand-color="$brandColor" 
+                :company-label="$companyLabel"
+                :phone="$phone"
+                :email="$email"
+                :website="$website"
+                :trade="$trade"
+                :city="$city"
+            />
+        </div>
+        @endif
 
         {{-- Footer --}}
-        <div class="absolute bottom-0 inset-x-0 h-12 flex items-center justify-center px-6" style="background-color: #1E293B">
-            <p class="text-white/60 font-bold uppercase tracking-widest text-[9px] font-montserrat">{{ $companyLabel }}</p>
+        <div class="absolute bottom-0 inset-x-0 py-2.5 flex flex-col items-center justify-center px-6 gap-1" style="background-color: #1E293B">
+            <p class="text-white/80 font-bold uppercase tracking-widest text-[9px] font-montserrat">{{ $companyLabel }}</p>
+            <div class="flex items-center gap-1.5 overflow-hidden">
+                @if($trade)
+                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $trade }}</span>
+                @endif
+                @if($city)
+                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $city }}</span>
+                @endif
+            </div>
         </div>
 
         {{-- Alpine Navigation --}}

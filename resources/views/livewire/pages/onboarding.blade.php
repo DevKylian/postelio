@@ -13,6 +13,9 @@ state([
     'trade'             => '',
     'name'              => '',
     'city'              => '',
+    'phone'             => '',
+    'email'             => '',
+    'website'           => '',
     'brand_color'       => '#F59E0B',
     'weekly_posts_goal' => 3,
     // Step 5: bio
@@ -44,8 +47,11 @@ $selectTrade = function (string $trade) {
 $nextStep = function () {
     if ($this->step === 2) {
         $this->validate([
-            'name' => ['required', 'string', 'min:2', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
+            'name'  => ['required', 'string', 'min:2', 'max:255'],
+            'city'  => ['required', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'website' => ['nullable', 'url', 'max:255'],
         ]);
     }
 
@@ -70,6 +76,9 @@ $complete = function () {
     $this->validate([
         'name'        => ['required', 'string', 'min:2', 'max:255'],
         'city'        => ['required', 'string', 'max:255'],
+        'phone'       => ['nullable', 'string', 'max:30'],
+        'email'       => ['nullable', 'email', 'max:255'],
+        'website'     => ['nullable', 'url', 'max:255'],
         'brand_color' => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
     ]);
 
@@ -79,6 +88,9 @@ $complete = function () {
     $data = [
         'name'              => $this->name,
         'city'              => $this->city,
+        'phone'             => $this->phone,
+        'email'             => $this->email,
+        'website'           => $this->website,
         'trade'             => $this->trade,
         'brand_color'       => $this->brand_color,
         'weekly_posts_goal' => $this->weekly_posts_goal,
@@ -231,6 +243,49 @@ $complete = function () {
                                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm
                                           focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200" />
                             @error('city')
+                                <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                                    Téléphone (optionnel)
+                                </label>
+                                <input wire:model="phone"
+                                       type="tel"
+                                       placeholder="Ex : 06 01 02 03 04"
+                                       class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm
+                                              focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200" />
+                                @error('phone')
+                                    <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                                    Email (optionnel)
+                                </label>
+                                <input wire:model="email"
+                                       type="email"
+                                       placeholder="Ex : contact@artisan.fr"
+                                       class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm
+                                              focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200" />
+                                @error('email')
+                                    <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                                Site internet (optionnel)
+                            </label>
+                            <input wire:model="website"
+                                   type="url"
+                                   placeholder="Ex : https://www.mon-entreprise.fr"
+                                   class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm
+                                          focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200" />
+                            @error('website')
                                 <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $message }}</p>
                             @enderror
                         </div>

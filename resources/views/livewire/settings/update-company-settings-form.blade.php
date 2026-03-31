@@ -8,6 +8,9 @@ use function Livewire\Volt\{state};
 state([
     'name'              => fn () => auth()->user()->company?->name ?? '',
     'city'              => fn () => auth()->user()->company?->city ?? '',
+    'phone'             => fn () => auth()->user()->company?->phone ?? '',
+    'email'             => fn () => auth()->user()->company?->email ?? '',
+    'website'           => fn () => auth()->user()->company?->website ?? '',
     'brand_color'       => fn () => auth()->user()->company?->brand_color ?? '#F59E0B',
     'weekly_posts_goal' => fn () => auth()->user()->company?->weekly_posts_goal ?? 3,
 ]);
@@ -16,6 +19,9 @@ $updateCompanySettings = function () {
     $this->validate([
         'name'              => ['required', 'string', 'max:255'],
         'city'              => ['nullable', 'string', 'max:255'],
+        'phone'             => ['nullable', 'string', 'max:30'],
+        'email'             => ['nullable', 'email', 'max:255'],
+        'website'           => ['nullable', 'url', 'max:255'],
         'brand_color'       => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         'weekly_posts_goal' => ['required', 'integer', 'min:0', 'max:7'],
     ]);
@@ -26,6 +32,9 @@ $updateCompanySettings = function () {
     $data = [
         'name'              => $this->name,
         'city'              => $this->city,
+        'phone'             => $this->phone,
+        'email'             => $this->email,
+        'website'           => $this->website,
         'brand_color'       => $this->brand_color,
         'weekly_posts_goal' => $this->weekly_posts_goal,
     ];
@@ -40,6 +49,9 @@ $updateCompanySettings = function () {
 
     $this->name              = $user->company->name;
     $this->city              = $user->company->city ?? '';
+    $this->phone             = $user->company->phone ?? '';
+    $this->email             = $user->company->email ?? '';
+    $this->website           = $user->company->website ?? '';
     $this->brand_color       = $user->company->brand_color;
     $this->weekly_posts_goal = $user->company->weekly_posts_goal;
 
@@ -83,6 +95,44 @@ $updateCompanySettings = function () {
                           class="mt-1 block w-full"
                           autocomplete="address-level2" />
             <x-input-error class="mt-2" :messages="$errors->get('city')" />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Téléphone -->
+            <div>
+                <x-input-label for="phone" value="Téléphone (optionnel)" />
+                <x-text-input wire:model="phone"
+                              id="phone"
+                              name="phone"
+                              type="tel"
+                              class="mt-1 block w-full"
+                              autocomplete="tel" />
+                <x-input-error class="mt-2" :messages="$errors->get('phone')" />
+            </div>
+
+            <!-- Email -->
+            <div>
+                <x-input-label for="email" value="Email pro (optionnel)" />
+                <x-text-input wire:model="email"
+                              id="email"
+                              name="email"
+                              type="email"
+                              class="mt-1 block w-full"
+                              autocomplete="email" />
+                <x-input-error class="mt-2" :messages="$errors->get('email')" />
+            </div>
+        </div>
+
+        <!-- Site internet -->
+        <div>
+            <x-input-label for="website" value="Site internet (optionnel)" />
+            <x-text-input wire:model="website"
+                          id="website"
+                          name="website"
+                          type="url"
+                          class="mt-1 block w-full"
+                          placeholder="https://www.mon-entreprise.fr" />
+            <x-input-error class="mt-2" :messages="$errors->get('website')" />
         </div>
 
         <!-- Couleur de marque -->

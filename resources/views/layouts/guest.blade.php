@@ -15,7 +15,12 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
+        <!-- Umami Analytics -->
+    @production
+        <script async src="https://analytics.postelio.fr/script.js" data-website-id="90955bbe-b301-4559-85a5-5c0d037b01f3"></script>
+    @endproduction
+
+    <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-white text-midnight overflow-x-hidden">

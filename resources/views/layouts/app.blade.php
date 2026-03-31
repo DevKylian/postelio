@@ -24,7 +24,12 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
+        <!-- Umami Analytics -->
+    @production
+        <script async src="https://analytics.postelio.fr/script.js" data-website-id="90955bbe-b301-4559-85a5-5c0d037b01f3"></script>
+    @endproduction
+
+    <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         @stack('styles')

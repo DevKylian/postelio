@@ -33,8 +33,9 @@ $confirmPassword = function () {
 ?>
 
 <div>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Ceci est une zone sécurisée de l\'application. Veuillez confirmer votre mot de passe avant de continuer.') }}
+    <div class="mb-10">
+        <h1 class="text-3xl font-display font-bold text-midnight tracking-tight">Confirmez votre identité</h1>
+        <p class="text-slate-500 mt-2 font-light">Cette zone sécurisée nécessite une confirmation de votre mot de passe.</p>
     </div>
 
     <form wire:submit="confirmPassword">

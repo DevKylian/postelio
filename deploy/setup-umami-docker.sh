@@ -49,13 +49,27 @@ UMAMI_APP_SECRET=$(grep "App secret" "$CREDS_FILE" | awk '{print $4}')
 
 info "Configuration pour : $UMAMI_DOMAIN"
 
-# --- 3. Docker Compose -------------------------------------------------------
-step "3/5 — Lancement d'Umami"
+# --- 3. Configuration MySQL pour Docker ---------------------------------------
+step "3/6 — Configuration MySQL pour Docker"
+info "Ouverture de MySQL (0.0.0.0)..."
+if [ -f /etc/mysql/mysql.conf.d/mysqld.cnf ]; then
+    sed -i "s/bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
+    systemctl restart mysql
+fi
+
+info "Mise à jour des privilèges MySQL pour l'utilisateur Docker..."
+mysql -u root << MYSQL_SCRIPT
+GRANT ALL PRIVILEGES ON \`${UMAMI_DB_NAME}\`.* TO '${UMAMI_DB_USER}'@'%';
+FLUSH PRIVILEGES;
+MYSQL_SCRIPT
+log "MySQL prêt pour Docker."
+
+# --- 4. Docker Compose -------------------------------------------------------
+step "4/6 — Lancement d'Umami"
 UMAMI_DOCKER_DIR="/opt/umami-docker"
 mkdir -p "$UMAMI_DOCKER_DIR"
 
 cat > "$UMAMI_DOCKER_DIR/docker-compose.yml" << EOF
-version: '3'
 services:
   umami:
     image: ghcr.io/umami-software/umami:mysql-latest
@@ -65,22 +79,21 @@ services:
       APP_SECRET: $UMAMI_APP_SECRET
       DATABASE_TYPE: mysql
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
 EOF
-
-# S'assurer que MySQL accepte les connexions de Docker (souvent deja le cas sur localhost)
-# Mais on utilise host.docker.internal qui pointe vers l'IP de la machine.
 
 cd "$UMAMI_DOCKER_DIR"
 docker compose pull
 docker compose up -d
 
-log "Conteneur Umami lancé sur le port 3000."
+info "Attente du conteneur (30s)..."
+sleep 5
+docker compose logs --tail 20 umami
 
-# --- 4. Nginx ----------------------------------------------------------------
-step "4/5 — Configuration Nginx"
+# --- 5. Nginx ----------------------------------------------------------------
+step "5/6 — Configuration Nginx"
 cat > "/etc/nginx/sites-available/umami" << NGINXEOF
 server {
     listen 80;

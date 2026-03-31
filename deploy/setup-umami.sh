@@ -143,6 +143,11 @@ if [ -d "$UMAMI_DIR/.git" ]; then
     warn "Umami déjà cloné — mise à jour..."
     sudo -u "$UMAMI_USER" git -C "$UMAMI_DIR" pull --quiet
 else
+    # Supprimer le dossier s'il existe mais est vide/corrompu
+    if [ -d "$UMAMI_DIR" ]; then
+        warn "Dossier $UMAMI_DIR existant sans .git — suppression..."
+        rm -rf "$UMAMI_DIR"
+    fi
     info "Clonage du dépôt Umami..."
     git clone --depth 1 https://github.com/umami-software/umami.git "$UMAMI_DIR" --quiet
     chown -R "$UMAMI_USER:$UMAMI_USER" "$UMAMI_DIR"

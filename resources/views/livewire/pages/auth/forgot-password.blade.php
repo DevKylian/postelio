@@ -37,8 +37,9 @@ $sendPasswordResetLink = function () {
 ?>
 
 <div>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Mot de passe oublié ? Pas de problème. Indiquez-nous votre adresse e-mail et nous vous enverrons un lien de réinitialisation qui vous permettra d\'en choisir un nouveau.') }}
+    <div class="mb-10">
+        <h1 class="text-3xl font-display font-bold text-midnight tracking-tight">Mot de passe oublié ?</h1>
+        <p class="text-slate-500 mt-2 font-light">Indiquez votre e-mail, nous vous enverrons un lien de réinitialisation.</p>
     </div>
 
     <!-- Session Status -->

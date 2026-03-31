@@ -21,12 +21,12 @@ $deleteUser = function (Logout $logout) {
 ?>
 
 <section class="space-y-6">
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
+    <header class="mb-2">
+        <h2 class="text-base font-semibold text-midnight">
             {{ __('Supprimer le compte') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm text-gray-400">
             {{ __('Une fois votre compte supprimé, toutes ses ressources et données seront définitivement effacées. Avant de supprimer votre compte, veuillez télécharger toutes les données ou informations que vous souhaitez conserver.') }}
         </p>
     </header>
@@ -37,13 +37,13 @@ $deleteUser = function (Logout $logout) {
     >{{ __('Supprimer le compte') }}</x-danger-button>
 
     <x-modal name="confirm-user-deletion" :show="$errors->isNotEmpty()" focusable>
-        <form wire:submit="deleteUser" class="p-6">
+        <form wire:submit="deleteUser" class="p-6 lg:p-8">
 
-            <h2 class="text-lg font-medium text-gray-900">
+            <h2 class="text-base font-semibold text-midnight">
                 {{ __('Êtes-vous sûr de vouloir supprimer votre compte ?') }}
             </h2>
 
-            <p class="mt-1 text-sm text-gray-600">
+            <p class="mt-1 text-sm text-gray-400">
                 {{ __('Une fois votre compte supprimé, toutes ses ressources et données seront définitivement effacées. Veuillez entrer votre mot de passe pour confirmer que vous souhaitez supprimer définitivement votre compte.') }}
             </p>
 

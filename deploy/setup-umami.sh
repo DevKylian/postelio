@@ -109,9 +109,10 @@ step "1/7 — Paquets système"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 
-if ! command -v node &>/dev/null || [[ "$(node -v | grep -oP '\d+' | head -1)" -ne 18 ]]; then
-    info "Installation Node.js 18 (LTS stable)..."
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - > /dev/null 2>&1
+# Node.js 22 (Dernière LTS, meilleure gestion mémoire)
+if ! command -v node &>/dev/null || [[ "$(node -v | grep -oP '\d+' | head -1)" -ne 22 ]]; then
+    info "Installation Node.js 22 (LTS latest)..."
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - > /dev/null 2>&1
     apt-get install -y -qq nodejs
 fi
 
@@ -198,6 +199,10 @@ sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && \
 info "Force Babel fallback (Bye bye SIGBUS)..."
 sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && echo '{\"presets\": [\"next/babel\"]}' > .babelrc"
 
+# Nettoyage RADICAL pour eviter les ARCH mismatch et corruptions
+info "Nettoyage radical node_modules/cache..."
+sudo -u "$UMAMI_USER" rm -rf "$UMAMI_DIR/node_modules" "$UMAMI_DIR/.next"
+
 sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && npm install --legacy-peer-deps --quiet" \
     >> "${LOG_DIR}/build.log" 2>&1 || fail "npm install échoué."
 
@@ -213,18 +218,16 @@ if [ ! -d "$UMAMI_DIR/.next" ] || [ "$FORCE_REBUILD" = true ]; then
     df -h /
     ulimit -a | grep "memory"
 
-    info "Nettoyage du cache .next..."
-    sudo -u "$UMAMI_USER" rm -rf "$UMAMI_DIR/.next"
-
-    info "npm run build (Babel mode — stable)..."
-    # MALLOC_ARENA_MAX=2 + UV_THREADPOOL_SIZE=1 + limitation RAM + Babel
+    info "npm run build (Stabilisé — peut être long)..."
+    # MALLOC_ARENA_MAX=2 + UV_THREADPOOL_SIZE=1 + limitation RAM + Babel + no-incremental-gc
     sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && \
         ulimit -s unlimited && \
         export MALLOC_ARENA_MAX=2 && \
-        export NODE_OPTIONS='--max-old-space-size=4096' && \
+        export NODE_OPTIONS='--max-old-space-size=4096 --no-incremental-gc' && \
         export UV_THREADPOOL_SIZE=1 && \
         export NEXT_CPU_COUNT=1 && \
         export NEXT_TELEMETRY_DISABLED=1 && \
+        export NEXT_SHARP_PATH=/dev/null && \
         export SKIP_DB_CHECK=1 && \
         export DATABASE_URL=mysql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@127.0.0.1:3306/${UMAMI_DB_NAME} && \
         npx next build" \

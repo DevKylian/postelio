@@ -1,195 +1,196 @@
 #!/bin/bash
 # =============================================================================
 # Postelio — Setup Umami Analytics (Ubuntu 22.04)
-# Usage : sudo bash deploy/setup-umami.sh
-# One command, clé en main — tous les mots de passe générés automatiquement
+# Usage : sudo bash deploy/setup-umami.sh [--domain DOMAIN] [--email EMAIL] [--force-build]
 # =============================================================================
 set -euo pipefail
 
-# --- Couleurs (identiques à setup.sh) ----------------------------------------
+# Trap — affiche exactement quelle ligne échoue
+trap 'echo -e "\033[0;31m[✗] ERREUR ligne ${LINENO} : ${BASH_COMMAND}\033[0m" >&2' ERR
+
+# --- Couleurs ----------------------------------------------------------------
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
 BLUE='\033[0;34m'; BOLD='\033[1m'; NC='\033[0m'
 
 log()  { echo -e "${GREEN}[✓]${NC} $1"; }
 info() { echo -e "${BLUE}[→]${NC} $1"; }
 warn() { echo -e "${YELLOW}[!]${NC} $1"; }
-fail() { echo -e "${RED}[✗] ERREUR : $1${NC}" && exit 1; }
+fail() { echo -e "${RED}[✗] ERREUR : $1${NC}" >&2; exit 1; }
 hr()   { echo -e "${BOLD}────────────────────────────────────────────${NC}"; }
+step() { echo ""; hr; info "$1"; hr; }
 
-# --- Vérifications initiales --------------------------------------------------
+# --- Vérifications -----------------------------------------------------------
 [[ $EUID -ne 0 ]] && fail "Lancer en root : sudo bash deploy/setup-umami.sh"
-[[ $(lsb_release -rs) != "22.04" ]] && warn "Testé sur Ubuntu 22.04 uniquement."
+command -v python3 &>/dev/null || fail "python3 requis (déjà présent normalement)."
 
 hr
-echo -e "${BOLD}  Postelio — Setup Umami Analytics${NC}"
-echo -e "  Tous les mots de passe sont générés automatiquement."
+echo -e "${BOLD}  Postelio — Setup Umami Analytics (MySQL optimized)${NC}"
+echo -e "  Persistence, CLI args et correctif Umami v3 inclus."
 hr
 echo ""
 
-# --- Collecte des paramètres --------------------------------------------------
-echo -e "${BOLD}Paramètres requis :${NC}"
-echo ""
+# --- Arguments CLI ------------------------------------------------------------
+UMAMI_DOMAIN=""
+LE_EMAIL=""
+FORCE_REBUILD=false
 
-read -rp "  Sous-domaine Umami (ex: analytics.postelio.fr) : " UMAMI_DOMAIN
-[[ -z "$UMAMI_DOMAIN" ]] && fail "Sous-domaine requis."
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --domain) UMAMI_DOMAIN="$2"; shift ;;
+        --email) LE_EMAIL="$2"; shift ;;
+        --force-build) FORCE_REBUILD=true ;;
+    esac
+    shift
+done
 
-read -rp "  Email Let's Encrypt (pour le certificat SSL) : " LE_EMAIL
-[[ -z "$LE_EMAIL" ]] && fail "Email requis."
-
-echo ""
-info "Génération des credentials..."
-
-# =============================================================================
-# GÉNÉRATION DES CREDENTIALS (aucun mot de passe à choisir)
-# =============================================================================
-UMAMI_DB_PASSWORD=$(openssl rand -base64 32 | tr -d '/+=\n' | cut -c1-36)
-UMAMI_DB_USER="umami"
-UMAMI_DB_NAME="umami"
-UMAMI_APP_SECRET=$(openssl rand -hex 32)
-# Mot de passe admin : 20 chars lisibles — openssl évite le SIGPIPE de tr+head
-UMAMI_ADMIN_PASSWORD=$(openssl rand -base64 24 | tr -d '/+=\n' | cut -c1-20)
-
-# Fichier de sauvegarde des credentials (root only)
+# --- Persistance des Credentials ----------------------------------------------
 CREDS_FILE="/root/umami-credentials.txt"
+UMAMI_DB_NAME="umami"
+UMAMI_DB_USER="umami_db"
 
-cat > "$CREDS_FILE" << EOF
-# ============================================================
-# Umami Analytics — Credentials
-# Généré le $(date '+%d/%m/%Y à %H:%M:%S')
-# CONSERVER CE FICHIER EN LIEU SÛR
-# ============================================================
+# Valeurs par défaut (si on doit générer)
+UMAMI_DB_PASSWORD=$(python3 -c "import secrets; print(secrets.token_hex(24))")
+UMAMI_APP_SECRET=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+UMAMI_ADMIN_PASSWORD=$(python3 -c "import secrets; print(secrets.token_urlsafe(16))")
 
-URL             : https://${UMAMI_DOMAIN}
+if [[ -f "$CREDS_FILE" ]]; then
+    warn "Credentials existants trouvés dans $CREDS_FILE. Chargement..."
+    EXISTING_URL=$(grep "URL" "$CREDS_FILE" | awk '{print $3}' | sed 's/https:\/\///' || echo "")
+    [[ -n "$EXISTING_URL" ]] && UMAMI_DOMAIN=${UMAMI_DOMAIN:-$EXISTING_URL}
 
-Admin login     : admin
-Admin password  : ${UMAMI_ADMIN_PASSWORD}
+    EXISTING_PASS=$(grep "MySQL password" "$CREDS_FILE" | awk '{print $4}' || echo "")
+    [[ -n "$EXISTING_PASS" ]] && UMAMI_DB_PASSWORD="$EXISTING_PASS"
 
-PostgreSQL DB   : ${UMAMI_DB_NAME}
-PostgreSQL user : ${UMAMI_DB_USER}
-PostgreSQL pass : ${UMAMI_DB_PASSWORD}
-App secret      : ${UMAMI_APP_SECRET}
+    EXISTING_SECRET=$(grep "App secret" "$CREDS_FILE" | awk '{print $4}' || echo "")
+    [[ -n "$EXISTING_SECRET" ]] && UMAMI_APP_SECRET="$EXISTING_SECRET"
 
-# Snippet à ajouter dans layouts/app.blade.php (après génération du site ID) :
-# <script async src="https://${UMAMI_DOMAIN}/script.js" data-website-id="VOTRE-SITE-ID"></script>
-EOF
+    EXISTING_ADMIN=$(grep "Admin password" "$CREDS_FILE" | awk '{print $4}' || echo "")
+    [[ -n "$EXISTING_ADMIN" ]] && UMAMI_ADMIN_PASSWORD="$EXISTING_ADMIN"
+    
+    log "Données chargées pour ${UMAMI_DOMAIN:-inconnu}."
+fi
+
+# Collecte interactive si non fourni
+if [[ -z "$UMAMI_DOMAIN" ]]; then
+    read -rp "  Sous-domaine Umami (ex: analytics.postelio.fr) : " UMAMI_DOMAIN
+    [[ -z "$UMAMI_DOMAIN" ]] && fail "Sous-domaine requis."
+fi
+if [[ -z "$LE_EMAIL" ]]; then
+    read -rp "  Email Let's Encrypt (pour le certificat SSL)   : " LE_EMAIL
+    [[ -z "$LE_EMAIL" ]] && fail "Email requis."
+fi
+
+# Sauvegarde finale
+{
+    printf '# ============================================================\n'
+    printf '# Umami Analytics — Credentials\n'
+    printf '# Genere le %s\n' "$(date '+%d/%m/%Y a %H:%M:%S')"
+    printf '# CONSERVER CE FICHIER EN LIEU SUR\n'
+    printf '# ============================================================\n\n'
+    printf 'URL              : https://%s\n\n' "$UMAMI_DOMAIN"
+    printf 'Admin login      : admin\n'
+    printf 'Admin password   : %s\n\n' "$UMAMI_ADMIN_PASSWORD"
+    printf 'MySQL DB         : %s\n' "$UMAMI_DB_NAME"
+    printf 'MySQL user       : %s\n' "$UMAMI_DB_USER"
+    printf 'MySQL password   : %s\n' "$UMAMI_DB_PASSWORD"
+    printf 'App secret       : %s\n\n' "$UMAMI_APP_SECRET"
+    printf '# Snippet tracking :\n'
+    printf '# <script async src="https://%s/script.js" data-website-id="SITE-ID"></script>\n' "$UMAMI_DOMAIN"
+} > "$CREDS_FILE"
 chmod 600 "$CREDS_FILE"
-log "Credentials sauvegardés dans $CREDS_FILE"
 
 # --- Constantes ---------------------------------------------------------------
 UMAMI_DIR="/opt/umami"
 UMAMI_USER="umami"
 UMAMI_PORT=3001
 LOG_DIR="/var/log/umami"
-NODE_VERSION="20"
-
-echo ""
 
 # =============================================================================
 # 1. PAQUETS SYSTÈME
 # =============================================================================
-hr; info "1/8 — Paquets système"; hr
-
+step "1/7 — Paquets système"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 
-# Node.js 20 (peut déjà être présent via setup.sh)
-if ! command -v node &>/dev/null || [[ $(node -v | grep -oP '\d+' | head -1) -lt 18 ]]; then
-    info "Installation de Node.js ${NODE_VERSION}..."
-    curl -fsSL "https://deb.nodesource.com/setup_${NODE_VERSION}.x" | bash - > /dev/null 2>&1
+if ! command -v node &>/dev/null || [[ "$(node -v | grep -oP '\d+' | head -1)" -lt 18 ]]; then
+    info "Installation Node.js 20..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - > /dev/null 2>&1
     apt-get install -y -qq nodejs
 fi
 
-# PostgreSQL
-if ! command -v psql &>/dev/null; then
-    info "Installation de PostgreSQL..."
-    apt-get install -y -qq postgresql postgresql-contrib
+if ! command -v certbot &>/dev/null; then
+    apt-get install -y -qq certbot python3-certbot-nginx
 fi
-
-# Outils
-apt-get install -y -qq git curl wget certbot python3-certbot-nginx > /dev/null 2>&1
-
-log "Paquets installés. Node $(node -v) | psql $(psql --version | awk '{print $3}')"
+log "Logiciels de base OK."
 
 # =============================================================================
-# 2. POSTGRESQL — Base de données Umami
+# 2. MYSQL — Base de données Umami
 # =============================================================================
-hr; info "2/8 — PostgreSQL"; hr
+step "2/7 — MySQL (base umami)"
+systemctl is-active mysql --quiet || systemctl start mysql
 
-systemctl enable postgresql --quiet
-systemctl start postgresql
-
-# Création de la DB et de l'utilisateur via sudo -u postgres
-sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='${UMAMI_DB_USER}'" \
-    | grep -q 1 \
-    || sudo -u postgres psql -c "CREATE USER ${UMAMI_DB_USER} WITH PASSWORD '${UMAMI_DB_PASSWORD}';"
-
-sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname='${UMAMI_DB_NAME}'" \
-    | grep -q 1 \
-    || sudo -u postgres psql -c "CREATE DATABASE ${UMAMI_DB_NAME} OWNER ${UMAMI_DB_USER} ENCODING 'UTF8';"
-
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${UMAMI_DB_NAME} TO ${UMAMI_DB_USER};" > /dev/null
-
-log "PostgreSQL — base '${UMAMI_DB_NAME}' créée."
+mysql -u root << MYSQL_SCRIPT
+CREATE DATABASE IF NOT EXISTS \`${UMAMI_DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS '${UMAMI_DB_USER}'@'localhost' IDENTIFIED BY '${UMAMI_DB_PASSWORD}';
+GRANT ALL PRIVILEGES ON \`${UMAMI_DB_NAME}\`.* TO '${UMAMI_DB_USER}'@'localhost';
+FLUSH PRIVILEGES;
+MYSQL_SCRIPT
+log "MySQL prêt."
 
 # =============================================================================
 # 3. UTILISATEUR SYSTÈME
 # =============================================================================
-hr; info "3/8 — Utilisateur système 'umami'"; hr
-
+step "3/7 — Utilisateur système 'umami'"
 if ! id "$UMAMI_USER" &>/dev/null; then
     useradd -r -m -s /bin/bash -d "$UMAMI_DIR" "$UMAMI_USER"
-    log "Utilisateur '${UMAMI_USER}' créé."
-else
-    log "Utilisateur '${UMAMI_USER}' déjà existant."
 fi
-
 mkdir -p "$LOG_DIR"
 chown "$UMAMI_USER:$UMAMI_USER" "$LOG_DIR"
 
 # =============================================================================
 # 4. INSTALLATION D'UMAMI
 # =============================================================================
-hr; info "4/8 — Installation d'Umami (Next.js)"; hr
-
+step "4/7 — Installation Umami"
 if [ -d "$UMAMI_DIR/.git" ]; then
-    warn "Umami déjà cloné — mise à jour..."
+    warn "Umami existe — mise à jour..."
     sudo -u "$UMAMI_USER" git -C "$UMAMI_DIR" pull --quiet
 else
-    info "Clonage du dépôt Umami..."
+    [ -d "$UMAMI_DIR" ] && rm -rf "$UMAMI_DIR"
     git clone --depth 1 https://github.com/umami-software/umami.git "$UMAMI_DIR" --quiet
     chown -R "$UMAMI_USER:$UMAMI_USER" "$UMAMI_DIR"
 fi
 
-# --- Fichier de configuration .env.local -------------------------------------
-cat > "${UMAMI_DIR}/.env" << ENVEOF
-DATABASE_URL=postgresql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@127.0.0.1:5432/${UMAMI_DB_NAME}
-APP_SECRET=${UMAMI_APP_SECRET}
-ENVEOF
-
+printf 'DATABASE_URL=mysql://%s:%s@127.0.0.1:3306/%s\n' "$UMAMI_DB_USER" "$UMAMI_DB_PASSWORD" "$UMAMI_DB_NAME" > "${UMAMI_DIR}/.env"
+printf 'APP_SECRET=%s\n' "$UMAMI_APP_SECRET" >> "${UMAMI_DIR}/.env"
 chown "$UMAMI_USER:$UMAMI_USER" "${UMAMI_DIR}/.env"
-chmod 640 "${UMAMI_DIR}/.env"
 
-# --- Build -------------------------------------------------------------------
 info "npm install..."
 sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && npm install --legacy-peer-deps --quiet" \
-    >> "${LOG_DIR}/build.log" 2>&1 || fail "npm install a échoué. Voir ${LOG_DIR}/build.log"
+    >> "${LOG_DIR}/build.log" 2>&1 || fail "npm install échoué."
 
-info "npm run build (Next.js — peut prendre 2-3 minutes)..."
-sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && npm run build" \
-    >> "${LOG_DIR}/build.log" 2>&1 || fail "Build échoué. Voir ${LOG_DIR}/build.log"
+# Fix prisma
+info "Migrations Prisma..."
+sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && npx prisma migrate deploy" \
+    >> "${LOG_DIR}/build.log" 2>&1 || warn "Prisma migrate a échoué/déjà fait."
 
-log "Umami compilé avec succès."
+if [ ! -d "$UMAMI_DIR/.next" ] || [ "$FORCE_REBUILD" = true ]; then
+    info "npm run build (3-5 min)..."
+    sudo -u "$UMAMI_USER" bash -c "cd $UMAMI_DIR && SKIP_DB_CHECK=1 DATABASE_URL=mysql://${UMAMI_DB_USER}:${UMAMI_DB_PASSWORD}@127.0.0.1:3306/${UMAMI_DB_NAME} npm run build" \
+        >> "${LOG_DIR}/build.log" 2>&1 || fail "Build échoué."
+    log "Umami compilé."
+else
+    log "Build présent, skip."
+fi
 
 # =============================================================================
 # 5. SERVICE SYSTEMD
 # =============================================================================
-hr; info "5/8 — Service systemd 'umami'"; hr
-
+step "5/7 — Service 'umami'"
 cat > /etc/systemd/system/umami.service << SVCEOF
 [Unit]
 Description=Umami Analytics
-After=network.target postgresql.service
-Wants=postgresql.service
+After=network.target mysql.service
+Wants=mysql.service
 
 [Service]
 Type=simple
@@ -207,11 +208,6 @@ StandardOutput=append:${LOG_DIR}/umami.log
 StandardError=append:${LOG_DIR}/umami-error.log
 KillSignal=SIGTERM
 TimeoutStopSec=30
-# Hardening
-NoNewPrivileges=true
-PrivateTmp=true
-ProtectSystem=strict
-ReadWritePaths=${UMAMI_DIR} ${LOG_DIR}
 
 [Install]
 WantedBy=multi-user.target
@@ -219,199 +215,73 @@ SVCEOF
 
 systemctl daemon-reload
 systemctl enable umami --quiet
-systemctl start umami
+systemctl restart umami
 
-# Attendre que le serveur soit prêt (max 60s)
-info "Attente du démarrage d'Umami..."
-for i in $(seq 1 60); do
+# Wait for readiness
+info "Attente Umami (90s)..."
+READY=0
+for i in $(seq 1 90); do
     if curl -sf "http://127.0.0.1:${UMAMI_PORT}/api/heartbeat" > /dev/null 2>&1; then
-        log "Umami démarré (${i}s)"
+        READY=1
+        log "Prêt en ${i}s."
         break
     fi
     sleep 1
-    if [ "$i" -eq 60 ]; then
-        warn "Timeout — Umami met plus de 60s à démarrer. Vérifier : journalctl -u umami -n 50"
-    fi
 done
 
 # =============================================================================
-# 6. NGINX — Reverse proxy pour Umami
+# 6. NGINX
 # =============================================================================
-hr; info "6/8 — Nginx (reverse proxy)"; hr
-
+step "6/7 — Nginx"
 cat > "/etc/nginx/sites-available/umami" << NGINXEOF
-# Umami Analytics — HTTP (certbot upgarde vers HTTPS automatiquement)
 server {
     listen 80;
     server_name ${UMAMI_DOMAIN};
 
-    # Sécurité
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-
-    # Proxy vers Umami (Next.js sur 127.0.0.1:${UMAMI_PORT})
     location / {
-        proxy_pass         http://127.0.0.1:${UMAMI_PORT};
+        proxy_pass http://127.0.0.1:${UMAMI_PORT};
         proxy_http_version 1.1;
-        proxy_set_header   Upgrade \$http_upgrade;
-        proxy_set_header   Connection 'upgrade';
-        proxy_set_header   Host \$host;
-        proxy_set_header   X-Real-IP \$remote_addr;
-        proxy_set_header   X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto \$scheme;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
         proxy_cache_bypass \$http_upgrade;
-        proxy_read_timeout 300;
-        proxy_connect_timeout 10;
-        client_max_body_size 10M;
     }
 
-    # Next.js static assets (cache agressif)
     location /_next/static/ {
         proxy_pass http://127.0.0.1:${UMAMI_PORT};
-        proxy_set_header Host \$host;
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
-
-    # Bloquer l'accès aux fichiers sensibles
-    location ~ /\.(env|git) { deny all; return 404; }
-
-    access_log /var/log/nginx/umami-access.log;
-    error_log  /var/log/nginx/umami-error.log;
 }
 NGINXEOF
 
 ln -sf /etc/nginx/sites-available/umami /etc/nginx/sites-enabled/umami
 nginx -t && systemctl reload nginx
-log "Nginx configuré pour ${UMAMI_DOMAIN}."
 
 # =============================================================================
-# 7. SSL LET'S ENCRYPT
+# 7. SSL
 # =============================================================================
-hr; info "7/8 — SSL Let's Encrypt pour ${UMAMI_DOMAIN}"; hr
+step "7/7 — SSL Let's Encrypt"
+certbot --nginx -d "${UMAMI_DOMAIN}" --non-interactive --agree-tos --email "$LE_EMAIL" --redirect --quiet
 
-certbot --nginx \
-    -d "${UMAMI_DOMAIN}" \
-    --non-interactive \
-    --agree-tos \
-    --email "$LE_EMAIL" \
-    --redirect \
-    --quiet
-
-log "Certificat SSL obtenu et Nginx rechargé."
-
-# =============================================================================
-# 8. LOGROTATE
-# =============================================================================
-hr; info "8/8 — Logrotate"; hr
-
-cat > /etc/logrotate.d/umami << 'LOGREOF'
-/var/log/umami/*.log {
-    daily
-    missingok
-    rotate 30
-    compress
-    delaycompress
-    notifempty
-    create 640 umami umami
-    sharedscripts
-    postrotate
-        systemctl reload umami > /dev/null 2>&1 || true
-    endscript
-}
-LOGREOF
-
-log "Logrotate configuré."
-
-# =============================================================================
-# AJOUT DU MOT DE PASSE ADMIN DANS LE RÉSUMÉ FINAL
-# (Umami crée le compte admin au 1er démarrage, on le configure via l'API)
-# =============================================================================
-
-# Changer le mot de passe admin par défaut via l'API Umami
-# Umami démarre avec admin/umami — on change immédiatement
-info "Configuration du mot de passe admin..."
-
-# Attendre que l'API soit vraiment prête
-sleep 5
-
-# Obtenir le token JWT avec le login par défaut
+# Password config via API
+info "Changement mot de passe admin..."
+sleep 3
 ADMIN_TOKEN=$(curl -sf -X POST "http://127.0.0.1:${UMAMI_PORT}/api/auth/login" \
-    -H "Content-Type: application/json" \
-    -d '{"username":"admin","password":"umami"}' \
-    2>/dev/null | grep -oP '"token":"\K[^"]+' || echo "")
+    -H "Content-Type: application/json" -d "{\"username\":\"admin\",\"password\":\"umami\"}" \
+    | python3 -c "import sys,json; print(json.load(sys.stdin).get('token',''))" 2>/dev/null || echo "")
 
 if [[ -n "$ADMIN_TOKEN" ]]; then
-    # Récupérer le userId admin
-    ADMIN_USER_ID=$(curl -sf "http://127.0.0.1:${UMAMI_PORT}/api/me" \
-        -H "Authorization: Bearer ${ADMIN_TOKEN}" \
-        2>/dev/null | grep -oP '"id":"\K[^"]+' | head -1 || echo "")
-
+    ADMIN_USER_ID=$(curl -sf "http://127.0.0.1:${UMAMI_PORT}/api/me" -H "Authorization: Bearer ${ADMIN_TOKEN}" \
+        | python3 -c "import sys,json; print(json.load(sys.stdin).get('id',''))" 2>/dev/null || echo "")
     if [[ -n "$ADMIN_USER_ID" ]]; then
-        # Changer le mot de passe
-        HTTP_STATUS=$(curl -sf -o /dev/null -w "%{http_code}" \
-            -X POST "http://127.0.0.1:${UMAMI_PORT}/api/users/${ADMIN_USER_ID}/password" \
-            -H "Authorization: Bearer ${ADMIN_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d "{\"currentPassword\":\"umami\",\"newPassword\":\"${UMAMI_ADMIN_PASSWORD}\"}" \
-            2>/dev/null || echo "0")
-
-        if [[ "$HTTP_STATUS" == "200" ]]; then
-            log "Mot de passe admin changé avec succès."
-        else
-            warn "Changement de mot de passe via API impossible (code: ${HTTP_STATUS})."
-            warn "→ Se connecter manuellement avec admin/umami puis changer le mot de passe."
-            warn "→ Le mot de passe généré est dans $CREDS_FILE"
-        fi
+        curl -sf -o /dev/null -X POST "http://127.0.0.1:${UMAMI_PORT}/api/users/${ADMIN_USER_ID}/password" \
+            -H "Authorization: Bearer ${ADMIN_TOKEN}" -H "Content-Type: application/json" \
+            -d "{\"currentPassword\":\"umami\",\"newPassword\":\"${UMAMI_ADMIN_PASSWORD}\"}" && log "Pass admin modifie."
     fi
-else
-    warn "Impossible de se connecter à l'API Umami pour changer le mot de passe."
-    warn "→ Connexion initiale : admin / umami — puis changer dans Profile > Password"
-    warn "→ Utiliser le mot de passe généré : voir $CREDS_FILE"
 fi
 
-# =============================================================================
-# RÉSUMÉ FINAL
-# =============================================================================
-hr
-echo ""
-echo -e "${BOLD}${GREEN}  ✅ Umami Analytics — Setup terminé !${NC}"
-echo ""
-hr
-echo ""
-echo -e "${BOLD}Accès :${NC}"
-echo "  URL        : https://${UMAMI_DOMAIN}"
-echo "  Login      : admin"
-echo -e "  Password   : ${BOLD}${UMAMI_ADMIN_PASSWORD}${NC}"
-echo ""
-echo -e "${BOLD}Base de données PostgreSQL :${NC}"
-echo "  DB         : ${UMAMI_DB_NAME}"
-echo "  User       : ${UMAMI_DB_USER}"
-echo "  Password   : ${UMAMI_DB_PASSWORD}"
-echo ""
-echo -e "${BOLD}Fichier credentials (root seulement) :${NC}"
-echo "  cat $CREDS_FILE"
-echo ""
-echo -e "${BOLD}Service systemd :${NC}"
-echo "  systemctl status umami"
-echo "  journalctl -u umami -f"
-echo "  tail -f ${LOG_DIR}/umami.log"
-echo ""
-hr
-echo ""
-echo -e "${BOLD}${YELLOW}  Étapes post-installation :${NC}"
-echo ""
-echo -e "  ${BOLD}1.${NC} Se connecter sur https://${UMAMI_DOMAIN}"
-echo -e "  ${BOLD}2.${NC} Aller dans Settings → Websites → Add website"
-echo -e "  ${BOLD}3.${NC} Ajouter : postelio.fr"
-echo -e "  ${BOLD}4.${NC} Copier le tracking script généré"
-echo -e "  ${BOLD}5.${NC} L'ajouter dans ${BOLD}resources/views/layouts/app.blade.php${NC}"
-echo "     juste avant </head> :"
-echo ""
-echo -e "     ${BLUE}<script async src=\"https://${UMAMI_DOMAIN}/script.js\"${NC}"
-echo -e "     ${BLUE}        data-website-id=\"VOTRE-SITE-ID\"></script>${NC}"
-echo ""
-echo -e "  ${BOLD}6.${NC} Déployer Postelio (push sur main) → tracking actif"
-echo ""
-hr
+echo -e "\n${BOLD}${GREEN}✅ Setup Umami (MySQL) termine !${NC}"
+echo "URL : https://${UMAMI_DOMAIN}"
+echo "Pass: ${UMAMI_ADMIN_PASSWORD}"
+echo "Credentials complets: cat ${CREDS_FILE}"

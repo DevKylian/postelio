@@ -2,19 +2,12 @@
 # =============================================================================
 # Postelio — Industrial Umami Analytics Deployer (Docker v3)
 # =============================================================================
-# Ce script installe Umami v3 via Docker, configure MySQL sur l'hôte,
-# gère le SSL et assure la persistance des accès.
-# Compatible Ubuntu 22.04+
-# =============================================================================
-
 set -euo pipefail
 
-# --- Configuration -----------------------------------------------------------
 CREDS_FILE="/root/umami-credentials.txt"
 UMAMI_DOCKER_DIR="/opt/umami-docker"
-UMAMI_IMAGE="ghcr.io/umami-software/umami:mysql-v3-latest"
+UMAMI_IMAGE="ghcr.io/umami-software/umami:latest"
 
-# --- Couleurs ----------------------------------------------------------------
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
 BLUE='\033[0;34m'; BOLD='\033[1m'; NC='\033[0m'
 
@@ -27,75 +20,53 @@ step() { echo ""; hr; info "$1"; hr; }
 
 [[ $EUID -ne 0 ]] && fail "Lancer en root : sudo bash setup-umami-docker.sh"
 
-# --- 1. Arguments & Credentials ----------------------------------------------
-step "1/7 — Préparation et Identifiants"
+step "1/8 — Identifiants et Configuration"
 
 if [[ -f "$CREDS_FILE" ]]; then
-    warn "Identifiants existants trouvés. Chargement..."
+    warn "Identifiants existants trouvés."
     UMAMI_DOMAIN=$(grep "URL" "$CREDS_FILE" | awk '{print $3}' | sed 's/https:\/\///')
-    UMAMI_DB_NAME="umami_db"
-    UMAMI_DB_USER="umami_user"
-    DB_PASS=$(grep "Postgres password" "$CREDS_FILE" | awk '{print $4}' || echo "")
-    UMAMI_APP_SECRET=$(grep "App secret" "$CREDS_FILE" | awk '{print $4}')
-    
-    # Si le mot de passe Postgres n'est pas dans le fichier, on en genere un (compatibilite)
-    if [[ -z "$DB_PASS" ]]; then
-        DB_PASS=$(openssl rand -base64 12 | tr -dc 'a-zA-Z0-9' | head -c 12)
-        printf 'Postgres password: %s\n' "$DB_PASS" >> "$CREDS_FILE"
-    fi
+    DB_PASS=$(grep "DB_PASSWORD" "$CREDS_FILE" | awk '{print $3}' || echo "")
+    UMAMI_APP_SECRET=$(grep "APP_SECRET" "$CREDS_FILE" | awk '{print $3}' || echo "")
+    LE_EMAIL=$(grep "EMAIL" "$CREDS_FILE" | awk '{print $3}' || echo "")
 else
-    info "Nouveau déploiement détecté. Génération des accès..."
-    read -p "Entrez le domaine (ex: analytics.domaine.com) : " UMAMI_DOMAIN
-    read -p "Entrez votre email (pour SSL) : " LE_EMAIL
-    
-    UMAMI_DB_NAME="umami_db"
-    UMAMI_DB_USER="umami_user"
+    info "Nouveau déploiement. Configuration initiale..."
+    read -p "Domaine (ex: analytics.postelio.fr) : " UMAMI_DOMAIN
+    read -p "Email (pour SSL) : " LE_EMAIL
     DB_PASS=$(openssl rand -base64 12 | tr -dc 'a-zA-Z0-9' | head -c 12)
     UMAMI_APP_SECRET=$(openssl rand -base64 32)
 
-    # Sauvegarde
-    {
-        printf 'URL              : https://%s\n' "$UMAMI_DOMAIN"
-        printf 'MySQL DB         : %s\n' "$UMAMI_DB_NAME"
-        printf 'MySQL user       : %s\n' "$UMAMI_DB_USER"
-        printf 'MySQL password   : %s\n' "$UMAMI_DB_PASSWORD"
-        printf 'App secret       : %s\n' "$UMAMI_APP_SECRET"
-        [[ -n "$LE_EMAIL" ]] && printf 'LE Email         : %s\n' "$LE_EMAIL"
-    } > "$CREDS_FILE"
+    cat > "$CREDS_FILE" << EOF
+URL          : https://$UMAMI_DOMAIN
+EMAIL        : $LE_EMAIL
+DB_PASSWORD  : $DB_PASS
+APP_SECRET   : $UMAMI_APP_SECRET
+EOF
     chmod 600 "$CREDS_FILE"
 fi
 
+# Sécurité : On s'assure que tout est rempli
+[[ -z "$DB_PASS" ]] && DB_PASS=$(openssl rand -base64 12 | tr -dc 'a-zA-Z0-9' | head -c 12) && echo "DB_PASSWORD  : $DB_PASS" >> "$CREDS_FILE"
+[[ -z "$UMAMI_APP_SECRET" ]] && UMAMI_APP_SECRET=$(openssl rand -base64 32) && echo "APP_SECRET   : $UMAMI_APP_SECRET" >> "$CREDS_FILE"
+
 log "Domaine : $UMAMI_DOMAIN"
 
-# --- 2. Installation Dépendances ---------------------------------------------
-step "2/8 — Installation Docker & MySQL"
-apt-get update -qq
-apt-get install -y -qq curl gnupg mysql-server certbot python3-certbot-nginx ufw jq >/dev/null
-
+step "2/8 — Installation Dépendances"
+apt-get update -qq && apt-get install -y -qq curl gnupg certbot python3-certbot-nginx ufw jq >/dev/null
 if ! command -v docker &>/dev/null; then
     curl -fsSL https://get.docker.com | sh >/dev/null
     systemctl enable --now docker
 fi
-log "Docker et MySQL installés."
 
-# --- 3. Configuration Pare-feu -----------------------------------------------
-step "3/7 — Sécurité (UFW)"
-ufw allow OpenSSH >/dev/null
-ufw allow 'Nginx Full' >/dev/null
+step "3/8 — Sécurité (Firewall)"
+ufw allow OpenSSH >/dev/null && ufw allow 'Nginx Full' >/dev/null
 echo "y" | ufw enable >/dev/null
-log "Pare-feu configuré (SSH, HTTP, HTTPS)."
 
-# --- 4. Docker Compose (Stack v3 avec PostgreSQL) ---------------------------
-step "4/7 — Lancement Umami v3 (Stack PostgreSQL)"
+step "4/8 — Stack Docker (PostgreSQL + Umami)"
 mkdir -p "$UMAMI_DOCKER_DIR"
-
-# On utilise le DB_PASS chargé au début
-info "Utilisation du mot de passe base de données sauvegardé."
-
 cat > "$UMAMI_DOCKER_DIR/docker-compose.yml" << EOF
 services:
   umami:
-    image: ghcr.io/umami-software/umami:latest
+    image: $UMAMI_IMAGE
     restart: always
     environment:
       DATABASE_URL: postgresql://umami_user:$DB_PASS@db:5432/umami_db
@@ -119,28 +90,25 @@ services:
       test: ["CMD-SHELL", "pg_isready -U umami_user -d umami_db"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
 volumes:
   umami-db-data:
 EOF
 
 cd "$UMAMI_DOCKER_DIR"
-docker compose pull
+docker compose pull -q
 docker compose up -d --remove-orphans
 
-info "Attente du démarrage (Postgres + Umami v3)..."
-sleep 10
-docker compose logs --tail 20 umami
+info "Démarrage des services (Postgres v16)..."
+sleep 15
 
-# --- 6. Nginx ----------------------------------------------------------------
-step "6/8 — Configuration Nginx"
+step "5/8 — Configuration Nginx"
 NGINX_CONF="/etc/nginx/sites-available/umami"
-cat > "$NGINX_CONF" << NGINXEOF
+cat > "$NGINX_CONF" << EOF
 server {
     listen 80;
     server_name $UMAMI_DOMAIN;
-
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
@@ -148,66 +116,40 @@ server {
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host \$host;
         proxy_cache_bypass \$http_upgrade;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
     }
 }
-NGINXEOF
-
-# Suppression active de l'ancien lien s'il existe et creation propre
-rm -f /etc/nginx/sites-enabled/umami
-ln -s "$NGINX_CONF" /etc/nginx/sites-enabled/umami
+EOF
+ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/umami
 nginx -t && systemctl reload nginx
-log "Nginx configuré pour $UMAMI_DOMAIN."
 
-# --- 7. SSL ------------------------------------------------------------------
-step "7/8 — SSL (Let's Encrypt)"
-EMAIL=$(grep "LE Email" "$CREDS_FILE" | awk '{print $4}' || echo "admin@$UMAMI_DOMAIN")
-if ! certbot --nginx -d "$UMAMI_DOMAIN" --non-interactive --agree-tos --email "$EMAIL" --redirect --quiet; then
-    warn "Certbot a echoué. Verifie que ton DNS $UMAMI_DOMAIN pointe bien sur l'IP du serveur."
-else
-    log "SSL activé et redirection HTTPS forcée."
-fi
+step "6/8 — SSL"
+certbot --nginx -d "$UMAMI_DOMAIN" --non-interactive --agree-tos --email "$LE_EMAIL" --redirect --quiet || warn "SSL échoué."
 
-# --- 8. Auto-Enregistrement du site -------------------------------------------
-step "8/8 — Enregistrement du site"
-info "Attente que l'API Umami soit prête..."
+step "7/8 — Auto-Enregistrement"
+info "Vérification API..."
 RETRIES=0
 while ! curl -s "http://127.0.0.1:3000/api/heartbeat" | grep -q "ok"; do
     ((RETRIES++))
-    if [ $RETRIES -gt 30 ]; then fail "Umami n'a pas demarre a temps."; fi
-    sleep 2
+    [[ $RETRIES -gt 30 ]] && fail "L'API ne répond pas."
+    sleep 3
 done
 
-info "Connexion à l'API..."
-TOKEN=$(curl -s -X POST "http://127.0.0.1:3000/api/auth/login" \
-    -H "Content-Type: application/json" \
-    -d '{"username":"admin","password":"umami"}' | jq -r '.token')
+TOKEN=$(curl -s -X POST "http://127.0.0.1:3000/api/auth/login" -H "Content-Type: application/json" -d "{\"username\":\"admin\",\"password\":\"umami\"}" | jq -r '.token')
 
-if [ "$TOKEN" == "null" ] || [ -z "$TOKEN" ]; then
-    warn "Impossible de se connecter a l'API (mot de passe deja change ?)."
-else
-    # On cree le site principal (postelio.fr par exemple)
-    read -p "Domaine du site à tracker (ex: postelio.fr) : " SITE_DOMAIN
-    SITE_NAME="Postelio"
-    
-    info "Création du site dans Umami..."
-    SITE_DATA=$(curl -s -X POST "http://127.0.0.1:3000/api/websites" \
-        -H "Authorization: Bearer $TOKEN" \
-        -H "Content-Type: application/json" \
-        -d "{\"name\":\"$SITE_NAME\",\"domain\":\"$SITE_DOMAIN\"}")
-    
-    WEBSITE_ID=$(echo "$SITE_DATA" | jq -r '.id')
-    
-    if [ "$WEBSITE_ID" != "null" ]; then
-        log "Site '$SITE_NAME' créé avec succès !"
-        info "Voici ton code de tracking a inserer dans ton <head> :"
-        echo -e "${YELLOW}<script async src=\"https://$UMAMI_DOMAIN/script.js\" data-website-id=\"$WEBSITE_ID\"></script>${NC}"
-    else
-        warn "Le site existe peut-etre déjà : $(echo $SITE_DATA | jq -r '.message')"
+if [[ "$TOKEN" != "null" && -n "$TOKEN" ]]; then
+    read -p "Nom du site à créer (ex: Postelio) : " SITE_NAME
+    read -p "Domaine à tracker (ex: postelio.fr) : " SITE_DOMAIN
+    SITE_DATA=$(curl -s -X POST "http://127.0.0.1:3000/api/websites" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d "{\"name\":\"$SITE_NAME\",\"domain\":\"$SITE_DOMAIN\"}")
+    W_ID=$(echo "$SITE_DATA" | jq -r '.id')
+    if [[ "$W_ID" != "null" ]]; then
+        log "Site créé ! ID: $W_ID"
+        info "Tracking code : <script async src=\"https://$UMAMI_DOMAIN/script.js\" data-website-id=\"$W_ID\"></script>"
     fi
 fi
 
 hr
-echo -e "${BOLD}${GREEN}✅ Umami v3 Déployé et Site Configuré !${NC}"
-echo -e "URL : https://$UMAMI_DOMAIN"
-echo -e "Credentials : $CREDS_FILE"
+log "Umami v3 est prêt sur https://$UMAMI_DOMAIN"
 hr

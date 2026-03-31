@@ -33,18 +33,24 @@ step "1/7 — Préparation et Identifiants"
 if [[ -f "$CREDS_FILE" ]]; then
     warn "Identifiants existants trouvés. Chargement..."
     UMAMI_DOMAIN=$(grep "URL" "$CREDS_FILE" | awk '{print $3}' | sed 's/https:\/\///')
-    UMAMI_DB_NAME=$(grep "MySQL DB" "$CREDS_FILE" | awk '{print $4}')
-    UMAMI_DB_USER=$(grep "MySQL user" "$CREDS_FILE" | awk '{print $4}')
-    UMAMI_DB_PASSWORD=$(grep "MySQL password" "$CREDS_FILE" | awk '{print $4}')
+    UMAMI_DB_NAME="umami_db"
+    UMAMI_DB_USER="umami_user"
+    DB_PASS=$(grep "Postgres password" "$CREDS_FILE" | awk '{print $4}' || echo "")
     UMAMI_APP_SECRET=$(grep "App secret" "$CREDS_FILE" | awk '{print $4}')
+    
+    # Si le mot de passe Postgres n'est pas dans le fichier, on en genere un (compatibilite)
+    if [[ -z "$DB_PASS" ]]; then
+        DB_PASS=$(openssl rand -base64 12 | tr -dc 'a-zA-Z0-9' | head -c 12)
+        printf 'Postgres password: %s\n' "$DB_PASS" >> "$CREDS_FILE"
+    fi
 else
     info "Nouveau déploiement détecté. Génération des accès..."
     read -p "Entrez le domaine (ex: analytics.domaine.com) : " UMAMI_DOMAIN
     read -p "Entrez votre email (pour SSL) : " LE_EMAIL
     
-    UMAMI_DB_NAME="umami"
+    UMAMI_DB_NAME="umami_db"
     UMAMI_DB_USER="umami_user"
-    UMAMI_DB_PASSWORD=$(openssl rand -base64 16 | tr -dc 'a-zA-Z0-9' | head -c 16)
+    DB_PASS=$(openssl rand -base64 12 | tr -dc 'a-zA-Z0-9' | head -c 12)
     UMAMI_APP_SECRET=$(openssl rand -base64 32)
 
     # Sauvegarde
@@ -83,8 +89,8 @@ log "Pare-feu configuré (SSH, HTTP, HTTPS)."
 step "4/7 — Lancement Umami v3 (Stack PostgreSQL)"
 mkdir -p "$UMAMI_DOCKER_DIR"
 
-# On genere des mots de passe pour Postgres si nouveaux
-DB_PASS=$(openssl rand -base64 12 | tr -dc 'a-zA-Z0-9' | head -c 12)
+# On utilise le DB_PASS chargé au début
+info "Utilisation du mot de passe base de données sauvegardé."
 
 cat > "$UMAMI_DOCKER_DIR/docker-compose.yml" << EOF
 services:
@@ -145,9 +151,20 @@ server {
 }
 NGINXEOF
 
-ln -sf /etc/nginx/sites-available/umami /etc/nginx/sites-enabled/umami
+# Suppression active de l'ancien lien s'il existe et creation propre
+rm -f /etc/nginx/sites-enabled/umami
+ln -s "$NGINX_CONF" /etc/nginx/sites-enabled/umami
 nginx -t && systemctl reload nginx
-log "Nginx configuré."
+log "Nginx configuré pour $UMAMI_DOMAIN."
+
+# --- 7. SSL ------------------------------------------------------------------
+step "7/8 — SSL (Let's Encrypt)"
+EMAIL=$(grep "LE Email" "$CREDS_FILE" | awk '{print $4}' || echo "admin@$UMAMI_DOMAIN")
+if ! certbot --nginx -d "$UMAMI_DOMAIN" --non-interactive --agree-tos --email "$EMAIL" --redirect --quiet; then
+    warn "Certbot a echoué. Verifie que ton DNS $UMAMI_DOMAIN pointe bien sur l'IP du serveur."
+else
+    log "SSL activé et redirection HTTPS forcée."
+fi
 
 # --- 8. Auto-Enregistrement du site -------------------------------------------
 step "8/8 — Enregistrement du site"

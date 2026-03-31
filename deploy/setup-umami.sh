@@ -42,12 +42,12 @@ info "Génération des credentials..."
 # =============================================================================
 # GÉNÉRATION DES CREDENTIALS (aucun mot de passe à choisir)
 # =============================================================================
-UMAMI_DB_PASSWORD=$(openssl rand -base64 32 | tr -d '/+=\n' | head -c 36)
+UMAMI_DB_PASSWORD=$(openssl rand -base64 32 | tr -d '/+=\n' | cut -c1-36)
 UMAMI_DB_USER="umami"
 UMAMI_DB_NAME="umami"
 UMAMI_APP_SECRET=$(openssl rand -hex 32)
-# Mot de passe admin : 20 chars, lisible (majuscule + chiffres + minuscules)
-UMAMI_ADMIN_PASSWORD=$(tr -dc 'A-Za-z0-9!@#$' < /dev/urandom | head -c 20)
+# Mot de passe admin : 20 chars lisibles — openssl évite le SIGPIPE de tr+head
+UMAMI_ADMIN_PASSWORD=$(openssl rand -base64 24 | tr -d '/+=\n' | cut -c1-20)
 
 # Fichier de sauvegarde des credentials (root only)
 CREDS_FILE="/root/umami-credentials.txt"

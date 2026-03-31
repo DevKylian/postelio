@@ -513,3 +513,64 @@
 [Tue Mar 31 19:09:21 2026] 127.0.0.1:19460 Accepted
 [Tue Mar 31 19:09:21 2026] 127.0.0.1:19460 [200]: GET /sw.js
 [Tue Mar 31 19:09:21 2026] 127.0.0.1:19460 Closing
+[Tue Mar 31 19:12:09 2026] 127.0.0.1:19583 Accepted
+[Tue Mar 31 19:12:09 2026] 127.0.0.1:19584 Accepted
+[Tue Mar 31 19:12:09 2026] PHP Fatal error:  Uncaught ReflectionException: Class "view" does not exist in C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php:1122
+Stack trace:
+#0 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(1122): ReflectionClass->__construct('view')
+#1 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(933): Illuminate\Container\Container->build('view')
+#2 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1078): Illuminate\Container\Container->resolve('view', Array, true)
+#3 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(864): Illuminate\Foundation\Application->resolve('view', Array)
+#4 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1058): Illuminate\Container\Container->make('view', Array)
+#5 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(1805): Illuminate\Foundation\Application->make('view')
+#6 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Routing\RoutingServiceProvider.php(177): Illuminate\Container\Container->offsetGet('Illuminate\\Cont...')
+#7 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(1115): Illuminate\Routing\RoutingServiceProvider->{closure:Illuminate\Routing\RoutingServiceProvider::registerResponseFactory():176}(Object(Illuminate\Foundation\Application), Array)
+#8 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(933): Illuminate\Container\Container->build(Object(Closure))
+#9 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1078): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#10 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(864): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#11 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1058): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#12 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\helpers.php(138): Illuminate\Foundation\Application->make('Illuminate\\Cont...', Array)
+#13 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\helpers.php(850): app('Illuminate\\Cont...')
+#14 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Exceptions\Handler.php(987): response('<!-- syntax err...', 500, Array)
+#15 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Exceptions\Handler.php(839): Illuminate\Foundation\Exceptions\Handler->toIlluminateResponse(Object(Symfony\Component\HttpFoundation\Response), Object(ParseError))
+#16 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Exceptions\Handler.php(738): Illuminate\Foundation\Exceptions\Handler->prepareResponse(Object(Illuminate\Http\Request), Object(ParseError))
+#17 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Exceptions\Handler.php(626): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse(Object(Illuminate\Http\Request), Object(ParseError))
+#18 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(574): Illuminate\Foundation\Exceptions\Handler->render(Object(Illuminate\Http\Request), Object(ParseError))
+#19 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(148): Illuminate\Foundation\Http\Kernel->renderException(Object(Illuminate\Http\Request), Object(ParseError))
+#20 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1220): Illuminate\Foundation\Http\Kernel->handle(Object(Illuminate\Http\Request))
+#21 C:\Users\Kylian\Documents\postelio\public\index.php(20): Illuminate\Foundation\Application->handleRequest(Object(Illuminate\Http\Request))
+#22 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\resources\server.php(23): require_once('C:\\Users\\Kylian...')
+#23 {main}
+
+Next Illuminate\Contracts\Container\BindingResolutionException: Target class [view] does not exist. in C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php:1124
+Stack trace:
+#0 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(933): Illuminate\Container\Container->build('view')
+#1 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1078): Illuminate\Container\Container->resolve('view', Array, true)
+#2 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(864): Illuminate\Foundation\Application->resolve('view', Array)
+#3 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1058): Illuminate\Container\Container->make('view', Array)
+#4 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(1805): Illuminate\Foundation\Application->make('view')
+#5 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Routing\RoutingServiceProvider.php(177): Illuminate\Container\Container->offsetGet('Illuminate\\Cont...')
+#6 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(1115): Illuminate\Routing\RoutingServiceProvider->{closure:Illuminate\Routing\RoutingServiceProvider::registerResponseFactory():176}(Object(Illuminate\Foundation\Application), Array)
+#7 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(933): Illuminate\Container\Container->build(Object(Closure))
+#8 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1078): Illuminate\Container\Container->resolve('Illuminate\\Cont...', Array, true)
+#9 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php(864): Illuminate\Foundation\Application->resolve('Illuminate\\Cont...', Array)
+#10 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1058): Illuminate\Container\Container->make('Illuminate\\Cont...', Array)
+#11 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\helpers.php(138): Illuminate\Foundation\Application->make('Illuminate\\Cont...', Array)
+#12 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\helpers.php(850): app('Illuminate\\Cont...')
+#13 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Exceptions\Handler.php(987): response('<!-- syntax err...', 500, Array)
+#14 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Exceptions\Handler.php(839): Illuminate\Foundation\Exceptions\Handler->toIlluminateResponse(Object(Symfony\Component\HttpFoundation\Response), Object(ParseError))
+#15 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Exceptions\Handler.php(738): Illuminate\Foundation\Exceptions\Handler->prepareResponse(Object(Illuminate\Http\Request), Object(ParseError))
+#16 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Exceptions\Handler.php(626): Illuminate\Foundation\Exceptions\Handler->renderExceptionResponse(Object(Illuminate\Http\Request), Object(ParseError))
+#17 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(574): Illuminate\Foundation\Exceptions\Handler->render(Object(Illuminate\Http\Request), Object(ParseError))
+#18 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(148): Illuminate\Foundation\Http\Kernel->renderException(Object(Illuminate\Http\Request), Object(ParseError))
+#19 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\Application.php(1220): Illuminate\Foundation\Http\Kernel->handle(Object(Illuminate\Http\Request))
+#20 C:\Users\Kylian\Documents\postelio\public\index.php(20): Illuminate\Foundation\Application->handleRequest(Object(Illuminate\Http\Request))
+#21 C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Foundation\resources\server.php(23): require_once('C:\\Users\\Kylian...')
+#22 {main}
+  thrown in C:\Users\Kylian\Documents\postelio\vendor\laravel\framework\src\Illuminate\Container\Container.php on line 1124
+[Tue Mar 31 19:12:09 2026] 127.0.0.1:19583 Closing
+[Tue Mar 31 19:12:10 2026] 127.0.0.1:19584 [200]: GET /favicon.ico
+[Tue Mar 31 19:12:10 2026] 127.0.0.1:19584 Closing
+[Tue Mar 31 19:12:12 2026] 127.0.0.1:19588 Accepted
+[Tue Mar 31 19:12:12 2026] 127.0.0.1:19588 [200]: GET /sw.js
+[Tue Mar 31 19:12:12 2026] 127.0.0.1:19588 Closing

@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FBBF24"/>
+            <stop offset="100%" stop-color="#F97316"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Fond dégradé jaune-orange -->
+    <rect width="512" height="512" fill="url(#bgGradient)"/>
+
+    <!-- Barres vocales blanches (logo Postelio) — plus gros, centré -->
+    <line x1="136" y1="218" x2="136" y2="294" stroke="white" stroke-width="36" stroke-linecap="round"/>
+    <line x1="196" y1="158" x2="196" y2="354" stroke="white" stroke-width="36" stroke-linecap="round"/>
+    <line x1="256" y1="98" x2="256" y2="414" stroke="white" stroke-width="36" stroke-linecap="round"/>
+    <line x1="316" y1="162" x2="316" y2="350" stroke="white" stroke-width="36" stroke-linecap="round"/>
+    <line x1="376" y1="224" x2="376" y2="288" stroke="white" stroke-width="36" stroke-linecap="round"/>
+</svg>

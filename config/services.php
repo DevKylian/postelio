@@ -63,4 +63,9 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL'),
     ],
 
+    'umami' => [
+        'url' => env('UMAMI_URL'),
+        'id' => env('UMAMI_WEBSITE_ID'),
+    ],
+
 ];

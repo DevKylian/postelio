@@ -25,9 +25,9 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
         <!-- Umami Analytics -->
-    @production
-        <script async src="https://analytics.postelio.fr/script.js" data-website-id="90955bbe-b301-4559-85a5-5c0d037b01f3"></script>
-    @endproduction
+    @if(config('services.umami.id'))
+        <script async src="{{ config('services.umami.url') }}/script.js" data-website-id="{{ config('services.umami.id') }}"></script>
+    @endif
 
     <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])

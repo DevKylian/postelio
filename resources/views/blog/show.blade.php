@@ -295,6 +295,18 @@
             "@@id": "{{ route('blog.show', $post->slug) }}"
         }
     }
+    <!-- Umami Event Tracking (Blog Views) -->
+    @if(config('services.umami.id'))
+    <script>
+        window.addEventListener('load', () => {
+            if (window.umami) {
+                umami.track('view_blog_post', { 
+                    title: {!! json_encode($post->title) !!}, 
+                    id: {{ $post->id }} 
+                });
+            }
+        });
     </script>
+    @endif
 </body>
 </html>

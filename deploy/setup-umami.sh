@@ -112,7 +112,8 @@ systemctl is-active mysql --quiet || systemctl start mysql
 # Connexion root sans mot de passe (configuré ainsi par setup.sh principal)
 mysql -u root << MYSQL_SCRIPT
 CREATE DATABASE IF NOT EXISTS \`${UMAMI_DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS '${UMAMI_DB_USER}'@'localhost' IDENTIFIED BY '${UMAMI_DB_PASSWORD}';
+CREATE USER IF NOT EXISTS '${UMAMI_DB_USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${UMAMI_DB_PASSWORD}';
+ALTER USER '${UMAMI_DB_USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${UMAMI_DB_PASSWORD}';
 GRANT ALL PRIVILEGES ON \`${UMAMI_DB_NAME}\`.* TO '${UMAMI_DB_USER}'@'localhost';
 FLUSH PRIVILEGES;
 MYSQL_SCRIPT

@@ -10,7 +10,7 @@
         </div>
     </x-slot>
 
-    <div class="py-8 px-4 sm:px-6 lg:px-8">
+    <div class="py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-5xl mx-auto">
 
             {{-- Manage Subscription (if active) --}}
@@ -27,10 +27,10 @@
                     </div>
                     <form method="POST" action="{{ route('subscription.portal') }}">
                         @csrf
-                        <x-primary-button type="submit" class="!gap-2">
+                        <button type="submit" class="inline-flex items-center gap-2 bg-midnight hover:bg-slate-800 text-white text-sm font-bold px-6 py-3 rounded-2xl transition-all shadow-lg shadow-midnight/10">
                             Gérer mon abonnement
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                        </x-primary-button>
+                        </button>
                     </form>
                 </div>
             @endif

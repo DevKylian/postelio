@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <h1 class="font-bold text-xl lg:text-2xl text-midnight tracking-tight leading-tight">
+                <h1 class="font-display font-bold text-2xl lg:text-3xl text-midnight tracking-tight leading-tight">
                     Nouveautés & Mises à jour
                 </h1>
                 <p class="text-gray-400 text-sm mt-1 max-w-lg font-medium">
@@ -29,7 +29,7 @@
         
         @if($latest)
         {{-- ── Latest Update (Hero) ── --}}
-        <section class="animate-fade-up relative">
+        <section class="animate-in fade-in slide-in-from-bottom-4 duration-700 relative">
             <div class="absolute -left-20 -top-20 w-96 h-96 bg-{{ $latest->type_color }}-500/10 rounded-full blur-[120px] pointer-events-none"></div>
             <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-copper/10 rounded-full blur-[100px] pointer-events-none"></div>
 
@@ -149,7 +149,7 @@
         </section>
         @endif
         @else
-        <div class="py-20 text-center animate-fade-up">
+        <div class="py-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-50 text-slate-200 mb-6">
                 <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
@@ -162,6 +162,12 @@
     </div>
 
     <style>
+        .animate-in { animation: animate-in 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes animate-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .changelog-content ul { list-style-type: disc; margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
         .changelog-content ol { list-style-type: decimal; margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
         .changelog-content li { margin-bottom: 0.25rem; }

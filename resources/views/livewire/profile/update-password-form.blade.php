@@ -40,12 +40,12 @@ $updatePassword = function () {
 ?>
 
 <section>
-    <header class="mb-6">
-        <h2 class="text-base font-semibold text-midnight">
+    <header>
+        <h2 class="text-lg font-medium text-gray-900">
             {{ __('Mettre à jour le mot de passe') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-400">
+        <p class="mt-1 text-sm text-gray-600">
             {{ __('Assurez-vous que votre compte utilise un mot de passe long et aléatoire pour rester sécurisé.') }}
         </p>
     </header>

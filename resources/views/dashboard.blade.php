@@ -176,9 +176,9 @@
                             </svg>
                         </div>
                         @if($hasInstagram)
-                            <span class="badge badge-success !text-[11px] !px-2">Connecté</span>
+                            <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Connecté</span>
                         @else
-                            <span class="badge badge-gray !text-[11px] !px-2">Non lié</span>
+                            <span class="text-[11px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Non lié</span>
                         @endif
                     </div>
                     <p class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Instagram</p>

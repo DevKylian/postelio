@@ -62,11 +62,6 @@ $resetPassword = function () {
 ?>
 
 <div>
-    <div class="mb-10">
-        <h1 class="text-3xl font-display font-bold text-midnight tracking-tight">Nouveau mot de passe</h1>
-        <p class="text-slate-500 mt-2 font-light">Choisissez un mot de passe sécurisé pour votre compte.</p>
-    </div>
-
     <form wire:submit="resetPassword">
         <!-- Email Address -->
         <div>

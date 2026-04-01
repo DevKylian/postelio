@@ -33,6 +33,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_admin',
         'is_premium',
         'is_tester',
+        'manual_plan',
         'is_banned',
         'onboarding_completed',
         'total_credits',
@@ -88,11 +89,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getTotalCreditsAttribute($value): int
     {
-        if ($this->is_tester) {
-            return (int) \App\Models\Setting::get('tester_quota', 10);
-        }
-
-        return (int) $value;
+        return $this->planCredits();
     }
 
     public function getRemainingCreditsAttribute(): int
@@ -110,11 +107,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function deductCredits(int $amount): void
     {
-        if ($this->is_admin || $this->is_premium) {
+        if ($this->is_admin) {
             return;
         }
         
-        // Non-premium testers are still deducted if they have a shared quota limit
         $this->increment('used_credits', $amount);
     }
 
@@ -144,21 +140,42 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get credits allowed by the current plan.
+     * Get target role key for permissions.
+     */
+    public function getRoleKey(): string
+    {
+        if ($this->is_admin) return 'admin';
+        
+        // 1. Manual plan set by Admin (Priority 1)
+        if ($this->manual_plan) return $this->manual_plan;
+        
+        // 2. Active Stripe Subscription (Priority 2)
+        $planKey = $this->currentPlanKey();
+        if ($planKey) return $planKey;
+        
+        // 3. Tester role (Priority 3)
+        if ($this->is_tester) return 'tester';
+        
+        return 'free';
+    }
+
+    /**
+     * Get a specific permission value for this user.
+     */
+    public function getPermission(string $key, $default = null)
+    {
+        $roleKey = $this->getRoleKey();
+        $permissions = RolePermission::getForRole($roleKey);
+        
+        return $permissions->$key ?? $default;
+    }
+
+    /**
+     * Get credits allowed by the current plan/role.
      */
     public function planCredits(): int
     {
-        if ($this->is_tester) {
-            return (int) \App\Models\Setting::get('tester_quota', 10);
-        }
-
-        $planKey = $this->currentPlanKey();
-        
-        if (!$planKey) {
-            return config('subscription.free_credits', 3);
-        }
-
-        return config("subscription.plans.{$planKey}.credits", 0);
+        return (int) $this->getPermission('monthly_quota', 3);
     }
 
     /**
@@ -174,11 +191,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function canPublishToSocialMedia(): bool
     {
-        if ($this->is_tester) {
-            return (bool) \App\Models\Setting::get('tester_can_publish', false);
-        }
-
-        return $this->is_premium || $this->hasActiveSubscription();
+        return (bool) $this->getPermission('can_connect_social', false);
     }
 
     /**
@@ -186,15 +199,8 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function hasFullTemplateAccess(): bool
     {
-        if ($this->is_admin || $this->is_premium || $this->hasActiveSubscription()) {
-            return true;
-        }
-
-        if ($this->is_tester) {
-            return (bool) \App\Models\Setting::get('tester_all_templates', false);
-        }
-
-        return false;
+        if ($this->is_admin) return true;
+        return (bool) $this->getPermission('has_premium_templates', false);
     }
 
     public function company()

@@ -11,6 +11,7 @@
     'city' => null,
     'slideIndex' => null,
     'preview' => false,
+    'brandTextColor' => '#FFFFFF',
 ])
 
 @if($preview)
@@ -96,7 +97,7 @@
         $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
     @endphp
     @if($hasContactInfo)
-    <div class="absolute inset-0 bg-white" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
+    <div class="absolute inset-0 bg-gray-900" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
          <x-post-templates.contact-slide 
             :brand-color="$brandColor" 
             :company-label="$companyLabel"
@@ -105,6 +106,8 @@
             :website="$website"
             :trade="$trade"
             :city="$city"
+            :brand-text-color="$brandTextColor"
+            visualStyle="glass"
         />
     </div>
     @endif

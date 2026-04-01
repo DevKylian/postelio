@@ -10,6 +10,7 @@
     'imageBeforeUrl' => null,
     'imageAfterUrl' => null,
     'imageUrl' => null,
+    'brandTextColor' => '#FFFFFF',
 ])
 
 @php
@@ -49,11 +50,11 @@
         ],
         'brand_color' => [
             'bg' => $brandColor,
-            'title' => 'rgba(255,255,255,0.9)',
-            'text' => '#FFFFFF',
-            'label' => 'rgba(255,255,255,0.8)',
-            'sep' => 'rgba(0,0,0,0.15)',
-            'ghost' => 'rgba(0,0,0,0.1)'
+            'title' => $brandTextColor,
+            'text' => $brandTextColor,
+            'label' => $brandTextColor,
+            'sep' => $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.15)',
+            'ghost' => $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.1)'
         ]
     ];
     
@@ -177,7 +178,8 @@
                     'logoUrl' => $logoUrl,
                     'beforeImage' => $imageBeforeUrl,
                     'afterImage' => $imageAfterUrl,
-                    'image' => $imageUrl
+                    'image' => $imageUrl,
+                    'brandTextColor' => $brandTextColor,
                 ]) !!}
             </div>
 

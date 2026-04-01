@@ -10,6 +10,7 @@
     'city' => null,
     'slideIndex' => null,
     'preview' => false,
+    'brandTextColor' => '#FFFFFF',
 ])
 
 @if($preview)
@@ -39,8 +40,8 @@
     @endphp
     <div class="absolute inset-0" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
         <div class="absolute inset-0 overflow-hidden pointer-events-none" style="opacity:0.045">
-            <div class="absolute bg-white w-full h-3 top-1/2 left-0" style="transform: rotate(45deg) scaleX(1.6) translateY(-50%)"></div>
-            <div class="absolute bg-white w-full h-3 top-1/2 left-0" style="transform: rotate(-45deg) scaleX(1.6) translateY(-50%)"></div>
+            <div class="absolute w-full h-3 top-1/2 left-0" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)' }}; transform: rotate(45deg) scaleX(1.6) translateY(-50%)"></div>
+            <div class="absolute w-full h-3 top-1/2 left-0" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)' }}; transform: rotate(-45deg) scaleX(1.6) translateY(-50%)"></div>
         </div>
         <div class="absolute inset-0 p-10 flex flex-col justify-center">
             <span class="inline-block w-12 h-1 mb-6" style="background-color: {{ $brandColor }}"></span>
@@ -81,7 +82,7 @@
         $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
     @endphp
     @if($hasContactInfo)
-    <div class="absolute inset-0 bg-white" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
+    <div class="absolute inset-0 bg-[#111827]" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
          <x-post-templates.contact-slide 
             :brand-color="$brandColor" 
             :company-label="$companyLabel"
@@ -90,6 +91,8 @@
             :website="$website"
             :trade="$trade"
             :city="$city"
+            :brand-text-color="$brandTextColor"
+            visualStyle="glass"
         />
     </div>
     @endif

@@ -7,6 +7,7 @@
     'trade' => null,
     'city' => null,
     'visualStyle' => 'standard', // standard, glass, blueprint, kraft, beton
+    'brandTextColor' => '#FFFFFF',
 ])
 
 @php
@@ -34,12 +35,16 @@
         default => 'text-amber-600',
     };
     
-    // Fallback to brand color for accent if standard
-    if ($visualStyle === 'standard') {
-        $accentStyle = "color: $brandColor;";
+    // Icon Accent Logic
+    $isLightBg = in_array($visualStyle, ['standard', 'kraft']);
+    if ($isLightBg) {
+        // On light cards, if brand is too light, use Soft Black
+        $iconColor = $brandTextColor === '#1E293B' ? '#1E293B' : $brandColor;
     } else {
-        $accentStyle = "";
+        // On dark cards (glass, blueprint, beton), if brand is too dark, use White or Amber
+        $iconColor = $brandTextColor === '#FFFFFF' ? '#FBBF24' : $brandColor;
     }
+    $accentStyle = "color: $iconColor;";
 @endphp
 
 <div class="absolute inset-0 flex items-center justify-center p-4 {{ $bgStyle }} overflow-hidden">
@@ -75,8 +80,9 @@
             {{-- Contact Items --}}
             @if($phone)
                 <div class="flex items-center gap-2.5 text-left">
-                    <div class="w-7 h-7 rounded-lg bg-black/5 flex items-center justify-center shrink-0 {{ $accentColor }}" style="{{ $accentStyle }}">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" 
+                         style="{{ $accentStyle }} background-color: {{ $isLightBg ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)' }};">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" style="{{ $accentStyle }}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                     </div>
                     <div class="min-w-0">
                         <p class="text-[6px] font-bold uppercase tracking-widest opacity-30 mb-0 leading-none">Téléphone</p>
@@ -87,8 +93,9 @@
 
             @if($email)
                 <div class="flex items-center gap-2.5 text-left">
-                    <div class="w-7 h-7 rounded-lg bg-black/5 flex items-center justify-center shrink-0 {{ $accentColor }}" style="{{ $accentStyle }}">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" 
+                         style="{{ $accentStyle }} background-color: {{ $isLightBg ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)' }};">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" style="{{ $accentStyle }}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                     </div>
                     <div class="min-w-0 flex-1">
                         <p class="text-[6px] font-bold uppercase tracking-widest opacity-30 mb-0 leading-none">Email</p>
@@ -99,8 +106,9 @@
 
             @if($website)
                 <div class="flex items-center gap-2.5 text-left">
-                    <div class="w-7 h-7 rounded-lg bg-black/5 flex items-center justify-center shrink-0 {{ $accentColor }}" style="{{ $accentStyle }}">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" 
+                         style="{{ $accentStyle }} background-color: {{ $isLightBg ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)' }};">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" style="{{ $accentStyle }}" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18" />

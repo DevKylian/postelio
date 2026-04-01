@@ -110,6 +110,13 @@ class ContentRefinerService
         $prompt .= "RÈGLE ABSOLUE : Tu dois TOUJOURS générer le contenu demandé. Si certains champs de contexte "
             . "semblent ne pas correspondre au mémo vocal, ignore-les et travaille avec le transcript uniquement. Ne refuse jamais.\n\n";
 
+        // ── 5. Emoji rules (Critical Improvement) ──
+        $prompt .= "RÈGLE FONDAMENTALE SUR LES ÉMOJIS :\n"
+            . "- N'utilise JAMAIS d'émojis 'étoiles' (⭐, 🌟, ✨, 💫, 🤩) même si l'artisan mentionne une note ou '5 étoiles' dans son vocal.\n"
+            . "- Si une note est mentionnée, laisse-la sous forme de texte (ex: '5/5' ou '5 étoiles') sans aucun émoji.\n"
+            . "- Les émojis autorisés sont UNIQUEMENT ceux de structure (📍, ✔️, 🔹, 📞, 📧, 👌).\n"
+            . "- Ne surcharge JAMAIS le texte d'émojis : un par paragraphe maximum.\n\n";
+
         $prompt .= $spec['ai_role'] . ' ' . $this->toneInstruction($tone) . "\n\n";
         $prompt .= "TYPE DE POST : " . $spec['description'] . "\n";
         $prompt .= "INSTRUCTIONS : " . $spec['ai_content_instructions'] . "\n\n";
@@ -283,8 +290,8 @@ class ContentRefinerService
             . "1. L'Accroche visuelle (Le Hook) : Un émoji lié au métier + une phrase courte annonçant la fin du projet ou le type de réalisation{$clientPart}.\n"
             . "{$locationPart}\n"
             . "3. Le Contexte et la Technique (Le Corps du texte) : Un court paragraphe (2-3 phrases) qui explique ce qui a été fait, les matériaux ou marques utilisés, la spécificité technique. Intègre ici les éléments clés du mémo vocal.\n"
-            . "4. Les Bénéfices pour le client (La Preuve de valeur) : Une courte phrase d'introduction puis une liste à puces de 3 ou 4 points (avec des emojis ✔️ ou ✨). Traduis la technique en avantages concrets pour le client final.\n"
-            . "5. La Conclusion humaine (La Fierté) : Une phrase chaleureuse sur le résultat final ou la satisfaction du client (ex: \"Une superbe transformation pour moderniser cette pièce de vie ! 👌\").\n"
+            . "4. Les Bénéfices pour le client (La Preuve de valeur) : Une courte phrase d'introduction puis une liste à puces de 3 ou 4 points (avec des emojis ✔️ ou 🔹). Traduis la technique en avantages concrets pour le client final. INTERDIT d'utiliser des étoiles ⭐ pour la liste.\n"
+            . "5. La Conclusion humaine (La Fierté) : Une phrase chaleureuse sur le résultat final ou la satisfaction du client (ex: \"Une superbe transformation pour moderniser cette pièce de vie ! 👌\"). Ne rajoute AUCUN émoji décoratif supplémentaire.\n"
             . "{$ctaPart}\n"
             . "7. Le Bloc de Hashtags : Ajoute OBLIGATOIREMENT le bloc de hashtags juste après une ligne vide. Ne l'oublie JAMAIS. Voir la consigne de hashtags ci-dessous.\n";
     }

@@ -11,6 +11,7 @@
     'city' => null,
     'slideIndex' => null,
     'preview' => false,
+    'brandTextColor' => '#FFFFFF',
 ])
 
 @if($preview)
@@ -55,7 +56,7 @@
             elseif ($len > 60) $fontSize = 'text-xl';
         @endphp
         <div class="flex-1 flex items-center justify-center max-h-[280px] overflow-hidden">
-            <p class="text-white font-black uppercase tracking-tight {{ $fontSize }} leading-tight font-montserrat drop-shadow-sm">
+            <p class="font-black uppercase tracking-tight {{ $fontSize }} leading-tight font-montserrat drop-shadow-sm" style="color: {{ $brandTextColor }}">
                 {!! nl2br(e($text)) !!}
             </p>
         </div>
@@ -64,7 +65,7 @@
                 @if ($logoUrl)
                     <img src="{{ $logoUrl }}" alt="Logo" class="h-6 w-6 object-contain rounded">
                 @endif
-                <p class="text-white/90 font-bold text-xs uppercase tracking-widest font-montserrat">{{ $companyLabel }} • {{ $customerName }}</p>
+                <p class="font-bold text-xs uppercase tracking-widest font-montserrat" style="color: {{ $brandTextColor }}">{{ $companyLabel }} • {{ $customerName }}</p>
             </div>
             <div class="flex items-center gap-1.5 mt-0.5">
                 @if($trade)
@@ -76,7 +77,7 @@
             </div>
         </div>
         <div class="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-        <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-black/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-12 -left-12 w-32 h-32 rounded-full blur-2xl pointer-events-none" style="background-color: {{ $brandTextColor === '#FFFFFF' ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.02)' }}"></div>
     </div>
 
     {{-- Slide 1: Contact --}}
@@ -95,6 +96,7 @@
             :website="$website"
             :trade="$trade"
             :city="$city"
+            :brand-text-color="$brandTextColor"
         />
     </div>
     @endif

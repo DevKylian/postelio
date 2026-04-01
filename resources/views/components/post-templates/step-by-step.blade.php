@@ -11,6 +11,7 @@
     'city' => null,
     'slideIndex' => null,
     'preview' => false,
+    'brandTextColor' => '#FFFFFF',
 ])
 
 @if($preview)
@@ -59,7 +60,7 @@
             
             <div class="absolute inset-0 {{ $index === 0 ? 'p-10 flex flex-col justify-center' : '' }}" {!! $slideCondition !!} style="{{ $slideInlineStyle }}">
                 @if($index === 0)
-                    <p class="text-white/30 font-black text-4xl mb-2 select-none tracking-tighter uppercase leading-none">ÉTAPE PAR ÉTAPE</p>
+                    <p class="font-black text-4xl mb-2 select-none tracking-tighter uppercase leading-none opacity-30" style="color: {{ $brandTextColor }}">ÉTAPE PAR ÉTAPE</p>
                     @php
                         $coverText = $slideContents[0] ?? '';
                     @endphp
@@ -70,13 +71,13 @@
                             if ($cLen > 80) $cFontSize = 'text-sm';
                             elseif ($cLen > 40) $cFontSize = 'text-base';
                         @endphp
-                        <div class="mt-4 bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/20 max-h-[140px] overflow-hidden">
-                            <p class="text-white font-black {{ $cFontSize }} uppercase leading-tight font-montserrat">{{ $coverText }}</p>
+                        <div class="mt-4 backdrop-blur-sm p-4 rounded-2xl border max-h-[140px] overflow-hidden" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)' }}; border-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }};">
+                            <p class="font-black {{ $cFontSize }} uppercase leading-tight font-montserrat" style="color: {{ $brandTextColor }}">{{ $coverText }}</p>
                         </div>
                     @else
                         <div class="space-y-2 mt-4">
-                            <div class="h-1.5 w-full bg-white/40 rounded-full"></div>
-                            <div class="h-1.5 w-2/3 bg-white/40 rounded-full"></div>
+                            <div class="h-1.5 w-full rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}"></div>
+                            <div class="h-1.5 w-2/3 rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}"></div>
                         </div>
                     @endif
                 @else
@@ -91,7 +92,7 @@
                         </div>
                     @endif
                     
-                    <div class="absolute top-6 left-6 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg z-10" style="background-color: {{ $brandColor }}">
+                    <div class="absolute top-6 left-6 w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-lg z-10" style="background-color: {{ $brandColor }}; color: {{ $brandTextColor }}; border: 1px solid {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }};">
                         {{ $index }}
                     </div>
 
@@ -131,6 +132,7 @@
                 :website="$website"
                 :trade="$trade"
                 :city="$city"
+                :brand-text-color="$brandTextColor"
             />
         </div>
         @endif

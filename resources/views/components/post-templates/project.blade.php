@@ -12,6 +12,7 @@
     'city' => null,
     'slideIndex' => null,
     'preview' => false,
+    'brandTextColor' => '#FFFFFF',
 ])
 
 @if($preview)
@@ -118,6 +119,7 @@
                 :website="$website"
                 :trade="$trade"
                 :city="$city"
+                :brand-text-color="$brandTextColor"
             />
         </div>
         @endif
@@ -160,17 +162,17 @@
             elseif ($tLen > 25) $tFontSize = 'text-[13px]';
         @endphp
         <div class="flex flex-col items-center max-w-full">
-            <p class="text-white/80 font-bold uppercase tracking-widest {{ $cFontSize }} font-montserrat leading-none mb-1 truncate w-full text-center">{{ $companyLabel }}</p>
+            <p class="font-bold uppercase tracking-widest {{ $cFontSize }} font-montserrat leading-none mb-1 truncate w-full text-center opacity-60" style="color: {{ $brandTextColor }}">{{ $companyLabel }}</p>
             <div class="flex items-center gap-1.5 mb-1.5">
                 @if($trade)
-                    <span class="px-1.5 py-0.5 rounded-md bg-white/20 text-white/70 text-[7px] font-bold uppercase tracking-wider">{{ $trade }}</span>
+                    <span class="px-1.5 py-0.5 rounded-md text-[7px] font-bold uppercase tracking-wider border border-current opacity-40 shrink-0" style="color: {{ $brandTextColor }}">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-1.5 py-0.5 rounded-md bg-white/20 text-white/70 text-[7px] font-bold uppercase tracking-wider">{{ $city }}</span>
+                    <span class="px-1.5 py-0.5 rounded-md text-[7px] font-bold uppercase tracking-wider border border-current opacity-40 shrink-0" style="color: {{ $brandTextColor }}">{{ $city }}</span>
                 @endif
             </div>
             <div class="max-h-[30px] overflow-hidden">
-                <h3 class="text-white font-black uppercase tracking-tighter {{ $tFontSize }} font-montserrat leading-none text-center">{{ $text }}</h3>
+                <h3 class="font-black uppercase tracking-tighter {{ $tFontSize }} font-montserrat leading-none text-center" style="color: {{ $brandTextColor }}">{{ $text }}</h3>
             </div>
         </div>
     </div>

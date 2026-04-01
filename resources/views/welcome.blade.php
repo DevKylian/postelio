@@ -122,15 +122,14 @@
             <div class="text-center max-w-4xl mx-auto"
                  x-intersect="$el.classList.add('animate-fade-up')">
                 <div class="badge badge-copper gap-2 mb-8 shadow-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-copper"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364-.707.707M6.343 17.657l-.707.707m12.728 0-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>
-                  Pour les artisans qui veulent de meilleurs chantiers
+                  L'appli des artisans fiers de leur travail.
                 </div>
-              <h1 class="text-5xl sm:text-6xl lg:text-8xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.05]">
-                Votre chantier travaille <br class="hidden sm:block" />
-                <span class="text-gradient-copper italic">pour vous.</span>
+              <h1 class="text-4xl sm:text-6xl lg:text-7xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.05]">
+                Ne bradez plus vos devis <br class="hidden sm:block" />
+                <span class="text-gradient-copper italic">à cause de mauvaises photos.</span>
               </h1>
-              <p class="text-xl sm:text-2xl font-light text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-                Attirez des clients haut de gamme et mieux payés, sans négociation ni effort supplémentaire.
+              <p class="text-xl sm:text-2xl font-light text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+                10 secondes pour transformer vos fins de chantier en vitrine premium. Attirez de vrais clients, sans y passer vos soirées.
               </p>
               <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 @auth
@@ -588,7 +587,7 @@
         function audioPreview() {
             return {
                 progress: 0, isPlaying: false, displayedText: '',
-                fullText: "Euh voilà, on a fini la pose de la verrière chez le client à Lyon, c'est du sur-mesure en acier noir, le rendu est super propre.",
+                fullText: "Euh voilà, on a terminé la pose de la verrière chez le client à Lyon, c'est du sur-mesure en acier noir, le rendu est super propre.",
                 waveform: [30, 40, 60, 80, 100, 70, 50, 40, 60, 90, 80, 50, 30, 40, 70, 100, 80, 60, 40, 30, 50, 70, 90, 60, 40, 35, 25, 35, 45, 25],
                 start() {
                     if (this.isPlaying) { this.isPlaying = false; return; }
@@ -623,13 +622,13 @@
               <div class="flex-1 text-center lg:text-left">
                 <div class="badge badge-copper inline-flex items-center mb-6 shadow-sm">
                   <i data-lucide="wand-2" class="w-3.5 h-3.5 mr-2 text-amber-500"></i>
-                  Votre texte professionnel généré en un clic
+                  Votre texte pro, généré en un clic.
                 </div>
                 <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">
-                  Un rendu <span class="text-gradient-copper italic pr-1 -mr-1">impeccable</span>, à chaque fois.
+                  Vous faites du bon boulot. <span class="text-gradient-copper italic pr-1 -mr-1">Montrez-le.</span>
                 </h2>
                 <p class="text-lg text-slate-600 font-light leading-relaxed mb-12">
-                  Fini le syndrome de la page blanche. Postelio transforme votre simple note vocale en une publication professionnelle, engageante, avec les bons hashtags et emojis.
+                  Gérer Insta le soir après le chantier, c'est l'enfer. Résultat : vous publiez peu, et on vous compare sur le prix avec des bricoleurs.
                 </p>
                 
                 <div class="max-w-md mx-auto lg:mx-0 bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-200/60 relative"
@@ -660,8 +659,7 @@
 
                   <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left min-h-[80px] flex align-center">
                     <p class="text-midnight font-medium leading-relaxed text-sm">
-                      "<span x-text="displayedText"></span>"
-                      <span class="inline-block w-0.5 h-4 bg-amber-500 ml-1" style="vertical-align: middle; animation: mdPulse 1s infinite" x-show="isPlaying"></span>
+                      Fini la page blanche. Dicte un vocal direct depuis l'utilitaire, Postelio rédige et publie un post parfait pour vous.
                     </p>
                   </div>
                 </div>
@@ -784,16 +782,16 @@
         <section id="methode" class="py-32">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-20">
-              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Prouvez votre expertise en <span class="text-gradient-copper italic">30 secondes.</span></h2>
-              <p class="text-xl font-light text-slate-600">Pas besoin de devenir un pro du digital. Montrez simplement ce que vous savez faire de mieux, directement depuis le chantier.</p>
+              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">En ligne en <span class="text-gradient-copper italic">30 secondes chrono.</span></h2>
+              <p class="text-xl font-light text-slate-600">Pas besoin d'être un pro du digital. Rangez vos outils, sortez votre téléphone, et laissez l'application faire le reste.</p>
             </div>
 
             <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               @php
                 $steps = [
-                  ['icon' => 'camera', 'title' => 'Capturez la preuve', 'desc' => "Prenez une photo Avant/Après de votre réalisation. C'est la preuve irréfutable de la qualité de votre travail."],
-                  ['icon' => 'mic', 'title' => 'Dictez votre note', 'desc' => "Parlez à votre téléphone : « Pose d'une verrière sur-mesure ». L'IA structure votre message."],
-                  ['icon' => 'send', 'title' => 'C\'est en ligne', 'desc' => "Le résultat est publié automatiquement. Vos futurs clients voient votre niveau d'exigence."]
+                  ['icon' => 'camera', 'title' => '1. La photo', 'desc' => "Prenez votre réalisation Avant/Après. C'est la preuve de votre qualité."],
+                  ['icon' => 'mic', 'title' => '2. Le vocal', 'desc' => "Dites juste « Pose d'une verrière à Lyon, acier noir ». L'outil rédige le post comme un pro."],
+                  ['icon' => 'send', 'title' => '3. C\'est publié', 'desc' => "Vos clients voient votre niveau d'exigence immédiatement."]
                 ];
               @endphp
               @foreach($steps as $idx => $step)
@@ -815,31 +813,31 @@
           <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none"></div>
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-3xl mx-auto mb-16">
-              <h2 class="text-3xl sm:text-4xl font-display font-semibold tracking-tight mb-4">Pourquoi ça marche ?</h2>
+              <h2 class="text-3xl sm:text-4xl font-display font-semibold tracking-tight mb-4">Pourquoi vous allez signer plus ?</h2>
               <p class="text-lg font-light text-slate-300">La psychologie de vos clients est simple. Voici pourquoi ils vous choisiront vous.</p>
             </div>
             
             <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto text-copper">
               <div class="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors">
                 <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
-                  <i data-lucide="eye" class="w-6 h-6"></i>
+                  <i data-lucide="camera" class="w-6 h-6"></i>
                 </div>
-                <h3 class="text-xl font-display font-medium mb-3 text-white">Ils achètent ce qu'ils voient</h3>
-                <p class="text-slate-400 font-light leading-relaxed">Les clients ont du mal à se projeter. Montrer vos réalisations concrètes lève leurs doutes instantanément.</p>
+                <h3 class="text-xl font-display font-medium mb-3 text-white">La preuve visuelle</h3>
+                <p class="text-slate-400 font-light leading-relaxed">L'Avant/Après lève les doutes instantanément.</p>
               </div>
               <div class="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors">
                 <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
                   <i data-lucide="shield-check" class="w-6 h-6"></i>
                 </div>
-                <h3 class="text-xl font-display font-medium mb-3 text-white">L'Avant/Après crée la confiance</h3>
-                <p class="text-slate-400 font-light leading-relaxed">Rien n'est plus puissant que la preuve de votre transformation. C'est la garantie de votre expertise.</p>
+                <h3 class="text-xl font-display font-medium mb-3 text-white">La confiance</h3>
+                <p class="text-slate-400 font-light leading-relaxed">Un post propre et technique justifie vos prix.</p>
               </div>
               <div class="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors">
                 <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
-                  <i data-lucide="trending-up" class="w-6 h-6"></i>
+                  <i data-lucide="map-pin" class="w-6 h-6"></i>
                 </div>
-                <h3 class="text-xl font-display font-medium mb-3 text-white">La régularité crée la demande</h3>
-                <p class="text-slate-400 font-light leading-relaxed">Être vu souvent par les bonnes personnes locales crée un effet de familiarité. Quand ils auront besoin, ils penseront à vous.</p>
+                <h3 class="text-xl font-display font-medium mb-3 text-white">La régularité</h3>
+                <p class="text-slate-400 font-light leading-relaxed">Être vu souvent ramène les chantiers locaux.</p>
               </div>
             </div>
           </div>
@@ -872,15 +870,15 @@
         <section class="py-24">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-20">
-              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Ils ont choisi <span class="text-gradient-copper italic">leurs clients.</span></h2>
+              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Ils ont arrêté de chercher des chantiers. <span class="text-gradient-copper italic">Leurs chantiers parlent pour eux.</span></h2>
             </div>
 
             <div class="grid md:grid-cols-3 gap-6">
               @php
                 $testimonials = [
-                  ['name' => 'Marc D.', 'job' => 'Plombier-Chauffagiste', 'text' => "Avant, poster sur Facebook était une corvée. Aujourd'hui, je montre des finitions propres, et les clients négocient beaucoup moins mes devis.", 'img' => 'plumber'],
-                  ['name' => 'Sophie L.', 'job' => 'Peintre en bâtiment', 'text' => "C'est ultra simple. Je fais ma photo de fin de chantier, je parle dans le téléphone, et ça me ramène de belles rénovations sans y passer mes soirées.", 'img' => 'painter'],
-                  ['name' => 'Thomas B.', 'job' => 'Menuisier Agenceur', 'text' => "C'est devenu ma routine de fin de chantier. Je montre mon boulot, ça me ramène de bons clients et je ne me bats plus pour justifier mes prix.", 'img' => 'carpenter']
+                  ['name' => 'Marc D.', 'job' => 'Plombier', 'text' => "Aujourd'hui, je montre des finitions propres en 10s. Bizarrement, les clients négocient beaucoup moins mes prix.", 'img' => 'plumber'],
+                  ['name' => 'Sophie L.', 'job' => 'Peintre', 'text' => "Je fais ma photo, je parle dans le téléphone, et ça me ramène de belles rénovations sans y passer mes soirées.", 'img' => 'painter'],
+                  ['name' => 'Thomas B.', 'job' => 'Menuisier', 'text' => "Je montre mon exigence, je signe avec des clients sérieux, fini la guerre des prix.", 'img' => 'carpenter']
                 ];
               @endphp
               @foreach($testimonials as $t)
@@ -926,8 +924,8 @@
         <section id="tarifs" class="py-32 relative" x-data="{ billingPeriod: 'monthly' }">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-10">
-              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Un investissement dérisoire pour <span class="text-gradient-copper italic">monter en gamme.</span></h2>
-              <p class="text-xl font-light text-slate-600">Rentabilisé dès votre premier chantier haut de gamme signé.</p>
+              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Un investissement <span class="text-gradient-copper italic">dérisoire.</span></h2>
+              <p class="text-xl font-light text-slate-600">Un abonnement rentabilisé à la seconde où vous signez un seul chantier sans devoir baisser votre prix.</p>
             </div>
 
             <!-- Toggle Billing Period -->
@@ -1204,10 +1202,10 @@
             <div class="space-y-4">
               @php
                 $faqs = [
-                  ['q' => "Est-ce que j'ai besoin de beaucoup d'abonnés ?", 'short' => "Non. Quelques centaines de personnes locales suffisent.", 'a' => "Vous n'êtes pas un influenceur. Votre but est de toucher les propriétaires de votre région. Un petit réseau local qualifié génère bien plus de chantiers que 10 000 abonnés à l'autre bout du monde."],
-                  ['q' => "Faut-il savoir poster sur Instagram ou Facebook ?", 'short' => "Non, l'application fait tout pour vous.", 'a' => "30 secondes suffisent pour créer et publier un post parfait. Vous n'avez besoin d'aucune compétence en réseaux sociaux."],
-                  ['q' => "Combien de temps ça prend par jour ?", 'short' => "30 secondes par chantier suffisent.", 'a' => "Prenez la photo, dictez votre note vocale, et c'est publié. L'application s'occupe de la rédaction et de la mise en forme."],
-                  ['q' => "Est-ce vraiment rentable dès le premier mois ?", 'short' => "Oui, nos artisans voient +30% de clients premium.", 'a' => "Dès les premières semaines, votre vitrine professionnelle rassure les prospects et justifie vos tarifs sans négociation."]
+                  ['q' => "Est-ce que j'ai besoin de beaucoup d'abonnés ?", 'short' => "Non. Quelque centaines de locaux suffisent.", 'a' => "Non. Quelques centaines de personnes locales (vos anciens clients, vos partenaires) suffisent pour créer un bouche-à-oreille qualifié et puissant."],
+                  ['q' => "Je suis nul en informatique, c'est pour moi ?", 'short' => "Si vous utilisez WhatsApp, c'est bon.", 'a' => "Si vous savez envoyer un message vocal sur WhatsApp, vous savez utiliser Postelio. L'application gère toute la technique."],
+                  ['q' => "Combien de temps ça prend par jour ?", 'short' => "Strictement 30 secondes.", 'a' => "Strictement 30 secondes par chantier. Vous parlez, on publie."],
+                  ['q' => "Est-ce vraiment rentable ?", 'short' => "Remboursé pour 5 ans dès le 1er devis.", 'a' => "Oui. Un seul devis haut de gamme signé au prix fort grâce à l'image professionnelle de votre page rembourse l'outil pour les 5 prochaines années."]
                 ];
               @endphp
               @foreach($faqs as $idx => $faq)

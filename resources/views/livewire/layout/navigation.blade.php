@@ -59,12 +59,14 @@ $logout = function (Logout $logout) {
                 <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-[0.12em]">Créations</p>
             </div>
 
+            @if(auth()->user()->getPermission('can_generate_posts'))
             <x-sidebar-link :href="route('generate-post')" :active="request()->routeIs('generate-post')" wire:navigate>
                 <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
                 <span>Générer un post</span>
             </x-sidebar-link>
+            @endif
 
             <x-sidebar-link :href="route('posts.index')" :active="request()->routeIs('posts.index')" wire:navigate>
                 <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,27 +75,33 @@ $logout = function (Logout $logout) {
                 <span>Mes créations</span>
             </x-sidebar-link>
 
+            @if(auth()->user()->getPermission('can_view_calendar'))
             <x-sidebar-link :href="route('calendar')" :active="request()->routeIs('calendar')" wire:navigate>
                 <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <span>Calendrier</span>
             </x-sidebar-link>
+            @endif
 
+            @if(auth()->user()->getPermission('can_view_template_previews'))
             <x-sidebar-link :href="route('templates-preview')" :active="request()->routeIs('templates-preview')" wire:navigate>
                 <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1 1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
                 </svg>
                 <span>Gabarits</span>
             </x-sidebar-link>
+            @endif
 
 
+            @if(auth()->user()->getPermission('can_view_statistics'))
             <x-sidebar-link :href="route('statistics')" :active="request()->routeIs('statistics')" wire:navigate>
                 <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
                 <span>Statistiques</span>
             </x-sidebar-link>
+            @endif
             
             <x-sidebar-link :href="route('changelog')" :active="request()->routeIs('changelog')" wire:navigate>
                 <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,7 +207,7 @@ $logout = function (Logout $logout) {
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Quota Mensuel</span>
                     </div>
                     <span class="text-[12px] font-bold text-slate-200 tabular-nums">
-                        @if(auth()->user()->is_admin || auth()->user()->is_premium)
+                        @if(auth()->user()->total_credits >= 999999)
                             <span class="text-lg leading-none">∞</span>
                         @else
                             {{ auth()->user()->remaining_credits }} <span class="text-slate-500 font-medium">/ {{ auth()->user()->total_credits }}</span>
@@ -211,7 +219,7 @@ $logout = function (Logout $logout) {
                     @php
                         $remaining = auth()->user()->remaining_credits;
                         $total = max(1, auth()->user()->total_credits);
-                        $isUnlimited = auth()->user()->is_admin || auth()->user()->is_premium;
+                        $isUnlimited = auth()->user()->total_credits >= 999999;
                         $percentage = $isUnlimited ? 100 : min(100, ($remaining / $total) * 100);
                         $colorClass = $isUnlimited ? 'from-amber-400 to-copper' : ($percentage < 15 ? 'from-rose-500 to-red-600' : ($percentage < 40 ? 'from-orange-500 to-amber-500' : 'from-amber-400 to-copper'));
                     @endphp

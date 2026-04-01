@@ -1,311 +1,350 @@
 <div>
     <x-slot name="header">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
-                <a href="{{ route('admin.users.index') }}" wire:navigate class="p-2 -ml-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                <a href="{{ route('admin.users.index') }}" wire:navigate class="group p-2 -ml-2 rounded-xl text-gray-400 hover:text-midnight hover:bg-gray-100 transition-all">
+                    <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                 </a>
                 <div>
-                    <h1 class="font-bold text-2xl text-gray-900 tracking-tight flex items-center gap-3">
-                        {{ $user->name }}
-                        @if($user->is_admin)
-                            <span class="px-2.5 py-1 bg-purple-100 text-purple-700 text-xs font-semibold uppercase tracking-wider rounded-md">Admin</span>
-                        @endif
-                        @if($user->is_banned)
-                            <span class="px-2.5 py-1 bg-red-100 text-red-700 text-xs font-semibold uppercase tracking-wider rounded-md">Banni</span>
-                        @endif
-                    </h1>
-                    <p class="text-gray-500 text-sm mt-1">{{ $user->email }}</p>
+                    <nav class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                        <a href="{{ route('admin.dashboard') }}" wire:navigate class="hover:text-copper transition-colors">Admin</a>
+                        <svg class="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
+                        <a href="{{ route('admin.users.index') }}" wire:navigate class="hover:text-copper transition-colors">Membres</a>
+                    </nav>
+                    <div class="flex items-center gap-3">
+                        <h1 class="font-bold text-2xl text-midnight tracking-tight">{{ $user->name }}</h1>
+                        <div class="flex items-center gap-1.5">
+                            @if($user->is_admin)
+                                <span class="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase tracking-widest rounded-md border border-indigo-100">Admin</span>
+                            @endif
+                            @if($user->is_tester)
+                                <span class="px-2 py-0.5 bg-amber-50 text-amber-600 text-[9px] font-black uppercase tracking-widest rounded-md border border-amber-100">Testeur</span>
+                            @endif
+                            @if($user->is_banned)
+                                <span class="px-2 py-0.5 bg-red-50 text-red-600 text-[9px] font-black uppercase tracking-widest rounded-md border border-red-100">Banni</span>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
+
             <div class="flex items-center gap-3">
-                @if($user->currentPlanKey())
-                    <span class="px-4 py-2 bg-copper/10 text-copper font-semibold text-sm rounded-lg capitalize">
-                        Plan {{ $user->currentPlanKey() }}
-                    </span>
-                @else
-                    <span class="px-4 py-2 bg-gray-100 text-gray-600 font-semibold text-sm rounded-lg uppercase">
-                        Gratuit
-                    </span>
-                @endif
+                @php $role = $user->getRoleKey(); @endphp
+                <div class="text-right">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Statut Abonnement</p>
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 rounded-xl shadow-sm">
+                        @if($role != 'free' && $role != 'tester')
+                            <div class="w-2 h-2 rounded-full bg-copper animate-pulse"></div>
+                            <span class="font-black text-xs text-midnight uppercase tracking-widest">Plan {{ $role }}</span>
+                        @elseif($role == 'tester')
+                            <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
+                            <span class="font-black text-xs text-midnight uppercase tracking-widest">Accès Testeur</span>
+                        @else
+                            <div class="w-2 h-2 rounded-full bg-gray-300"></div>
+                            <span class="font-black text-xs text-gray-400 uppercase tracking-widest">Gratuit</span>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-8 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto space-y-6">
+    <div class="py-10 px-4 sm:px-6 lg:px-8 bg-gray-50/30 min-h-screen">
+        <div class="max-w-7xl mx-auto space-y-10">
 
             @if (session()->has('success'))
-                <div class="bg-green-50 text-green-700 p-4 rounded-xl border border-green-200 text-sm font-medium flex items-center gap-3" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    {{ session('success') }}
+                <div class="bg-midnight text-white p-4 rounded-2xl shadow-xl flex items-center gap-4 animate-in slide-in-from-top duration-300" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)">
+                    <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                    <span class="text-sm font-bold uppercase tracking-wide">{{ session('success') }}</span>
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Dashboard Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- User Profile Card -->
+                <div class="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
+                    <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Profil Utilisateur</h3>
+                    <div class="flex items-center gap-5 mb-8">
+                        <div class="w-20 h-20 rounded-2xl bg-copper text-white flex items-center justify-center shadow-lg shadow-copper/20 shrink-0">
+                            @if($user->avatar)
+                                <img src="{{ $user->avatar }}" class="w-full h-full object-cover rounded-2xl">
+                            @else
+                                <span class="text-3xl font-black">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                            @endif
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="font-black text-xl text-midnight truncate">{{ $user->name }}</h4>
+                            <p class="text-sm text-gray-400 font-medium truncate">{{ $user->email }}</p>
+                            <div class="mt-2 text-[10px] font-bold text-gray-400 flex items-center gap-2">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                Inscrit en {{ $user->created_at->translatedFormat('F Y') }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-3 pt-6 border-t border-gray-50">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-400 font-bold uppercase tracking-tight">Vérifié</span>
+                            @if($user->email_verified_at)
+                                <span class="text-green-600 font-black tracking-tighter uppercase">OUI</span>
+                            @else
+                                <span class="text-red-500 font-black tracking-tighter uppercase">NON</span>
+                            @endif
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-400 font-bold uppercase tracking-tight">Onboarding</span>
+                            <span class="{{ $user->onboarding_completed ? 'text-green-600' : 'text-amber-500' }} font-black tracking-tighter uppercase">
+                                {{ $user->onboarding_completed ? 'COMPLÉTÉ' : 'EN COURS' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- Company Details -->
-                <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-500 mb-6">Entreprise</h3>
-                        @if($user->company)
-                            <div class="flex items-center gap-4 mb-4">
-                                @if($user->company->logo)
-                                    <div class="w-16 h-16 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0">
-                                        <img src="{{ Storage::url($user->company->logo) }}" class="w-full h-full object-cover">
-                                    </div>
+                <!-- Company Info -->
+                <div class="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
+                    <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Établissement</h3>
+                    @if($user->company)
+                        <div class="flex items-start gap-4 mb-8">
+                             <div class="w-14 h-14 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0">
+                                @if($user->company->logo_path)
+                                    <img src="{{ Storage::url($user->company->logo_path) }}" class="w-full h-full object-cover">
                                 @else
-                                    <div class="w-16 h-16 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 shrink-0">
-                                        <span class="text-xl font-semibold">{{ strtoupper(substr($user->company->name ?? $user->name, 0, 1)) }}</span>
+                                    <div class="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5" /></svg>
                                     </div>
                                 @endif
-                                <div class="w-full overflow-hidden">
-                                    <p class="font-semibold text-lg text-gray-900 truncate" title="{{ $user->company->name ?? 'Enregistrée' }}">{{ $user->company->name ?? 'Enregistrée' }}</p>
-                                    <p class="text-sm text-gray-500 truncate">{{ $user->company->trade ?? 'Secteur non renseigné' }}</p>
-                                </div>
                             </div>
-                        @else
-                            <div class="flex items-center gap-3 text-gray-400 mt-2">
-                                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                <p class="text-sm">Onboarding non complété</p>
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-base text-midnight truncate">{{ $user->company->name ?? 'Nom non défini' }}</h4>
+                                <p class="text-xs text-copper font-black uppercase tracking-widest mt-0.5">{{ $user->company->trade ?? 'Métier non défini' }}</p>
+                                <p class="text-xs text-gray-400 mt-1 font-medium">{{ $user->company->city ?? 'Ville non définie' }}</p>
                             </div>
-                        @endif
-                    </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="p-3 rounded-2xl border {{ $user->company->facebook_connected ? 'border-blue-100 bg-blue-50/30' : 'border-gray-50 bg-gray-50/50' }} transition-all text-center">
+                                <p class="text-[9px] font-black uppercase tracking-tighter mb-1 {{ $user->company->facebook_connected ? 'text-blue-600' : 'text-gray-400' }}">Facebook</p>
+                                <p class="text-[10px] font-black text-midnight">{{ $user->company->facebook_connected ? 'Connecté' : 'Offline' }}</p>
+                            </div>
+                            <div class="p-3 rounded-2xl border {{ $user->company->instagram_connected ? 'border-pink-100 bg-pink-50/30' : 'border-gray-50 bg-gray-50/50' }} transition-all text-center">
+                                <p class="text-[9px] font-black uppercase tracking-tighter mb-1 {{ $user->company->instagram_connected ? 'text-pink-600' : 'text-gray-400' }}">Instagram</p>
+                                <p class="text-[10px] font-black text-midnight">{{ $user->company->instagram_connected ? 'Connecté' : 'Offline' }}</p>
+                            </div>
+                        </div>
+                    @else
+                        <div class="h-full flex flex-col items-center justify-center py-6 text-gray-300">
+                            <svg class="w-12 h-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <p class="text-xs font-bold uppercase tracking-widest text-center">En attente de setup</p>
+                        </div>
+                    @endif
                 </div>
 
-                <!-- Quota & Subscription -->
-                <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-500 mb-4">Quotas & Facturation</h3>
-                        <div class="flex items-baseline gap-2 mb-2">
-                            <span class="text-3xl font-bold text-gray-900">{{ $user->remaining_credits }}</span>
-                            <span class="text-sm text-gray-500">posts restants</span>
-                        </div>
-                        <div class="w-full bg-gray-100 rounded-full h-2 mb-2">
-                            <div class="bg-copper h-2 rounded-full" style="width: {{ $user->total_credits > 0 ? min(100, ($user->used_credits / $user->total_credits) * 100) : 0 }}%"></div>
-                        </div>
-                        <div class="flex justify-between items-center text-xs text-gray-500">
-                            <span>{{ $user->used_credits }} consommés / {{ $user->total_credits }}</span>
-                        </div>
+                <!-- Consumption Card -->
+                <div class="bg-midnight rounded-3xl p-8 shadow-xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                        <svg class="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                     </div>
-                    <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center text-sm">
-                        <span class="text-gray-500">Abonnements actifs</span>
-                        <span class="font-semibold text-gray-900">{{ $user->subscriptions()->active()->count() }}</span>
-                    </div>
-                </div>
-
-                <!-- Social Details -->
-                <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-500 mb-5">Réseaux Sociaux</h3>
-                        <div class="space-y-4">
-                            <!-- Facebook -->
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 {{ $user->company?->facebook_connected ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400' }}">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-900">Facebook</span>
-                                </div>
-                                <span class="text-xs font-semibold {{ $user->company?->facebook_connected ? 'text-green-600' : 'text-gray-400' }}">{{ $user->company?->facebook_connected ? 'Connecté' : 'Non lié' }}</span>
+                    <div class="relative z-10">
+                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Utilisation des crédits</h3>
+                        <div class="flex items-end gap-3 mb-6">
+                            <span class="text-5xl font-black text-white leading-none">{{ $user->remaining_credits }}</span>
+                            <span class="text-xs font-bold text-gray-400 pb-1.5 uppercase tracking-widest">Restants</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="h-3 w-full bg-white/10 rounded-full overflow-hidden border border-white/5">
+                                @php $percent = $user->total_credits > 0 ? min(100, ($user->used_credits / $user->total_credits) * 100) : 0; @endphp
+                                <div class="h-full bg-gradient-to-r from-copper to-amber-500 rounded-full transition-all duration-700" style="width: {{ $percent }}%"></div>
                             </div>
-
-                            <!-- Instagram -->
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 {{ $user->company?->instagram_connected ? 'bg-pink-100 text-pink-600' : 'bg-gray-100 text-gray-400' }}">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-                                    </div>
-                                    <span class="text-sm font-medium text-gray-900">Instagram</span>
-                                </div>
-                                <span class="text-xs font-semibold {{ $user->company?->instagram_connected ? 'text-green-600' : 'text-gray-400' }}">{{ $user->company?->instagram_connected ? 'Connecté' : 'Non lié' }}</span>
+                            <div class="flex justify-between text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                <span>{{ $user->used_credits }} Consommés</span>
+                                <span>{{ $user->total_credits }} Total</span>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Admin Zone -->
-                <div class="bg-white rounded-xl border-t-4 border-t-red-500 shadow-sm p-6 flex flex-col justify-between relative overflow-hidden">
-                    <h3 class="text-sm font-semibold text-gray-900 mb-5 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                        Zone Admin
-                    </h3>
-
-                    <div class="space-y-4">
-                        <!-- Quota Input -->
-                        <div>
-                            <label class="text-xs font-medium text-gray-700 mb-1.5 block">Modifier Quota Mensuel</label>
-                            <div class="flex items-center gap-2">
-                                <input type="number" wire:model="newTotalQuota" class="block w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-1 focus:ring-copper focus:border-copper transition-shadow" placeholder="{{ $user->total_credits }}">
-                                <button wire:click="updateQuota" class="px-4 py-2 bg-copper hover:bg-copper-dark text-white text-sm font-semibold rounded-lg transition-colors">MAJ</button>
-                            </div>
-                            @error('newTotalQuota') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2 mt-2">
-                            <!-- Role Toggle -->
-                            <button wire:click="toggleAdmin" class="flex flex-col items-center justify-center gap-1.5 p-2 rounded-lg border {{ $user->is_admin ? 'border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                                <span class="text-[10px] font-semibold text-center">{{ $user->is_admin ? 'Rétrograder Admin' : 'Promouvoir Admin' }}</span>
-                            </button>
-
-                            <!-- Premium Toggle -->
-                            <button wire:click="togglePremium" class="flex flex-col items-center justify-center gap-1.5 p-2 rounded-lg border {{ $user->is_premium ? 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50' }} transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
-                                <span class="text-[10px] font-semibold text-center">{{ $user->is_premium ? 'Retirer Premium' : 'Rendre Premium' }}</span>
-                            </button>
-
-                            <!-- Ban Toggle -->
-                            <button wire:click="toggleBan" wire:confirm="Êtes-vous sûr de vouloir {{ $user->is_banned ? 'débannir' : 'bannir' }} cet utilisateur ?" class="flex flex-col items-center justify-center gap-1.5 p-2 col-span-2 rounded-lg border {{ $user->is_banned ? 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100' : 'border-gray-200 bg-white text-red-600 hover:bg-red-50' }} transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
-                                <span class="text-[10px] font-semibold text-center">{{ $user->is_banned ? 'Débannir Compte' : 'Bannir Compte' }}</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
             </div>
 
-            <!-- User Posts Grid -->
+            <!-- Management Section -->
+            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-50">
+                    <!-- Credits Control -->
+                    <div class="p-8 lg:p-10">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-10 h-10 rounded-xl bg-copper/10 text-copper flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </div>
+                            <h3 class="text-sm font-black text-midnight uppercase tracking-widest">Ajuster Quota</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="relative">
+                                <input type="number" wire:model="newTotalQuota" class="block w-full px-5 py-4 bg-gray-50 border-none rounded-2xl text-lg font-black text-midnight focus:ring-2 focus:ring-copper transition-shadow" placeholder="{{ $user->total_credits }}">
+                                <button wire:click="updateQuota" class="absolute right-2 top-2 bottom-2 px-6 bg-midnight text-white text-[10px] font-black rounded-xl hover:bg-black transition-all active:scale-95 uppercase tracking-widest shadow-lg">
+                                    Mettre à jour
+                                </button>
+                            </div>
+                            <p class="text-[10px] text-gray-400 font-medium leading-relaxed">Définit le quota total mensuel. Les crédits s'ajustent automatiquement.</p>
+                            @error('newTotalQuota') <p class="text-red-500 text-[10px] font-bold">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <!-- Plan Override -->
+                    <div class="p-8 lg:p-10">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                            </div>
+                            <h3 class="text-sm font-black text-midnight uppercase tracking-widest">Forcer le Plan</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button wire:click="setManualPlan('basic')" class="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all {{ $user->manual_plan == 'basic' ? 'border-midnight bg-midnight text-white' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200' }}">
+                                <span class="text-[10px] font-black uppercase tracking-widest">Starter</span>
+                            </button>
+                            <button wire:click="setManualPlan('pro')" class="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all {{ $user->manual_plan == 'pro' ? 'border-copper bg-copper text-white' : 'border-gray-50 bg-gray-50 text-gray-400 hover:border-gray-200' }}">
+                                <span class="text-[10px] font-black uppercase tracking-widest">Pro</span>
+                            </button>
+                            <button wire:click="setManualPlan(null)" class="col-span-2 flex items-center justify-center gap-2 p-4 rounded-2xl border-2 border-dashed border-gray-100 text-gray-400 hover:border-red-200 hover:text-red-500 transition-all font-bold text-[10px] uppercase tracking-widest">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                Réinitialiser (Auto)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Safety & Account -->
+                    <div class="p-8 lg:p-10">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            </div>
+                            <h3 class="text-sm font-black text-midnight uppercase tracking-widest">Privilèges & Accès</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <button wire:click="toggleAdmin" class="w-full flex items-center justify-between px-5 py-4 rounded-2xl transition-all {{ $user->is_admin ? 'bg-indigo-600 text-white' : 'bg-gray-50 text-gray-500' }}">
+                                <span class="text-[10px] font-black uppercase tracking-widest">Accès Administrateur</span>
+                                <div class="w-4 h-4 rounded-full border-2 {{ $user->is_admin ? 'bg-white' : 'border-gray-200' }}"></div>
+                            </button>
+                            <button wire:click="toggleTester" class="w-full flex items-center justify-between px-5 py-4 rounded-2xl transition-all {{ $user->is_tester ? 'bg-amber-500 text-white' : 'bg-gray-50 text-gray-500' }}">
+                                <span class="text-[10px] font-black uppercase tracking-widest">Mode Testeur</span>
+                                <div class="w-4 h-4 rounded-full border-2 {{ $user->is_tester ? 'bg-white' : 'border-gray-200' }}"></div>
+                            </button>
+                            <button wire:click="toggleBan" wire:confirm="Bannir l'utilisateur ? Il ne pourra plus se connecter." class="w-full flex items-center justify-center gap-2 px-5 py-4 rounded-2xl border-2 transition-all {{ $user->is_banned ? 'bg-red-600 text-white border-red-600' : 'border-red-100 text-red-600 hover:bg-red-50' }}">
+                                <span class="text-[10px] font-black uppercase tracking-widest">{{ $user->is_banned ? 'DÉBANNIR LE COMPTE' : 'BANNIR L\'UTILISATEUR' }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Posts History -->
             <div>
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="font-semibold text-lg text-gray-900">Historique des Générations ({{ $posts->total() }})</h2>
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="font-black text-2xl text-midnight tracking-tight">Historique des créations</h2>
+                    <span class="px-4 py-1.5 bg-white border border-gray-100 rounded-full text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ $posts->total() }} Posts générés</span>
                 </div>
 
                 @if($posts->isEmpty())
-                    <div class="bg-gray-50 rounded-xl border border-dashed border-gray-200 p-12 text-center">
-                        <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        <p class="text-gray-500 font-medium">Cet utilisateur n'a généré aucun contenu.</p>
+                    <div class="bg-white rounded-[32px] border border-gray-100 p-20 text-center shadow-sm">
+                        <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-gray-200">
+                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        </div>
+                        <p class="text-gray-400 font-bold uppercase tracking-widest text-sm">Aucune activité pour le moment</p>
                     </div>
                 @else
-                    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
                         @foreach($posts as $post)
-                            <div wire:click="selectPost({{ $post->id }})" class="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col hover:shadow-md transition-shadow cursor-pointer">
-                                <div class="aspect-square bg-gray-100 relative">
-                                    @if($post->image_path)
-                                        <img src="{{ Storage::url($post->image_path) }}" class="w-full h-full object-cover">
-                                    @elseif($post->slides)
-                                        <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 gap-2">
-                                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                            <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Carrousel</p>
-                                        </div>
-                                    @else
-                                        <div class="w-full h-full flex items-center justify-center text-gray-300">
-                                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                        </div>
-                                    @endif
-
-                                    <!-- Status indicator -->
-                                    <div class="absolute top-2 left-2">
-                                        <span class="px-2 py-0.5 {{ $post->status_color_class }} text-[10px] font-semibold border rounded-md shadow-sm">
-                                            {{ $post->status_label }}
-                                        </span>
+                            <div wire:click="selectPost({{ $post->id }})" class="group relative aspect-square bg-white rounded-2xl border border-gray-100 overflow-hidden cursor-pointer shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all">
+                                @if($post->image_path)
+                                    <img src="{{ Storage::url($post->image_path) }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                @elseif($post->slides)
+                                     <div class="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-400 gap-2">
+                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>
+                                        <span class="text-[9px] font-black uppercase tracking-widest">Carrousel</span>
                                     </div>
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center bg-gray-50 text-gray-200">
+                                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    </div>
+                                @endif
+                                
+                                <!-- Overlay Info -->
+                                <div class="absolute inset-0 bg-gradient-to-t from-midnight/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                                    <span class="text-[9px] font-black text-copper uppercase tracking-widest mb-1">{{ $post->template ?? 'Standard' }}</span>
+                                    <p class="text-white text-[10px] font-bold line-clamp-2">{{ $post->caption }}</p>
                                 </div>
-                                <div class="p-3 flex flex-col flex-1">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <span class="text-[10px] font-medium text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{{ $post->template ?? 'Standard' }}</span>
-                                    </div>
-                                    <p class="text-xs text-gray-800 font-medium line-clamp-2 mt-1">{{ $post->caption ?? 'Génération sans légende.' }}</p>
-                                    <div class="mt-auto pt-2 flex items-center justify-between text-[10px] text-gray-400">
-                                        <span>{{ $post->created_at->format('d/m/Y') }}</span>
-                                        <span>{{ $post->created_at->format('H:i') }}</span>
-                                    </div>
+
+                                <div class="absolute top-2 right-2">
+                                    <div class="w-2.5 h-2.5 rounded-full border-2 border-white {{ $post->status === 'published' ? 'bg-emerald-500' : ($post->status === 'failed' ? 'bg-red-500' : 'bg-amber-500') }} shadow-sm"></div>
                                 </div>
                             </div>
                         @endforeach
                     </div>
-                    @if($posts->hasPages())
-                        <div class="mt-6">
-                            {{ $posts->links() }}
-                        </div>
-                    @endif
                 @endif
-            </div>
 
+                <div class="mt-12">
+                    {{ $posts->links() }}
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Modal Détail Post -->
+    <!-- Post Detail Modal -->
     @if($selectedPost)
-        <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm" wire:click.self="closeModal">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col md:flex-row transform transition-all">
-                <!-- Image Side -->
-                <div class="w-full md:w-1/2 bg-gray-50 relative flex items-center justify-center p-6 border-r border-gray-100 min-h-[300px]">
+        <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-midnight/90 backdrop-blur-xl" x-on:keydown.escape.window="$wire.closeModal()">
+            <div class="bg-white rounded-[40px] shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col md:flex-row transform transition-all animate-in zoom-in-95 duration-200">
+                <!-- Visual Side -->
+                <div class="w-full md:w-3/5 bg-gray-50 flex items-center justify-center p-8 lg:p-12 border-r border-gray-100 overflow-y-auto">
                     @if($selectedPost->image_path)
-                        <img src="{{ Storage::url($selectedPost->image_path) }}" class="max-w-full max-h-full object-contain rounded-xl shadow-sm">
+                        <img src="{{ Storage::url($selectedPost->image_path) }}" class="max-w-full h-auto rounded-3xl shadow-2xl">
                     @elseif($selectedPost->slides)
-                        <div class="w-full h-full flex flex-col items-center justify-center">
-                            <span class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 inline-block">Carrousel ({{ is_array($selectedPost->slides) ? count($selectedPost->slides) : 0 }} slides)</span>
-                            <div class="grid grid-cols-2 gap-3 w-full max-w-sm">
-                                @if(is_array($selectedPost->slides))
-                                    @foreach(array_slice($selectedPost->slides, 0, 4) as $slide)
-                                        <div class="aspect-square rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-white">
-                                            <img src="{{ Storage::url($slide) }}" class="w-full h-full object-cover">
-                                        </div>
-                                    @endforeach
-                                @endif
-                            </div>
-                        </div>
-                    @else
-                        <div class="text-gray-400 font-medium flex flex-col items-center gap-3">
-                            <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                            Aucun visuel disponible
+                        <div class="grid grid-cols-2 gap-4 w-full">
+                            @foreach($selectedPost->slides as $slide)
+                                <img src="{{ Storage::url($slide) }}" class="w-full aspect-square object-cover rounded-2xl shadow-lg border border-white">
+                            @endforeach
                         </div>
                     @endif
                 </div>
-                
-                <!-- Content Side -->
-                <div class="w-full md:w-1/2 flex flex-col h-full max-h-[50vh] md:max-h-none overflow-y-auto bg-white">
-                    <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs font-bold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-md uppercase tracking-wider">{{ $selectedPost->template ?? 'Standard' }}</span>
-                            <span class="text-xs font-medium text-gray-400 flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                {{ $selectedPost->created_at->format('d/m/Y H:i') }}
-                            </span>
+
+                <!-- Info Side -->
+                <div class="w-full md:w-2/5 flex flex-col bg-white overflow-y-auto">
+                    <div class="p-8 border-b border-gray-50 flex justify-between items-start sticky top-0 bg-white/80 backdrop-blur-md z-10">
+                        <div>
+                            <span class="text-[10px] font-black text-copper bg-copper/5 px-3 py-1 rounded-full uppercase tracking-widest mb-2 inline-block">Modèle {{ $selectedPost->template ?? 'Standard' }}</span>
+                            <h2 class="text-sm font-black text-midnight uppercase tracking-tight">{{ $selectedPost->created_at->translatedFormat('d F Y \à H:i') }}</h2>
                         </div>
-                        <button wire:click="closeModal" class="text-gray-400 hover:text-gray-700 transition-colors p-1.5 bg-gray-50 hover:bg-gray-200 rounded-lg">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        <button wire:click="closeModal" class="p-2 bg-gray-50 text-gray-400 hover:text-midnight hover:bg-gray-100 rounded-2xl transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
-                    
-                    <div class="p-6 flex-1 flex flex-col gap-6">
+
+                    <div class="p-8 space-y-10">
+                        <!-- Caption -->
                         <div>
-                            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
-                                Légende générée
-                            </h4>
-                            <div class="bg-gray-50 rounded-xl p-4 text-sm text-gray-800 whitespace-pre-wrap border border-gray-100 leading-relaxed shadow-inner font-medium">{{ $selectedPost->caption ?? 'Aucune légende n\'a été générée pour ce post.' }}</div>
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Légende générée</p>
+                            <div class="bg-gray-50 rounded-3xl p-6 text-sm text-midnight font-bold leading-relaxed border border-gray-100 shadow-inner select-all">
+                                {{ $selectedPost->caption }}
+                            </div>
                         </div>
 
+                        <!-- Status & Feedback -->
                         <div>
-                            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                Statut
-                            </h4>
-                            <div class="inline-flex items-center gap-2 px-3.5 py-2 {{ $selectedPost->status_color_class }} border text-sm font-semibold rounded-xl">
-                                {{ $selectedPost->status_label }}
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Statut de la génération</p>
+                            <div class="flex items-center gap-4">
+                                <span class="px-4 py-2 {{ $selectedPost->status_color_class }} text-[10px] font-black rounded-xl border uppercase tracking-widest text-center">
+                                    {{ $selectedPost->status_label }}
+                                </span>
+                                @if($selectedPost->error_message)
+                                    <p class="text-[10px] text-red-500 font-bold max-w-xs leading-tight italic">{{ $selectedPost->error_message }}</p>
+                                @endif
                             </div>
-
-                            @if($selectedPost->status === 'failed' && $selectedPost->error_message)
-                                <div class="mt-2 p-3 bg-red-50 border border-red-100 text-red-700 text-xs rounded-lg break-all">
-                                    {{ $selectedPost->error_message }}
-                                </div>
-                            @endif
                         </div>
 
-                         @if($selectedPost->audio_path)
-                            <div>
-                                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-                                    Audio source
-                                </h4>
-                                <audio controls class="w-full h-12 rounded-lg bg-gray-50 border border-gray-100">
-                                    <source src="{{ Storage::url($selectedPost->audio_path) }}" type="audio/mpeg">
-                                 </audio>
+                        <!-- Technical Info -->
+                        <div class="pt-10 border-t border-gray-50 flex items-center justify-between">
+                            <div class="flex items-center gap-3 text-[10px] font-bold text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                Généré en {{ $selectedPost->created_at->diffForHumans($selectedPost->updated_at, true) }}
                             </div>
-                        @endif
+                            <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest">ID: #{{ $selectedPost->id }}</span>
+                        </div>
                     </div>
                 </div>
             </div>

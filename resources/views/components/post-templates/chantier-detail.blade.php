@@ -12,6 +12,7 @@
     'city' => null,
     'slideIndex' => null,
     'preview' => false,
+    'brandTextColor' => '#FFFFFF',
 ])
 
 @if($preview)
@@ -102,6 +103,7 @@
                 :website="$website"
                 :trade="$trade"
                 :city="$city"
+                :brand-text-color="$brandTextColor"
             />
         </div>
         @endif

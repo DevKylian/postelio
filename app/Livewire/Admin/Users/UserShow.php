@@ -46,12 +46,24 @@ class UserShow extends Component
         session()->flash('success', 'Rang mis à jour.');
     }
 
-    public function togglePremium()
+    public function setManualPlan(?string $planKey)
     {
-        $this->user->is_premium = !$this->user->is_premium;
+        $this->user->manual_plan = $planKey;
+        
+        // Backward compatibility: set is_premium for non-free plans
+        $this->user->is_premium = ($planKey !== null);
+        
         $this->user->save();
-        $status = $this->user->is_premium ? 'Premium' : 'Standard';
-        session()->flash('success', "Le statut a été passé en $status.");
+        
+        $status = $planKey ? "Plan " . ucfirst($planKey) : "Standard (Free)";
+        session()->flash('success', "Le plan a été forcé en : $status.");
+    }
+
+    public function toggleTester()
+    {
+        $this->user->is_tester = !$this->user->is_tester;
+        $this->user->save();
+        session()->flash('success', 'Statut testeur mis à jour.');
     }
 
     public function toggleBan()

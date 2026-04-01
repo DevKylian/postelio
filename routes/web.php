@@ -65,11 +65,19 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
 Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
 
     Route::view('dashboard', 'dashboard')->name('dashboard');
-    Route::view('generate-post', 'generate-post')->name('generate-post');
-    Route::view('templates-preview', 'templates-preview')->name('templates-preview');
-    Route::view('calendar', 'calendar')->name('calendar');
+    Route::view('generate-post', 'generate-post')
+        ->middleware('permission:can_generate_posts')
+        ->name('generate-post');
+    Route::view('templates-preview', 'templates-preview')
+        ->middleware('permission:can_view_template_previews')
+        ->name('templates-preview');
+    Route::view('calendar', 'calendar')
+        ->middleware('permission:can_view_calendar')
+        ->name('calendar');
     Route::view('post-settings', 'post-settings')->name('post-settings');
-    Route::view('statistics', 'statistics')->name('statistics');
+    Route::view('statistics', 'statistics')
+        ->middleware('permission:can_view_statistics')
+        ->name('statistics');
     Route::view('changelog', 'changelog')->name('changelog');
 
     // Help Center
@@ -89,6 +97,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
         Route::get('/admin/blog', \App\Livewire\Admin\Blog\BlogManager::class)->name('admin.blog.index');
         Route::get('/admin/faq', \App\Livewire\Admin\Faq\FaqManager::class)->name('admin.faq.index');
         Route::get('/admin/testers', \App\Livewire\Admin\Users\TesterManager::class)->name('admin.testers');
+        Route::get('/admin/permissions', \App\Livewire\Admin\Permissions\PermissionManager::class)->name('admin.permissions.index');
         Route::get('/admin/server', \App\Livewire\Admin\ServerMonitor::class)->name('admin.server');
     });
 

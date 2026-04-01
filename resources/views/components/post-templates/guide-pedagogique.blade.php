@@ -11,6 +11,7 @@
     'city' => null,
     'slideIndex' => null,
     'preview' => false,
+    'brandTextColor' => '#FFFFFF',
 ])
 
 @if($preview)
@@ -57,16 +58,16 @@
             }
         @endphp
         <div class="absolute inset-0 p-10 pb-32 flex flex-col justify-center text-center" {!! $coverAlpine !!} style="{{ $coverStyle }}">
-            <p class="text-white/40 font-bold text-[10px] uppercase tracking-[0.2em] mb-6 select-none">CONSEIL D'EXPERT</p>
+            <p class="font-bold text-[10px] uppercase tracking-[0.2em] mb-6 select-none opacity-40" style="color: {{ $brandTextColor }}">CONSEIL D'EXPERT</p>
             @if($title)
                 <div class="max-h-[160px] overflow-hidden">
-                    <h2 class="text-white font-black {{ $fontSizeClass }} uppercase leading-tight font-montserrat">{!! nl2br(e($title)) !!}</h2>
+                    <h2 class="font-black {{ $fontSizeClass }} uppercase leading-tight font-montserrat" style="color: {{ $brandTextColor }}">{!! nl2br(e($title)) !!}</h2>
                 </div>
             @else
                 <div class="space-y-3">
-                    <div class="h-2 w-full bg-white/30 rounded-full"></div>
-                    <div class="h-2 w-5/6 mx-auto bg-white/30 rounded-full"></div>
-                    <div class="h-2 w-4/6 mx-auto bg-white/30 rounded-full"></div>
+                    <div class="h-2 w-full rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.3)' }}"></div>
+                    <div class="h-2 w-5/6 mx-auto rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.3)' }}"></div>
+                    <div class="h-2 w-4/6 mx-auto rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.3)' }}"></div>
                 </div>
             @endif
         </div>
@@ -81,7 +82,7 @@
             @endphp
             <div class="absolute inset-0 p-10 pb-20 flex flex-col justify-center text-center" {!! $slideAlpine !!} style="{{ $slideStyle }}">
                 <div class="bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-blue-100 relative">
-                     <div class="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-lg shadow-xl" style="background-color: {{ $brandColor }}">
+                     <div class="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full flex items-center justify-center font-black text-lg shadow-xl" style="background-color: {{ $brandColor }}; color: {{ $brandTextColor }}; border: 1px solid {{ $brandTextColor === '#000000' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }};">
                          {{ $realIdx }}
                      </div>
                      @php
@@ -117,6 +118,7 @@
                 :website="$website"
                 :trade="$trade"
                 :city="$city"
+                :brand-text-color="$brandTextColor"
             />
         </div>
         @endif

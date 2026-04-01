@@ -12,6 +12,7 @@
     'city' => null,
     'slideIndex' => null,
     'preview' => false,
+    'brandTextColor' => '#FFFFFF',
 ])
 
 @if($preview)
@@ -44,7 +45,7 @@
             $slide0Style = (int)$slideIndex !== 0 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         <div {!! $slide0Alpine !!} style="{{ $slide0Style }}">
-            <h3 class="font-black uppercase tracking-widest text-sm mb-4" style="color: {{ $brandColor }}">FAQ Artisan</h3>
+            <h3 class="font-black uppercase tracking-widest text-sm mb-4" style="color: white; opacity: 0.6;">FAQ Artisan</h3>
             @php
                 $qLen = mb_strlen($question);
                 $qFontSize = 'text-2xl';
@@ -82,7 +83,7 @@
             $slide2Style = (int)$slideIndex !== 2 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         @if($hasContactInfo)
-        <div class="absolute inset-x-10 inset-y-0 flex items-center justify-center bg-white rounded-xl my-10" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
+        <div class="absolute inset-0 flex items-center justify-center bg-midnight" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
              <x-post-templates.contact-slide 
                 :brand-color="$brandColor" 
                 :company-label="$companyLabel"
@@ -91,7 +92,8 @@
                 :website="$website"
                 :trade="$trade"
                 :city="$city"
-                theme="light"
+                :brand-text-color="$brandTextColor"
+                visualStyle="glass"
             />
         </div>
         @endif

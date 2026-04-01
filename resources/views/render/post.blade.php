@@ -23,6 +23,19 @@
         $company = $post->company;
         $brandColor = $company->brand_color ?? '#F59E0B';
         
+        $getContrastColor = function($hex) {
+            $hex = str_replace('#', '', $hex);
+            if (strlen($hex) == 3) {
+                $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+            }
+            $r = hexdec(substr($hex, 0, 2));
+            $g = hexdec(substr($hex, 2, 2));
+            $b = hexdec(substr($hex, 4, 2));
+            $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+            return ($yiq >= 150) ? '#1E293B' : '#FFFFFF';
+        };
+        $brandTextColor = $getContrastColor($brandColor);
+        
         $name = $company->name;
         $words = explode(' ', $name);
         $companyLabel = count($words) > 1 ? ($words[0] . ' ' . $words[1]) : $name;
@@ -98,6 +111,7 @@
         // Prepare common props
         $commonProps = [
             'brandColor' => $brandColor,
+            'brandTextColor' => $brandTextColor,
             'companyLabel' => $companyLabel,
             'logoUrl' => $logoUrl,
             'preview' => $preview,
@@ -220,6 +234,7 @@
             :trade="$props['trade']"
             :city="$props['city']"
             :visual-style="$props['visualStyle']"
+            :brand-text-color="$brandTextColor"
         />
     @elseif($template === 'lifestyle')
         {{-- ... existing lifestyle code ... --}}
@@ -257,7 +272,7 @@
                 <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: white; border-top: 2px solid #0047AB; padding: 0 28px; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
                     <div style="display: flex; align-items: center; justify-content: space-between;">
                         <span style="color: #0047AB; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; font-family: 'Courier New', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">{{ $companyLabel }}</span>
-                        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
+                        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }}; border: 1px solid rgba(0,71,171,0.2);"></div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 6px; overflow: hidden;">
                         @if($props['trade'] ?? null)
@@ -409,10 +424,10 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 6px;">
                         @if($props['trade'] ?? null)
-                            <span style="color: white; font-size: 6px; font-weight: 800; text-transform: uppercase; opacity: 0.3; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 1px 6px; white-space: nowrap;">{{ $props['trade'] }}</span>
+                            <span style="color: {{ $brandTextColor }}; font-size: 6px; font-weight: 800; text-transform: uppercase; opacity: 0.3; border: 1px solid {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}; border-radius: 4px; padding: 1px 6px; white-space: nowrap;">{{ $props['trade'] }}</span>
                         @endif
                         @if($props['city'] ?? null)
-                            <span style="color: white; font-size: 6px; font-weight: 800; text-transform: uppercase; opacity: 0.3; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 1px 6px; white-space: nowrap;">{{ $props['city'] }}</span>
+                            <span style="color: {{ $brandTextColor }}; font-size: 6px; font-weight: 800; text-transform: uppercase; opacity: 0.3; border: 1px solid {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}; border-radius: 4px; padding: 1px 6px; white-space: nowrap;">{{ $props['city'] }}</span>
                         @endif
                     </div>
                 </div>
@@ -439,9 +454,10 @@
             :template="$props['template'] ?? null"
             :trade="$props['trade'] ?? null"
             :city="$props['city'] ?? null"
+            :brand-text-color="$brandTextColor"
         />
     @else
-        <div style="width: 360px; height: 360px; background: {{ $brandColor }}; color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 40px; text-align: center;">
+        <div style="width: 360px; height: 360px; background: {{ $brandColor }}; color: {{ $brandTextColor }}; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 40px; text-align: center;">
             {{ $rawText }}
         </div>
     @endif

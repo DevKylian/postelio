@@ -77,9 +77,9 @@
                         if ($sLen > 120) $sFontSize = 'text-[7px]';
                         elseif ($sLen > 60) $sFontSize = 'text-[9px]';
                     @endphp
-                    <div class="absolute inset-x-4 bottom-20 bg-black/70 backdrop-blur-sm p-4 rounded-xl border border-white/10 shadow-xl">
+                     <div class="absolute inset-x-4 bottom-20 bg-black/70 backdrop-blur-sm p-4 rounded-xl border border-white/10 shadow-xl">
                         <div class="max-h-[60px] overflow-hidden">
-                             <p class="text-white font-black {{ $sFontSize }} uppercase leading-snug font-montserrat text-center">{{ $slideText }}</p>
+                             <p class="text-white font-black {{ $sFontSize }} leading-snug font-montserrat text-center">{{ $slideText }}</p>
                         </div>
                     </div>
                 @endif
@@ -113,13 +113,13 @@
             $brandBarAlpine = $slideIndex === null ? "x-show=\"current < $contactIdx\"" : '';
         @endphp
         <div class="absolute inset-x-0 bottom-0 py-2 px-6 flex flex-col items-center justify-center bg-black/85" {!! $brandBarAlpine !!} style="{{ !$showBrandBar ? 'display:none;' : '' }}">
-            <p class="text-white font-bold uppercase tracking-widest text-[9px] font-montserrat mb-1">{{ $companyLabel }}</p>
+            <p class="text-white font-bold tracking-widest text-[9px] font-montserrat mb-1">{{ $companyLabel }}</p>
             <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)
-                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $trade }}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold tracking-wider border border-white/5">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $city }}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold tracking-wider border border-white/5">{{ $city }}</span>
                 @endif
             </div>
             @if ($logoUrl)

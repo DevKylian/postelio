@@ -61,7 +61,7 @@
             <p class="font-bold text-[10px] uppercase tracking-[0.2em] mb-6 select-none opacity-40" style="color: {{ $brandTextColor }}">CONSEIL D'EXPERT</p>
             @if($title)
                 <div class="max-h-[160px] overflow-hidden">
-                    <h2 class="font-black {{ $fontSizeClass }} uppercase leading-tight font-montserrat" style="color: {{ $brandTextColor }}">{!! nl2br(e($title)) !!}</h2>
+                    <h2 class="font-black {{ $fontSizeClass }} leading-tight font-montserrat" style="color: {{ $brandTextColor }}">{!! nl2br(e($title)) !!}</h2>
                 </div>
             @else
                 <div class="space-y-3">
@@ -93,7 +93,7 @@
                          elseif ($cLen > 40) $cFontSize = 'text-lg';
                      @endphp
                      <div class="max-h-[180px] overflow-hidden">
-                         <p class="text-gray-800 font-black {{ $cFontSize }} uppercase tracking-tight leading-tight font-montserrat">
+                         <p class="text-gray-800 font-black {{ $cFontSize }} tracking-tight leading-tight font-montserrat">
                              {{ $content }}
                          </p>
                      </div>
@@ -125,13 +125,13 @@
 
         {{-- Footer --}}
         <div class="absolute bottom-0 inset-x-0 py-2.5 flex flex-col items-center justify-center px-6 gap-1" style="background-color: #1E293B">
-            <p class="text-white/80 font-bold uppercase tracking-widest text-[9px] font-montserrat">{{ $companyLabel }}</p>
+            <p class="text-white/80 font-bold tracking-widest text-[9px] font-montserrat">{{ $companyLabel }}</p>
             <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)
-                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $trade }}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold tracking-wider border border-white/5">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $city }}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold tracking-wider border border-white/5">{{ $city }}</span>
                 @endif
             </div>
         </div>

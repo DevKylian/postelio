@@ -66,9 +66,9 @@
             $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
             $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-6 bg-gray-400 rounded-xl border-4 border-gray-900 overflow-hidden shadow-2xl" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
+        <div class="absolute inset-6 bg-slate-950 rounded-xl border-4 border-gray-900 overflow-hidden shadow-2xl" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if($imageBeforeUrl)
-                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-contain">
+                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-contain p-4">
                 <div class="absolute top-6 left-6 bg-gray-900 px-5 py-2 rounded-lg text-xs font-black text-white uppercase font-montserrat tracking-[0.2em] shadow-2xl z-20">VUE INITIALE</div>
             @endif
         </div>
@@ -79,9 +79,9 @@
             $slide2Alpine = $slideIndex === null ? "x-show=\"current === 2\" style=\"display: none;\"" : '';
             $slide2Style = (int)$slideIndex !== 2 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-6 bg-gray-500 rounded-xl border-4 border-gray-900 overflow-hidden shadow-2xl" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
+        <div class="absolute inset-6 bg-slate-900 rounded-xl border-4 border-gray-900 overflow-hidden shadow-2xl" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if($imageAfterUrl)
-                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-contain">
+                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-contain p-4">
                 <div class="absolute top-6 right-6 px-5 py-2 rounded-lg text-xs font-black text-white uppercase font-montserrat tracking-[0.2em] shadow-2xl z-20" style="background-color: {{ $brandColor }}">RÉSULTAT FINAL</div>
             @endif
         </div>

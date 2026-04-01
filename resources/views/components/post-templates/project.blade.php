@@ -79,9 +79,9 @@
             $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
             $slide1Style = $slideIndex !== 1 ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-0 bg-gray-300 flex items-center justify-center" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
+        <div class="absolute inset-0 bg-slate-950 flex items-center justify-center" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if ($imageBeforeUrl)
-                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-contain p-4">
                 <div class="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-4 py-2 rounded-lg border border-white/20 z-20 shadow-xl">
                     <p class="text-white text-xs font-black uppercase tracking-[0.2em] leading-none">Avant</p>
                 </div>
@@ -94,9 +94,9 @@
             $slide2Alpine = $slideIndex === null ? "x-show=\"current === 2\" style=\"display: none;\"" : '';
             $slide2Style = (int)$slideIndex !== 2 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-0 bg-gray-400 flex items-center justify-center" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
+        <div class="absolute inset-0 bg-slate-900 flex items-center justify-center" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if ($imageAfterUrl)
-                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-contain p-4">
                 <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg border border-black/10 z-20 shadow-xl">
                     <p class="text-gray-900 text-xs font-black uppercase tracking-[0.2em] leading-none">Après</p>
                 </div>
@@ -162,17 +162,17 @@
             elseif ($tLen > 25) $tFontSize = 'text-[13px]';
         @endphp
         <div class="flex flex-col items-center max-w-full">
-            <p class="font-bold uppercase tracking-widest {{ $cFontSize }} font-montserrat leading-none mb-1 truncate w-full text-center opacity-60" style="color: {{ $brandTextColor }}">{{ $companyLabel }}</p>
+            <p class="font-bold tracking-widest {{ $cFontSize }} font-montserrat leading-none mb-1 truncate w-full text-center opacity-60" style="color: {{ $brandTextColor }}">{{ $companyLabel }}</p>
             <div class="flex items-center gap-1.5 mb-1.5">
                 @if($trade)
-                    <span class="px-1.5 py-0.5 rounded-md text-[7px] font-bold uppercase tracking-wider border border-current opacity-40 shrink-0" style="color: {{ $brandTextColor }}">{{ $trade }}</span>
+                    <span class="px-1.5 py-0.5 rounded-md text-[7px] font-bold tracking-wider border border-current opacity-40 shrink-0" style="color: {{ $brandTextColor }}">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-1.5 py-0.5 rounded-md text-[7px] font-bold uppercase tracking-wider border border-current opacity-40 shrink-0" style="color: {{ $brandTextColor }}">{{ $city }}</span>
+                    <span class="px-1.5 py-0.5 rounded-md text-[7px] font-bold tracking-wider border border-current opacity-40 shrink-0" style="color: {{ $brandTextColor }}">{{ $city }}</span>
                 @endif
             </div>
             <div class="max-h-[30px] overflow-hidden">
-                <h3 class="font-black uppercase tracking-tighter {{ $tFontSize }} font-montserrat leading-none text-center" style="color: {{ $brandTextColor }}">{{ $text }}</h3>
+                <h3 class="font-black tracking-tighter {{ $tFontSize }} font-montserrat leading-none text-center" style="color: {{ $brandTextColor }}">{{ $text }}</h3>
             </div>
         </div>
     </div>

@@ -62,9 +62,9 @@
             $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
             $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-0 bg-gray-800" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
+        <div class="absolute inset-0 bg-slate-950" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if ($imageBeforeUrl)
-                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-contain p-6">
                 <div class="absolute top-6 left-6 backdrop-blur-xl bg-white/10 border border-white/20 px-4 py-2 rounded-xl z-20 shadow-2xl">
                     <p class="text-white text-[10px] font-black uppercase tracking-[0.3em] leading-none">Avant</p>
                 </div>
@@ -77,9 +77,9 @@
             $slide2Alpine = $slideIndex === null ? "x-show=\"current === 2\" style=\"display: none;\"" : '';
             $slide2Style = (int)$slideIndex !== 2 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-0 bg-gray-700" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
+        <div class="absolute inset-0 bg-slate-900" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if ($imageAfterUrl)
-                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-contain p-6">
                 <div class="absolute top-6 right-6 backdrop-blur-xl bg-white/20 border border-white/30 px-4 py-2 rounded-xl z-20 shadow-2xl">
                     <p class="text-white text-[10px] font-black uppercase tracking-[0.3em] leading-none">Après</p>
                 </div>

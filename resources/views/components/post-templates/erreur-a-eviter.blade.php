@@ -54,7 +54,7 @@
                 elseif ($len > 40) $fontSize = 'text-xl';
             @endphp
             <div class="max-h-[160px] overflow-hidden">
-                <p class="text-white font-black uppercase tracking-tight {{ $fontSize }} leading-snug font-montserrat">{!! nl2br(e($text)) !!}</p>
+                <p class="text-white font-black {{ $fontSize }} leading-snug font-montserrat">{!! nl2br(e($text)) !!}</p>
             </div>
         </div>
         <div class="absolute bottom-0 inset-x-0 border-t px-10 py-3 flex flex-col gap-1" style="border-color: rgba(255,255,255,0.1)">
@@ -62,14 +62,14 @@
                 @if ($logoUrl)
                     <img src="{{ $logoUrl }}" alt="Logo" class="h-4 w-4 object-contain rounded">
                 @endif
-                <p class="font-bold text-xs uppercase tracking-widest font-montserrat" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
+                <p class="font-bold text-xs tracking-widest font-montserrat" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
             </div>
             <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)
-                    <span class="px-1.5 py-0.5 rounded bg-white/5 text-white/30 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $trade }}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-white/5 text-white/30 text-[7px] font-bold tracking-wider border border-white/5">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-1.5 py-0.5 rounded bg-white/5 text-white/30 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $city }}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-white/5 text-white/30 text-[7px] font-bold tracking-wider border border-white/5">{{ $city }}</span>
                 @endif
             </div>
         </div>

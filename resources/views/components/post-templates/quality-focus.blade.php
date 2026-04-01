@@ -61,18 +61,18 @@
             @endphp
             <p class="text-[10px] font-bold uppercase tracking-[0.2em] mb-2 text-white/50">Focus Qualité</p>
             <div class="max-h-[80px] overflow-hidden">
-                <h3 class="text-white font-black {{ $fontSize }} uppercase leading-snug font-montserrat">{!! nl2br(e($text)) !!}</h3>
+                <h3 class="text-white font-black {{ $fontSize }} leading-snug font-montserrat">{!! nl2br(e($text)) !!}</h3>
             </div>
         </div>
 
         <div class="absolute inset-x-0 bottom-0 py-2 px-6 flex flex-col items-center justify-center bg-black/80">
-            <p class="font-bold text-[9px] uppercase tracking-widest font-montserrat text-white/90 mb-1">{{ $companyLabel }}</p>
+            <p class="font-bold text-[9px] tracking-widest font-montserrat text-white/90 mb-1">{{ $companyLabel }}</p>
             <div class="flex items-center gap-1.5">
                 @if($trade)
-                    <span class="px-1.5 py-0.5 rounded-md bg-white/10 text-white/50 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $trade }}</span>
+                    <span class="px-1.5 py-0.5 rounded-md bg-white/10 text-white/50 text-[7px] font-bold tracking-wider border border-white/5">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-1.5 py-0.5 rounded-md bg-white/10 text-white/50 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $city }}</span>
+                    <span class="px-1.5 py-0.5 rounded-md bg-white/10 text-white/50 text-[7px] font-bold tracking-wider border border-white/5">{{ $city }}</span>
                 @endif
             </div>
             @if ($logoUrl)

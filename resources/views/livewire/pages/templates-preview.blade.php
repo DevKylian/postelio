@@ -167,7 +167,7 @@ $deleteTemplate = function (int $id) {
             $g = hexdec(substr($hex, 2, 2));
             $b = hexdec(substr($hex, 4, 2));
             $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
-            return ($yiq >= 150) ? '#1E293B' : '#FFFFFF';
+            return ($yiq >= 186) ? '#1E293B' : '#FFFFFF';
         };
         $brandTextColor = $getContrastColor($brandColor);
 

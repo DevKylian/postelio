@@ -62,14 +62,14 @@
                 @if ($logoUrl)
                     <img src="{{ $logoUrl }}" alt="Logo" class="h-4 w-4 object-contain rounded">
                 @endif
-                <p class="text-white/90 font-bold text-[9px] uppercase tracking-widest font-montserrat truncate">{{ $companyLabel }}</p>
+                <p class="text-white/90 font-bold text-[9px] tracking-widest font-montserrat truncate">{{ $companyLabel }}</p>
             </div>
             <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)
-                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/50 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $trade }}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/50 text-[7px] font-bold tracking-wider border border-white/5">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/50 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $city }}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/50 text-[7px] font-bold tracking-wider border border-white/5">{{ $city }}</span>
                 @endif
             </div>
         </div>
@@ -84,7 +84,7 @@
             @endphp
             <div class="absolute inset-x-6 bottom-[42px] top-[60%] flex items-center justify-center z-10 overflow-hidden">
                 <div class="bg-black/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/10">
-                    <h3 class="text-white font-black {{ $fontSize }} uppercase leading-snug font-montserrat text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</h3>
+                    <h3 class="text-white font-black {{ $fontSize }} leading-snug font-montserrat text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</h3>
                 </div>
             </div>
         @endif

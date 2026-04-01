@@ -32,7 +32,7 @@
             $g = hexdec(substr($hex, 2, 2));
             $b = hexdec(substr($hex, 4, 2));
             $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
-            return ($yiq >= 150) ? '#1E293B' : '#FFFFFF';
+            return ($yiq >= 186) ? '#1E293B' : '#FFFFFF';
         };
         $brandTextColor = $getContrastColor($brandColor);
         
@@ -243,7 +243,7 @@
         {{-- ... existing lifestyle code ... --}}
         {{-- INLINE lifestyle rendering — bypasses component system entirely --}}
         @php
-            $lifestyleText = strtoupper($rawText ?: 'SUR LE TERRAIN');
+            $lifestyleText = $rawText ?: 'Sur le terrain';
             $lifestyleLen = mb_strlen($lifestyleText);
             $lifestyleFontSize = $lifestyleLen > 25 ? '10px' : ($lifestyleLen > 18 ? '11px' : '13px');
             $lifestyleImgUrl = $props['imageUrl'] ?? null;
@@ -415,20 +415,20 @@
                 @if($lifestyleText)
                 <div style="position: absolute; left: 24px; right: 24px; bottom: 68px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                     <div style="background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 7px 16px; max-width: 100%; overflow: hidden;">
-                        <span style="color: white; font-size: {{ $lifestyleFontSize }}; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.3; text-align: center; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $lifestyleText }}</span>
+                        <span style="color: white; font-size: {{ $lifestyleFontSize }}; font-weight: 900; letter-spacing: 0.15em; line-height: 1.3; text-align: center; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $lifestyleText }}</span>
                     </div>
                 </div>
                 @endif
 
                 {{-- Bottom branding bar --}}
                 <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 20px 10px; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: flex; flex-direction: column; align-items: center; gap: 4px; border-top: 2px solid {{ $brandColor }};">
-                    <span style="color: rgba(255,255,255,0.9); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em;">{{ $companyLabel }}</span>
+                    <span style="color: rgba(255,255,255,0.9); font-size: 9px; font-weight: 700; letter-spacing: 0.2em;">{{ $companyLabel }}</span>
                     <div style="display: flex; align-items: center; gap: 6px; overflow: hidden;">
                         @if($props['trade'] ?? null)
-                            <span style="color: rgba(255,255,255,0.5); font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); border-radius: 3px; padding: 1px 5px; white-space: nowrap;">{{ $props['trade'] }}</span>
+                            <span style="color: rgba(255,255,255,0.5); font-size: 6px; font-weight: 700; letter-spacing: 0.1em; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); border-radius: 3px; padding: 1px 5px; white-space: nowrap;">{{ $props['trade'] }}</span>
                         @endif
                         @if($props['city'] ?? null)
-                            <span style="color: rgba(255,255,255,0.5); font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); border-radius: 3px; padding: 1px 5px; white-space: nowrap;">{{ $props['city'] }}</span>
+                            <span style="color: rgba(255,255,255,0.5); font-size: 6px; font-weight: 700; letter-spacing: 0.1em; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); border-radius: 3px; padding: 1px 5px; white-space: nowrap;">{{ $props['city'] }}</span>
                         @endif
                     </div>
                 </div>

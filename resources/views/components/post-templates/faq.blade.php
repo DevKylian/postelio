@@ -53,7 +53,7 @@
                 elseif ($qLen > 60) $qFontSize = 'text-xl';
             @endphp
             <div class="max-h-[200px] overflow-hidden">
-                <p class="text-white font-black uppercase tracking-tight {{ $qFontSize }} leading-snug font-montserrat">{!! nl2br(e($question)) !!}</p>
+                <p class="text-white font-black tracking-tight {{ $qFontSize }} leading-snug font-montserrat">{!! nl2br(e($question)) !!}</p>
             </div>
         </div>
 
@@ -106,7 +106,7 @@
                 @if ($logoUrl)
                     <img src="{{ $logoUrl }}" alt="Logo" class="h-5 w-5 object-contain rounded">
                 @endif
-                <p class="font-bold text-xs uppercase tracking-widest font-montserrat" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
+                <p class="font-bold text-xs tracking-widest font-montserrat" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
             </div>
             
             @if($preview || $slideIndex !== null)
@@ -122,10 +122,10 @@
         </div>
         <div class="flex items-center gap-1.5 overflow-hidden">
             @if($trade)
-                <span class="px-1.5 py-0.5 rounded bg-white/5 text-white/30 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $trade }}</span>
+                <span class="px-1.5 py-0.5 rounded bg-white/5 text-white/30 text-[7px] font-bold tracking-wider border border-white/5">{{ $trade }}</span>
             @endif
             @if($city)
-                <span class="px-1.5 py-0.5 rounded bg-white/5 text-white/30 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $city }}</span>
+                <span class="px-1.5 py-0.5 rounded bg-white/5 text-white/30 text-[7px] font-bold tracking-wider border border-white/5">{{ $city }}</span>
             @endif
         </div>
     </div>

@@ -72,7 +72,7 @@
                             elseif ($cLen > 40) $cFontSize = 'text-base';
                         @endphp
                         <div class="mt-4 backdrop-blur-sm p-4 rounded-2xl border max-h-[140px] overflow-hidden" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)' }}; border-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }};">
-                            <p class="font-black {{ $cFontSize }} uppercase leading-tight font-montserrat" style="color: {{ $brandTextColor }}">{{ $coverText }}</p>
+                            <p class="font-black {{ $cFontSize }} leading-tight font-montserrat" style="color: {{ $brandTextColor }}">{{ $coverText }}</p>
                         </div>
                     @else
                         <div class="space-y-2 mt-4">
@@ -107,7 +107,7 @@
                             elseif ($sLen > 80) $sFontSize = 'text-[10px]';
                         @endphp
                         <div class="absolute inset-x-6 bottom-16 bg-black/80 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-2xl max-h-[100px] overflow-hidden shrink-0">
-                            <p class="text-white font-black {{ $sFontSize }} uppercase leading-tight font-montserrat">{{ $stepText }}</p>
+                            <p class="text-white font-black {{ $sFontSize }} leading-tight font-montserrat">{{ $stepText }}</p>
                         </div>
                     @endif
                 @endif
@@ -139,7 +139,7 @@
 
         @if($preview)
             <div class="absolute bottom-0 inset-x-0 h-10 flex items-center justify-center px-4" :style="current === 0 ? 'background-color: rgba(0,0,0,0.2)' : 'background-color: transparent'">
-                <p class="font-bold text-[9px] uppercase tracking-widest font-montserrat" :class="current === 0 || current === {{ $contactIndex }} ? 'text-white/60' : 'text-white'" x-show="current !== {{ $contactIndex }}">{{ $companyLabel }}</p>
+                <p class="font-bold text-[9px] tracking-widest font-montserrat" :class="current === 0 || current === {{ $contactIndex }} ? 'text-white/60' : 'text-white'" x-show="current !== {{ $contactIndex }}">{{ $companyLabel }}</p>
             </div>
             
             <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity">
@@ -159,13 +159,13 @@
             @endphp
             @if($showFooter)
             <div class="absolute bottom-0 inset-x-0 h-14 flex flex-col items-center justify-center px-4" style="{{ $footerStyle }}">
-                <p class="font-bold text-[9px] uppercase tracking-widest font-montserrat truncate mb-1 {{ ($slideIndex === 0) ? 'text-white/60' : 'text-white' }}">{{ $companyLabel }}</p>
+                <p class="font-bold text-[9px] tracking-widest font-montserrat truncate mb-1 {{ ($slideIndex === 0) ? 'text-white/60' : 'text-white' }}">{{ $companyLabel }}</p>
                 <div class="flex items-center gap-1.5 overflow-hidden">
                     @if($trade)
-                        <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $trade }}</span>
+                        <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold tracking-wider border border-white/5">{{ $trade }}</span>
                     @endif
                     @if($city)
-                        <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold uppercase tracking-wider border border-white/5">{{ $city }}</span>
+                        <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/40 text-[7px] font-bold tracking-wider border border-white/5">{{ $city }}</span>
                     @endif
                 </div>
             </div>

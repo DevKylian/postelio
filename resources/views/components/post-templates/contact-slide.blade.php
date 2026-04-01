@@ -49,7 +49,7 @@
     {{-- Contact Card — Front layer --}}
     <div class="relative z-10 w-full max-w-[250px] rounded-[1.5rem] p-5 flex flex-col items-center text-center {{ $cardStyle }}">
         
-        <h2 class="text-lg font-black uppercase tracking-tight mb-1 leading-tight">{{ $companyLabel }}</h2>
+        <h2 class="text-lg font-black tracking-tight mb-1 leading-tight">{{ $companyLabel }}</h2>
         
         @if($trade || $city)
             <div class="mb-4 flex flex-wrap justify-center gap-2">

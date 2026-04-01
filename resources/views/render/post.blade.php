@@ -124,6 +124,25 @@
             'visualStyle' => $visualStyle,
         ];
 
+        // Prepare specialized data early for count calculation
+        if (in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique'])) {
+            $slideTexts = [];
+            if (is_array($contentData) && isset($contentData['slides'])) {
+                $slideTexts = array_map(fn($s) => is_string($s) ? $s : ($s['text'] ?? ($s['content'] ?? '')), $contentData['slides']);
+            }
+            $title = is_array($contentData) && isset($contentData['title']) ? $contentData['title'] : ($slideTexts[0] ?? $rawText);
+            
+            $photos = $post->extra_images ?? [];
+            if(!empty($post->image_path)) {
+                array_unshift($photos, $post->image_path);
+            }
+            $slides = empty($photos) ? [null, null, null] : array_map(fn($p) => asset(Storage::url($p)), $photos);
+            
+            if ($template === 'step_by_step' && count($slides) >= 1 && $slides[0] !== null) {
+                array_unshift($slides, null); // Cover slide
+            }
+        }
+
         // Determine total slides for this template (logic must match ImageGeneratorService)
         $totalSlidesBeforeContact = 1;
         if ($template === 'guide_pedagogique') {
@@ -135,7 +154,7 @@
             $faqSlides = (is_array($contentData) && isset($contentData['slides']) && is_array($contentData['slides'])) ? $contentData['slides'] : [];
             $totalSlidesBeforeContact = 1 + count($faqSlides);
         } elseif ($template === 'chantier_detail' || $template === 'step_by_step') {
-            $totalSlidesBeforeContact = count($post->extra_images ?? []) + 1;
+            $totalSlidesBeforeContact = count($slides ?? []);
         }
 
         $hasContactInfo = !empty($commonProps['phone']) || !empty($commonProps['email']) || !empty($commonProps['website']);
@@ -178,26 +197,10 @@
                 'text' => $rawText,
             ]);
         } elseif (in_array($template, ['chantier_detail', 'step_by_step', 'guide_pedagogique'])) {
-            $slideTexts = [];
-            if (is_array($contentData) && isset($contentData['slides'])) {
-                $slideTexts = array_map(fn($s) => is_string($s) ? $s : ($s['text'] ?? ($s['content'] ?? '')), $contentData['slides']);
-            }
-            $title = is_array($contentData) && isset($contentData['title']) ? $contentData['title'] : ($slideTexts[0] ?? $rawText);
-            
-            $photos = $post->extra_images ?? [];
-            if(!empty($post->image_path)) {
-                array_unshift($photos, $post->image_path);
-            }
-            $slides = empty($photos) ? [null, null, null] : array_map(fn($p) => asset(Storage::url($p)), $photos);
-            
-            if ($template === 'step_by_step' && count($slides) >= 1 && $slides[0] !== null) {
-                array_unshift($slides, null); // Cover slide
-            }
-
             $props = array_merge($commonProps, [
-                'title' => $title,
-                'slides' => $slides,
-                'slideContents' => $slideTexts,
+                'title' => $title ?? '',
+                'slides' => $slides ?? [],
+                'slideContents' => $slideTexts ?? [],
             ]);
         } elseif ($template === 'custom') {
             $ctId = $post->template_options['custom_template_id'] ?? null;

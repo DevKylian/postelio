@@ -59,7 +59,16 @@ class ImageGeneratorService
                 : 1;
             $totalSlides = 1 + $faqSlideCount;
         } elseif ($post->template === 'chantier_detail' || $post->template === 'step_by_step') {
-            $totalSlides = count($post->extra_images ?? []) + 1; // +1 for cover/intro
+            $photos = $post->extra_images ?? [];
+            if(!empty($post->image_path)) {
+                array_unshift($photos, $post->image_path);
+            }
+            $photoCount = count($photos);
+            if ($photoCount === 0) {
+                $totalSlides = 3; // Match the [null, null, null] default in post.blade.php
+            } else {
+                $totalSlides = $photoCount + ($post->template === 'step_by_step' ? 1 : 0);
+            }
         } else {
             // Single image templates (lifestyle, quality_focus, review, etc.)
             $totalSlides = 1;

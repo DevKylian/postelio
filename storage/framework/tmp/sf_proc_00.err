@@ -9016,3 +9016,446 @@ Au caractäre Ligne:1 : 1
 [Wed Apr  1 14:20:31 2026] 127.0.0.1:9268 Closing
 [Wed Apr  1 15:53:57 2026] 127.0.0.1:12467 Accepted
 [Wed Apr  1 15:53:57 2026] 127.0.0.1:12468 Accepted
+[Wed Apr  1 15:53:58 2026] 127.0.0.1:12467 Closing
+[Wed Apr  1 15:53:58 2026] 127.0.0.1:12487 Accepted
+[Wed Apr  1 15:53:58 2026] 127.0.0.1:12487 [200]: GET /manifest.webmanifest
+[Wed Apr  1 15:53:58 2026] 127.0.0.1:12487 Closing
+[Wed Apr  1 15:53:58 2026] 127.0.0.1:12468 Closing
+[Wed Apr  1 15:53:59 2026] 127.0.0.1:12491 Accepted
+[Wed Apr  1 15:53:59 2026] 127.0.0.1:12491 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 15:53:59 2026] 127.0.0.1:12492 Accepted
+[Wed Apr  1 15:53:59 2026] 127.0.0.1:12492 [200]: GET /images/pwa/icon-192.png
+[Wed Apr  1 15:53:59 2026] 127.0.0.1:12491 Closing
+[Wed Apr  1 15:53:59 2026] 127.0.0.1:12492 Closing
+[Wed Apr  1 15:54:00 2026] 127.0.0.1:12501 Accepted
+[Wed Apr  1 15:54:00 2026] 127.0.0.1:12501 [200]: GET /sw.js
+[Wed Apr  1 15:54:00 2026] 127.0.0.1:12501 Closing
+[Wed Apr  1 15:54:33 2026] 127.0.0.1:12644 Accepted
+[Wed Apr  1 15:54:34 2026] 127.0.0.1:12644 Closing
+[Wed Apr  1 15:54:37 2026] 127.0.0.1:12658 Accepted
+[Wed Apr  1 15:54:37 2026] 127.0.0.1:12658 [200]: GET /sw.js
+[Wed Apr  1 15:54:37 2026] 127.0.0.1:12658 Closing
+[Wed Apr  1 15:54:46 2026] 127.0.0.1:12664 Accepted
+[Wed Apr  1 15:54:46 2026] 127.0.0.1:12665 Accepted
+[Wed Apr  1 15:54:46 2026] 127.0.0.1:12664 Closing
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12665 [200]: GET /images/customers/1.png
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12671 Accepted
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12671 [200]: GET /images/customers/2.png
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12665 Closing
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12671 Closing
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12672 Accepted
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12672 [200]: GET /images/customers/3.png
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12673 Accepted
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12673 [200]: GET /images/customers/4.png
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12672 Closing
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12673 Closing
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12675 Accepted
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12675 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 15:54:47 2026] 127.0.0.1:12675 Closing
+[Wed Apr  1 15:54:48 2026] 127.0.0.1:12678 Accepted
+[Wed Apr  1 15:54:48 2026] 127.0.0.1:12678 [200]: GET /sw.js
+[Wed Apr  1 15:54:48 2026] 127.0.0.1:12678 Closing
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13177 Accepted
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13178 Accepted
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13177 Closing
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13178 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13185 Accepted
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13185 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13178 Closing
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13185 Closing
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13187 Accepted
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13187 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13188 Accepted
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13188 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13187 Closing
+[Wed Apr  1 16:08:03 2026] 127.0.0.1:13188 Closing
+[Wed Apr  1 16:08:04 2026] 127.0.0.1:13191 Accepted
+[Wed Apr  1 16:08:04 2026] 127.0.0.1:13191 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:08:04 2026] 127.0.0.1:13191 Closing
+[Wed Apr  1 16:08:06 2026] 127.0.0.1:13195 Accepted
+[Wed Apr  1 16:08:06 2026] 127.0.0.1:13195 [200]: GET /sw.js
+[Wed Apr  1 16:08:06 2026] 127.0.0.1:13195 Closing
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13203 Accepted
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13204 Accepted
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13203 Closing
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13204 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13209 Accepted
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13209 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13204 Closing
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13209 Closing
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13210 Accepted
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13210 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13211 Accepted
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13210 Closing
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13211 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13211 Closing
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13213 Accepted
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13213 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:08:14 2026] 127.0.0.1:13213 Closing
+[Wed Apr  1 16:08:16 2026] 127.0.0.1:13214 Accepted
+[Wed Apr  1 16:08:16 2026] 127.0.0.1:13214 [200]: GET /sw.js
+[Wed Apr  1 16:08:16 2026] 127.0.0.1:13214 Closing
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13222 Accepted
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13223 Accepted
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13222 Closing
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13223 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13228 Accepted
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13228 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13223 Closing
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13228 Closing
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13229 Accepted
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13229 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13230 Accepted
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13230 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13229 Closing
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13230 Closing
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13232 Accepted
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13232 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:08:24 2026] 127.0.0.1:13232 Closing
+[Wed Apr  1 16:08:26 2026] 127.0.0.1:13234 Accepted
+[Wed Apr  1 16:08:26 2026] 127.0.0.1:13234 [200]: GET /sw.js
+[Wed Apr  1 16:08:26 2026] 127.0.0.1:13234 Closing
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13241 Accepted
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13242 Accepted
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13241 Closing
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13242 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13247 Accepted
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13247 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13242 Closing
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13247 Closing
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13248 Accepted
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13248 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13249 Accepted
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13248 Closing
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13249 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13249 Closing
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13251 Accepted
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13251 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:08:34 2026] 127.0.0.1:13251 Closing
+[Wed Apr  1 16:08:36 2026] 127.0.0.1:13253 Accepted
+[Wed Apr  1 16:08:36 2026] 127.0.0.1:13253 [200]: GET /sw.js
+[Wed Apr  1 16:08:36 2026] 127.0.0.1:13253 Closing
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13260 Accepted
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13261 Accepted
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13260 Closing
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13261 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13266 Accepted
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13266 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13261 Closing
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13266 Closing
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13267 Accepted
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13267 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13267 Closing
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13268 Accepted
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13268 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13268 Closing
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13270 Accepted
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13270 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:08:43 2026] 127.0.0.1:13270 Closing
+[Wed Apr  1 16:08:45 2026] 127.0.0.1:13272 Accepted
+[Wed Apr  1 16:08:45 2026] 127.0.0.1:13272 [200]: GET /sw.js
+[Wed Apr  1 16:08:45 2026] 127.0.0.1:13272 Closing
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13280 Accepted
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13281 Accepted
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13280 Closing
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13281 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13281 Closing
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13284 Accepted
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13284 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13284 Closing
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13285 Accepted
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13285 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13286 Accepted
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13286 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13285 Closing
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13286 Closing
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13288 Accepted
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13288 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:08:55 2026] 127.0.0.1:13288 Closing
+[Wed Apr  1 16:08:57 2026] 127.0.0.1:13290 Accepted
+[Wed Apr  1 16:08:57 2026] 127.0.0.1:13290 [200]: GET /sw.js
+[Wed Apr  1 16:08:57 2026] 127.0.0.1:13290 Closing
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13316 Accepted
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13317 Accepted
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13316 Closing
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13317 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13317 Closing
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13322 Accepted
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13322 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13322 Closing
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13323 Accepted
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13323 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13323 Closing
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13324 Accepted
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13324 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13324 Closing
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13328 Accepted
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13328 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:09:42 2026] 127.0.0.1:13328 Closing
+[Wed Apr  1 16:09:44 2026] 127.0.0.1:13329 Accepted
+[Wed Apr  1 16:09:44 2026] 127.0.0.1:13329 [200]: GET /sw.js
+[Wed Apr  1 16:09:44 2026] 127.0.0.1:13329 Closing
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13575 Accepted
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13576 Accepted
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13575 Closing
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13576 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13576 Closing
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13583 Accepted
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13583 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13583 Closing
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13584 Accepted
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13584 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13584 Closing
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13585 Accepted
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13585 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:14:38 2026] 127.0.0.1:13585 Closing
+[Wed Apr  1 16:14:39 2026] 127.0.0.1:13590 Accepted
+[Wed Apr  1 16:14:39 2026] 127.0.0.1:13590 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:14:39 2026] 127.0.0.1:13590 Closing
+[Wed Apr  1 16:14:41 2026] 127.0.0.1:13591 Accepted
+[Wed Apr  1 16:14:41 2026] 127.0.0.1:13591 [200]: GET /sw.js
+[Wed Apr  1 16:14:41 2026] 127.0.0.1:13591 Closing
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13607 Accepted
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13608 Accepted
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13607 Closing
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13608 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13608 Closing
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13613 Accepted
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13613 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13613 Closing
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13614 Accepted
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13614 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13615 Accepted
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13614 Closing
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13615 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13615 Closing
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13619 Accepted
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13619 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:15:08 2026] 127.0.0.1:13619 Closing
+[Wed Apr  1 16:15:10 2026] 127.0.0.1:13621 Accepted
+[Wed Apr  1 16:15:10 2026] 127.0.0.1:13621 [200]: GET /sw.js
+[Wed Apr  1 16:15:10 2026] 127.0.0.1:13621 Closing
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13650 Accepted
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13651 Accepted
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13650 Closing
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13651 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13655 Accepted
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13655 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13651 Closing
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13655 Closing
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13657 Accepted
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13657 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13657 Closing
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13658 Accepted
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13658 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:15:54 2026] 127.0.0.1:13658 Closing
+[Wed Apr  1 16:15:55 2026] 127.0.0.1:13661 Accepted
+[Wed Apr  1 16:15:55 2026] 127.0.0.1:13661 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:15:55 2026] 127.0.0.1:13661 Closing
+[Wed Apr  1 16:15:57 2026] 127.0.0.1:13662 Accepted
+[Wed Apr  1 16:15:57 2026] 127.0.0.1:13662 [200]: GET /sw.js
+[Wed Apr  1 16:15:57 2026] 127.0.0.1:13662 Closing
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13759 Accepted
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13760 Accepted
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13759 Closing
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13760 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13760 Closing
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13765 Accepted
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13765 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13765 Closing
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13766 Accepted
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13766 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13767 Accepted
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13767 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13766 Closing
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13767 Closing
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13772 Accepted
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13772 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:17:01 2026] 127.0.0.1:13772 Closing
+[Wed Apr  1 16:17:03 2026] 127.0.0.1:13774 Accepted
+[Wed Apr  1 16:17:03 2026] 127.0.0.1:13774 [200]: GET /sw.js
+[Wed Apr  1 16:17:03 2026] 127.0.0.1:13774 Closing
+[Wed Apr  1 16:37:47 2026] 127.0.0.1:14602 Accepted
+[Wed Apr  1 16:37:47 2026] 127.0.0.1:14603 Accepted
+[Wed Apr  1 16:37:47 2026] 127.0.0.1:14602 Closing
+[Wed Apr  1 16:37:47 2026] 127.0.0.1:14603 Closing
+[Wed Apr  1 16:37:47 2026] 127.0.0.1:14609 Accepted
+[Wed Apr  1 16:37:47 2026] 127.0.0.1:14609 [200]: GET /sw.js
+[Wed Apr  1 16:37:47 2026] 127.0.0.1:14609 Closing
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14622 Accepted
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14623 Accepted
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14624 Accepted
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14622 Closing
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14623 Closing
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14624 Closing
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14631 Accepted
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14631 Closing
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14633 Accepted
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14633 Closing
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14635 Accepted
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14635 Closing
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14637 Accepted
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14637 Closing
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14642 Accepted
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14642 Closing
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14644 Accepted
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14645 Accepted
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14644 Closing
+[Wed Apr  1 16:37:48 2026] 127.0.0.1:14645 Closing
+[Wed Apr  1 16:37:49 2026] 127.0.0.1:14651 Accepted
+[Wed Apr  1 16:37:49 2026] 127.0.0.1:14652 Accepted
+[Wed Apr  1 16:37:49 2026] 127.0.0.1:14651 Closing
+[Wed Apr  1 16:37:49 2026] 127.0.0.1:14652 Closing
+[Wed Apr  1 16:37:49 2026] 127.0.0.1:14657 Accepted
+[Wed Apr  1 16:37:49 2026] 127.0.0.1:14658 Accepted
+[Wed Apr  1 16:37:49 2026] 127.0.0.1:14657 Closing
+[Wed Apr  1 16:37:49 2026] 127.0.0.1:14658 Closing
+[Wed Apr  1 16:37:49 2026] 127.0.0.1:14663 Accepted
+[Wed Apr  1 16:37:49 2026] 127.0.0.1:14664 Accepted
+[Wed Apr  1 16:37:49 2026] 127.0.0.1:14663 Closing
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14664 Closing
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14669 Accepted
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14670 Accepted
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14669 Closing
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14670 [200]: GET /manifest.webmanifest
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14670 Closing
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14675 Accepted
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14676 Accepted
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14677 Accepted
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14675 Closing
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14676 [200]: GET /images/pwa/icon-192.png
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14677 [200]: GET /images/pwa/icon-512.png
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14676 Closing
+[Wed Apr  1 16:37:50 2026] 127.0.0.1:14677 Closing
+[Wed Apr  1 16:37:51 2026] 127.0.0.1:14680 Accepted
+[Wed Apr  1 16:37:51 2026] 127.0.0.1:14680 [200]: GET /favicon.ico
+[Wed Apr  1 16:37:51 2026] 127.0.0.1:14680 Closing
+[Wed Apr  1 16:38:34 2026] 127.0.0.1:14722 Accepted
+[Wed Apr  1 16:38:34 2026] 127.0.0.1:14723 Accepted
+[Wed Apr  1 16:38:34 2026] 127.0.0.1:14722 Closing
+[Wed Apr  1 16:38:34 2026] 127.0.0.1:14723 Closing
+[Wed Apr  1 16:38:34 2026] 127.0.0.1:14731 Accepted
+[Wed Apr  1 16:38:35 2026] 127.0.0.1:14731 [200]: GET /sw.js
+[Wed Apr  1 16:38:35 2026] 127.0.0.1:14731 Closing
+[Wed Apr  1 16:38:51 2026] 127.0.0.1:14747 Accepted
+[Wed Apr  1 16:38:51 2026] 127.0.0.1:14748 Accepted
+[Wed Apr  1 16:38:51 2026] 127.0.0.1:14747 Closing
+[Wed Apr  1 16:38:51 2026] 127.0.0.1:14748 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:38:51 2026] 127.0.0.1:14748 Closing
+[Wed Apr  1 16:38:51 2026] 127.0.0.1:14756 Accepted
+[Wed Apr  1 16:38:51 2026] 127.0.0.1:14756 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:38:51 2026] 127.0.0.1:14756 Closing
+[Wed Apr  1 16:38:51 2026] 127.0.0.1:14757 Accepted
+[Wed Apr  1 16:38:51 2026] 127.0.0.1:14757 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:38:51 2026] 127.0.0.1:14757 Closing
+[Wed Apr  1 16:38:52 2026] 127.0.0.1:14758 Accepted
+[Wed Apr  1 16:38:52 2026] 127.0.0.1:14758 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:38:52 2026] 127.0.0.1:14758 Closing
+[Wed Apr  1 16:38:53 2026] 127.0.0.1:14762 Accepted
+[Wed Apr  1 16:38:53 2026] 127.0.0.1:14762 [200]: GET /sw.js
+[Wed Apr  1 16:38:53 2026] 127.0.0.1:14762 Closing
+[Wed Apr  1 16:38:54 2026] 127.0.0.1:14763 Accepted
+[Wed Apr  1 16:38:58 2026] 127.0.0.1:14763 Closing
+[Wed Apr  1 16:38:58 2026] 127.0.0.1:14769 Accepted
+[Wed Apr  1 16:38:59 2026] 127.0.0.1:14769 [200]: GET /sw.js
+[Wed Apr  1 16:38:59 2026] 127.0.0.1:14769 Closing
+[Wed Apr  1 16:41:13 2026] 127.0.0.1:14858 Accepted
+[Wed Apr  1 16:41:13 2026] 127.0.0.1:14859 Accepted
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14858 Closing
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14866 Accepted
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14867 Accepted
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14866 Closing
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14871 Accepted
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14859 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14859 Closing
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14867 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14867 Closing
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14874 Accepted
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14874 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14874 Closing
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14876 Accepted
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14876 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14877 Accepted
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14877 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14876 Closing
+[Wed Apr  1 16:41:14 2026] 127.0.0.1:14877 Closing
+[Wed Apr  1 16:41:15 2026] 127.0.0.1:14879 Accepted
+[Wed Apr  1 16:41:15 2026] 127.0.0.1:14879 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:41:15 2026] 127.0.0.1:14879 Closing
+[Wed Apr  1 16:41:15 2026] 127.0.0.1:14871 [200]: GET /sw.js
+[Wed Apr  1 16:41:15 2026] 127.0.0.1:14871 Closing
+[Wed Apr  1 16:41:17 2026] 127.0.0.1:14881 Accepted
+[Wed Apr  1 16:41:17 2026] 127.0.0.1:14881 [200]: GET /sw.js
+[Wed Apr  1 16:41:17 2026] 127.0.0.1:14881 Closing
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14894 Accepted
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14895 Accepted
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14894 Closing
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14898 Accepted
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14899 Accepted
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14898 Closing
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14901 Accepted
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14895 [200]: GET /images/customers/1.png
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14908 Accepted
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14908 [200]: GET /images/customers/2.png
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14895 Closing
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14908 Closing
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14910 Accepted
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14910 [200]: GET /images/customers/3.png
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14910 Closing
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14911 Accepted
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14911 [200]: GET /images/customers/4.png
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14911 Closing
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14899 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:41:26 2026] 127.0.0.1:14899 Closing
+[Wed Apr  1 16:41:27 2026] 127.0.0.1:14913 Accepted
+[Wed Apr  1 16:41:27 2026] 127.0.0.1:14913 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:41:27 2026] 127.0.0.1:14913 Closing
+[Wed Apr  1 16:41:28 2026] 127.0.0.1:14901 [200]: GET /sw.js
+[Wed Apr  1 16:41:28 2026] 127.0.0.1:14901 Closing
+[Wed Apr  1 16:41:28 2026] 127.0.0.1:14914 Accepted
+[Wed Apr  1 16:41:28 2026] 127.0.0.1:14914 [200]: GET /sw.js
+[Wed Apr  1 16:41:28 2026] 127.0.0.1:14914 Closing
+[Wed Apr  1 16:46:07 2026] 127.0.0.1:15105 Accepted
+[Wed Apr  1 16:46:07 2026] 127.0.0.1:15106 Accepted
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15105 Closing
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15106 [200]: GET /storage/posts/23_0.jpg
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15113 Accepted
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15113 [200]: GET /storage/posts/22_0.jpg
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15106 Closing
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15113 Closing
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15114 Accepted
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15114 [200]: GET /storage/posts/21_0.jpg
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15115 Accepted
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15115 [200]: GET /storage/posts/19_0.jpg
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15114 Closing
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15115 Closing
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15117 Accepted
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15117 [200]: GET /manifest.webmanifest
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15117 Closing
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15119 Accepted
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15119 Closing
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15120 Accepted
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15120 [200]: GET /images/postelio-logo-gradient.svg
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15121 Accepted
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15121 [200]: GET /images/pwa/icon-192.png
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15120 Closing
+[Wed Apr  1 16:46:08 2026] 127.0.0.1:15121 Closing
+[Wed Apr  1 16:46:09 2026] 127.0.0.1:15122 Accepted
+[Wed Apr  1 16:46:09 2026] 127.0.0.1:15122 Closing
+[Wed Apr  1 16:46:09 2026] 127.0.0.1:15124 Accepted
+[Wed Apr  1 16:46:09 2026] 127.0.0.1:15124 [200]: GET /manifest.webmanifest
+[Wed Apr  1 16:46:09 2026] 127.0.0.1:15124 Closing
+[Wed Apr  1 16:46:09 2026] 127.0.0.1:15125 Accepted
+[Wed Apr  1 16:46:09 2026] 127.0.0.1:15125 [200]: GET /images/pwa/icon-192.png
+[Wed Apr  1 16:46:09 2026] 127.0.0.1:15125 Closing
+[Wed Apr  1 16:46:10 2026] 127.0.0.1:15126 Accepted
+[Wed Apr  1 16:46:10 2026] 127.0.0.1:15126 [200]: GET /sw.js
+[Wed Apr  1 16:46:10 2026] 127.0.0.1:15126 Closing
+[Wed Apr  1 16:46:27 2026] 127.0.0.1:15138 Accepted
+[Wed Apr  1 16:46:27 2026] 127.0.0.1:15138 Closing
+[Wed Apr  1 16:46:27 2026] 127.0.0.1:15142 Accepted
+[Wed Apr  1 16:46:27 2026] 127.0.0.1:15142 [200]: GET /manifest.webmanifest
+[Wed Apr  1 16:46:27 2026] 127.0.0.1:15142 Closing
+[Wed Apr  1 16:46:27 2026] 127.0.0.1:15143 Accepted
+[Wed Apr  1 16:46:27 2026] 127.0.0.1:15143 [200]: GET /images/pwa/icon-192.png
+[Wed Apr  1 16:46:27 2026] 127.0.0.1:15143 Closing

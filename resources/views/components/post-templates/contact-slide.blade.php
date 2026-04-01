@@ -27,14 +27,6 @@
         default => 'bg-white shadow-2xl border border-gray-100 text-slate-800',
     };
 
-    $accentColor = match($visualStyle) {
-        'glass' => 'text-amber-400',
-        'blueprint' => 'text-cyan-300',
-        'kraft' => 'text-orange-900',
-        'beton' => 'text-yellow-500',
-        default => 'text-amber-600',
-    };
-    
     // Icon Accent Logic
     $isLightBg = in_array($visualStyle, ['standard', 'kraft']);
     if ($isLightBg) {
@@ -122,8 +114,8 @@
             @endif
         </div>
 
-        <div class="mt-6 pt-4 border-t border-black/5 w-full">
-            <p class="text-[8px] font-black uppercase tracking-[0.25em] opacity-20">Contactez-nous</p>
+        <div class="mt-6 pt-4 w-full" style="border-top: 1px solid {{ $isLightBg ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.1)' }}">
+            <p class="text-[8px] font-black uppercase tracking-[0.25em] opacity-30">Contactez-nous</p>
         </div>
     </div>
 </div>

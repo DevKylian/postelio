@@ -57,7 +57,7 @@
                     elseif ($dlen > 40) $fontSize = 'text-xl';
                 @endphp
                 <div class="max-h-[240px] overflow-hidden">
-                    <p class="text-gray-900 {{ $fontSize }} font-black font-montserrat leading-snug uppercase mb-8">
+                    <p class="text-gray-900 {{ $fontSize }} font-black font-montserrat leading-snug mb-8">
                         "{{ $text }}"
                     </p>
                 </div>

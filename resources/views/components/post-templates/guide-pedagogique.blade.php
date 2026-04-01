@@ -57,7 +57,7 @@
                 $fontSizeClass = 'text-xl';
             }
         @endphp
-        <div class="absolute inset-0 p-10 pb-32 flex flex-col justify-center text-center" {!! $coverAlpine !!} style="{{ $coverStyle }}">
+        <div class="absolute inset-0 p-10 pb-28 flex flex-col justify-center text-center" {!! $coverAlpine !!} style="{{ $coverStyle }}">
             <p class="font-bold text-[10px] uppercase tracking-[0.2em] mb-6 select-none opacity-40" style="color: {{ $brandTextColor }}">CONSEIL D'EXPERT</p>
             @if($title)
                 <div class="max-h-[160px] overflow-hidden">
@@ -81,8 +81,8 @@
                 $slideAlpine = $slideIndex === null ? "x-show=\"current === $realIdx\" style=\"display: none;\"" : '';
             @endphp
             <div class="absolute inset-0 p-10 pb-20 flex flex-col justify-center text-center" {!! $slideAlpine !!} style="{{ $slideStyle }}">
-                <div class="bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-blue-100 relative">
-                     <div class="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full flex items-center justify-center font-black text-lg shadow-xl" style="background-color: {{ $brandColor }}; color: {{ $brandTextColor }}; border: 1px solid {{ $brandTextColor === '#000000' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }};">
+                <div class="bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-gray-100 relative">
+                     <div class="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full flex items-center justify-center font-black text-lg shadow-xl" style="background-color: {{ $brandColor }}; color: {{ $brandTextColor }}; border: 1px solid {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }};">
                          {{ $realIdx }}
                      </div>
                      @php

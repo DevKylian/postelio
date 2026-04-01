@@ -64,7 +64,7 @@
             @endphp
 
             <div class="max-h-[220px] overflow-hidden">
-                <p class="text-[#0047AB] {{ $fontSize }} font-black leading-tight font-mono-technical mb-10 uppercase text-center">
+                <p class="text-[#0047AB] {{ $fontSize }} font-black leading-tight font-mono-technical mb-10 text-center">
                     "{{ $text }}"
                 </p>
             </div>

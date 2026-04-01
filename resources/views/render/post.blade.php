@@ -398,36 +398,34 @@
             </div>
 
         @else
-            {{-- STANDARD lifestyle --}}
-            <div style="width: 360px; height: 360px; background: #1a1a2e; position: relative; overflow: hidden;">
-                {{-- Photo --}}
-                <div style="position: absolute; top: 20px; left: 20px; right: 20px; height: 230px; border-radius: 8px; overflow: hidden;">
-                    @if($lifestyleImgUrl)
-                        <img src="{{ $lifestyleImgUrl }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-                    @else
-                        <div style="width: 100%; height: 100%; background: #ddd;"></div>
-                    @endif
-                </div>
+            {{-- STANDARD lifestyle: full-bleed photo with gradient overlay --}}
+            <div style="width: 360px; height: 360px; background: #374151; position: relative; overflow: hidden;">
+                {{-- Full-bleed photo --}}
+                @if($lifestyleImgUrl)
+                    <img src="{{ $lifestyleImgUrl }}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;">
+                @endif
 
-                {{-- Text label --}}
-                <div style="position: absolute; top: 258px; left: 20px; right: 20px; height: 48px; display: flex; align-items: center; justify-content: center;">
-                    <div style="padding: 6px 16px; max-width: 100%; overflow: hidden;">
-                        <span style="color: white; font-size: {{ $lifestyleFontSize }}; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $lifestyleText }}</span>
+                {{-- Dark gradient on lower half --}}
+                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 55%; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);"></div>
+
+                {{-- Text label above footer --}}
+                @if($lifestyleText)
+                <div style="position: absolute; left: 24px; right: 24px; bottom: 68px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    <div style="background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 7px 16px; max-width: 100%; overflow: hidden;">
+                        <span style="color: white; font-size: {{ $lifestyleFontSize }}; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.3; text-align: center; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $lifestyleText }}</span>
                     </div>
                 </div>
+                @endif
 
-                {{-- Footer --}}
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60px; padding: 0 28px; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <span style="color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.7;">{{ $companyLabel }}</span>
-                        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
+                {{-- Bottom branding bar --}}
+                <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 20px 10px; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: flex; flex-direction: column; align-items: center; gap: 4px; border-top: 2px solid {{ $brandColor }};">
+                    <span style="color: rgba(255,255,255,0.9); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em;">{{ $companyLabel }}</span>
+                    <div style="display: flex; align-items: center; gap: 6px; overflow: hidden;">
                         @if($props['trade'] ?? null)
-                            <span style="color: {{ $brandTextColor }}; font-size: 6px; font-weight: 800; text-transform: uppercase; opacity: 0.3; border: 1px solid {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}; border-radius: 4px; padding: 1px 6px; white-space: nowrap;">{{ $props['trade'] }}</span>
+                            <span style="color: rgba(255,255,255,0.5); font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); border-radius: 3px; padding: 1px 5px; white-space: nowrap;">{{ $props['trade'] }}</span>
                         @endif
                         @if($props['city'] ?? null)
-                            <span style="color: {{ $brandTextColor }}; font-size: 6px; font-weight: 800; text-transform: uppercase; opacity: 0.3; border: 1px solid {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}; border-radius: 4px; padding: 1px 6px; white-space: nowrap;">{{ $props['city'] }}</span>
+                            <span style="color: rgba(255,255,255,0.5); font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); border-radius: 3px; padding: 1px 5px; white-space: nowrap;">{{ $props['city'] }}</span>
                         @endif
                     </div>
                 </div>

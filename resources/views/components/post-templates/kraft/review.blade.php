@@ -55,7 +55,7 @@
                 @endphp
 
                 <div class="max-h-[220px] overflow-hidden">
-                    <p class="text-gray-900 {{ $fontSize }} font-black leading-[1.1] font-montserrat uppercase text-center">
+                    <p class="text-gray-900 {{ $fontSize }} font-black leading-[1.1] font-montserrat text-center">
                         "{{ $text }}"
                     </p>
                 </div>

@@ -108,7 +108,11 @@
         </div>
         @endif
 
-        <div class="absolute inset-x-0 bottom-0 py-2 px-6 flex flex-col items-center justify-center bg-black/85">
+        @php
+            $showBrandBar = $slideIndex === null || (int)$slideIndex < $contactIdx;
+            $brandBarAlpine = $slideIndex === null ? "x-show=\"current < $contactIdx\"" : '';
+        @endphp
+        <div class="absolute inset-x-0 bottom-0 py-2 px-6 flex flex-col items-center justify-center bg-black/85" {!! $brandBarAlpine !!} style="{{ !$showBrandBar ? 'display:none;' : '' }}">
             <p class="text-white font-bold uppercase tracking-widest text-[9px] font-montserrat mb-1">{{ $companyLabel }}</p>
             <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)

@@ -119,7 +119,7 @@
                 elseif ($len > 60) $fSize = '0.95rem';
             @endphp
             <div class="h-1/3 w-full flex items-center justify-center px-8 text-center" style="background-color: {{ $brandColor }}">
-                <h3 class="font-black uppercase text-white tracking-tighter" style="font-size: 1.8rem; line-height: 1;">{{ $name }}</h3>
+                <h3 class="font-black uppercase tracking-tighter" style="font-size: 1.8rem; line-height: 1; color: {{ $brandTextColor }}">{{ $name }}</h3>
             </div>
             <div class="flex-1 flex flex-col justify-center px-10">
                 <div class="w-10 h-1 mb-4 rounded-full" style="background-color: {{ $brandColor }}"></div>

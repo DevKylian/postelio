@@ -99,6 +99,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
         Route::get('/admin/testers', \App\Livewire\Admin\Users\TesterManager::class)->name('admin.testers');
         Route::get('/admin/permissions', \App\Livewire\Admin\Permissions\PermissionManager::class)->name('admin.permissions.index');
         Route::get('/admin/server', \App\Livewire\Admin\ServerMonitor::class)->name('admin.server');
+        Route::get('/admin/instagram', \App\Livewire\Admin\InstagramPostGenerator::class)->name('admin.instagram');
     });
 
     // Social & Sync routes (Premium only)

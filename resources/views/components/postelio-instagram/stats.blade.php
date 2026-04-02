@@ -5,106 +5,141 @@
     'insight'          => 'Et si vous étiez différent ?',
 ])
 
+@php
+    // Stat number scaling
+    $statLen = strlen($stat);
+    $statSize = $statLen > 4 ? '68px' : '84px';
+
+    // Label scaling
+    $labelLen = strlen($stat_label);
+    $labelSize = $labelLen > 25 ? '10px' : '11.5px';
+
+    // Description scaling
+    $descLen = strlen($stat_description);
+    $descSize = $descLen > 100 ? '11px' : '13.5px';
+    $descLH = $descLen > 100 ? '1.45' : '1.55';
+
+    // Insight scaling
+    $insightLen = strlen($insight);
+    $insightSize = $insightLen > 45 ? '10.5px' : '12px';
+
+    $cleanDesc = html_entity_decode($stat_description, ENT_QUOTES, 'UTF-8');
+    $cleanInsight = html_entity_decode($insight, ENT_QUOTES, 'UTF-8');
+@endphp
+
 <div style="
-    width: 360px; height: 360px;
-    background: #111827;
+    width: 360px; height: 450px;
+    background: radial-gradient(circle at top right, #1E293B 0%, #0F172A 100%);
     position: relative; overflow: hidden;
-    font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+    color: #FFFFFF;
+    font-family: 'Outfit', 'Inter', sans-serif;
 ">
-    {{-- Horizontal lines decoration --}}
-    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0.04;">
-        @for($i = 0; $i < 8; $i++)
-            <div style="position: absolute; left: 0; right: 0; height: 1px; background: #F59E0B; top: {{ $i * 50 }}px;"></div>
-        @endfor
+    {{-- Abstract Data Pattern --}}
+    <div style="position: absolute; inset: 0; opacity: 0.07; pointer-events: none;">
+        <svg width="100%" height="100%" viewBox="0 0 360 450" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,350 Q90,300 180,350 T360,300" fill="none" stroke="#F59E0B" stroke-width="2"/>
+            <path d="M0,380 Q90,330 180,380 T360,330" fill="none" stroke="#F59E0B" stroke-width="1"/>
+            <path d="M0,410 Q90,360 180,410 T360,360" fill="none" stroke="#F59E0B" stroke-width="0.5"/>
+            @for($i=0; $i<15; $i++)
+                <circle cx="{{ rand(0, 360) }}" cy="{{ rand(0, 450) }}" r="{{ rand(1, 3) }}" fill="#F59E0B"/>
+            @endfor
+        </svg>
     </div>
 
-    {{-- Background big glow behind stat --}}
+    {{-- Subtle Blueprint Grid --}}
     <div style="
-        position: absolute; top: 50%; left: 50%;
-        transform: translate(-50%, -60%);
-        width: 300px; height: 300px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(245,158,11,0.18) 0%, transparent 65%);
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background-image: linear-gradient(rgba(245, 158, 11, 0.05) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(245, 158, 11, 0.05) 1px, transparent 1px);
+        background-size: 30px 30px;
         pointer-events: none;
     "></div>
 
-    {{-- Top label --}}
+    {{-- Main Content Wrapper --}}
     <div style="
-        position: absolute; top: 28px; left: 0; right: 0;
-        display: flex; justify-content: center;
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        display: flex; flex-direction: column; align-items: center;
+        padding: 40px 32px 36px 32px;
     ">
-        <div style="
-            display: flex; align-items: center; gap: 8px;
-            background: rgba(245,158,11,0.1);
-            border: 1px solid rgba(245,158,11,0.25);
-            padding: 5px 16px; border-radius: 100px;
-        ">
-            <div style="width: 5px; height: 5px; border-radius: 50%; background: #F59E0B;"></div>
+        {{-- Top Badge --}}
+        <div style="margin-bottom: 20px;">
             <span style="
+                background: rgba(245, 158, 11, 0.12);
+                border: 1px solid rgba(245, 158, 11, 0.3);
                 color: #F59E0B;
-                font-size: 9px; font-weight: 800;
-                letter-spacing: 0.2em; text-transform: uppercase;
-            ">Chiffre clé · Postelio</span>
+                font-size: 8.5px; font-weight: 800;
+                letter-spacing: 0.12em; text-transform: uppercase;
+                padding: 4px 12px; border-radius: 100px;
+            ">Analyse du marché</span>
+        </div>
+
+        {{-- Big Stat Value --}}
+        <div style="position: relative; margin-bottom: 8px;">
+            <div style="
+                position: absolute; top: 4px; left: 4px;
+                font-size: {{ $statSize }}; font-weight: 900; line-height: 1;
+                letter-spacing: -0.04em; color: rgba(0,0,0,0.4);
+                filter: blur(8px);
+            ">{{ $stat }}</div>
+            <div style="
+                position: relative;
+                font-size: {{ $statSize }}; font-weight: 900; line-height: 1;
+                letter-spacing: -0.04em;
+                background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            ">{{ $stat }}</div>
+        </div>
+
+        {{-- Stat Context --}}
+        <div style="
+            color: rgba(255,255,255,0.45);
+            font-size: {{ $labelSize }}; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            margin-bottom: 18px; text-align: center;
+        ">{{ $stat_label }}</div>
+
+        {{-- Divider --}}
+        <div style="width: 32px; height: 2px; background: linear-gradient(90deg, #F59E0B, #D97706); border-radius: 2px; margin-bottom: 18px;"></div>
+
+        {{-- Description --}}
+        <p style="
+            color: #E2E8F0;
+            font-size: {{ $descSize }}; font-weight: 400; line-height: {{ $descLH }};
+            margin: 0 0 20px 0;
+            text-align: center;
+            white-space: pre-line;
+        ">{!! $cleanDesc !!}</p>
+
+        {{-- Insight Box (Premium Callout) --}}
+        <div style="
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-left: 4px solid #F59E0B;
+            padding: 18px 24px;
+            border-radius: 0 12px 12px 0;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: 24px;
+            backdrop-filter: blur(4px);
+        ">
+            <div style="color: #F59E0B; font-size: 8px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px;">Point Expert</div>
+            <p style="
+                color: #FFFFFF;
+                font-size: {{ $insightSize }}; font-weight: 700;
+                line-height: 1.45; margin: 0;
+            ">{!! $cleanInsight !!}</p>
         </div>
     </div>
 
-    {{-- Big stat number --}}
+    {{-- Wordmark --}}
     <div style="
-        position: absolute; top: 80px; left: 0; right: 0;
-        text-align: center;
+        position: absolute; bottom: 20px; left: 0; right: 0;
+        display: flex; align-items: center; justify-content: center; gap: 6px;
+        opacity: 0.4; pointer-events: none;
     ">
-        <div style="
-            font-size: 96px; font-weight: 900; line-height: 1;
-            letter-spacing: -0.04em;
-            background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 40%, #D97706 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: inline-block;
-        ">{{ $stat }}</div>
-        <div style="
-            color: rgba(255,255,255,0.5);
-            font-size: 13px; font-weight: 600;
-            letter-spacing: 0.08em; text-transform: uppercase;
-            margin-top: 4px;
-        ">{{ $stat_label }}</div>
-    </div>
-
-    {{-- Thin separator --}}
-    <div style="
-        position: absolute; top: 230px; left: 50%; transform: translateX(-50%);
-        width: 40px; height: 2px;
-        background: linear-gradient(90deg, transparent, #F59E0B, transparent);
-    "></div>
-
-    {{-- Description --}}
-    <div style="
-        position: absolute; top: 244px; left: 32px; right: 32px;
-        text-align: center;
-    ">
-        <p style="
-            color: #9CA3AF;
-            font-size: 12px; font-weight: 400;
-            line-height: 1.65; margin: 0 0 14px 0;
-        ">{{ $stat_description }}</p>
-        <p style="
-            color: #F59E0B;
-            font-size: 12px; font-weight: 700;
-            letter-spacing: 0.02em; margin: 0;
-        ">{{ $insight }}</p>
-    </div>
-
-    {{-- Bottom branding --}}
-    <div style="
-        position: absolute; bottom: 18px; left: 0; right: 0;
-        display: flex; justify-content: center; align-items: center; gap: 8px;
-    ">
-        <div style="width: 16px; height: 1px; background: rgba(255,255,255,0.15);"></div>
-        <span style="
-            color: rgba(255,255,255,0.2);
-            font-size: 9px; font-weight: 700;
-            letter-spacing: 0.18em; text-transform: uppercase;
-        ">postelio.fr</span>
-        <div style="width: 16px; height: 1px; background: rgba(255,255,255,0.15);"></div>
+        <div style="width: 4px; height: 4px; border-radius: 50%; background: #F59E0B;"></div>
+        <span style="color: #FFFFFF; font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;">Postelio</span>
     </div>
 </div>

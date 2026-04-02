@@ -5,7 +5,7 @@
 ])
 
 <div style="
-    width: 360px; height: 360px;
+    width: 360px; height: 450px;
     background: #111827;
     position: relative; overflow: hidden;
     font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
@@ -42,9 +42,10 @@
 
     {{-- Content --}}
     <div style="
-        position: absolute; inset: 0;
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        width: 100%; height: 100%;
         display: flex; flex-direction: column; justify-content: center;
-        padding: 36px 36px 56px 36px;
+        padding: 40px 36px 64px 36px;
     ">
         {{-- Tag --}}
         <div style="
@@ -73,13 +74,14 @@
             font-size: 12px; font-weight: 400;
             line-height: 1.65;
             margin: 0;
+            white-space: pre-line;
         ">{{ $teaser }}</p>
     </div>
 
     {{-- Bottom branding --}}
     <div style="
         position: absolute; bottom: 0; left: 0; right: 0;
-        height: 44px;
+        height: 54px;
         background: rgba(245,158,11,0.08);
         border-top: 1px solid rgba(245,158,11,0.15);
         display: flex; align-items: center; justify-content: space-between;
@@ -87,8 +89,8 @@
     ">
         <div style="display: flex; align-items: center; gap: 8px;">
             <div style="width: 5px; height: 5px; border-radius: 50%; background: #F59E0B;"></div>
-            <span style="color: #F59E0B; font-size: 9px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;">Postelio</span>
+            <span style="color: #F59E0B; font-size: 10px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;">Postelio</span>
         </div>
-        <span style="color: rgba(255,255,255,0.2); font-size: 9px; letter-spacing: 0.08em;">Répondez en commentaire 👇</span>
+        <span style="color: rgba(255,255,255,0.2); font-size: 10px; letter-spacing: 0.08em;">Répondez en commentaire 👇</span>
     </div>
 </div>

@@ -23,7 +23,7 @@ rollback() {
     if [ ! -z "${PREV_COMMIT:-}" ]; then
         log "Retour au commit précédent : ${PREV_COMMIT}"
         cd "$APP_DIR" && git reset --hard "$PREV_COMMIT" --quiet || true
-        log "Restructuration des caches pour l'ancien code..."
+        log "Nettoyage des caches..."
         cd "$APP_DIR" && $PHP artisan optimize:clear 2>/dev/null || true
     fi
     cd "$APP_DIR" && $PHP artisan up 2>/dev/null || true
@@ -46,13 +46,9 @@ GITHUB_TOKEN="$(cat /etc/postelio-github-token)"
 git remote set-url origin "https://${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git"
 
 # --- Vérification Droits / Permissions ---------------------------------------
-# S'assurer que 'deploy' peut bien écrire dans .git
 if [ ! -w "${APP_DIR}/.git" ]; then
-    log "Problème de permissions détecté sur ${APP_DIR}/.git - tentative de correction..."
-    # On tente un fix silencieux si on a une permission partielle ou via sudo si configuré 
-    # (mais ici on assume que si on ne peut pas écrire, on log l'erreur pour maintenance)
     log "ERREUR : L'utilisateur $(whoami) n'a pas les droits d'écriture sur .git"
-    fail "Permissions insuffisantes"
+    fail "Permissions insuffisantes (échec .git writable)"
 fi
 
 # --- Vérifier si nouveaux commits -------------------------------------------
@@ -82,8 +78,6 @@ done
 if [ -n "$MISSING_EXTS" ]; then
     log "Extensions PHP manquantes : ${MISSING_EXTS}"
     log "Veuillez installer via : sudo apt-get install ${MISSING_EXTS} && sudo systemctl restart php8.3-fpm"
-    # Note: On ne fail pas forcément ici si l'app peut tourner en mode dégradé, 
-    # mais pour une prod Laravel il vaut mieux s'arrêter.
     fail "Déploiement avorté : extensions manquantes."
 fi
 
@@ -107,13 +101,12 @@ if [ ! -d "public/build" ]; then
 fi
 
 if [ "$FRONTEND_CHANGED" -gt 0 ]; then
-    log "Frontend modifié (ou build manquant) — rebuild npm..."
-    # On vide le dossier de build manuellement avant car Vite peut échouer (EACCES rmdir) 
-    # si les permissions sont strictes lors de son nettoyage interne.
+    log "Changements frontend détectés (ou build manquant) — rebuild npm..."
+    # Nettoyage manuel car Vite peut échouer sur rmdir (EACCES) si les permissions sont strictes
     rm -rf public/build
     npm install --no-audit --no-fund --quiet
     npm run build --quiet
-    # Fix permissions post-build immédiat
+    # Ajustement permissions après build
     chmod -R 775 public/build 2>/dev/null || true
 else
     log "Pas de changements frontend — skip npm build."
@@ -139,7 +132,8 @@ log "Rebuild caches (optimize)..."
 $PHP artisan optimize
 $PHP artisan view:cache
 $PHP artisan event:cache
-# Force storage link (évite l'erreur "already exists")
+
+# --- Storage link ------------------------------------------------------------
 rm -f public/storage
 $PHP artisan storage:link --quiet
 

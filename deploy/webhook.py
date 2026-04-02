@@ -1,21 +1,9 @@
 #!/usr/bin/env python3
 """
 Postelio — Webhook receiver pour GitHub CD
-Écoute sur 127.0.0.1:9876, proxié par Nginx depuis /deploy-webhook
-
-Variables d'environnement :
-  WEBHOOK_SECRET  — Secret configuré dans GitHub
-  DEPLOY_SCRIPT   — Chemin vers deploy.sh
-  WEBHOOK_PORT    — Port d'écoute (défaut: 9876)
+Écho sur 127.0.0.1:WEBHOOK_PORT, Nginx proxy /deploy-webhook → ici
 """
-import hashlib
-import hmac
-import http.server
-import json
-import logging
-import os
-import subprocess
-import threading
+import hashlib, hmac, http.server, json, logging, os, subprocess, threading
 
 WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET", "").encode()
 DEPLOY_SCRIPT  = os.environ.get("DEPLOY_SCRIPT", "/opt/postelio-deploy/deploy.sh")
@@ -30,21 +18,18 @@ log = logging.getLogger("webhook")
 
 
 def run_deploy():
-    """Lance deploy.sh en arrière-plan et log le résultat."""
-    log.info("Déploiement lancé…")
-    result = subprocess.run(
-        ["bash", DEPLOY_SCRIPT],
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode == 0:
-        log.info("Déploiement terminé avec succès.")
-    else:
-        log.error(
-            "Déploiement en échec (code %d) :\n%s",
-            result.returncode,
-            result.stderr[-2000:],  # Limiter la taille du log
+    log.info("Déploiement lancé via script : %s", DEPLOY_SCRIPT)
+    try:
+        result = subprocess.run(
+            ["bash", DEPLOY_SCRIPT],
+            capture_output=True, text=True
         )
+        if result.returncode == 0:
+            log.info("Déploiement terminé avec succès.")
+        else:
+            log.error("Déploiement en échec (code %d) :\n%s", result.returncode, result.stderr)
+    except Exception as e:
+        log.error("Erreur système lors du lancement du déploiement : %s", str(e))
 
 
 class WebhookHandler(http.server.BaseHTTPRequestHandler):
@@ -54,62 +39,43 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
             self._reply(404, "Not Found")
             return
 
-        # Lecture du body
         length = int(self.headers.get("Content-Length", 0))
         body   = self.rfile.read(length)
 
         # Vérification signature HMAC-SHA256
         received = self.headers.get("X-Hub-Signature-256", "")
-        expected = "sha256=" + hmac.new(WEBHOOK_SECRET, body, hashlib.sha256).hexdigest()
-
-        if not hmac.compare_digest(received, expected):
-            log.warning("Signature invalide — requête rejetée (IP: %s)", self.client_address[0])
+        if not received:
+            log.warning("Requête sans signature rejetée.")
             self._reply(401, "Unauthorized")
             return
 
-        # Parse payload
+        expected = "sha256=" + hmac.new(WEBHOOK_SECRET, body, hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(received, expected):
+            log.warning("Signature invalide — requête rejetée.")
+            self._reply(401, "Unauthorized")
+            return
+
         try:
             payload = json.loads(body)
         except json.JSONDecodeError:
-            self._reply(400, "Invalid JSON")
+            self._reply(400, "Bad Request")
             return
 
-        ref = payload.get("ref", "")
-
-        # Ignorer les pushs hors main
-        if ref != "refs/heads/main":
-            log.info("Branche ignorée : %s", ref)
-            self._reply(200, f"Ignored ({ref})")
+        # Ignorer si ce n'est pas la branche main
+        if payload.get("ref") != "refs/heads/main":
+            self._reply(200, f"Ignored ({payload.get('ref', '?')})")
             return
 
-        pusher  = payload.get("pusher", {}).get("name", "inconnu")
-        commits = payload.get("commits", [])
-        nb      = len(commits)
-        msg     = commits[-1].get("message", "").split("\n")[0] if commits else "?"
+        pusher  = payload.get("pusher", {}).get("name", "?")
+        commits = len(payload.get("commits", []))
+        log.info("Push reçu de %s (%d commit(s)) — lancement du déploiement…", pusher, commits)
 
-        log.info(
-            "Push de %s — %d commit(s) — dernier : %s",
-            pusher, nb, msg[:80]
-        )
-
-        # Répondre immédiatement à GitHub (évite un timeout)
+        # Répondre immédiatement, déployer en arrière-plan
         self._reply(200, "Deploying…")
-
-        # Déploiement en arrière-plan
         threading.Thread(target=run_deploy, daemon=True).start()
 
-    def do_GET(self):
-        """Health check simple."""
-        if self.path == "/health":
-            self._reply(200, "OK")
-        else:
-            self._reply(404, "Not Found")
-
-    def _reply(self, code: int, message: str):
+    def _reply(self, code, message):
         body = message.encode()
-        self.send_response(code)
-        self.send_header("Content-Type", "text/plain; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
 

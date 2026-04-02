@@ -6,7 +6,7 @@
 ])
 
 <div style="
-    width: 360px; height: 360px;
+    width: 360px; height: 450px;
     background: #111827;
     position: relative; overflow: hidden;
     font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
@@ -33,27 +33,27 @@
 
     {{-- Top row: tag + branding --}}
     <div style="
-        position: absolute; top: 16px; left: 20px; right: 20px;
+        position: absolute; top: 24px; left: 24px; right: 24px;
         display: flex; align-items: center; justify-content: space-between;
     ">
         <span style="
             background: rgba(245,158,11,0.12);
             border: 1px solid rgba(245,158,11,0.35);
             color: #F59E0B;
-            font-size: 8px; font-weight: 800;
+            font-size: 9px; font-weight: 800;
             letter-spacing: 0.2em; text-transform: uppercase;
-            padding: 3px 10px; border-radius: 100px;
+            padding: 4px 12px; border-radius: 100px;
         ">{{ $tag }}</span>
-        <div style="display: flex; align-items: center; gap: 5px;">
-            <div style="width: 4px; height: 4px; border-radius: 50%; background: #F59E0B;"></div>
-            <span style="color: rgba(255,255,255,0.3); font-size: 8px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;">Postelio</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <div style="width: 5px; height: 5px; border-radius: 50%; background: #F59E0B;"></div>
+            <span style="color: rgba(255,255,255,0.3); font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;">Postelio</span>
         </div>
     </div>
 
     {{-- Screenshot mockup --}}
     <div style="
-        position: absolute; top: 46px; left: 20px; right: 20px;
-        height: 176px;
+        position: absolute; top: 64px; left: 24px; right: 24px;
+        height: 240px;
     ">
         {{-- Outer frame --}}
         <div style="
@@ -103,28 +103,29 @@
 
     {{-- Text content below screenshot --}}
     <div style="
-        position: absolute; bottom: 22px; left: 20px; right: 20px;
+        position: absolute; bottom: 32px; left: 24px; right: 24px;
     ">
         {{-- Separator --}}
         <div style="
-            width: 24px; height: 2px;
+            width: 32px; height: 2px;
             background: #F59E0B; border-radius: 2px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         "></div>
 
         {{-- Headline --}}
         <h2 style="
             color: #FFFFFF;
-            font-size: 18px; font-weight: 900;
+            font-size: 20px; font-weight: 900;
             line-height: 1.2; letter-spacing: -0.02em;
-            margin: 0 0 8px 0;
+            margin: 0 0 10px 0;
         ">{{ $headline }}</h2>
 
         {{-- Subheadline --}}
         <p style="
-            color: #6B7280;
-            font-size: 11px; font-weight: 400;
-            line-height: 1.55; margin: 0;
+            color: #D1D5DB;
+            font-size: 13px; font-weight: 400;
+            line-height: 1.6; margin: 0;
+            white-space: pre-line;
         ">{{ $subheadline }}</p>
     </div>
 </div>

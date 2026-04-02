@@ -6,7 +6,7 @@
 ])
 
 <div style="
-    width: 360px; height: 360px;
+    width: 360px; height: 450px;
     background: #1F2937;
     position: relative; overflow: hidden;
     font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
@@ -30,18 +30,18 @@
         </div>
     @endif
 
-    {{-- Strong gradient overlay bottom 65% --}}
+    {{-- Strong gradient overlay bottom 75% --}}
     <div style="
         position: absolute; left: 0; right: 0; bottom: 0;
-        height: 65%;
-        background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 45%, transparent 100%);
+        height: 75%;
+        background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 55%, transparent 100%);
         pointer-events: none;
     "></div>
 
     {{-- Subtle top gradient for tag readability --}}
     <div style="
         position: absolute; left: 0; right: 0; top: 0;
-        height: 80px;
+        height: 100px;
         background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%);
         pointer-events: none;
     "></div>
@@ -53,54 +53,54 @@
     "></div>
 
     {{-- Tag badge top-left --}}
-    <div style="position: absolute; top: 16px; left: 18px;">
+    <div style="position: absolute; top: 24px; left: 24px;">
         <span style="
             display: inline-block;
             background: #F59E0B;
             color: #111827;
-            font-size: 9px; font-weight: 800;
+            font-size: 10px; font-weight: 800;
             letter-spacing: 0.18em; text-transform: uppercase;
-            padding: 4px 12px; border-radius: 6px;
+            padding: 4px 14px; border-radius: 6px;
         ">{{ $tag }}</span>
     </div>
 
     {{-- Postelio wordmark top-right --}}
     <div style="
-        position: absolute; top: 18px; right: 18px;
-        display: flex; align-items: center; gap: 5px;
+        position: absolute; top: 26px; right: 24px;
+        display: flex; align-items: center; gap: 6px;
     ">
-        <div style="width: 4px; height: 4px; border-radius: 50%; background: #F59E0B;"></div>
-        <span style="color: rgba(255,255,255,0.5); font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;">Postelio</span>
+        <div style="width: 5px; height: 5px; border-radius: 50%; background: #F59E0B;"></div>
+        <span style="color: rgba(255,255,255,0.6); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;">Postelio</span>
     </div>
 
     {{-- Bottom text content --}}
     <div style="
-        position: absolute; bottom: 24px; left: 22px; right: 22px;
+        position: absolute; bottom: 28px; left: 24px; right: 24px;
     ">
         {{-- Separator --}}
         <div style="
             width: 28px; height: 2px;
             background: #F59E0B;
-            border-radius: 2px; margin-bottom: 12px;
+            border-radius: 2px; margin-bottom: 14px;
         "></div>
 
         {{-- Headline --}}
         @php
             $len = mb_strlen($headline);
-            $fs = $len > 60 ? '16px' : ($len > 40 ? '19px' : '22px');
+            $fs = $len > 60 ? '17px' : ($len > 40 ? '20px' : '24px');
         @endphp
         <h1 style="
             color: #FFFFFF;
             font-size: {{ $fs }}; font-weight: 900;
-            line-height: 1.2; letter-spacing: -0.02em;
+            line-height: 1.25; letter-spacing: -0.02em;
             margin: 0 0 10px 0;
         ">{{ $headline }}</h1>
 
         {{-- Caption --}}
         <p style="
-            color: rgba(255,255,255,0.55);
-            font-size: 12px; font-weight: 400;
-            line-height: 1.5; margin: 0;
+            color: rgba(255,255,255,0.65);
+            font-size: 13px; font-weight: 400;
+            line-height: 1.55; margin: 0;
         ">{{ $caption }}</p>
     </div>
 </div>

@@ -5,17 +5,34 @@
     'stars'      => 5,
 ])
 
+@php
+    $len = strlen($quote);
+    if ($len < 65) {
+        $fontSize = '26px';
+        $lineHeight = '1.3';
+        $fontWeight = '800';
+    } elseif ($len < 120) {
+        $fontSize = '20px';
+        $lineHeight = '1.45';
+        $fontWeight = '500';
+    } else {
+        $fontSize = '15.5px';
+        $lineHeight = '1.65';
+        $fontWeight = '400';
+    }
+@endphp
+
 <div style="
-    width: 360px; height: 360px;
+    width: 360px; height: 450px;
     background: #111827;
     position: relative; overflow: hidden;
     font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
 ">
     {{-- Top ambient glow --}}
     <div style="
-        position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
-        width: 280px; height: 200px; border-radius: 50%;
-        background: radial-gradient(ellipse, rgba(245,158,11,0.18) 0%, transparent 70%);
+        position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+        width: 320px; height: 240px; border-radius: 50%;
+        background: radial-gradient(ellipse, rgba(245,158,11,0.2) 0%, transparent 70%);
         pointer-events: none;
     "></div>
 
@@ -60,22 +77,27 @@
         ">Avis client</span>
     </div>
 
-    {{-- Quote text --}}
+    {{-- Quote text (Centered Container) --}}
     <div style="
-        position: absolute; top: 80px; left: 28px; right: 28px;
+        position: absolute; top: 80px; bottom: 140px; left: 32px; right: 32px;
+        display: flex; align-items: center; justify-content: center;
     ">
         <p style="
-            color: #E5E7EB;
-            font-size: 15px; font-weight: 400;
-            line-height: 1.7;
+            color: #F3F4F6;
+            font-size: {{ $fontSize }}; 
+            font-weight: {{ $fontWeight }};
+            line-height: {{ $lineHeight }};
             font-style: italic;
             margin: 0;
+            text-align: left;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            white-space: pre-line;
         ">"{{ $quote }}"</p>
     </div>
 
     {{-- Author block --}}
     <div style="
-        position: absolute; bottom: 50px; left: 28px; right: 28px;
+        position: absolute; bottom: 65px; left: 28px; right: 28px;
         display: flex; align-items: center; gap: 14px;
     ">
         {{-- Avatar initial --}}
@@ -99,15 +121,15 @@
 
     {{-- Bottom branding --}}
     <div style="
-        position: absolute; bottom: 16px; left: 28px; right: 28px;
+        position: absolute; bottom: 20px; left: 28px; right: 28px;
         display: flex; align-items: center; justify-content: space-between;
         border-top: 1px solid rgba(255,255,255,0.05);
-        padding-top: 10px;
+        padding-top: 14px;
     ">
         <div style="display: flex; align-items: center; gap: 6px;">
             <div style="width: 5px; height: 5px; border-radius: 50%; background: #F59E0B;"></div>
-            <span style="color: rgba(255,255,255,0.3); font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;">Postelio</span>
+            <span style="color: rgba(255,255,255,0.3); font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;">Postelio</span>
         </div>
-        <span style="color: rgba(255,255,255,0.2); font-size: 9px; letter-spacing: 0.05em;">postelio.fr</span>
+        <span style="color: rgba(255,255,255,0.2); font-size: 10px; letter-spacing: 0.05em;">postelio.fr</span>
     </div>
 </div>

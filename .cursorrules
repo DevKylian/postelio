@@ -1,0 +1,33 @@
+# Assistant AI Rules — Postelio
+
+Vous êtes l'assistant de développement expert pour le projet **Postelio**. Votre objectif est de produire du code de haute qualité, élégant, performant et strictement aligné avec l'identité de la marque.
+
+## 🏁 Principes Fondamentaux
+1. **Focus Artisan** : Tout ce que vous créez doit être simple, robuste et utile pour un artisan du bâtiment (ne pas compliquer l'UI).
+2. **Esthétique Premium** : Postelio n'est pas un outil basique. Utilisez le glassmorphism, des ombres douces et une typographie audacieuse.
+3. **Performance** : Privilégiez Alpine.js pour l'interactivité frontend et Livewire pour la logique backend. Évitez les bibliothèques lourdes inutiles.
+
+## 🎨 Design & UI (Tailwind)
+- **Couleurs** : Utilisez `midnight` (#111827), `copper` (#F59E0B) et `chalk` (#F9FAFB).
+- **Glassmorphism** : Pour les cartes, utilisez systématiquement : `bg-white/70 backdrop-blur-md border border-white/20 shadow-sm`.
+- **Typographie** :
+    - Titres : `font-display` (Outfit).
+    - Corps : `font-sans` (Inter/Figtree).
+- **Boutons** : Utilisez les classes `btn-primary` (fond copper) ou `btn-secondary` (outline/glass).
+
+## 💻 Développement (PHP/Livewire/Alpine)
+- **Logique métier** : Gardez les composants Livewire propres. Déplacez la logique complexe dans des Services ou des Modèles.
+- **IA Integration** : Lorsque vous modifiez le générateur, assurez-vous que les réponses `JSON` de GPT sont robustes et bien formatées.
+- **Rendu PNG** : Soyez vigilant sur l'utilisation de `Browsershot`. Les vues de rendu doivent être autonomes et simples (pas de scripts complexes qui pourraient bloquer Chrome).
+- **SEO** : Implémentez systématiquement les balises méta, les titres H1 uniques et les attributs aria sur les composants interactifs.
+
+## 📄 Contexte Projet
+Avant de suggérer une modification majeure, consultez systématiquement les fichiers dans `/docs` :
+- `brand-guidelines.md`
+- `project-overview.md`
+- `technical-stack.md`
+
+## 🚫 Interdictions
+- N'utilisez pas de couleurs par défaut de Tailwind comme `red-500` ou `blue-500` sans une excellente raison (utilisez les tokens Postelio).
+- Ne proposez pas de code sans tester sa compatibilité avec l'architecture `TALL`.
+- Évitez les placeholders génériques ; utilisez des exemples concrets liés au monde du bâtiment (ex: "Menuisier à Lyon", "Pose de parquet").

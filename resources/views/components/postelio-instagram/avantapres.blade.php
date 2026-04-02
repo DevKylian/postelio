@@ -6,14 +6,14 @@
 ])
 
 <div style="
-    width: 360px; height: 360px;
+    width: 360px; height: 450px;
     background: #111827;
     position: relative; overflow: hidden;
     font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
 ">
     {{-- SANS POSTELIO side (left) --}}
     <div style="
-        position: absolute; top: 0; left: 0; bottom: 52px;
+        position: absolute; top: 0; left: 0; bottom: 64px;
         width: 179px; overflow: hidden;
     ">
         @if($image_before_url)
@@ -51,7 +51,7 @@
 
     {{-- Center divider --}}
     <div style="
-        position: absolute; top: 0; bottom: 52px; left: 50%; transform: translateX(-50%);
+        position: absolute; top: 0; bottom: 64px; left: 50%; transform: translateX(-50%);
         width: 2px; background: #111827; z-index: 10;
     "></div>
 
@@ -71,7 +71,7 @@
 
     {{-- AVEC POSTELIO side (right) --}}
     <div style="
-        position: absolute; top: 0; right: 0; bottom: 52px;
+        position: absolute; top: 0; right: 0; bottom: 64px;
         width: 179px; overflow: hidden;
     ">
         @if($image_after_url)
@@ -109,11 +109,11 @@
     {{-- Bottom bar --}}
     <div style="
         position: absolute; bottom: 0; left: 0; right: 0;
-        height: 52px;
+        height: 64px;
         background: #111827;
         border-top: 1px solid rgba(255,255,255,0.06);
         display: flex; align-items: center; justify-content: space-between;
-        padding: 0 18px;
+        padding: 0 24px;
     ">
         <div style="display: flex; flex-direction: column; gap: 2px; overflow: hidden; max-width: 230px;">
             <span style="color: #F59E0B; font-size: 8px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;">{{ $tag }}</span>

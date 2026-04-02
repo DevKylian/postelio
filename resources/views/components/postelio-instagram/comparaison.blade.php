@@ -15,7 +15,7 @@
 ])
 
 <div style="
-    width: 360px; height: 360px;
+    width: 360px; height: 450px;
     background: #111827;
     position: relative; overflow: hidden;
     font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
@@ -23,7 +23,7 @@
     {{-- Top bar with headline --}}
     <div style="
         position: absolute; top: 0; left: 0; right: 0;
-        padding: 20px 24px 16px 24px;
+        padding: 32px 24px 24px 24px;
         border-bottom: 1px solid rgba(255,255,255,0.06);
     ">
         <h2 style="
@@ -36,7 +36,7 @@
 
     {{-- Two columns --}}
     <div style="
-        position: absolute; top: 64px; left: 0; right: 0; bottom: 44px;
+        position: absolute; top: 84px; left: 0; right: 0; bottom: 64px;
         display: flex;
     ">
         {{-- SANS column --}}
@@ -44,8 +44,8 @@
             flex: 1;
             background: rgba(239,68,68,0.04);
             border-right: 1px solid rgba(255,255,255,0.06);
-            padding: 18px 16px;
-            display: flex; flex-direction: column; gap: 10px;
+            padding: 24px 16px;
+            display: flex; flex-direction: column; gap: 14px;
         ">
             <div style="
                 display: flex; align-items: center; gap: 6px;
@@ -74,8 +74,8 @@
         <div style="
             flex: 1;
             background: rgba(245,158,11,0.04);
-            padding: 18px 16px;
-            display: flex; flex-direction: column; gap: 10px;
+            padding: 24px 16px;
+            display: flex; flex-direction: column; gap: 14px;
         ">
             <div style="
                 display: flex; align-items: center; gap: 6px;
@@ -104,7 +104,7 @@
     {{-- Bottom branding --}}
     <div style="
         position: absolute; bottom: 0; left: 0; right: 0;
-        height: 44px;
+        height: 64px;
         background: #F59E0B;
         display: flex; align-items: center; justify-content: center; gap: 10px;
     ">

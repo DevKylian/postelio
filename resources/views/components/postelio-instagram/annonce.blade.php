@@ -6,7 +6,7 @@
 ])
 
 <div style="
-    width: 360px; height: 360px;
+    width: 360px; height: 450px;
     background: #111827;
     position: relative; overflow: hidden;
     font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
@@ -46,12 +46,13 @@
 
     {{-- Main content --}}
     <div style="
-        position: absolute; inset: 0;
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        width: 100%; height: 100%;
         display: flex; flex-direction: column; justify-content: center;
-        padding: 36px 36px 50px 36px;
+        padding: 40px 28px 48px 28px;
     ">
         {{-- Tag badge --}}
-        <div style="display: inline-flex; margin-bottom: 20px;">
+        <div style="display: inline-flex; margin-bottom: 24px;">
             <span style="
                 display: inline-block;
                 background: rgba(245,158,11,0.12);
@@ -67,23 +68,24 @@
         {{-- Headline --}}
         <h1 style="
             color: #FFFFFF;
-            font-size: 28px; font-weight: 900;
+            font-size: 30px; font-weight: 900;
             line-height: 1.15; letter-spacing: -0.02em;
-            margin: 0 0 16px 0;
+            margin: 0 0 20px 0;
         ">{{ $headline }}</h1>
 
         {{-- Separator line --}}
         <div style="
-            width: 36px; height: 2px;
+            width: 40px; height: 2px;
             background: linear-gradient(90deg, #F59E0B, #D97706);
-            border-radius: 2px; margin-bottom: 16px;
+            border-radius: 2px; margin-bottom: 20px;
         "></div>
 
         {{-- Subheadline --}}
         <p style="
             color: #9CA3AF;
-            font-size: 13px; font-weight: 400; line-height: 1.65;
-            margin: 0 0 28px 0;
+            font-size: 13.5px; font-weight: 400; line-height: 1.6;
+            margin: 0 0 24px 0;
+            white-space: pre-line;
         ">{{ $subheadline }}</p>
 
         {{-- CTA button --}}
@@ -92,16 +94,16 @@
                 display: inline-block;
                 background: #F59E0B;
                 color: #111827;
-                font-size: 11px; font-weight: 800;
+                font-size: 12px; font-weight: 800;
                 letter-spacing: 0.04em;
-                padding: 9px 18px; border-radius: 10px;
+                padding: 10px 22px; border-radius: 10px;
             ">{{ $cta }}</span>
         </div>
     </div>
 
     {{-- Postelio wordmark bottom right --}}
     <div style="
-        position: absolute; bottom: 18px; right: 24px;
+        position: absolute; bottom: 24px; right: 24px;
         display: flex; align-items: center; gap: 6px;
     ">
         <div style="
@@ -110,7 +112,7 @@
         "></div>
         <span style="
             color: rgba(255,255,255,0.35);
-            font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
+            font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
             text-transform: uppercase;
         ">postelio.fr</span>
     </div>

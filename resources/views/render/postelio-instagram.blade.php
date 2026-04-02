@@ -9,7 +9,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             margin: 0; padding: 0;
-            width: 360px; height: 360px;
+            width: 360px; height: 450px;
             overflow: hidden;
             background: #111827;
         }
@@ -17,7 +17,7 @@
     </style>
 </head>
 <body>
-    <div style="width: 360px; height: 360px; overflow: hidden; position: relative;">
+    <div style="width: 360px; height: 450px; overflow: hidden; position: relative;">
         @if($template === 'annonce')
             <x-postelio-instagram.annonce
                 :tag="$data['tag'] ?? 'NOUVEAUTÉ'"
@@ -31,6 +31,7 @@
                 :tip_title="$data['tip_title'] ?? ''"
                 :tip_body="$data['tip_body'] ?? ''"
                 :hashtags="$data['hashtags'] ?? '#artisan #instagram'"
+                :show_swipe="$data['show_swipe'] ?? false"
             />
         @elseif($template === 'stats')
             <x-postelio-instagram.stats
@@ -71,6 +72,13 @@
                 :col_sans="$data['col_sans'] ?? []"
                 :col_avec="$data['col_avec'] ?? []"
             />
+        @elseif($template === 'chantier')
+            <x-postelio-instagram.chantier
+                :tag="$data['tag'] ?? 'RÉALISATION'"
+                :headline="$data['headline'] ?? ''"
+                :caption="$data['caption'] ?? ''"
+                :image_url="$data['image_url'] ?? $data['image1_b64'] ?? null"
+            />
         @elseif($template === 'avantapres')
             <x-postelio-instagram.avantapres
                 :image_before_url="$data['image1_b64'] ?? null"
@@ -80,10 +88,23 @@
             />
         @elseif($template === 'appmockup')
             <x-postelio-instagram.appmockup
-                :image_url="$data['image1_b64'] ?? null"
+                :image_url="$data['image_url'] ?? $data['image1_b64'] ?? null"
                 :tag="$data['tag'] ?? 'EN ACTION'"
                 :headline="$data['headline'] ?? ''"
                 :subheadline="$data['subheadline'] ?? ''"
+            />
+        @elseif($template === 'educatif')
+            <x-postelio-instagram.educatif
+                :tag="$data['tag'] ?? 'POINT EXPERT'"
+                :title="$data['title'] ?? ''"
+                :body="$data['body'] ?? ''"
+                :insight="$data['insight'] ?? 'Leçon'"
+            />
+        @elseif($template === 'hero')
+            <x-postelio-instagram.hero
+                :tag="$data['tag'] ?? 'OFFICIEL'"
+                :headline="$data['headline'] ?? ''"
+                :body="$data['body'] ?? ''"
             />
         @endif
     </div>

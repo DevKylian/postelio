@@ -6,7 +6,7 @@
 ])
 
 <div style="
-    width: 360px; height: 360px;
+    width: 360px; height: 450px;
     background: linear-gradient(145deg, #92400E 0%, #B45309 25%, #D97706 55%, #F59E0B 100%);
     position: relative; overflow: hidden;
     font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
@@ -55,9 +55,10 @@
 
     {{-- Main content --}}
     <div style="
-        position: absolute; inset: 0;
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        width: 100%; height: 100%;
         display: flex; flex-direction: column; justify-content: center;
-        padding: 36px;
+        padding: 40px;
     ">
         {{-- Hook --}}
         <h1 style="
@@ -70,10 +71,10 @@
 
         {{-- Description --}}
         <p style="
-            color: rgba(255,255,255,0.85);
-            font-size: 13px; font-weight: 400;
-            line-height: 1.65;
-            margin: 0 0 32px 0;
+            color: #9CA3AF;
+            font-size: 13.5px; font-weight: 400; line-height: 1.6;
+            margin: 0 0 24px 0;
+            white-space: pre-line;
         ">{{ $description }}</p>
 
         {{-- CTA button --}}
@@ -92,12 +93,12 @@
 
     {{-- Bottom URL --}}
     <div style="
-        position: absolute; bottom: 18px; left: 0; right: 0;
+        position: absolute; bottom: 24px; left: 0; right: 0;
         display: flex; justify-content: center;
     ">
         <span style="
             color: rgba(255,255,255,0.45);
-            font-size: 9px; font-weight: 600;
+            font-size: 10px; font-weight: 600;
             letter-spacing: 0.15em; text-transform: uppercase;
         ">{{ $url }}</span>
     </div>

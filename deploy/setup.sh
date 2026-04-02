@@ -24,7 +24,7 @@ BACKUP_DIR="/var/backups/postelio"
 PHP="php8.3"
 PHP_FPM="php8.3-fpm"
 WEBHOOK_PORT=9876
-DOMAIN="postelio.fr"
+DOMAIN="" # Défini via read plus bas
 GITHUB_REPO="devkylian/postelio"
 GITHUB_BRANCH="main"
 
@@ -51,6 +51,9 @@ echo ""
 read -rsp "  Secret webhook GitHub (chaîne aléatoire) : " WEBHOOK_SECRET
 echo ""
 [[ -z "$WEBHOOK_SECRET" ]] && fail "Secret webhook requis."
+
+read -rp "  Domaine de l'application (ex: postelio.fr) : " DOMAIN
+[[ -z "$DOMAIN" ]] && fail "Domaine requis."
 
 read -rp "  Email Let's Encrypt (pour les alertes SSL) : " LE_EMAIL
 [[ -z "$LE_EMAIL" ]] && fail "Email requis."
@@ -85,13 +88,22 @@ apt-get install -y -qq \
     nginx mysql-server \
     git curl wget unzip zip \
     certbot python3-certbot-nginx \
-    ffmpeg chromium-browser \
+    ffmpeg dnsutils \
     ufw fail2ban \
     logrotate cron \
     libatk1.0-0 libatk-bridge2.0-0 libcups2 libxdamage1 \
     libxcomposite1 libxrandr2 libgbm1 libpango-1.0-0 \
     libcairo2 libasound2 libnspr4 libnss3 libxss1 libxtst6 \
     fonts-liberation
+
+# Google Chrome Stable (au lieu de Chromium Snap qui pose problème avec Browsershot)
+if ! command -v google-chrome-stable &>/dev/null; then
+    info "Installation de Google Chrome Stable..."
+    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
+    apt-get update -qq
+    apt-get install -y -qq google-chrome-stable
+fi
 
 # Composer
 if ! command -v composer &>/dev/null; then
@@ -136,7 +148,8 @@ systemctl enable mysql --quiet
 systemctl start mysql
 
 # Sécurisation et création DB
-mysql -u root << MYSQL_SCRIPT
+# Sécurisation et création DB via sudo
+sudo mysql << MYSQL_SCRIPT
 ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
@@ -144,7 +157,7 @@ DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
 
 CREATE DATABASE IF NOT EXISTS \`postelio\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'postelio'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';
+CREATE USER IF NOT EXISTS 'postelio'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DB_PASSWORD}';
 GRANT ALL PRIVILEGES ON \`postelio\`.* TO 'postelio'@'localhost';
 FLUSH PRIVILEGES;
 MYSQL_SCRIPT
@@ -239,7 +252,7 @@ OPENAI_API_KEY=${OPENAI_API_KEY}
 OPENAI_MODEL=gpt-4o
 OPENAI_WHISPER_MODEL=whisper-1
 
-BROWSERSHOT_CHROME_PATH=/usr/bin/chromium-browser
+BROWSERSHOT_CHROME_PATH=/usr/bin/google-chrome-stable
 EOF
 
 chmod 640 "$APP_DIR/.env"
@@ -249,7 +262,7 @@ chown -R deploy:www-data "$APP_DIR"
 
 # Installation des dépendances PHP
 info "composer install..."
-sudo -u deploy composer update --no-dev --optimize-autoloader --no-interaction --quiet
+sudo -u deploy composer install --no-dev --optimize-autoloader --no-interaction --quiet
 
 # Installation des dépendances Node.js + build
 info "npm install + build..."
@@ -279,6 +292,8 @@ find "$APP_DIR" -type f -exec chmod 644 {} \;
 find "$APP_DIR" -type d -exec chmod 755 {} \;
 # Dossiers nécessitant des droits d'écriture pour l'utilisateur ET le groupe
 chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" "$APP_DIR/.git" "$APP_DIR/public" 2>/dev/null || true
+# Forcer le bit SETGID pour que les nouveaux fichiers héritent du groupe www-data
+chmod g+s "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
 chown -R deploy:www-data "$LOG_DIR" "$BACKUP_DIR"
 
 log "Application configurée."
@@ -373,14 +388,24 @@ log "Nginx configuré (HTTP)."
 # =============================================================================
 hr; info "8/10 — SSL Let's Encrypt"; hr
 
-certbot --nginx \
-    -d "${DOMAIN}" \
-    -d "www.${DOMAIN}" \
-    --non-interactive \
-    --agree-tos \
-    --email "$LE_EMAIL" \
-    --redirect \
-    --quiet
+# Vérifier si le domaine pointe vers ce serveur avant de lancer Certbot
+info "Vérification DNS pour ${DOMAIN}..."
+IP_SERVER=$(curl -s https://ifconfig.me)
+ADDR_DNS=$(dig +short "${DOMAIN}" | tail -n1)
+
+if [[ "$ADDR_DNS" != "$IP_SERVER" ]]; then
+    warn "Le domaine ${DOMAIN} ne semble pas encore pointer vers ${IP_SERVER} (trouvé: ${ADDR_DNS:-aucun})."
+    warn "SSL ignoré pour l'instant. Relancez 'certbot --nginx' manuellement plus tard."
+else
+    certbot --nginx \
+        -d "${DOMAIN}" \
+        -d "www.${DOMAIN}" \
+        --non-interactive \
+        --agree-tos \
+        --email "$LE_EMAIL" \
+        --redirect \
+        --quiet
+fi
 
 # Renouvellement auto via cron (certbot le fait seul mais on s'assure)
 (crontab -l 2>/dev/null | grep -v certbot; echo "0 3 * * * certbot renew --quiet --post-hook 'systemctl reload nginx'") | crontab -
@@ -561,11 +586,25 @@ DEPLOY_LOG="\${LOG_DIR}/deploy.log"
 exec >> "\${DEPLOY_LOG}" 2>&1
 
 log()  { echo "[DEPLOY \$(date '+%Y-%m-%d %H:%M:%S')] \$1"; }
+
+rollback() {
+    log "ERREUR FATALE DÉTECTÉE ! Annulation du déploiement..."
+    if [ ! -z "\${PREV_COMMIT:-}" ]; then
+        log "Retour au commit précédent : \${PREV_COMMIT}"
+        cd "\$APP_DIR" && git reset --hard "\$PREV_COMMIT" --quiet || true
+        log "Nettoyage des caches..."
+        cd "\$APP_DIR" && \$PHP artisan optimize:clear 2>/dev/null || true
+    fi
+    cd "\$APP_DIR" && \$PHP artisan up 2>/dev/null || true
+}
+
 fail() {
     log "ERREUR : \$1"
-    cd "\$APP_DIR" && \$PHP artisan up 2>/dev/null || true
     exit 1
 }
+
+# La trap catch n'importe quelle sortie non-0 (crash de bash due à set -e)
+trap 'if [ \$? -ne 0 ]; then rollback; fi' EXIT
 
 log "====== DÉPLOIEMENT DÉMARRÉ ======"
 
@@ -606,7 +645,7 @@ done
 
 if [ -n "\$MISSING_EXTS" ]; then
     log "Extensions PHP manquantes : \${MISSING_EXTS}"
-    log "Installer via : sudo apt-get install \${MISSING_EXTS} && sudo systemctl restart php8.3-fpm"
+    log "Veuillez installer via : sudo apt-get install \${MISSING_EXTS} && sudo systemctl restart php8.3-fpm"
     fail "Déploiement avorté : extensions manquantes."
 fi
 
@@ -629,7 +668,7 @@ if [ ! -d "public/build" ]; then
     FRONTEND_CHANGED=1
 fi
 
-if [ "$FRONTEND_CHANGED" -gt 0 ]; then
+if [ "\$FRONTEND_CHANGED" -gt 0 ]; then
     log "Changements frontend détectés (ou build manquant) — rebuild npm..."
     # Nettoyage manuel car Vite peut échouer sur rmdir (EACCES) si les permissions sont strictes
     rm -rf public/build
@@ -658,9 +697,8 @@ log "Migrations..."
 \$PHP artisan migrate --force || fail "Migrations échouées — rollback nécessaire"
 
 # --- Caches ------------------------------------------------------------------
-log "Rebuild des caches..."
-\$PHP artisan config:cache
-\$PHP artisan route:cache
+log "Rebuild des caches (optimize)..."
+\$PHP artisan optimize
 \$PHP artisan view:cache
 \$PHP artisan event:cache
 
@@ -676,6 +714,8 @@ log "Mode maintenance désactivé..."
 log "Redémarrage du queue worker..."
 sudo systemctl restart postelio-queue
 
+# --- Succès ------------------------------------------------------------------
+trap - EXIT
 log "====== DÉPLOIEMENT TERMINÉ ======"
 DEPLOYEOF
 

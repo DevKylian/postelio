@@ -520,7 +520,7 @@
                         <div class="relative group flex-1 min-h-[300px]">
                             <div class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none rounded-b-2xl"></div>
                             <pre x-ref="promptText" class="absolute inset-0 text-[11px] sm:text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-2xl p-5 overflow-y-auto font-mono whitespace-pre-wrap leading-[1.8] shadow-inner selection:bg-copper/20">SUJET DE L'ARTICLE : <span x-text="subject || '[INSÉRER LE TITRE DU TABLEAU]'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
-AXE DE RÉDACTION (PAS) : <span x-text="axe || '[INSÉRER L'AXE DU TABLEAU]'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
+AXE DE RÉDACTION (PAS) : <span x-text="axe || '[INSÉRER L\'AXE DU TABLEAU]'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
 
 TON RÔLE :
 Tu es un copywriter web d'élite spécialisé dans le B2B pour les artisans du bâtiment (plombiers, électriciens, menuisiers, paysagistes...). Tu parles "vrai". Pas de jargon marketing, pas de "bullshit corporate". Tu t'adresses directement à l'artisan d'humain à humain (tutoie-le, sois percutant, utilise son vocabulaire : chantier, devis, matos, fin de journée, galère).

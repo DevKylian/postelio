@@ -4,12 +4,15 @@ namespace App\Livewire\Admin;
 
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use OpenAI\Laravel\Facades\OpenAI;
 use Spatie\Browsershot\Browsershot;
 
 #[Layout('layouts.app')]
 class InstagramPostGenerator extends Component
 {
+    use WithFileUploads;
+
     // ── Form ──────────────────────────────────────────────────────────────────
     public string $topic    = '';
     public string $template = 'annonce';
@@ -20,6 +23,10 @@ class InstagramPostGenerator extends Component
     public bool    $downloading  = false;
     public ?string $errorMessage = null;
     public bool    $hasContent   = false;
+
+    // ── Image uploads ─────────────────────────────────────────────────────────
+    public $uploadImage1 = null; // avant (avantapres) or main (chantier)
+    public $uploadImage2 = null; // après (avantapres only)
 
     // ── Editable fields: annonce ──────────────────────────────────────────────
     public string $tag         = '';
@@ -65,8 +72,20 @@ class InstagramPostGenerator extends Component
     public array  $col_sans             = [];
     public array  $col_avec             = [];
 
+    // ── Editable fields: avantapres ───────────────────────────────────────────
+    public string $avantapres_headline = '';
+    public string $avantapres_tag      = '';
+
+    // ── Editable fields: chantier ─────────────────────────────────────────────
+    public string $chantier_tag      = '';
+    public string $chantier_headline = '';
+    public string $chantier_caption  = '';
+
     // ── History ───────────────────────────────────────────────────────────────
     public array $history = [];
+
+    // ── Image-based templates ─────────────────────────────────────────────────
+    private const IMAGE_TEMPLATES = ['avantapres', 'chantier'];
 
     public function resetFields(): void
     {
@@ -82,6 +101,10 @@ class InstagramPostGenerator extends Component
         $this->question = $this->question_teaser = $this->question_tag = '';
         $this->comparaison_headline = '';
         $this->col_sans = $this->col_avec = [];
+        $this->avantapres_headline = $this->avantapres_tag = '';
+        $this->chantier_tag = $this->chantier_headline = $this->chantier_caption = '';
+        $this->uploadImage1 = null;
+        $this->uploadImage2 = null;
         $this->hasContent   = false;
         $this->errorMessage = null;
     }
@@ -91,11 +114,29 @@ class InstagramPostGenerator extends Component
         $this->resetFields();
     }
 
+    public function updatedUploadImage1(): void
+    {
+        $this->validateOnly('uploadImage1', [
+            'uploadImage1' => 'nullable|image|max:8192',
+        ]);
+        // Once image uploaded on image-based templates, mark as having content
+        if (in_array($this->template, self::IMAGE_TEMPLATES)) {
+            $this->hasContent = true;
+        }
+    }
+
+    public function updatedUploadImage2(): void
+    {
+        $this->validateOnly('uploadImage2', [
+            'uploadImage2' => 'nullable|image|max:8192',
+        ]);
+    }
+
     public function generate(): void
     {
         $this->validate([
             'topic'    => 'required|min:5|max:300',
-            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison',
+            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,chantier',
             'tone'     => 'required|in:professionnel,accessible,dynamique,inspirant',
         ]);
 
@@ -156,12 +197,28 @@ class InstagramPostGenerator extends Component
             return null;
         }
 
+        // Image templates require at least one uploaded image
+        if (in_array($this->template, self::IMAGE_TEMPLATES) && !$this->uploadImage1) {
+            $this->errorMessage = 'Veuillez uploader au moins une image avant de générer le PNG.';
+            return null;
+        }
+
         $this->downloading = true;
 
         try {
+            $data = $this->buildDataArray();
+
+            // Embed images as base64 for Browsershot
+            if ($this->uploadImage1) {
+                $data['image1_b64'] = $this->fileToDataUri($this->uploadImage1);
+            }
+            if ($this->uploadImage2) {
+                $data['image2_b64'] = $this->fileToDataUri($this->uploadImage2);
+            }
+
             $html = view('render.postelio-instagram', [
                 'template' => $this->template,
-                'data'     => $this->buildDataArray(),
+                'data'     => $data,
             ])->render();
 
             $png = Browsershot::html($html)
@@ -199,6 +256,8 @@ class InstagramPostGenerator extends Component
             'avantages'   => $this->fillAvantages($data),
             'question'    => $this->fillQuestion($data),
             'comparaison' => $this->fillComparaison($data),
+            'avantapres'  => $this->fillAvantapres($data),
+            'chantier'    => $this->fillChantier($data),
         };
     }
 
@@ -263,6 +322,19 @@ class InstagramPostGenerator extends Component
         $this->col_avec             = array_slice((array) ($d['col_avec'] ?? []), 0, 4);
     }
 
+    private function fillAvantapres(array $d): void
+    {
+        $this->avantapres_headline = $d['headline'] ?? 'Transformation complète';
+        $this->avantapres_tag      = $d['tag']      ?? 'AVANT / APRÈS';
+    }
+
+    private function fillChantier(array $d): void
+    {
+        $this->chantier_tag      = $d['tag']      ?? 'RÉALISATION';
+        $this->chantier_headline = $d['headline'] ?? '';
+        $this->chantier_caption  = $d['caption']  ?? '';
+    }
+
     private function buildDataArray(): array
     {
         return match ($this->template) {
@@ -301,8 +373,26 @@ class InstagramPostGenerator extends Component
                 'col_sans' => $this->col_sans,
                 'col_avec' => $this->col_avec,
             ],
+            'avantapres' => [
+                'headline' => $this->avantapres_headline,
+                'tag'      => $this->avantapres_tag,
+            ],
+            'chantier' => [
+                'tag'     => $this->chantier_tag,
+                'headline' => $this->chantier_headline,
+                'caption'  => $this->chantier_caption,
+            ],
             default => [],
         };
+    }
+
+    // ── Image helper ──────────────────────────────────────────────────────────
+
+    private function fileToDataUri($file): string
+    {
+        $mime = $file->getMimeType();
+        $data = base64_encode(file_get_contents($file->getRealPath()));
+        return "data:{$mime};base64,{$data}";
     }
 
     // ── AI Prompt builders ────────────────────────────────────────────────────
@@ -340,42 +430,41 @@ class InstagramPostGenerator extends Component
                 PROMPT,
             'temoignage' => <<<PROMPT
                 Post de type "Témoignage client". Simule un avis authentique d'un artisan satisfait de Postelio.
-                Le témoignage doit sonner vrai et naturel, parler d'un bénéfice concret (clients, temps, visibilité).
                 JSON requis :
-                {
-                  "quote": "témoignage authentique 120-160 car., première personne, sans marketing",
-                  "author": "prénom + initiale du nom ex: Marc D.",
-                  "profession": "métier + ville ex: Plombier — Lyon",
-                  "stars": 5
-                }
+                { "quote": "témoignage authentique 120-160 car., première personne", "author": "prénom + initiale ex: Marc D.", "profession": "métier + ville ex: Plombier — Lyon", "stars": 5 }
                 PROMPT,
             'avantages' => <<<PROMPT
-                Post de type "Liste d'avantages". Présente 4 bénéfices clés de Postelio pour les artisans.
+                Post de type "Liste d'avantages". Présente 4 bénéfices clés de Postelio.
                 JSON requis :
-                {
-                  "tag": "label court MAJUSCULES max 25 car. ex: POURQUOI POSTELIO ?",
-                  "headline": "titre accrocheur max 45 car.",
-                  "items": ["bénéfice 1 max 45 car.", "bénéfice 2 max 45 car.", "bénéfice 3 max 45 car.", "bénéfice 4 max 45 car."]
-                }
+                { "tag": "label MAJUSCULES max 25 car.", "headline": "titre accrocheur max 45 car.", "items": ["bénéfice max 45 car. x4"] }
                 PROMPT,
             'question' => <<<PROMPT
-                Post de type "Question engageante" (TOFU) pour interpeller les artisans et déclencher des commentaires.
-                La question doit être directe, pointer une douleur réelle, et donner envie de répondre.
+                Post de type "Question engageante" pour interpeller les artisans.
                 JSON requis :
-                {
-                  "tag": "label court max 20 car. ex: BONNE QUESTION",
-                  "question": "question directe et percutante max 90 car.",
-                  "teaser": "amorce de réponse intrigante max 110 car., donne envie de lire la suite"
-                }
+                { "tag": "label max 20 car.", "question": "question percutante max 90 car.", "teaser": "amorce réponse max 110 car." }
                 PROMPT,
             'comparaison' => <<<PROMPT
-                Post de type "Comparaison Sans vs Avec Postelio" (BOFU). Montre le contraste avant/après.
-                Chaque colonne doit avoir exactement 4 points courts et percutants.
+                Post de type "Comparaison Sans vs Avec Postelio".
+                JSON requis :
+                { "headline": "titre max 35 car.", "col_sans": ["4 points négatifs max 38 car. chacun"], "col_avec": ["4 points positifs max 38 car. chacun"] }
+                PROMPT,
+            'avantapres' => <<<PROMPT
+                Post de type "Avant / Après" pour un artisan montrant une transformation de chantier grâce à Postelio.
+                L'image du chantier sera uploadée séparément. Génère uniquement le texte d'accompagnement.
                 JSON requis :
                 {
-                  "headline": "titre court et accrocheur max 35 car.",
-                  "col_sans": ["point négatif 1 max 38 car.", "point négatif 2 max 38 car.", "point négatif 3 max 38 car.", "point négatif 4 max 38 car."],
-                  "col_avec": ["point positif 1 max 38 car.", "point positif 2 max 38 car.", "point positif 3 max 38 car.", "point positif 4 max 38 car."]
+                  "tag": "label court MAJUSCULES max 20 car. ex: AVANT / APRÈS",
+                  "headline": "titre court qui décrit la transformation, max 45 car."
+                }
+                PROMPT,
+            'chantier' => <<<PROMPT
+                Post de type "Réalisation / Chantier" pour un artisan showcasant un travail terminé sur Instagram via Postelio.
+                L'image du chantier sera uploadée séparément. Génère uniquement le texte qui s'affichera par-dessus.
+                JSON requis :
+                {
+                  "tag": "label court MAJUSCULES max 18 car. ex: RÉALISATION, CHANTIER TERMINÉ, NOUVEAU PROJET...",
+                  "headline": "phrase accrocheuse sur le savoir-faire, max 60 car.",
+                  "caption": "courte description du travail réalisé, max 75 car., professionnelle"
                 }
                 PROMPT,
             default => '',

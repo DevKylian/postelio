@@ -71,6 +71,20 @@
                 :col_sans="$data['col_sans'] ?? []"
                 :col_avec="$data['col_avec'] ?? []"
             />
+        @elseif($template === 'avantapres')
+            <x-postelio-instagram.avantapres
+                :image_before_url="$data['image1_b64'] ?? null"
+                :image_after_url="$data['image2_b64'] ?? null"
+                :headline="$data['headline'] ?? 'Transformation complète'"
+                :tag="$data['tag'] ?? 'AVANT / APRÈS'"
+            />
+        @elseif($template === 'chantier')
+            <x-postelio-instagram.chantier
+                :image_url="$data['image1_b64'] ?? null"
+                :tag="$data['tag'] ?? 'RÉALISATION'"
+                :headline="$data['headline'] ?? ''"
+                :caption="$data['caption'] ?? ''"
+            />
         @endif
     </div>
 </body>

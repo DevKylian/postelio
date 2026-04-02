@@ -361,6 +361,7 @@
              x-data="{ 
                 copied: false, 
                 subject: '',
+                axe: '',
                 bannerTitle: '',
                 isExporting: false,
                 
@@ -495,7 +496,10 @@
                                 Le Prompt à copier
                             </h4>
                             <button @click="
-                                navigator.clipboard.writeText($refs.promptText.innerText.replace('{INSERER_LE_SUJET_ICI}', subject || '[VOTRE SUJET]'));
+                                let text = $refs.promptText.innerText;
+                                text = text.replace('[INSÉRER LE TITRE DU TABLEAU]', subject || '[VOTRE SUJET]');
+                                text = text.replace('[INSÉRER L\'AXE DU TABLEAU]', axe || '[VOTRE AXE]');
+                                navigator.clipboard.writeText(text);
                                 copied = true;
                                 setTimeout(() => copied = false, 2000);
                             " class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-sm"
@@ -506,48 +510,53 @@
                             </button>
                         </div>
                         
-                        <div>
-                            <input type="text" x-model="subject" placeholder="Sujet de l'article (ex: Rénover une salle de bain...)" 
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <input type="text" x-model="subject" placeholder="Sujet de l'article (Titre du tableau)" 
+                                   class="w-full bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-midnight focus:border-copper focus:ring-2 focus:ring-copper/20 outline-none transition-all shadow-sm">
+                            <input type="text" x-model="axe" placeholder="Axe de rédaction (Axe du tableau)" 
                                    class="w-full bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-midnight focus:border-copper focus:ring-2 focus:ring-copper/20 outline-none transition-all shadow-sm">
                         </div>
 
                         <div class="relative group flex-1 min-h-[300px]">
                             <div class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none rounded-b-2xl"></div>
-                            <pre x-ref="promptText" class="absolute inset-0 text-[11px] sm:text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-2xl p-5 overflow-y-auto font-mono whitespace-pre-wrap leading-[1.8] shadow-inner selection:bg-copper/20">SUJET DE L'ARTICLE : <span x-text="subject || '{INSERER_LE_SUJET_ICI}'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
+                            <pre x-ref="promptText" class="absolute inset-0 text-[11px] sm:text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-2xl p-5 overflow-y-auto font-mono whitespace-pre-wrap leading-[1.8] shadow-inner selection:bg-copper/20">SUJET DE L'ARTICLE : <span x-text="subject || '[INSÉRER LE TITRE DU TABLEAU]'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
+AXE DE RÉDACTION (PAS) : <span x-text="axe || '[INSÉRER L'AXE DU TABLEAU]'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
 
 TON RÔLE :
-Tu es un copywriter web d'élite spécialisé dans le B2B pour les artisans du bâtiment (plombiers, électriciens, menuisiers, paysagistes, maçons...). Tu parles "vrai". Pas de jargon marketing, pas de "bullshit corporate", pas de grandes théories abstraites. Tu t'adresses directement à l'artisan d'humain à humain (choisis le vouvoiement ou le tutoiement, mais sois constant et percutant). 
+Tu es un copywriter web d'élite spécialisé dans le B2B pour les artisans du bâtiment (plombiers, électriciens, menuisiers, paysagistes...). Tu parles "vrai". Pas de jargon marketing, pas de "bullshit corporate". Tu t'adresses directement à l'artisan d'humain à humain (tutoie-le, sois percutant, utilise son vocabulaire : chantier, devis, matos, fin de journée, galère).
 
-Ton lecteur cible rentre à 19h le soir avec de la poussière sur les mains et souvent les genoux en vrac. Il n'a pas le temps de scroller l'infini sur son téléphone, il veut du concret, du pratique, et comprendre en 2 minutes chrono comment il peut trouver de meilleurs chantiers sans fournir d'effort supplémentaire.
+Ton lecteur rentre à 19h, il est crevé. Il n'a pas le temps pour les théories. Il veut comprendre en 2 minutes comment arrêter de brader ses prix et comment gagner du temps.
 
 TON OBJECTIF :
-Rédiger un article de blog complet (format "Tunnel de vente") sur le sujet demandé pour éduquer l'artisan. À la fin de la lecture, cet article doit lui donner irrésistiblement et logiquement envie d'utiliser notre outil : Postelio.
+Rédiger un article de blog complet qui utilise le framework PAS pour amener logiquement le lecteur à tester Postelio.
 
-À PROPOS DE POSTELIO :
-C'est l'application qui permet à un artisan de prendre une simple photo de son chantier. L'IA s'occupe ensuite d'analyser l'image, de rédiger un texte expert qui rassure, et de le publier automatiquement sur tous ses réseaux sociaux. 100% sans effort, 100% pensé pour les pros pressés.
+STRUCTURE DE L'ARTICLE (Respecte impérativement cet axe) :
+Suis scrupuleusement la logique suivante basée sur l'AXE DE RÉDACTION fourni :
 
-STRUCTURE DE L'ARTICLE (Framework PAS à respecter obligatoirement) :
-1. Problème (Problem) : Accroche immédiate sur sa galère quotidienne en lien avec le sujet.
-2. Agitation (Agitate) : Retourne le couteau dans la plaie chiffrée ou émotionnelle.
-3. [CTA] : Insère exactement la balise `[CTA]` vers le milieu de ton texte, isolée sur une ligne seule.
-4. Solution et valeur ajoutée (Solution) : Donne de VRAIS conseils pratiques, puis explique que Postelio le fait entièrement à leur place.
+Problème (Problem) : Attaque direct sur la douleur mentionnée dans l'axe. Pas d'introduction "Bonjour". On entre dans le vif du sujet.
+
+Agitation (Agitate) : Remue le couteau. Parle des conséquences (perte de fric, soirées gâchées, fatigue, clients qui négocient tout).
+
+[CTA] : Place la balise sur une ligne seule.
+
+Solution (Solution) : Donne 3 conseils concrets de "vieux loup de mer" que l'artisan peut appliquer demain. Puis, montre comment Postelio automatise tout ça pour lui.
 
 CONSIGNES POUR LE CONTENU HTML :
-- Longueur : Le texte de l'article doit faire au minimum 600 mots.
-- Format : Rédige le contenu en HTML brut.
-- Balises autorisées : &lt;h2&gt;, &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;.
-- Interdiction absolue : N'utilise JAMAIS de balise &lt;h1&gt;.
+Longueur : Minimum 600 mots.
+Format : HTML brut.
+Balises : &lt;h2&gt;, &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;.
+Interdiction : Pas de balise &lt;h1&gt;.
 
 FORMAT DE SORTIE EXIGÉ (JSON) :
-Tu dois impérativement et UNIQUEMENT répondre en format JSON valide, sans aucun texte avant ou après, en respectant scrupuleusement le schéma suivant :
+Réponds UNIQUEMENT en JSON valide :
 
 {
-  "titre": "Ton titre ultra percutant, max 60 caractères",
-  "extrait": "2 à 3 phrases choc ou chiffres clés pour donner immédiatement envie de lire",
-  "meta_title": "Le titre technique SEO optimisé, max 60 caractères",
-  "meta_description": "La description pour Google, max 150 caractères. PAS DE GUILLEMETS DOUBLE NI DE CODE HTML DEDANS.",
-  "mots_cles": ["mot-cle-1", "mot-cle-2", "mot-cle-3", "mot-cle-4", "mot-cle-5"],
-  "contenu_html": "Le texte complet de l'article formaté en HTML brut (Minimum 600 mots). N'oublie pas le shortcode [CTA] exact placé vers le milieu, isolé entre 2 paragrafes."
+"titre": "Titre percutant, max 60 caractères",
+"extrait": "2 phrases choc pour accrocher le lecteur",
+"meta_title": "Titre SEO optimisé, max 60 caractères",
+"meta_description": "Description sans guillemets ni HTML, max 150 caractères",
+"mots_cles": ["mot-cle-1", "mot-cle-2", "mot-cle-3", "mot-cle-4", "mot-cle-5"],
+"contenu_html": "Le texte complet (min 600 mots) avec le shortcode [CTA] au milieu."
 }</pre>
                         </div>
                     </div>

@@ -420,6 +420,7 @@
                             @endif
                         </div>
                     </div>
+                    @endif
 
                     {{-- History --}}
                     @if(count($history) > 0)

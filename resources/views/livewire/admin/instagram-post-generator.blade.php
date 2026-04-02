@@ -39,26 +39,43 @@
                     {{-- Template selector --}}
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                         <h3 class="font-bold text-sm text-midnight mb-4 uppercase tracking-widest">Type de post</h3>
-                        <div class="grid grid-cols-2 gap-3">
+                        {{-- TOFU --}}
+                        <p class="col-span-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">TOFU — Notoriété</p>
+                        @foreach([
+                            ['stats',    'Statistique', 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'],
+                            ['question', 'Question',    'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
+                        ] as [$val, $label, $icon])
+                        <button wire:click="$set('template', '{{ $val }}')" class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all {{ $template === $val ? 'border-copper bg-copper/5 text-copper' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:text-gray-600' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $icon }}"/></svg>
+                            <span class="text-xs font-bold">{{ $label }}</span>
+                        </button>
+                        @endforeach
 
-                            @foreach([
-                                ['annonce', 'Annonce', 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.952 9.168-5 .303.477.424 1.053.424 1.636 0 4.332-2.66 7.364-9 8.364z'],
-                                ['conseil',  'Conseil',  'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z'],
-                                ['stats',    'Stats',    'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'],
-                                ['cta',      'Appel CTA', 'M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122'],
-                            ] as [$val, $label, $icon])
-                            <button
-                                wire:click="$set('template', '{{ $val }}')"
-                                class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all {{ $template === $val ? 'border-copper bg-copper/5 text-copper' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:text-gray-600' }}"
-                            >
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $icon }}"/>
-                                </svg>
-                                <span class="text-xs font-bold">{{ $label }}</span>
-                            </button>
-                            @endforeach
+                        {{-- MOFU --}}
+                        <p class="col-span-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-2">MOFU — Considération</p>
+                        @foreach([
+                            ['conseil',    'Conseil',      'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z'],
+                            ['avantages',  'Avantages',    'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z'],
+                            ['temoignage', 'Témoignage',   'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z'],
+                            ['annonce',    'Annonce',      'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.952 9.168-5 .303.477.424 1.053.424 1.636 0 4.332-2.66 7.364-9 8.364z'],
+                        ] as [$val, $label, $icon])
+                        <button wire:click="$set('template', '{{ $val }}')" class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all {{ $template === $val ? 'border-copper bg-copper/5 text-copper' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:text-gray-600' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $icon }}"/></svg>
+                            <span class="text-xs font-bold">{{ $label }}</span>
+                        </button>
+                        @endforeach
 
-                        </div>
+                        {{-- BOFU --}}
+                        <p class="col-span-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-2">BOFU — Conversion</p>
+                        @foreach([
+                            ['comparaison', 'Comparaison', 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4'],
+                            ['cta',         'Appel CTA',   'M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122'],
+                        ] as [$val, $label, $icon])
+                        <button wire:click="$set('template', '{{ $val }}')" class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all {{ $template === $val ? 'border-copper bg-copper/5 text-copper' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:text-gray-600' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $icon }}"/></svg>
+                            <span class="text-xs font-bold">{{ $label }}</span>
+                        </button>
+                        @endforeach
                     </div>
 
                     {{-- Topic + Tone --}}
@@ -186,6 +203,80 @@
                                 <label class="block text-xs font-semibold text-gray-500 mb-1.5">URL</label>
                                 <input wire:model.live="url" type="text" maxlength="40" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
                             </div>
+
+                        @elseif($template === 'temoignage')
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5">Témoignage</label>
+                                <textarea wire:model.live="quote" rows="4" maxlength="160" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all resize-none"></textarea>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5">Auteur</label>
+                                    <input wire:model.live="author" type="text" maxlength="20" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5">Étoiles</label>
+                                    <select wire:model.live="stars" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
+                                        @foreach([5,4,3] as $s)
+                                        <option value="{{ $s }}">{{ str_repeat('★', $s) }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5">Profession</label>
+                                <input wire:model.live="profession" type="text" maxlength="45" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
+                            </div>
+
+                        @elseif($template === 'avantages')
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5">Badge</label>
+                                <input wire:model.live="avantages_tag" type="text" maxlength="25" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5">Titre</label>
+                                <input wire:model.live="avantages_headline" type="text" maxlength="45" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
+                            </div>
+                            @foreach($items as $i => $item)
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5">Point {{ $i + 1 }}</label>
+                                <input wire:model.live="items.{{ $i }}" type="text" maxlength="45" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
+                            </div>
+                            @endforeach
+
+                        @elseif($template === 'question')
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5">Badge</label>
+                                <input wire:model.live="question_tag" type="text" maxlength="20" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5">Question</label>
+                                <textarea wire:model.live="question" rows="3" maxlength="90" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5">Amorce réponse</label>
+                                <textarea wire:model.live="question_teaser" rows="2" maxlength="110" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all resize-none"></textarea>
+                            </div>
+
+                        @elseif($template === 'comparaison')
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5">Titre</label>
+                                <input wire:model.live="comparaison_headline" type="text" maxlength="35" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="space-y-2">
+                                    <p class="text-xs font-bold text-red-500">Sans Postelio</p>
+                                    @foreach($col_sans as $i => $item)
+                                    <input wire:model.live="col_sans.{{ $i }}" type="text" maxlength="38" class="w-full rounded-xl border-gray-200 text-xs focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
+                                    @endforeach
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="text-xs font-bold text-copper">Avec Postelio</p>
+                                    @foreach($col_avec as $i => $item)
+                                    <input wire:model.live="col_avec.{{ $i }}" type="text" maxlength="38" class="w-full rounded-xl border-gray-200 text-xs focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
+                                    @endforeach
+                                </div>
+                            </div>
                         @endif
                     </div>
                     @endif
@@ -279,6 +370,35 @@
                                             :cta="$cta"
                                             :url="$url"
                                         />
+
+                                    @elseif($template === 'temoignage')
+                                        <x-postelio-instagram.temoignage
+                                            :quote="$quote"
+                                            :author="$author"
+                                            :profession="$profession"
+                                            :stars="$stars"
+                                        />
+
+                                    @elseif($template === 'avantages')
+                                        <x-postelio-instagram.avantages
+                                            :headline="$avantages_headline"
+                                            :tag="$avantages_tag"
+                                            :items="$items"
+                                        />
+
+                                    @elseif($template === 'question')
+                                        <x-postelio-instagram.question
+                                            :question="$question"
+                                            :teaser="$question_teaser"
+                                            :tag="$question_tag"
+                                        />
+
+                                    @elseif($template === 'comparaison')
+                                        <x-postelio-instagram.comparaison
+                                            :headline="$comparaison_headline"
+                                            :col_sans="$col_sans"
+                                            :col_avec="$col_avec"
+                                        />
                                     @endif
 
                                 </div>
@@ -308,45 +428,24 @@
                     <div class="grid grid-cols-2 gap-4">
 
                         @foreach([
-                            [
-                                'key'   => 'annonce',
-                                'name'  => 'Annonce',
-                                'desc'  => 'Présente une fonctionnalité ou un avantage de Postelio. Fond sombre avec accentuation cuivrée.',
-                                'dark'  => true,
-                            ],
-                            [
-                                'key'   => 'conseil',
-                                'name'  => 'Conseil',
-                                'desc'  => 'Donne un conseil pratique aux artisans. Design épuré fond blanc avec numérotation.',
-                                'dark'  => false,
-                            ],
-                            [
-                                'key'   => 'stats',
-                                'name'  => 'Statistique',
-                                'desc'  => 'Frappe avec un chiffre clé. Grand nombre cuivré sur fond sombre.',
-                                'dark'  => true,
-                            ],
-                            [
-                                'key'   => 'cta',
-                                'name'  => 'Appel CTA',
-                                'desc'  => 'Convertit avec un message fort. Dégradé cuivré avec bouton dark.',
-                                'dark'  => false,
-                            ],
-                        ] as $t)
+                            ['stats',       'Statistique',  'Chiffre choc sur fond sombre. Idéal pour créer de la prise de conscience. TOFU.',          'bg-midnight', 'text-copper'],
+                            ['question',    'Question',     'Question directe pour déclencher l\'engagement et les commentaires. TOFU.',                 'bg-midnight', 'text-amber-400'],
+                            ['conseil',     'Conseil',      'Tip concret pour artisans. Fond blanc épuré avec numérotation cuivrée. MOFU.',              'bg-chalk border border-gray-200', 'text-midnight'],
+                            ['avantages',   'Avantages',    'Liste des 4 bénéfices clés de Postelio. Fond blanc, checkmarks cuivrés. MOFU.',            'bg-chalk border border-gray-200', 'text-midnight'],
+                            ['temoignage',  'Témoignage',   'Avis client authentique pour rassurer. Fond sombre avec citation. MOFU.',                  'bg-midnight', 'text-copper'],
+                            ['annonce',     'Annonce',      'Présente une feature ou actualité Postelio. Fond dark avec glow cuivré. MOFU.',             'bg-midnight', 'text-copper'],
+                            ['comparaison', 'Comparaison',  'Sans vs Avec Postelio. Design split pour forcer la décision. BOFU.',                       'bg-midnight', 'text-amber-400'],
+                            ['cta',         'Appel CTA',    'Converti avec un message direct. Dégradé cuivré avec bouton sombre. BOFU.',                'bg-amber-500', 'text-midnight'],
+                        ] as [$key, $name, $desc, $bg, $text])
                         <div
-                            wire:click="$set('template', '{{ $t['key'] }}')"
-                            class="rounded-2xl border p-4 cursor-pointer transition-all {{ $template === $t['key'] ? 'border-copper ring-2 ring-copper/20' : 'border-gray-100 hover:border-gray-200' }}"
+                            wire:click="$set('template', '{{ $key }}')"
+                            class="rounded-2xl border p-4 cursor-pointer transition-all {{ $template === $key ? 'border-copper ring-2 ring-copper/20' : 'border-gray-100 hover:border-gray-200' }}"
                         >
-                            {{-- Mini color swatch --}}
-                            <div class="w-full h-16 rounded-xl mb-3 overflow-hidden flex items-center justify-center shadow-inner
-                                {{ $t['dark'] ? 'bg-midnight' : 'bg-amber-500' }}
-                            ">
-                                <span class="text-{{ $t['dark'] ? 'copper' : 'midnight' }} text-xs font-black tracking-widest uppercase">
-                                    {{ $t['name'] }}
-                                </span>
+                            <div class="w-full h-12 rounded-xl mb-3 overflow-hidden flex items-center justify-center shadow-inner {{ $bg }}">
+                                <span class="{{ $text }} text-[10px] font-black tracking-widest uppercase">{{ $name }}</span>
                             </div>
-                            <p class="text-xs font-bold text-midnight mb-1">{{ $t['name'] }}</p>
-                            <p class="text-[11px] text-gray-400 leading-relaxed">{{ $t['desc'] }}</p>
+                            <p class="text-xs font-bold text-midnight mb-1">{{ $name }}</p>
+                            <p class="text-[11px] text-gray-400 leading-relaxed">{{ $desc }}</p>
                         </div>
                         @endforeach
 

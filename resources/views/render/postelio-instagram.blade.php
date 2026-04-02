@@ -46,6 +46,31 @@
                 :cta="$data['cta'] ?? 'Commencer gratuitement →'"
                 :url="$data['url'] ?? 'postelio.fr'"
             />
+        @elseif($template === 'temoignage')
+            <x-postelio-instagram.temoignage
+                :quote="$data['quote'] ?? ''"
+                :author="$data['author'] ?? 'Marc D.'"
+                :profession="$data['profession'] ?? 'Artisan'"
+                :stars="(int)($data['stars'] ?? 5)"
+            />
+        @elseif($template === 'avantages')
+            <x-postelio-instagram.avantages
+                :headline="$data['headline'] ?? ''"
+                :tag="$data['tag'] ?? 'POURQUOI POSTELIO ?'"
+                :items="$data['items'] ?? []"
+            />
+        @elseif($template === 'question')
+            <x-postelio-instagram.question
+                :question="$data['question'] ?? ''"
+                :teaser="$data['teaser'] ?? ''"
+                :tag="$data['tag'] ?? 'BONNE QUESTION'"
+            />
+        @elseif($template === 'comparaison')
+            <x-postelio-instagram.comparaison
+                :headline="$data['headline'] ?? 'La différence est réelle.'"
+                :col_sans="$data['col_sans'] ?? []"
+                :col_avec="$data['col_avec'] ?? []"
+            />
         @endif
     </div>
 </body>

@@ -25,8 +25,8 @@ class InstagramPostGenerator extends Component
     public bool    $hasContent   = false;
 
     // ── Image uploads ─────────────────────────────────────────────────────────
-    public $uploadImage1 = null; // avant (avantapres) or main (chantier)
-    public $uploadImage2 = null; // après (avantapres only)
+    public $uploadImage1 = null; // image gauche (avantapres) ou screenshot (appmockup)
+    public $uploadImage2 = null; // image droite (avantapres only)
 
     // ── Editable fields: annonce ──────────────────────────────────────────────
     public string $tag         = '';
@@ -76,16 +76,16 @@ class InstagramPostGenerator extends Component
     public string $avantapres_headline = '';
     public string $avantapres_tag      = '';
 
-    // ── Editable fields: chantier ─────────────────────────────────────────────
-    public string $chantier_tag      = '';
-    public string $chantier_headline = '';
-    public string $chantier_caption  = '';
+    // ── Editable fields: appmockup ────────────────────────────────────────────
+    public string $appmockup_tag         = '';
+    public string $appmockup_headline    = '';
+    public string $appmockup_subheadline = '';
 
     // ── History ───────────────────────────────────────────────────────────────
     public array $history = [];
 
     // ── Image-based templates ─────────────────────────────────────────────────
-    private const IMAGE_TEMPLATES = ['avantapres', 'chantier'];
+    private const IMAGE_TEMPLATES = ['avantapres', 'appmockup'];
 
     public function resetFields(): void
     {
@@ -102,7 +102,7 @@ class InstagramPostGenerator extends Component
         $this->comparaison_headline = '';
         $this->col_sans = $this->col_avec = [];
         $this->avantapres_headline = $this->avantapres_tag = '';
-        $this->chantier_tag = $this->chantier_headline = $this->chantier_caption = '';
+        $this->appmockup_tag = $this->appmockup_headline = $this->appmockup_subheadline = '';
         $this->uploadImage1 = null;
         $this->uploadImage2 = null;
         $this->hasContent   = false;
@@ -136,7 +136,7 @@ class InstagramPostGenerator extends Component
     {
         $this->validate([
             'topic'    => 'required|min:5|max:300',
-            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,chantier',
+            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup',
             'tone'     => 'required|in:professionnel,accessible,dynamique,inspirant',
         ]);
 
@@ -257,7 +257,7 @@ class InstagramPostGenerator extends Component
             'question'    => $this->fillQuestion($data),
             'comparaison' => $this->fillComparaison($data),
             'avantapres'  => $this->fillAvantapres($data),
-            'chantier'    => $this->fillChantier($data),
+            'appmockup'   => $this->fillAppmockup($data),
         };
     }
 
@@ -328,11 +328,11 @@ class InstagramPostGenerator extends Component
         $this->avantapres_tag      = $d['tag']      ?? 'AVANT / APRÈS';
     }
 
-    private function fillChantier(array $d): void
+    private function fillAppmockup(array $d): void
     {
-        $this->chantier_tag      = $d['tag']      ?? 'RÉALISATION';
-        $this->chantier_headline = $d['headline'] ?? '';
-        $this->chantier_caption  = $d['caption']  ?? '';
+        $this->appmockup_tag         = $d['tag']         ?? 'EN ACTION';
+        $this->appmockup_headline    = $d['headline']    ?? '';
+        $this->appmockup_subheadline = $d['subheadline'] ?? '';
     }
 
     private function buildDataArray(): array
@@ -377,10 +377,10 @@ class InstagramPostGenerator extends Component
                 'headline' => $this->avantapres_headline,
                 'tag'      => $this->avantapres_tag,
             ],
-            'chantier' => [
-                'tag'     => $this->chantier_tag,
-                'headline' => $this->chantier_headline,
-                'caption'  => $this->chantier_caption,
+            'appmockup' => [
+                'tag'         => $this->appmockup_tag,
+                'headline'    => $this->appmockup_headline,
+                'subheadline' => $this->appmockup_subheadline,
             ],
             default => [],
         };
@@ -449,22 +449,26 @@ class InstagramPostGenerator extends Component
                 { "headline": "titre max 35 car.", "col_sans": ["4 points négatifs max 38 car. chacun"], "col_avec": ["4 points positifs max 38 car. chacun"] }
                 PROMPT,
             'avantapres' => <<<PROMPT
-                Post de type "Avant / Après" pour un artisan montrant une transformation de chantier grâce à Postelio.
-                L'image du chantier sera uploadée séparément. Génère uniquement le texte d'accompagnement.
+                Post de type "Avant / Après" pour l'Instagram marketing de Postelio.
+                L'admin va uploader DEUX screenshots : un post Instagram artisan amateur (gauche) et un post Postelio professionnel (droite).
+                L'objectif est de montrer la transformation de la COMMUNICATION d'un artisan grâce à Postelio.
+                Génère le texte d'accompagnement qui explique la différence.
                 JSON requis :
                 {
-                  "tag": "label court MAJUSCULES max 20 car. ex: AVANT / APRÈS",
-                  "headline": "titre court qui décrit la transformation, max 45 car."
+                  "tag": "label MAJUSCULES max 22 car. ex: AVANT / APRÈS POSTELIO",
+                  "headline": "phrase courte qui résume la transformation de la communication, max 45 car."
                 }
                 PROMPT,
-            'chantier' => <<<PROMPT
-                Post de type "Réalisation / Chantier" pour un artisan showcasant un travail terminé sur Instagram via Postelio.
-                L'image du chantier sera uploadée séparément. Génère uniquement le texte qui s'affichera par-dessus.
+            'appmockup' => <<<PROMPT
+                Post de type "App Mockup" pour l'Instagram marketing de Postelio.
+                L'admin va uploader un screenshot de l'interface Postelio ou d'un post généré par Postelio.
+                L'objectif est de montrer concrètement ce que fait Postelio aux artisans.
+                Génère le texte marketing qui encadre ce screenshot.
                 JSON requis :
                 {
-                  "tag": "label court MAJUSCULES max 18 car. ex: RÉALISATION, CHANTIER TERMINÉ, NOUVEAU PROJET...",
-                  "headline": "phrase accrocheuse sur le savoir-faire, max 60 car.",
-                  "caption": "courte description du travail réalisé, max 75 car., professionnelle"
+                  "tag": "label court MAJUSCULES max 18 car. ex: EN ACTION, RÉSULTAT, LIVE, VOILÀ POSTELIO...",
+                  "headline": "phrase directe qui explique ce qu'on voit, max 40 car., orientée bénéfice artisan",
+                  "subheadline": "description concise de Postelio, max 95 car., mentionne le gain de temps et le professionnalisme"
                 }
                 PROMPT,
             default => '',

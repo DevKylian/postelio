@@ -78,12 +78,12 @@
                 :headline="$data['headline'] ?? 'Transformation complète'"
                 :tag="$data['tag'] ?? 'AVANT / APRÈS'"
             />
-        @elseif($template === 'chantier')
-            <x-postelio-instagram.chantier
+        @elseif($template === 'appmockup')
+            <x-postelio-instagram.appmockup
                 :image_url="$data['image1_b64'] ?? null"
-                :tag="$data['tag'] ?? 'RÉALISATION'"
+                :tag="$data['tag'] ?? 'EN ACTION'"
                 :headline="$data['headline'] ?? ''"
-                :caption="$data['caption'] ?? ''"
+                :subheadline="$data['subheadline'] ?? ''"
             />
         @endif
     </div>

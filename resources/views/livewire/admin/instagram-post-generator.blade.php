@@ -78,10 +78,10 @@
                         @endforeach
 
                         {{-- WITH IMAGE --}}
-                        <p class="col-span-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-2">Avec Photo — Portfolio</p>
+                        <p class="col-span-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-2">Avec Screenshot</p>
                         @foreach([
                             ['avantapres', 'Avant / Après', 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4'],
-                            ['chantier',   'Chantier',      'M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z M15 13a3 3 0 11-6 0 3 3 0 016 0z'],
+                            ['appmockup',  'App Mockup',    'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
                         ] as [$val, $label, $icon])
                         <button wire:click="$set('template', '{{ $val }}')" class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all {{ $template === $val ? 'border-copper bg-copper/5 text-copper' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:text-gray-600' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $icon }}"/></svg>
@@ -330,36 +330,37 @@
                                 <input wire:model.live="avantapres_headline" type="text" maxlength="45" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
                             </div>
 
-                        @elseif($template === 'chantier')
-                            {{-- Image upload --}}
+                        @elseif($template === 'appmockup')
+                            {{-- Screenshot upload --}}
                             <div>
-                                <label class="block text-xs font-semibold text-gray-500 mb-2">Photo du chantier</label>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">Screenshot Postelio</label>
+                                <p class="text-[10px] text-gray-400 mb-2">Interface de l'app ou exemple de post généré</p>
                                 <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl cursor-pointer transition-all h-36
                                     {{ $uploadImage1 ? 'border-copper bg-copper/5' : 'border-gray-200 hover:border-copper/50 bg-gray-50' }}">
                                     @if($uploadImage1)
                                         <img src="{{ $uploadImage1->temporaryUrl() }}" class="w-full h-full object-cover rounded-xl">
                                     @else
-                                        <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                        <span class="text-xs text-gray-400 font-medium">Cliquer pour uploader</span>
+                                        <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                        <span class="text-xs text-gray-400 font-medium">Uploader un screenshot</span>
                                         <span class="text-[10px] text-gray-300">JPG, PNG, WEBP — max 8 Mo</span>
                                     @endif
                                     <input wire:model="uploadImage1" type="file" accept="image/*" class="hidden">
                                 </label>
                                 @if($uploadImage1)
-                                <button wire:click="$set('uploadImage1', null)" class="mt-2 text-[10px] text-gray-400 hover:text-red-500 transition-colors">Supprimer l'image</button>
+                                <button wire:click="$set('uploadImage1', null)" class="mt-2 text-[10px] text-gray-400 hover:text-red-500 transition-colors">Supprimer</button>
                                 @endif
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 mb-1.5">Badge</label>
-                                <input wire:model.live="chantier_tag" type="text" maxlength="18" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
+                                <input wire:model.live="appmockup_tag" type="text" maxlength="18" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 mb-1.5">Titre</label>
-                                <textarea wire:model.live="chantier_headline" rows="2" maxlength="60" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all resize-none"></textarea>
+                                <input wire:model.live="appmockup_headline" type="text" maxlength="40" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-500 mb-1.5">Légende</label>
-                                <textarea wire:model.live="chantier_caption" rows="2" maxlength="75" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all resize-none"></textarea>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5">Sous-titre</label>
+                                <textarea wire:model.live="appmockup_subheadline" rows="2" maxlength="95" class="w-full rounded-xl border-gray-200 text-sm focus:ring-2 focus:ring-copper/30 focus:border-copper transition-all resize-none"></textarea>
                             </div>
                         @endif
                     </div>
@@ -492,12 +493,12 @@
                                             :tag="$avantapres_tag"
                                         />
 
-                                    @elseif($template === 'chantier')
-                                        <x-postelio-instagram.chantier
+                                    @elseif($template === 'appmockup')
+                                        <x-postelio-instagram.appmockup
                                             :image_url="$uploadImage1 ? $uploadImage1->temporaryUrl() : null"
-                                            :tag="$chantier_tag"
-                                            :headline="$chantier_headline"
-                                            :caption="$chantier_caption"
+                                            :tag="$appmockup_tag"
+                                            :headline="$appmockup_headline"
+                                            :subheadline="$appmockup_subheadline"
                                         />
                                     @endif
 
@@ -536,8 +537,8 @@
                             ['annonce',     'Annonce',      'Présente une feature ou actualité Postelio. Fond dark avec glow cuivré. MOFU.',             'bg-midnight', 'text-copper'],
                             ['comparaison', 'Comparaison',  'Sans vs Avec Postelio. Design split pour forcer la décision. BOFU.',                       'bg-midnight', 'text-amber-400'],
                             ['cta',         'Appel CTA',    'Converti avec un message direct. Dégradé cuivré avec bouton sombre. BOFU.',                'bg-amber-500', 'text-midnight'],
-                            ['avantapres',  'Avant / Après','2 photos uploadées côte à côte. Idéal pour montrer une transformation de chantier.',       'bg-gray-800', 'text-white'],
-                            ['chantier',    'Chantier',     '1 photo plein cadre + overlay texte. Pour showcaser une réalisation sur Instagram.',        'bg-gray-700', 'text-white'],
+                            ['avantapres',  'Avant / Après','2 screenshots : Instagram sans Postelio vs avec Postelio. Montre la transformation comm.',  'bg-gray-800', 'text-white'],
+                            ['appmockup',   'App Mockup',   'Screenshot de Postelio dans un cadre app. Montre concrètement ce que génère l\'outil.',      'bg-midnight', 'text-copper'],
                         ] as [$key, $name, $desc, $bg, $text])
                         <div
                             wire:click="$set('template', '{{ $key }}')"

@@ -15,7 +15,6 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Postelio — Votre chantier travaille pour vous</title>
-        <meta name="google-site-verification" content="b4LWGmIW0Wfw1Zts9dM9b68MO1JJlFDCQ9nZ2xWkWJc" />
         <meta name="description" content="Postelio — La solution IA pour les artisans. Transformez vos chantiers en posts Instagram parfaits en 30 secondes grâce au vocal. Automatisez votre marketing local dès aujourd'hui.">
         <link rel="canonical" href="{{ url()->current() }}">
 

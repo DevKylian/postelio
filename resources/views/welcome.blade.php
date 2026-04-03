@@ -20,8 +20,8 @@
 
         <script type="application/ld+json">
         {
-          "@context": "https://schema.org",
-          "@type": "Organization",
+          "@@context": "https://schema.org",
+          "@@type": "Organization",
           "name": "Postelio",
           "url": "{{ config('app.url') }}",
           "logo": "{{ asset('images/postelio-logo-gradient.svg') }}",
@@ -29,7 +29,7 @@
             "https://instagram.com/postelio.app"
           ],
           "contactPoint": {
-            "@type": "ContactPoint",
+            "@@type": "ContactPoint",
             "email": "hello@postelio.fr",
             "contactType": "customer support"
           }
@@ -37,12 +37,12 @@
         </script>
         <script type="application/ld+json">
         {
-          "@context": "https://schema.org",
-          "@type": "WebSite",
+          "@@context": "https://schema.org",
+          "@@type": "WebSite",
           "name": "Postelio",
           "url": "{{ config('app.url') }}",
           "potentialAction": {
-            "@type": "SearchAction",
+            "@@type": "SearchAction",
             "target": "{{ config('app.url') }}/search?q={search_term_string}",
             "query-input": "required name=search_term_string"
           }

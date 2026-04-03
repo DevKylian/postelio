@@ -107,6 +107,7 @@ if [ "$FRONTEND_CHANGED" -gt 0 ]; then
     log "Fichiers concernés : $(echo "$FRONTEND_FILES" | tr '\n' ' ')"
     
     # Nettoyage manuel car Vite peut échouer sur rmdir (EACCES) si les permissions sont strictes
+    chmod -R 777 public/build 2>/dev/null || true
     rm -rf public/build
     
     log "npm install..."

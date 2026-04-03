@@ -15,6 +15,39 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Postelio — Votre chantier travaille pour vous</title>
+        <meta name="description" content="Postelio — La solution IA pour les artisans. Transformez vos chantiers en posts Instagram parfaits en 30 secondes grâce au vocal. Automatisez votre marketing local dès aujourd'hui.">
+        <link rel="canonical" href="{{ url()->current() }}">
+
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Postelio",
+          "url": "{{ config('app.url') }}",
+          "logo": "{{ asset('images/postelio-logo-gradient.svg') }}",
+          "sameAs": [
+            "https://instagram.com/postelio.app"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "hello@postelio.fr",
+            "contactType": "customer support"
+          }
+        }
+        </script>
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Postelio",
+          "url": "{{ config('app.url') }}",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "{{ config('app.url') }}/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+        </script>
 
         <!-- Favicon -->
         <link rel="icon" type="image/svg+xml" href="{{ asset('images/postelio-logo-gradient.svg') }}">

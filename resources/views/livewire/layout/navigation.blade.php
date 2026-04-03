@@ -179,6 +179,13 @@ $logout = function (Logout $logout) {
                 </svg>
                 <span>Instagram Postelio</span>
             </x-sidebar-link>
+
+            <x-sidebar-link :href="route('admin.announcements.index')" :active="request()->routeIs('admin.announcements.*')" wire:navigate>
+                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8 a3 3 0 1 1-5.8-1.6"/>
+                </svg>
+                <span>Bandeau d'annonce</span>
+            </x-sidebar-link>
             @endif
 
             <!-- Section: Compte -->

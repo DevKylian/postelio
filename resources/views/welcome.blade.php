@@ -1,3 +1,14 @@
+@php
+    $announcementText = \App\Models\Setting::get('announcement_text', 'Recherche 10 artisans pour tester gratuitement l\'app !');
+    $announcementLinkText = \App\Models\Setting::get('announcement_link_text', 'Rejoindre le test →');
+    $announcementRoute = \App\Models\Setting::get('announcement_route', 'register');
+    $announcementActive = \App\Models\Setting::get('announcement_is_active', true);
+    try {
+        $announcementUrl = route($announcementRoute);
+    } catch (\Exception $e) {
+        $announcementUrl = route('register');
+    }
+@endphp
 <!DOCTYPE html>
 <html lang="fr" class="scroll-smooth">
     <head>
@@ -33,12 +44,39 @@
             isMenuOpen: false, 
             scrolled: false, 
             openFaq: null,
+            showAnnouncement: {{ $announcementActive ? 'true' : 'false' }},
             init() {
                 window.addEventListener('scroll', () => {
                     this.scrolled = window.scrollY > 50;
                 });
             }
           }">
+      
+      <!-- Announcement Bar -->
+      <div x-show="showAnnouncement" 
+           x-transition:enter="transition ease-out duration-500"
+           x-transition:enter-start="opacity-0 translate-y-4 md:translate-y-10"
+           x-transition:enter-end="opacity-100 translate-y-0"
+           x-transition:leave="transition ease-in duration-300"
+           x-transition:leave-start="opacity-100 translate-y-0"
+           x-transition:leave-end="opacity-0 translate-y-4 md:translate-y-10"
+           class="md:fixed md:bottom-8 fixed md:top-auto top-0 left-0 md:left-1/2 md:-translate-x-1/2 z-[100] w-full md:w-auto"
+           style="display: none;">
+        <div class="bg-amber-600 rounded-none md:rounded-full py-2.5 px-4 md:px-10 flex items-center justify-between md:justify-center gap-6 shadow-2xl shadow-amber-900/20">
+          <div class="flex items-center gap-3 text-white text-center md:text-left w-full md:w-auto">
+            <span class="hidden md:flex h-2.5 w-2.5 relative flex-shrink-0">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+            </span>
+            <p class="text-[11px] md:text-sm font-bold tracking-wide flex-1">
+              {{ $announcementText }} <a href="{{ $announcementUrl }}" class="underline decoration-white/40 hover:decoration-white transition-all ml-1 underline-offset-2">{{ $announcementLinkText }}</a>
+            </p>
+          </div>
+          <button @click="showAnnouncement = false" class="text-white/70 hover:text-white transition-colors p-1 bg-white/10 rounded-full flex-shrink-0">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
       
       <!-- Background Decoration -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
@@ -48,7 +86,8 @@
     </div>
 
       <!-- Navigation -->
-      <nav class="fixed top-4 inset-x-0 z-50 transition-all duration-500 flex justify-center px-4">
+      <nav class="fixed inset-x-0 z-50 transition-all duration-500 flex justify-center px-4"
+           :class="showAnnouncement ? 'top-[56px] md:top-4' : 'top-4'">
         <div class="w-full max-w-5xl transition-all duration-500 rounded-full px-4 sm:px-6 py-3 flex justify-between items-center border glass-card bg-white/70"
              :class="scrolled ? 'bg-white/95 shadow-lg' : 'bg-white/70 shadow-sm'">
           <a href="/" class="transition-opacity hover:opacity-80">
@@ -199,9 +238,11 @@
           .md-type.sel .md-type-ico{background:#fef3c7;color:#d97706}
           .md-type-lbl{font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;text-align:center;transition:all 0.3s}
           .md-type.sel .md-type-lbl{color:#d97706}
-          .md-upload{width:100%;max-width:280px;aspect-ratio:1;border:2px dashed #cbd5e1;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;background:#fafbfc;transition:all 0.3s}
+          .md-upload{width:100%;max-width:280px;aspect-ratio:1;border:2px dashed #cbd5e1;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden;background:#fafbfc;transition:all 0.3s}
+          .md-upload.sm{max-width:140px;width:100%;aspect-ratio:3.5/5;border-radius:12px;flex-shrink:0}
+          .md-upload-row{display:flex !important;flex-direction:row !important;gap:16px;justify-content:center;width:100%;max-width:400px}
           .md-upload.filled{border-style:solid;border-color:#f59e0b}
-          .md-upload img{position:absolute;inset:4px;border-radius:12px;object-fit:cover;opacity:0;transform:scale(0.9)}
+          .md-upload img{position:absolute;inset:0;border-radius:12px;object-fit:cover;opacity:0;transform:scale(0.9)}
           .md-upload img.show{animation:mdDrop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards}
           @keyframes mdDrop{to{opacity:1;transform:scale(1)}}
           .md-spinner{width:64px;height:64px;border-radius:50%;border:4px solid #f8fafc;border-top-color:#d97706;animation:mdSpin 1s cubic-bezier(0.68,-0.55,0.26,1.55) infinite;box-shadow:0 0 20px rgba(217,119,6,0.15)}
@@ -216,7 +257,7 @@
           .md-insta.show{animation:mdInstaPop 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards}
           @keyframes mdInstaPop{to{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
           .md-insta-head{display:flex;align-items:center;gap:8px;padding:8px 10px}
-          .md-insta-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706)}
+          .md-insta-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:14px;flex-shrink:0}
           .md-insta-img{width:100%;aspect-ratio:1;object-fit:cover}
           .md-insta-badge{position:absolute;top:8px;right:8px;background:rgba(30,41,59,0.8);backdrop-filter:blur(8px);color:white;font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.08em}
           .md-insta-acts{display:flex;gap:10px;padding:8px 10px;align-items:center}
@@ -373,14 +414,34 @@
               <!-- SCENE 3: Photo -->
               <div class="md-scene" :class="currentScene === 3 ? 'active' : ''">
                 <div class="md-content">
-                  <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;width:100%">
-                    <div style="font-size:13px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.08em">Étape 3 · Ajouter une photo</div>
-                    <div class="md-upload" :class="hasPhoto ? 'filled' : ''" style="display:flex;align-items:center;justify-content:center">
-                      <div x-show="!hasPhoto" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#94a3b8;width:100%">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:1.5rem;width:100%;justify-content:center">
+                    <div style="font-size:13px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.08em">Étape 3 · Ajouter les photos</div>
+                    
+                    <!-- Mode Avant/Après: 2 portraits côte à côte -->
+                    <div class="md-upload-row" x-show="selectedType === 'avant-apres'" x-transition>
+                      <div class="md-upload sm" :class="hasPhoto1 ? 'filled' : ''">
+                        <div x-show="!hasPhoto1" class="absolute inset-0 flex flex-col items-center justify-center gap-2 color-[#94a3b8] text-slate-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                          <span style="font-size:10px;font-weight:800;letter-spacing:0.05em">AVANT</span>
+                        </div>
+                        <img src="{{ asset('images/demo/avant.png') }}?v=5" alt="Avant" :class="hasPhoto1 ? 'show' : ''">
+                      </div>
+                      <div class="md-upload sm" :class="hasPhoto2 ? 'filled' : ''">
+                        <div x-show="!hasPhoto2" class="absolute inset-0 flex flex-col items-center justify-center gap-2 color-[#94a3b8] text-slate-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                          <span style="font-size:10px;font-weight:800;letter-spacing:0.05em">APRÈS</span>
+                        </div>
+                        <img src="{{ asset('images/demo/apres.png') }}?v=5" alt="Après" :class="hasPhoto2 ? 'show' : ''">
+                      </div>
+                    </div>
+
+                    <!-- Mode Simple -->
+                    <div class="md-upload" :class="hasPhoto1 ? 'filled' : ''" x-show="selectedType !== 'avant-apres'" x-transition>
+                      <div x-show="!hasPhoto1" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#94a3b8;width:100%">
                         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                         <span style="display:block;width:100%;font-size:13px;font-weight:500;text-align:center">Cliquez pour importer</span>
                       </div>
-                      <img src="https://picsum.photos/seed/verriere-final/500/500" alt="Photo chantier" :class="hasPhoto ? 'show' : ''">
+                      <img src="{{ asset('images/demo/result.png') }}?v=5" alt="Photo chantier" :class="hasPhoto1 ? 'show' : ''">
                     </div>
                   </div>
                 </div>
@@ -424,15 +485,14 @@
 
                   <div class="md-insta relative z-20" :class="showInstaPost ? 'show' : ''">
                     <div class="md-insta-head">
-                      <div class="md-insta-av"></div>
+                      <div class="md-insta-av">M</div>
                       <div>
                         <div style="font-size:11px;font-weight:700;color:#1e293b">Menuiserie Thomas</div>
                         <div style="font-size:9px;color:#94a3b8">Lyon, France</div>
                       </div>
                     </div>
                     <div style="position:relative">
-                      <img src="https://picsum.photos/seed/verriere-final/500/500" alt="Post" class="md-insta-img">
-                      <div class="md-insta-badge">Avant / Après</div>
+                      <img src="{{ asset('images/demo/result.png') }}?v=5" alt="Post" class="md-insta-img">
                     </div>
                     <div class="md-insta-acts">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#EF4444" stroke="#EF4444" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
@@ -441,8 +501,8 @@
                     </div>
                     <div style="font-size:11px;font-weight:700;color:#1e293b;padding:0 10px"><span x-text="likeCount"></span> J'aime</div>
                     <div style="font-size:10px;color:#334155;padding:4px 10px 8px;line-height:1.6">
-                      <strong style="color:#1e293b">Menuiserie Thomas</strong> Création et pose d'une verrière sur-mesure en acier thermolaqué noir. Une transformation lumineuse ! 🔨✨
-                      <br><span style="color:#3b82f6;font-weight:500">#menuiserie #artisan #verriere #lyon #renovation</span>
+                      <strong style="color:#1e293b">Menuiserie Thomas</strong> Transformation complète d'une cuisine. De la conception à la pose des luminaires. 🔨✨
+                      <br><span style="color:#3b82f6;font-weight:500">#menuiserie #artisan #cuisine #lyon #renovation</span>
                     </div>
                     <div style="font-size:8px;color:#94a3b8;padding:0 10px 8px;text-transform:uppercase;letter-spacing:0.05em">Il y a quelques secondes</div>
                   </div>
@@ -461,9 +521,9 @@
                 currentScene: 0, cursorX: 100, cursorY: 100, cursorSpeed: 0.6, cursorVisible: false,
                 clickX: 0, clickY: 0, showClick: false, sceneLabel: '',
                 isRecording: false, waveformHeights: Array(20).fill(15), transcriptText: '',
-                selectedType: '', hasPhoto: false, showInstaPost: false, showSuccessToast: false,
+                selectedType: '', hasPhoto1: false, hasPhoto2: false, showInstaPost: false, showSuccessToast: false,
                 likeCount: 0, trophyToasts: [], animationRunning: false, animationTimer: null, waveformInterval: null,
-                fullTranscript: "On a terminé la pose de la verrière chez le client, du sur-mesure en acier noir, le rendu est super propre.",
+                fullTranscript: "On a terminé la rénovation complète de la cuisine chez le client à Lyon, le rendu est vraiment superbe.",
 
                 startAnimation() {
                     if (this.animationRunning) return;
@@ -483,85 +543,103 @@
                         await this.scene3(); if (!this.animationRunning) break;
                         await this.scene4(); if (!this.animationRunning) break;
                         await this.scene5(); if (!this.animationRunning) break;
-                        await this.wait(2000);
+                        await this.wait(1800);
                     }
                 },
                 cursorRot: 0,
                 async reset() {
                     this.currentScene = 0; this.cursorVisible = false; this.isRecording = false;
                     this.cursorRot = 0;
-                    this.transcriptText = ''; this.selectedType = ''; this.hasPhoto = false;
+                    this.transcriptText = ''; this.selectedType = ''; this.hasPhoto1 = false; this.hasPhoto2 = false;
                     this.showInstaPost = false; this.showSuccessToast = false; this.likeCount = 0;
                     this.sceneLabel = ''; this.waveformHeights = Array(20).fill(15); this.trophyToasts = [];
                     if (this.waveformInterval) clearInterval(this.waveformInterval);
-                    await this.wait(300);
+                    await this.wait(250);
                 },
                 async scene1() {
                     this.currentScene = 1; this.sceneLabel = '01 · Enregistrement vocal';
-                    await this.wait(500);
+                    await this.wait(450);
                     this.cursorVisible = true;
                     const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
                     await this.moveCursor(sw * 0.3, sh * 0.3, 0);
-                    await this.wait(150);
-                    await this.moveCursor(sw * 0.5, sw < 600 ? sh * 0.52 : sh * 0.54, 0.55);
-                    await this.wait(150);
+                    await this.wait(130);
+                    await this.moveCursor(sw * 0.5, sw < 600 ? sh * 0.52 : sh * 0.54, 0.5);
+                    await this.wait(130);
                     await this.doClick(this.cursorX, this.cursorY);
                     this.isRecording = true;
                     this.waveformInterval = setInterval(() => {
                         this.waveformHeights = this.waveformHeights.map(() => Math.floor(Math.random() * 70) + 20);
-                    }, 150);
+                    }, 140);
                     const words = this.fullTranscript.split(' ');
                     for (let i = 0; i < words.length; i++) {
                         if (!this.animationRunning) return;
                         this.transcriptText += (i > 0 ? ' ' : '"') + words[i];
-                        await this.wait(70);
+                        await this.wait(60);
                     }
-                    this.transcriptText += '"'; await this.wait(300);
+                    this.transcriptText += '"'; await this.wait(250);
                     this.isRecording = false;
                     if (this.waveformInterval) clearInterval(this.waveformInterval);
-                    await this.wait(500);
+                    await this.wait(450);
                 },
                 async scene2() {
                     this.currentScene = 2; this.sceneLabel = '02 · Type de post';
-                    await this.wait(500);
+                    await this.wait(450);
                     const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
-                    await this.moveCursor(sw < 600 ? sw * 0.28 : sw * 0.35, sw < 600 ? sh * 0.42 : sh * 0.45, 0.45);
-                    await this.wait(150);
+                    await this.moveCursor(sw < 600 ? sw * 0.28 : sw * 0.35, sw < 600 ? sh * 0.42 : sh * 0.45, 0.4);
+                    await this.wait(130);
                     await this.doClick(this.cursorX, this.cursorY);
-                    this.selectedType = 'avant-apres'; await this.wait(1000);
+                    this.selectedType = 'avant-apres'; await this.wait(900);
                 },
                 async scene3() {
-                    this.currentScene = 3; this.sceneLabel = '03 · Photo du chantier';
-                    await this.wait(500);
+                    this.currentScene = 3; this.sceneLabel = '03 · Photos du chantier';
+                    await this.wait(350);
                     const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
-                    await this.moveCursor(sw * 0.5, sh * 0.55, 0.4);
-                    await this.wait(100);
-                    await this.doClick(this.cursorX, this.cursorY);
-                    this.hasPhoto = true; await this.wait(1000);
+                    
+                    if (this.selectedType === 'avant-apres') {
+                      // Click Left Slot
+                      await this.moveCursor(sw < 600 ? sw * 0.35 : sw * 0.4, sh * 0.55, 0.27);
+                      await this.wait(70);
+                      await this.doClick(this.cursorX, this.cursorY);
+                      this.hasPhoto1 = true;
+                      
+                      await this.wait(220);
+                      
+                      // Click Right Slot
+                      await this.moveCursor(sw < 600 ? sw * 0.65 : sw * 0.6, sh * 0.55, 0.18);
+                      await this.wait(70);
+                      await this.doClick(this.cursorX, this.cursorY);
+                      this.hasPhoto2 = true;
+                    } else {
+                      await this.moveCursor(sw * 0.5, sh * 0.55, 0.27);
+                      await this.wait(70);
+                      await this.doClick(this.cursorX, this.cursorY);
+                      this.hasPhoto1 = true;
+                    }
+                    await this.wait(720);
                 },
                 async scene4() {
                     this.currentScene = 4; this.sceneLabel = '04 · Génération IA';
                     const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
-                    this.moveCursor(sw * 0.8, sh * 0.8, 1.2);
-                    await this.wait(1400);
+                    this.moveCursor(sw * 0.8, sh * 0.8, 1.08);
+                    await this.wait(1260);
                 },
                 async scene5() {
                     this.currentScene = 5; this.sceneLabel = '05 · Publication IG';
                     const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
-                    await this.wait(500);
+                    await this.wait(450);
                     this.showInstaPost = true;
-                    this.moveCursor(sw > 600 ? sw - 80 : sw - 50, 80, 2.0);
+                    this.moveCursor(sw > 600 ? sw - 80 : sw - 50, 80, 1.8);
                     const target = 142; const steps = 20;
                     for (let i = 0; i <= steps; i++) {
                         if (!this.animationRunning) return;
-                        this.likeCount = Math.round((target / steps) * i); await this.wait(35);
+                        this.likeCount = Math.round((target / steps) * i); await this.wait(32);
                     }
-                    await this.wait(400); this.showSuccessToast = true;
-                    await this.wait(700); this.trophyToasts.push({show: false}); 
+                    await this.wait(360); this.showSuccessToast = true;
+                    await this.wait(630); this.trophyToasts.push({show: false}); 
                     setTimeout(() => { if(this.trophyToasts[0]) this.trophyToasts[0].show = true; }, 10);
-                    await this.wait(500); this.trophyToasts.push({show: false});
+                    await this.wait(450); this.trophyToasts.push({show: false});
                     setTimeout(() => { if(this.trophyToasts[1]) this.trophyToasts[1].show = true; }, 10);
-                    await this.wait(500); this.trophyToasts.push({show: false});
+                    await this.wait(450); this.trophyToasts.push({show: false});
                     setTimeout(() => { if(this.trophyToasts[2]) this.trophyToasts[2].show = true; }, 10);
                 },
                 async doClick(x, y) {
@@ -587,7 +665,7 @@
         function audioPreview() {
             return {
                 progress: 0, isPlaying: false, displayedText: '',
-                fullText: "Euh voilà, on a terminé la pose de la verrière chez le client à Lyon, c'est du sur-mesure en acier noir, le rendu est super propre.",
+                fullText: "Salut ! On vient de finir cette superbe rénovation de cuisine à Lyon. Le résultat est top, regardez l'avant-après !",
                 waveform: [30, 40, 60, 80, 100, 70, 50, 40, 60, 90, 80, 50, 30, 40, 70, 100, 80, 60, 40, 30, 50, 70, 90, 60, 40, 35, 25, 35, 45, 25],
                 start() {
                     if (this.isPlaying) { this.isPlaying = false; return; }
@@ -658,8 +736,7 @@
                   </div>
 
                   <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left min-h-[80px] flex align-center">
-                    <p class="text-midnight font-medium leading-relaxed text-sm">
-                      Fini la page blanche. Dicte un vocal direct depuis l'utilitaire, Postelio rédige et publie un post parfait pour vous.
+                    <p class="text-midnight font-medium leading-relaxed text-sm" x-text="isPlaying ? displayedText : 'Salut ! On vient de finir cette superbe rénovation de cuisine à Lyon. Le résultat est top, regardez l\'avant-après !'">
                     </p>
                   </div>
                 </div>
@@ -675,7 +752,7 @@
                   </div>                  <!-- App Header -->
                   <div class="pt-10 pb-3 px-4 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10 w-full">
                     <div class="flex items-center gap-3">
-                      <img src="https://picsum.photos/seed/artisan-avatar/100/100" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-slate-200">
+                      <div class="w-9 h-9 rounded-full bg-amber-500 flex items-center justify-center border border-amber-600/20 text-white font-bold text-[14px]">M</div>
                       <div class="text-left">
                         <div class="text-[13px] font-bold text-midnight leading-tight">Menuiserie Thomas</div>
                         <div class="text-[11px] text-slate-500">Lyon, France</div>
@@ -686,10 +763,7 @@
 
                   <!-- Post Image -->
                   <div class="relative aspect-square bg-slate-100 group">
-                    <img src="https://picsum.photos/seed/wood-finished/500/500" alt="Réalisation" class="w-full h-full object-cover">
-                    <div class="absolute top-3 right-3 badge badge-midnight backdrop-blur-md text-white shadow-sm border border-white/10 tracking-widest uppercase">
-                      Avant / Après
-                    </div>
+                    <img src="{{ asset('images/demo/result.png') }}?v=5" alt="Réalisation" class="w-full h-full object-cover">
                   </div>
 
                   <!-- Post Actions & Content -->
@@ -705,12 +779,12 @@
                     <div class="text-[13px] font-bold text-midnight mb-2">124 J'aime</div>
                     <div class="text-[13px] text-slate-800 leading-relaxed">
                       <span class="font-bold mr-2">Menuiserie Thomas</span>
-                      Création et pose d'une verrière sur-mesure en acier thermolaqué noir. 
-                      Une belle transformation qui apporte de la lumière à cette pièce de vie ! 🔨✨ 
+                      Transformation complète d'une cuisine. De la conception à la pose des luminaires. 
+                      Une réalisation qui change totalement l'espace de vie ! 🔨✨ 
                       <br/><br/>
                       Merci à nos clients pour leur confiance.
                       <br/><br/>
-                      <span class="text-blue-600 font-medium">#menuiserie #artisan #renovation #verriere #lyon</span>
+                      <span class="text-blue-600 font-medium">#menuiserie #artisan #renovation #cuisine #lyon</span>
                     </div>
                     <div class="text-[10px] text-slate-400 mt-3 uppercase tracking-wide">Il y a 2 heures</div>
                   </div>
@@ -745,26 +819,18 @@
             <div class="flex overflow-x-auto pb-8 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-4 gap-6 max-w-6xl mx-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               @php
                 $jobs = [
-                  ['icon' => 'paintbrush', 'name' => 'Peintres', 'caption' => 'Avant/Après peintures façades', 'img' => 'wall'],
-                  ['icon' => 'scissors', 'name' => 'Paysagistes', 'caption' => 'Avant/Après aménagement jardin', 'img' => 'garden'],
-                  ['icon' => 'zap', 'name' => 'Électriciens', 'caption' => 'Avant/Après tableau électrique', 'img' => 'wires'],
-                  ['icon' => 'hammer', 'name' => 'Menuisiers', 'caption' => 'Avant/Après menuiserie sur-mesure', 'img' => 'wood']
+                  ['icon' => 'paintbrush', 'name' => 'Peintres', 'caption' => 'Récit de réalisation', 'img' => 'wall', 'tag1' => 'Zoom', 'tag2' => 'Final'],
+                  ['icon' => 'scissors', 'name' => 'Paysagistes', 'caption' => 'Conseil entretien pelouse', 'img' => 'garden', 'tag1' => 'Saison', 'tag2' => 'Astuce'],
+                  ['icon' => 'zap', 'name' => 'Électriciens', 'caption' => 'Expertise mise aux normes', 'img' => 'wires', 'tag1' => 'Technique', 'tag2' => 'Sécurité'],
+                  ['icon' => 'hammer', 'name' => 'Menuisiers', 'caption' => 'Avant / Après chantier', 'img' => 'wood', 'tag1' => 'Avant', 'tag2' => 'Après']
                 ];
               @endphp
               @foreach($jobs as $job)
                 <div class="relative rounded-3xl overflow-hidden group aspect-[4/5] min-w-[260px] sm:min-w-0 snap-center cursor-pointer border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-all duration-500">
-                   <img src="https://picsum.photos/seed/{{ $job['img'] }}-dirty/400/500" alt="{{ $job['name'] }} Avant" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 group-hover:opacity-0">
-                   <img src="https://picsum.photos/seed/{{ $job['img'] }}-clean/400/500" alt="{{ $job['name'] }} Après" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 opacity-0 group-hover:opacity-100">
+                   <img src="{{ asset('images/demo/result.png') }}?v=5" alt="{{ $job['name'] }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                    
-                   <div class="absolute top-4 left-4 badge badge-white bg-white/90 backdrop-blur-md text-midnight transition-opacity duration-500 group-hover:opacity-0 uppercase tracking-widest shadow-sm">Avant</div>
-                   <div class="absolute top-4 left-4 badge badge-midnight bg-midnight text-white transition-opacity duration-500 opacity-0 group-hover:opacity-100 uppercase tracking-widest shadow-sm">Après</div>
-
-                   <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent flex flex-col justify-end p-6 pointer-events-none">
-                     <div class="flex items-center gap-3 text-white font-display font-medium text-lg mb-1">
-                       <i data-lucide="{{ $job['icon'] }}" class="w-5 h-5 text-copper"></i>
-                       {{ $job['name'] }}
-                     </div>
-                     <div class="text-xs text-slate-300 font-light">{{ $job['caption'] }}</div>
+                   <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent flex flex-col justify-end p-6 pointer-events-none">
+                     <h3 class="text-xl font-bold text-white transition-transform duration-500 group-hover:translate-x-1">{{ $job['name'] }}</h3>
                    </div>
                 </div>
               @endforeach
@@ -786,23 +852,51 @@
               <p class="text-xl font-light text-slate-600">Pas besoin d'être un pro du digital. Rangez vos outils, sortez votre téléphone, et laissez l'application faire le reste.</p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              @php
-                $steps = [
-                  ['icon' => 'camera', 'title' => '1. La photo', 'desc' => "Prenez votre réalisation Avant/Après. C'est la preuve de votre qualité."],
-                  ['icon' => 'mic', 'title' => '2. Le vocal', 'desc' => "Dites juste « Pose d'une verrière à Lyon, acier noir ». L'outil rédige le post comme un pro."],
-                  ['icon' => 'send', 'title' => '3. C\'est publié', 'desc' => "Vos clients voient votre niveau d'exigence immédiatement."]
-                ];
-              @endphp
-              @foreach($steps as $idx => $step)
-                <div class="glass-card p-8 flex flex-col items-start group">
-                  <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-8 border border-slate-100 shadow-sm group-hover:scale-110 group-hover:border-copper group-hover:shadow-copper/10 transition-all duration-500 text-copper">
-                    <i data-lucide="{{ $step['icon'] }}" class="w-6 h-6"></i>
+            <div class="relative max-w-5xl mx-auto">
+              <!-- Connecting Line (Desktop) -->
+              <div class="hidden md:block absolute top-12 left-[10%] right-[10%] h-[1px] bg-slate-200 z-0"></div>
+
+              <div class="grid md:grid-cols-3 gap-16 md:gap-8 relative z-10">
+                @php
+                  $steps = [
+                    [
+                      'icon' => 'image',
+                      'title' => 'Capturez votre travail',
+                      'desc' => "Prenez une photo de votre chantier, d'un détail ou d'un conseil. C'est la vitrine irréfutable de votre expertise.",
+                      'num' => '01'
+                    ],
+                    [
+                      'icon' => 'mic',
+                      'title' => 'Dictez votre note',
+                      'desc' => "Parlez à votre téléphone : « Pose d'une verrière sur-mesure ». L'IA structure votre message.",
+                      'num' => '02'
+                    ],
+                    [
+                      'icon' => 'send',
+                      'title' => 'C\'est en ligne',
+                      'desc' => "Le résultat est publié automatiquement. Vos futurs clients voient votre niveau d'exigence.",
+                      'num' => '03'
+                    ]
+                  ];
+                @endphp
+                @foreach($steps as $idx => $step)
+                  <div class="flex flex-col items-center text-center group">
+                    <div class="relative mb-10">
+                      <!-- Icon Circle -->
+                      <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center border border-slate-50 shadow-[0_15px_40px_rgba(0,0,0,0.06)] group-hover:scale-110 group-hover:border-copper/30 group-hover:shadow-copper/10 transition-all duration-500 text-copper">
+                        <i data-lucide="{{ $step['icon'] }}" class="w-9 h-9 opacity-90"></i>
+                      </div>
+                      <!-- Number Badge -->
+                      <div class="absolute -top-1 -right-1 w-7 h-7 bg-midnight text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                        {{ $step['num'] }}
+                      </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-display font-semibold tracking-tight text-midnight mb-4">{{ $step['title'] }}</h3>
+                    <p class="text-slate-500 font-light leading-relaxed max-w-[280px]">{{ $step['desc'] }}</p>
                   </div>
-                  <h3 class="text-2xl font-display font-semibold tracking-tight text-midnight mb-4">{{ $step['title'] }}</h3>
-                  <p class="text-slate-600 font-light leading-relaxed">{{ $step['desc'] }}</p>
-                </div>
-              @endforeach
+                @endforeach
+              </div>
             </div>
           </div>
         </section>
@@ -822,8 +916,8 @@
                 <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
                   <i data-lucide="camera" class="w-6 h-6"></i>
                 </div>
-                <h3 class="text-xl font-display font-medium mb-3 text-white">La preuve visuelle</h3>
-                <p class="text-slate-400 font-light leading-relaxed">L'Avant/Après lève les doutes instantanément.</p>
+                <h3 class="text-xl font-display font-medium mb-3 text-white">L'expertise visuelle</h3>
+                <p class="text-slate-400 font-light leading-relaxed">Montrer votre travail lève les doutes instantanément.</p>
               </div>
               <div class="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors">
                 <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
@@ -890,7 +984,9 @@
                   </div>
                   <p class="text-lg text-slate-700 mb-10 font-light leading-relaxed flex-1">"{{ $t['text'] }}"</p>
                   <div class="flex items-center gap-4 mt-auto">
-                    <img src="https://picsum.photos/seed/{{ $t['img'] }}/100/100" alt="{{ $t['name'] }}" class="w-12 h-12 rounded-full object-cover border border-slate-200 shadow-sm">
+                    <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 shadow-sm">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
                     <div>
                       <div class="font-medium text-midnight">{{ $t['name'] }}</div>
                       <div class="text-sm text-copper">{{ $t['job'] }}</div>

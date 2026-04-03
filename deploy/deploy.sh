@@ -89,10 +89,9 @@ if ! composer install --no-dev --optimize-autoloader --no-interaction --quiet 2>
 fi
 
 # --- Frontend (si JS/CSS/Blade modifié — Tailwind scanne aussi les vues) ----
-FRONTEND_REGEX="^(resources/|lang/|app/View/|app/Livewire/|package|vite\.config|tailwind\.config|composer\.lock)"
-FRONTEND_CHANGED=$(git diff "${PREV_COMMIT}" "${NEW_COMMIT}" --name-only 2>/dev/null \
-    | grep -cE "$FRONTEND_REGEX" || echo "0")
-FRONTEND_CHANGED=${FRONTEND_CHANGED:-0}
+FRONTEND_REGEX="(resources/|lang/|app/View/|app/Livewire/|package|vite\.config|tailwind\.config|postcss\.config|composer\.lock)"
+FRONTEND_FILES=$(git diff "${PREV_COMMIT}" "${NEW_COMMIT}" --name-only 2>/dev/null | grep -E "$FRONTEND_REGEX" | tr '\n' ' ' || echo "")
+FRONTEND_CHANGED=$(echo "$FRONTEND_FILES" | wc -w | xargs)
 
 # On force aussi si le dossier build est manquant
 if [ ! -d "public/build" ]; then
@@ -101,11 +100,12 @@ if [ ! -d "public/build" ]; then
 fi
 
 if [ "$FRONTEND_CHANGED" -gt 0 ]; then
-    log "Changements frontend détectés (ou build manquant) — rebuild npm..."
+    log "Changements frontend détectés (${FRONTEND_CHANGED} fichiers) — rebuild npm..."
+    log "Fichiers : ${FRONTEND_FILES}"
     # Nettoyage manuel car Vite peut échouer sur rmdir (EACCES) si les permissions sont strictes
     rm -rf public/build
-    npm install --no-audit --no-fund --quiet
-    npm run build --quiet
+    npm ci --quiet
+    npm run build
     # Ajustement permissions après build
     chmod -R 775 public/build 2>/dev/null || true
 else

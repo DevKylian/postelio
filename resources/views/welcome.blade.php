@@ -852,15 +852,15 @@
             <div class="flex overflow-x-auto pb-8 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-4 gap-6 max-w-6xl mx-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               @php
                 $jobs = [
-                  ['icon' => 'paintbrush', 'name' => 'Peintres', 'caption' => 'Récit de réalisation', 'img' => 'wall', 'tag1' => 'Zoom', 'tag2' => 'Final'],
-                  ['icon' => 'scissors', 'name' => 'Paysagistes', 'caption' => 'Conseil entretien pelouse', 'img' => 'garden', 'tag1' => 'Saison', 'tag2' => 'Astuce'],
-                  ['icon' => 'zap', 'name' => 'Électriciens', 'caption' => 'Expertise mise aux normes', 'img' => 'wires', 'tag1' => 'Technique', 'tag2' => 'Sécurité'],
-                  ['icon' => 'hammer', 'name' => 'Menuisiers', 'caption' => 'Avant / Après chantier', 'img' => 'wood', 'tag1' => 'Avant', 'tag2' => 'Après']
+                  ['icon' => 'paintbrush', 'name' => 'Peintres', 'img' => 'peintre.png'],
+                  ['icon' => 'scissors', 'name' => 'Paysagistes', 'img' => 'jardinier.png'],
+                  ['icon' => 'zap', 'name' => 'Électriciens', 'img' => 'electricien.png'],
+                  ['icon' => 'hammer', 'name' => 'Menuisiers', 'img' => 'menuiserie.png']
                 ];
               @endphp
               @foreach($jobs as $job)
                 <div class="relative rounded-3xl overflow-hidden group aspect-[4/5] min-w-[260px] sm:min-w-0 snap-center cursor-pointer border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-all duration-500">
-                   <img src="{{ asset('images/demo/result.png') }}?v=5" alt="{{ $job['name'] }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                   <img src="{{ asset('images/demo/' . $job['img']) }}" alt="{{ $job['name'] }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                    
                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent flex flex-col justify-end p-6 pointer-events-none">
                      <h3 class="text-xl font-bold text-white transition-transform duration-500 group-hover:translate-x-1">{{ $job['name'] }}</h3>

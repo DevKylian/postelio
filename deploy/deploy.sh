@@ -106,9 +106,8 @@ if [ "$FRONTEND_CHANGED" -gt 0 ]; then
     log "Changements frontend détectés (${FRONTEND_CHANGED} fichiers) — lancement build npm..."
     log "Fichiers concernés : $(echo "$FRONTEND_FILES" | tr '\n' ' ')"
     
-    # Nettoyage manuel car Vite peut échouer sur rmdir (EACCES) si les permissions sont strictes
-    chmod -R 777 public/build 2>/dev/null || true
-    rm -rf public/build
+    # Nettoyage manuel — sudo nécessaire si les fichiers appartiennent à www-data
+    sudo rm -rf public/build
     
     log "npm install..."
     # On tente npm ci (plus sûr), sinon npm install (plus flexible)

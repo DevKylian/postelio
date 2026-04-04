@@ -69,6 +69,47 @@ class PostGenerator extends Component
         $this->platforms = [];
         if ($company?->instagram_connected) $this->platforms[] = 'instagram';
         if ($company?->facebook_connected) $this->platforms[] = 'facebook';
+
+        // Restore review_pending state from ?resume=POST_ID
+        $resumeId = request()->query('resume');
+        if ($resumeId) {
+            $post = Post::where('id', $resumeId)
+                        ->where('user_id', Auth::id())
+                        ->where('status', Post::STATUS_REVIEW_PENDING)
+                        ->first();
+
+            if ($post) {
+                $this->generatedPostId = $post->id;
+                $this->scheduleType    = $post->scheduled_at ? 'scheduled' : 'now';
+                $this->scheduledAt     = $post->scheduled_at?->format('Y-m-d\TH:i') ?? '';
+                $this->aspectRatio     = $post->template_options['aspect_ratio'] ?? '4:5';
+
+                $rawVariants = $post->post_variants ?? [];
+                if (empty($rawVariants)) {
+                    $rawVariants = [[
+                        'slides'          => $post->slides ?? [],
+                        'image_path'      => $post->image_path,
+                        'refined_content' => $post->refined_content,
+                    ]];
+                }
+
+                $this->previewVariants = array_map(function ($v) {
+                    $slides  = $v['slides'] ?? [];
+                    $content = $v['refined_content'] ?? '';
+                    $decoded = json_decode($content, true);
+                    return [
+                        'slides'  => array_map(fn($s) => asset(\Illuminate\Support\Facades\Storage::url($s)), $slides),
+                        'content' => is_array($decoded) ? ($decoded['caption'] ?? $content) : $content,
+                    ];
+                }, $rawVariants);
+
+                $this->editableContents      = array_column($this->previewVariants, 'content');
+                $this->selectedVariantIndex  = 0;
+                $this->previewSlides         = $this->previewVariants[0]['slides'] ?? [];
+                $this->previewContent        = $this->previewVariants[0]['content'] ?? '';
+                $this->status                = Post::STATUS_REVIEW_PENDING;
+            }
+        }
     }
 
     public function updatedAudio()

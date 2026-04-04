@@ -76,6 +76,7 @@ class WebhookHandler(http.server.BaseHTTPRequestHandler):
 
     def _reply(self, code, message):
         body = message.encode()
+        self.send_response(code)
         self.end_headers()
         self.wfile.write(body)
 

@@ -440,7 +440,17 @@
                              }"
                              class="relative">
                             <input type="file" wire:model.live="audio" id="audio-input-file" class="hidden" accept="audio/*"
-                                   x-on:change="uploadError = false; console.log('[AUDIO DEBUG] File selected:', $event.target.files[0]?.name, $event.target.files[0]?.size, $event.target.files[0]?.type)">
+                                   x-on:change="
+                                        uploadError = false;
+                                        console.log('[AUDIO DEBUG] File selected:', $event.target.files[0]?.name, $event.target.files[0]?.size, $event.target.files[0]?.type);
+                                        if (!navigator.onLine) {
+                                            $event.preventDefault();
+                                            $event.stopImmediatePropagation();
+                                            window.dispatchEvent(new CustomEvent('notify', {
+                                                detail: { type: 'info', message: 'Fichier audio sélectionné. La transcription sera faite au retour en ligne.' }
+                                            }));
+                                        }
+                                   ">
                             <label for="audio-input-file"
                                    class="flex flex-col items-center justify-center w-full min-h-[200px] border-2 border-dashed rounded-2xl transition-all duration-200 cursor-pointer
                                         {{ $audio ? 'border-green-400 bg-green-50' : 'border-gray-200 hover:border-copper hover:bg-copper/5 bg-gray-50' }}">
@@ -1353,66 +1363,107 @@
                 @else
                     {{-- ── Submit ── --}}
                     <div class="flex-[2]" x-data="{
-                        submitOffline() {
-                            const formData = {
-                                template: @entangle('template'),
-                                tone: @entangle('tone'),
-                                includeHashtags: @entangle('includeHashtags'),
-                                clientName: @entangle('clientName'),
-                                serviceType: @entangle('serviceType'),
-                                workCategory: @entangle('workCategory'),
-                                jobDuration: @entangle('jobDuration'),
-                                faqCategory: @entangle('faqCategory'),
-                                season: @entangle('season'),
-                                targetSlides: @entangle('targetSlides'),
-                                customNote: @entangle('customNote'),
-                                visualStyle: @entangle('visualStyle'),
-                                scheduleType: @entangle('scheduleType'),
-                                scheduledAt: @entangle('scheduledAt'),
-                                textContent: @entangle('textContent'),
-                                platforms: @entangle('platforms'),
-                            };
-                            
-                            // Handle files
-                            const recorder = Alpine.$data(document.querySelector('[x-data=\"voiceRecorder\"]'));
-                            const audioInput = document.getElementById('audio-input-file');
-                            const imageBeforeInput = document.getElementById('before-input');
-                            const imageAfterInput = document.getElementById('after-input');
-                            
-                            if (recorder && recorder.audioBlob) {
-                                const type = recorder.audioBlob.type;
-                                const ext = type.includes('mp4') ? 'm4a' : type.includes('ogg') ? 'ogg' : 'webm';
-                                formData.audio = new File([recorder.audioBlob], `recording.${ext}`, { type });
-                            } else if (audioInput && audioInput.files && audioInput.files[0]) {
-                                formData.audio = audioInput.files[0];
-                            }
+                        isQueuing: false,
+                        async submitOffline() {
+                            if (this.isQueuing) return;
+                            this.isQueuing = true;
 
-                            if (imageBeforeInput && imageBeforeInput.files && imageBeforeInput.files[0]) formData.imageBefore = imageBeforeInput.files[0];
-                            if (imageAfterInput && imageAfterInput.files && imageAfterInput.files[0]) formData.imageAfter = imageAfterInput.files[0];
-                            
-                            $dispatch('pwa:offline-submit', {
-                                url: '/api/pwa/queue-generate',
-                                data: formData,
-                                redirectTo: '{{ route('posts.index') }}'
-                            });
-                            
-                            // Local immediate feedback
-                            alert('Post mis en file d\'attente ! Il sera généré automatiquement dès que vous aurez du réseau.');
+                            try {
+                                const formData = {
+                                    template:         @entangle('template'),
+                                    tone:             @entangle('tone'),
+                                    includeHashtags:  @entangle('includeHashtags'),
+                                    clientName:       @entangle('clientName'),
+                                    serviceType:      @entangle('serviceType'),
+                                    workCategory:     @entangle('workCategory'),
+                                    jobDuration:      @entangle('jobDuration'),
+                                    faqCategory:      @entangle('faqCategory'),
+                                    season:           @entangle('season'),
+                                    targetSlides:     @entangle('targetSlides'),
+                                    customNote:       @entangle('customNote'),
+                                    visualStyle:      @entangle('visualStyle'),
+                                    scheduleType:     @entangle('scheduleType'),
+                                    scheduledAt:      @entangle('scheduledAt'),
+                                    textContent:      @entangle('textContent'),
+                                    platforms:        @entangle('platforms'),
+                                    customTemplateId: @entangle('customTemplateId'),
+                                };
+
+                                // ── Audio ──────────────────────────────────────────────
+                                const recorderEl = document.querySelector('[x-data=\"voiceRecorder\"]');
+                                const recorder   = recorderEl ? Alpine.$data(recorderEl) : null;
+                                const audioInput = document.getElementById('audio-input-file');
+
+                                if (recorder && recorder.audioBlob) {
+                                    const type = recorder.audioBlob.type || 'audio/webm';
+                                    const ext  = type.includes('mp4') ? 'm4a' : type.includes('ogg') ? 'ogg' : 'webm';
+                                    formData.audio = new File([recorder.audioBlob], `recording.${ext}`, { type });
+                                } else if (audioInput && audioInput.files && audioInput.files[0]) {
+                                    formData.audio = audioInput.files[0];
+                                }
+
+                                // ── Single photos ──────────────────────────────────────
+                                const imageBeforeInput = document.getElementById('before-input');
+                                const imageAfterInput  = document.getElementById('after-input');
+                                if (imageBeforeInput && imageBeforeInput.files && imageBeforeInput.files[0]) {
+                                    formData.imageBefore = imageBeforeInput.files[0];
+                                }
+                                if (imageAfterInput && imageAfterInput.files && imageAfterInput.files[0]) {
+                                    formData.imageAfter = imageAfterInput.files[0];
+                                }
+
+                                // ── Carousel extra images (chantier_detail / step_by_step) ──
+                                const extraFiles = [];
+                                for (let i = 0; i < 5; i++) {
+                                    const el = document.getElementById(`extra-${i}`);
+                                    if (el && el.files && el.files[0]) {
+                                        extraFiles.push(el.files[0]);
+                                    }
+                                }
+                                if (extraFiles.length > 0) {
+                                    formData.extraImages = extraFiles;
+                                }
+
+                                // ── Queue it ────────────────────────────────────────────
+                                window.dispatchEvent(new CustomEvent('pwa:offline-submit', {
+                                    detail: {
+                                        url: '/api/pwa/queue-generate',
+                                        data: formData,
+                                        redirectTo: '{{ route('posts.index') }}'
+                                    }
+                                }));
+                            } finally {
+                                // Reset after a moment (redirect will navigate away)
+                                setTimeout(() => { this.isQueuing = false; }, 3000);
+                            }
                         }
                     }">
                         <button type="button"
                                 @click="navigator.onLine ? $wire.generate() : submitOffline()"
+                                :disabled="isQueuing"
                                 wire:loading.attr="disabled"
                                 wire:target="generate"
                                 @if(auth()->user()->remaining_credits <= 0) disabled @endif
                                 class="w-full relative group overflow-hidden bg-copper text-white font-bold text-sm py-4 rounded-2xl shadow-lg shadow-copper/25 hover:shadow-xl hover:shadow-copper/30 hover:bg-amber-500 transition-all active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed">
                             <div class="flex items-center justify-center gap-3">
-                                <svg wire:loading.remove wire:target="generate" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                <template x-if="!isQueuing">
+                                    <svg wire:loading.remove wire:target="generate" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                </template>
+                                <template x-if="isQueuing">
+                                    <svg class="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                </template>
                                 <svg wire:loading wire:target="generate" class="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                <span wire:loading.remove wire:target="generate" x-text="navigator.onLine ? 'Lancer la génération' : 'Mettre en file d\'attente (Hors-ligne)'"></span>
+                                <span wire:loading.remove wire:target="generate"
+                                      x-text="isQueuing ? 'Mise en file d\'attente...' : (navigator.onLine ? 'Lancer la génération' : 'Sauvegarder hors-ligne')"></span>
                                 <span wire:loading wire:target="generate">Analyse en cours...</span>
                             </div>
                         </button>
+
+                        {{-- Offline helper text --}}
+                        <p x-show="!navigator.onLine"
+                           class="text-center text-[11px] text-amber-600 font-semibold mt-2">
+                            Hors-ligne — le post sera généré dès le retour en ligne.
+                        </p>
                     </div>
                 @endif
             </div>
@@ -1765,6 +1816,19 @@
         },
 
         confirmRecording() {
+            // When offline, skip the server upload — the blob is stored in memory and
+            // will be collected by submitOffline() at submission time.
+            if (!navigator.onLine) {
+                this.recState = 'confirmed';
+                window.dispatchEvent(new CustomEvent('notify', {
+                    detail: {
+                        type: 'info',
+                        message: 'Mémo vocal enregistré. La transcription sera faite automatiquement dès le retour en ligne.'
+                    }
+                }));
+                return;
+            }
+
             this.recState = 'uploading';
             const type = this.audioBlob.type;
             const ext = type.includes('mp4') ? 'm4a' : type.includes('ogg') ? 'ogg' : 'webm';
@@ -1772,12 +1836,28 @@
             this.$wire.upload(
                 'audio',
                 file,
-                () => { 
-                    this.recState = 'confirmed'; 
+                () => {
+                    this.recState = 'confirmed';
                     // Manually trigger the analysis since upload doesn't always fire updatedAudio hook
                     this.$wire.analyzeAudio();
                 },
-                () => { this.recState = 'done'; alert('Erreur lors de l\'envoi. Réessayez.'); }
+                () => {
+                    if (!navigator.onLine) {
+                        // Lost connection during upload — keep blob for offline queue
+                        this.recState = 'confirmed';
+                        window.dispatchEvent(new CustomEvent('notify', {
+                            detail: {
+                                type: 'info',
+                                message: 'Connexion perdue. Le mémo est sauvegardé localement.'
+                            }
+                        }));
+                    } else {
+                        this.recState = 'done';
+                        window.dispatchEvent(new CustomEvent('notify', {
+                            detail: { type: 'error', message: 'Erreur lors de l\'envoi du mémo. Réessayez.' }
+                        }));
+                    }
+                }
             );
         },
 

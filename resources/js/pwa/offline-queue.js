@@ -4,14 +4,16 @@
  */
 const DB_NAME = 'postelio-offline-db';
 const STORE_NAME = 'pending-requests';
+const DB_VERSION = 2;
 
 function openDB() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+        store.createIndex('status', 'status', { unique: false });
       }
     };
     request.onsuccess = (event) => resolve(event.target.result);
@@ -75,5 +77,26 @@ export async function getQueueCount() {
     const request = store.count();
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
+  });
+}
+
+export async function updateQueueItemStatus(id, status) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_NAME, 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    const getReq = store.get(id);
+    getReq.onsuccess = () => {
+      const item = getReq.result;
+      if (item) {
+        item.status = status;
+        const putReq = store.put(item);
+        putReq.onsuccess = () => resolve();
+        putReq.onerror = () => reject(putReq.error);
+      } else {
+        resolve();
+      }
+    };
+    getReq.onerror = () => reject(getReq.error);
   });
 }

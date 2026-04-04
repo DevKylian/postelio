@@ -1,36 +1,46 @@
 /**
  * Postelio Offline UI Helpers
- * Intercepts form submissions and redirects when offline.
+ * Intercepts post generation submissions when offline and queues them locally.
  */
 import { addToQueue } from './offline-queue.js';
 
 export function setupOfflineInterception() {
-  // We can use a custom event or intercept standard Livewire submissions
-  // but a cleaner way is to use Alpine.js directly in the views.
-  
   window.addEventListener('pwa:offline-submit', async (event) => {
     const { url, data, redirectTo } = event.detail;
-    
+
     try {
       await addToQueue({
         type: 'generate-post',
         url: url,
-        data: data
+        data: data,
       });
-      
-      // Notify user
-      window.dispatchEvent(new CustomEvent('pwa:queued', {
-        detail: { message: 'Votre post a été mis en attente. Il sera généré dès le retour de votre connexion.' }
+
+      // Update the pending count badge everywhere
+      window.dispatchEvent(new CustomEvent('pwa:queued'));
+
+      // Notify the user with the app's toast system
+      window.dispatchEvent(new CustomEvent('notify', {
+        detail: {
+          type: 'success',
+          message: 'Post mis en file d\'attente. Il sera généré dès le retour de votre connexion.',
+        }
       }));
-      
-      // Redirect after a short delay
+
+      // Navigate away after a short delay so the user sees the confirmation
       if (redirectTo) {
         setTimeout(() => {
           window.location.href = redirectTo;
-        }, 2000);
+        }, 1800);
       }
     } catch (error) {
-      console.error('Failed to queue offline request:', error);
+      console.error('[PWA] Failed to queue offline request:', error);
+
+      window.dispatchEvent(new CustomEvent('notify', {
+        detail: {
+          type: 'error',
+          message: 'Impossible de mettre le post en file d\'attente. Vérifiez l\'espace disponible.',
+        }
+      }));
     }
   });
 }

@@ -114,6 +114,7 @@ class ProcessPostGeneration implements ShouldQueue
                 }
 
                 $variants[] = $variant;
+                $this->post->increment('variants_generated');
                 Log::info("Variant " . ($i + 1) . " done");
             }
 

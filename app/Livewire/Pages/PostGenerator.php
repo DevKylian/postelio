@@ -31,6 +31,7 @@ class PostGenerator extends Component
     public $previewSlides = [];       // slides of the currently selected variant
     public $previewVariants = [];     // all generated variants [{slides, content, imageUrl}]
     public int $selectedVariantIndex = 0;
+    public int $variantsGenerated = 0; // live counter during processing
 
     // ── Template customization options ──
     public $tone          = 'professionnel'; // professionnel | chaleureux | expert | dynamique
@@ -415,6 +416,9 @@ class PostGenerator extends Component
         $post = Post::find($this->generatedPostId);
         if (!$post) return;
 
+        // Always sync live progress counter while processing
+        $this->variantsGenerated = $post->variants_generated ?? 0;
+
         if ($post->status === Post::STATUS_REVIEW_PENDING) {
             $this->status = Post::STATUS_REVIEW_PENDING;
 
@@ -500,11 +504,16 @@ class PostGenerator extends Component
         }
     }
 
-    public function validatePost()
+    public function validatePost(int $index = -1): void
     {
         $post = Post::find($this->generatedPostId);
 
         if (!$post || $post->user_id !== Auth::id()) return;
+
+        // Use the passed index if valid, otherwise fall back to selectedVariantIndex
+        if ($index >= 0) {
+            $this->selectedVariantIndex = $index;
+        }
 
         // Copy selected variant data to the main post fields
         $variants = $post->post_variants ?? [];
@@ -582,6 +591,7 @@ class PostGenerator extends Component
         $this->previewSlides         = [];
         $this->previewVariants       = [];
         $this->selectedVariantIndex  = 0;
+        $this->variantsGenerated     = 0;
     }
 
     public function render()

@@ -214,7 +214,8 @@ cd "$APP_DIR"
 # Génération du .env
 APP_KEY=$(openssl rand -base64 32)
 
-cat > "$APP_DIR/.env" << EOF
+if [ ! -f "$APP_DIR/.env" ]; then
+    cat > "$APP_DIR/.env" << EOF
 APP_NAME=Postelio
 APP_ENV=production
 APP_KEY=base64:${APP_KEY}
@@ -232,11 +233,11 @@ DB_DATABASE=postelio
 DB_USERNAME=postelio
 DB_PASSWORD=${DB_PASSWORD}
 
-BROADCAST_DRIVER=log
-CACHE_DRIVER=file
+BROADCAST_CONNECTION=log
+CACHE_STORE=database
 FILESYSTEM_DISK=local
 QUEUE_CONNECTION=database
-SESSION_DRIVER=file
+SESSION_DRIVER=database
 SESSION_LIFETIME=120
 
 MAIL_MAILER=log
@@ -254,6 +255,9 @@ OPENAI_WHISPER_MODEL=whisper-1
 
 BROWSERSHOT_CHROME_PATH=/usr/bin/google-chrome-stable
 EOF
+else
+    info "Le fichier .env existe déjà, il a été conservé intact."
+fi
 
 chmod 640 "$APP_DIR/.env"
 
@@ -388,24 +392,15 @@ log "Nginx configuré (HTTP)."
 # =============================================================================
 hr; info "8/10 — SSL Let's Encrypt"; hr
 
-# Vérifier si le domaine pointe vers ce serveur avant de lancer Certbot
-info "Vérification DNS pour ${DOMAIN}..."
-IP_SERVER=$(curl -s https://ifconfig.me)
-ADDR_DNS=$(dig +short "${DOMAIN}" | tail -n1)
-
-if [[ "$ADDR_DNS" != "$IP_SERVER" ]]; then
-    warn "Le domaine ${DOMAIN} ne semble pas encore pointer vers ${IP_SERVER} (trouvé: ${ADDR_DNS:-aucun})."
-    warn "SSL ignoré pour l'instant. Relancez 'certbot --nginx' manuellement plus tard."
-else
-    certbot --nginx \
-        -d "${DOMAIN}" \
-        -d "www.${DOMAIN}" \
-        --non-interactive \
-        --agree-tos \
-        --email "$LE_EMAIL" \
-        --redirect \
-        --quiet
-fi
+info "Génération du certificat SSL via Certbot..."
+certbot --nginx \
+    -d "${DOMAIN}" \
+    -d "www.${DOMAIN}" \
+    --non-interactive \
+    --agree-tos \
+    --email "$LE_EMAIL" \
+    --redirect \
+    --quiet || warn "Certbot n'a pas pu configurer automatiquement le SSL. Relancez-le manuellement si besoin."
 
 # Renouvellement auto via cron (certbot le fait seul mais on s'assure)
 (crontab -l 2>/dev/null | grep -v certbot; echo "0 3 * * * certbot renew --quiet --post-hook 'systemctl reload nginx'") | crontab -

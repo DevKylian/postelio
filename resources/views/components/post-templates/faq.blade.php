@@ -33,7 +33,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-square bg-midnight flex flex-col p-10 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="border-top: 8px solid {{ $brandColor }}">
+<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-midnight flex flex-col p-10 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="border-top: 8px solid {{ $brandColor }}">
     
     <div class="flex-1 flex flex-col justify-center">
         <span class="inline-block w-12 h-1 mb-6" style="background-color: {{ $brandColor }}"></span>

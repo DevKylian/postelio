@@ -43,7 +43,7 @@
 @endphp
 
 <div {!! $alpineData !!} class="w-full relative">
-    <div class="w-full aspect-square bg-[#D1D5DB] relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#D1D5DB] relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
         {{-- Concrete Texture --}}
         <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay z-20" style="background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');"></div>
 
@@ -58,11 +58,11 @@
             @endphp
             <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
                 <div class="absolute inset-0 p-4">
-                    <div class="w-full h-full relative rounded-lg overflow-hidden border-2 border-gray-900 bg-gray-800 shadow-xl">
+                    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] relative rounded-lg overflow-hidden border-2 border-gray-900 bg-gray-800 shadow-xl">
                         @if ($imageUrl)
-                            <img src="{{ $imageUrl }}" class="w-full h-full object-cover">
+                            <img src="{{ $imageUrl }}" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] object-cover">
                         @else
-                            <div class="w-full h-full flex items-center justify-center bg-gray-700">
+                            <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] flex items-center justify-center bg-gray-700">
                                 <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Photo {{ $index + 1 }}</p>
                             </div>
                         @endif

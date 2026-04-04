@@ -30,12 +30,15 @@ class ImageGeneratorService
         return $this->generate($post);
     }
 
-    protected function getBrowsershotInstance(string $html): \Spatie\Browsershot\Browsershot
+    protected function getBrowsershotInstance(string $html, string $aspectRatio = '1:1'): \Spatie\Browsershot\Browsershot
     {
+        $width = 360;
+        $height = ($aspectRatio === '4:5') ? 450 : 360;
+
         return \Spatie\Browsershot\Browsershot::html($html)
-            ->windowSize(360, 360)
+            ->windowSize($width, $height)
             ->deviceScaleFactor(3)
-            ->clip(0, 0, 360, 360)
+            ->clip(0, 0, $width, $height)
             ->format('jpeg')
             ->noSandbox()
             ->timeout(60);
@@ -43,6 +46,10 @@ class ImageGeneratorService
 
     private function generateCarouselViaBrowsershot(Post $post): array
     {
+        $aspectRatio = $post->template_options['aspect_ratio'] ?? '1:1';
+        $targetWidth = 1080;
+        $targetHeight = ($aspectRatio === '4:5') ? 1350 : 1080;
+
         $slides = [];
         $totalSlides = 1;
 
@@ -93,14 +100,14 @@ class ImageGeneratorService
                 mkdir(dirname($fullPath), 0755, true);
             }
 
-            $imageData = $this->getBrowsershotInstance($html)->screenshot();
+            $imageData = $this->getBrowsershotInstance($html, $aspectRatio)->screenshot();
 
             $manager = new ImageManager(new Driver());
             $image = $manager->read($imageData);
-            $image->cover(1080, 1080);
+            $image->cover($targetWidth, $targetHeight);
             $image->toJpeg(90)->save($fullPath);
             
-            Log::debug("Image Generator: Slide $i saved as JPEG", ['path' => $fullPath]);
+            Log::debug("Image Generator: Slide $i saved as JPEG", ['path' => $fullPath, 'dimensions' => "{$targetWidth}x{$targetHeight}"]);
             $slides[] = $fileName;
         }
         

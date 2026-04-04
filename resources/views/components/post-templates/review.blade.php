@@ -32,7 +32,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-square relative overflow-hidden flex flex-col justify-end {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] relative overflow-hidden flex flex-col justify-end {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
     
     {{-- Slide 0 --}}
     @php

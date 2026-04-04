@@ -2,14 +2,19 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=360, initial-scale=1">
+    @php
+        $aspectRatio = $post->template_options['aspect_ratio'] ?? '1:1';
+        $canvasWidth = 360;
+        $canvasHeight = ($aspectRatio === '4:5') ? 450 : 360;
+    @endphp
+    <meta name="viewport" content="width={{ $canvasWidth }}, initial-scale=1">
     @vite(['resources/css/app.css'])
     <style>
         body {
             margin: 0;
             padding: 0;
-            width: 360px;
-            height: 360px;
+            width: {{ $canvasWidth }}px;
+            height: {{ $canvasHeight }}px;
             background: #ffffff;
             overflow: hidden;
         }
@@ -17,6 +22,7 @@
     </style>
 </head>
 <body>
+    <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; overflow: hidden; position: relative;">
     @php
         use Illuminate\Support\Facades\Storage;
         
@@ -226,7 +232,7 @@
         }
     @endphp
 
-    <div style="width: 360px; height: 360px; overflow: hidden; position: relative;">
+    <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; overflow: hidden; position: relative;">
     @if($isContactSlide)
          <x-post-templates.contact-slide
             :brand-color="$props['brandColor']"
@@ -251,7 +257,7 @@
 
         @if($visualStyle === 'blueprint')
             {{-- BLUEPRINT lifestyle: blue background, grid, photo frame, text label, white footer --}}
-            <div style="width: 360px; height: 360px; background: #0047AB; position: relative; overflow: hidden;">
+            <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: #0047AB; position: relative; overflow: hidden;">
                 {{-- Grid overlay --}}
                 <div style="position: absolute; inset: 0; opacity: 0.1; pointer-events: none; background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 30px 30px;"></div>
 
@@ -290,7 +296,7 @@
 
         @elseif($visualStyle === 'kraft')
             {{-- KRAFT lifestyle --}}
-            <div style="width: 360px; height: 360px; background: #BC9A7E; position: relative; overflow: hidden;">
+            <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: #BC9A7E; position: relative; overflow: hidden;">
                 {{-- Texture overlay --}}
                 <div style="position: absolute; inset: 0; opacity: 0.4; pointer-events: none; mix-blend-mode: multiply; background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
 
@@ -327,7 +333,7 @@
 
         @elseif($visualStyle === 'glass')
             {{-- GLASS lifestyle --}}
-            <div style="width: 360px; height: 360px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; overflow: hidden;">
+            <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; overflow: hidden;">
                 {{-- Photo --}}
                 <div style="position: absolute; top: 20px; left: 20px; right: 20px; height: 230px; border-radius: 16px; overflow: hidden;">
                     @if($lifestyleImgUrl)
@@ -363,7 +369,7 @@
 
         @elseif($visualStyle === 'beton')
             {{-- BETON lifestyle --}}
-            <div style="width: 360px; height: 360px; background: #4a4a4a; position: relative; overflow: hidden;">
+            <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: #4a4a4a; position: relative; overflow: hidden;">
                 {{-- Concrete texture --}}
                 <div style="position: absolute; inset: 0; opacity: 0.3; pointer-events: none; background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');"></div>
 
@@ -402,7 +408,7 @@
 
         @else
             {{-- STANDARD lifestyle: full-bleed photo with gradient overlay --}}
-            <div style="width: 360px; height: 360px; background: #374151; position: relative; overflow: hidden;">
+            <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: #374151; position: relative; overflow: hidden;">
                 {{-- Full-bleed photo --}}
                 @if($lifestyleImgUrl)
                     <img src="{{ $lifestyleImgUrl }}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;">
@@ -458,7 +464,7 @@
             :brand-text-color="$brandTextColor"
         />
     @else
-        <div style="width: 360px; height: 360px; background: {{ $brandColor }}; color: {{ $brandTextColor }}; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 40px; text-align: center;">
+        <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: {{ $brandColor }}; color: {{ $brandTextColor }}; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 40px; text-align: center;">
             {{ $rawText }}
         </div>
     @endif

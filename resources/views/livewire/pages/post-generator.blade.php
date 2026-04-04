@@ -804,79 +804,151 @@
                     </div>
                 </div>
 
-                <div class="p-6">
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                        @php
-                            $availableStyles = [
-                                ['id' => 'standard',  'label' => 'Classique',   'icon' => 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z', 'color' => 'gray'],
-                                ['id' => 'glass',     'label' => 'Glass',      'icon' => 'M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-3', 'color' => 'sky'],
-                                ['id' => 'blueprint', 'label' => 'Blueprint',  'icon' => 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7', 'color' => 'blue'],
-                                ['id' => 'kraft',     'label' => 'Kraft',      'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'color' => 'amber'],
-                                ['id' => 'beton',     'label' => 'Béton Brut', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', 'color' => 'slate'],
-                            ];
-                            $styleColors = [
-                                'gray'  => ['bg' => 'bg-gray-50',  'text' => 'text-gray-600', 'border' => 'border-gray-200', 'active' => 'border-gray-600 bg-gray-50'],
-                                'sky'   => ['bg' => 'bg-sky-50',   'text' => 'text-sky-600',  'border' => 'border-sky-200',  'active' => 'border-sky-500 bg-sky-50'],
-                                'blue'  => ['bg' => 'bg-blue-50',  'text' => 'text-blue-600', 'border' => 'border-blue-200', 'active' => 'border-blue-600 bg-blue-50'],
-                                'amber' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-600','border' => 'border-amber-200','active' => 'border-amber-600 bg-amber-50'],
-                                'slate' => ['bg' => 'bg-slate-50', 'text' => 'text-slate-600','border' => 'border-slate-200','active' => 'border-slate-600 bg-slate-50'],
-                            ];
-                        @endphp
-
-                        @foreach($availableStyles as $sty)
-                        @php 
-                            $c = $styleColors[$sty['color']]; 
-                            $isPremium = $sty['id'] !== 'standard';
-                            $hasAccess = Auth::user()->hasFullTemplateAccess() || !$isPremium;
-                        @endphp
-                        <button type="button"
-                                @if($hasAccess)
-                                    wire:click="$set('visualStyle', '{{ $sty['id'] }}')"
-                                @else
-                                    x-on:click="$dispatch('notify', { type: 'error', message: 'Ce style est réservé aux membres Premium.' })"
-                                @endif
-                                class="group relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200
-                                    {{ $visualStyle === $sty['id'] 
-                                        ? $c['active'] . ' shadow-sm' 
-                                        : 'border-gray-100 bg-white' }}
-                                    {{ !$hasAccess ? 'opacity-60 cursor-not-allowed grayscale' : 'hover:border-gray-200 hover:bg-gray-50' }}">
-                            
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200
-                                {{ $visualStyle === $sty['id'] 
-                                    ? 'bg-copper text-white' 
-                                    : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
-                                @if(!$hasAccess)
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                <div class="p-6 space-y-8">
+                    {{-- ── Format du post (Aspect Ratio) ── --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Format du post</p>
+                            <span class="text-[10px] font-bold text-copper bg-copper/10 px-2 py-0.5 rounded-md uppercase tracking-tighter">Impact Maximum</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button type="button"
+                                    wire:click="$set('aspectRatio', '1:1')"
+                                    class="group relative flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all duration-300
+                                        {{ $aspectRatio === '1:1' 
+                                            ? 'border-copper bg-copper/[0.03] shadow-md shadow-copper/5' 
+                                            : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/50' }}">
+                                <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300
+                                    {{ $aspectRatio === '1:1' 
+                                        ? 'bg-copper text-white shadow-lg shadow-copper/20' 
+                                        : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <rect x="5" y="5" width="14" height="14" rx="2" stroke-width="2"/>
                                     </svg>
-                                @else
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $sty['icon'] }}" />
-                                    </svg>
-                                @endif
-                            </div>
-
-                            <div class="text-center">
-                                <p class="text-[10px] font-bold uppercase tracking-wider {{ $visualStyle === $sty['id'] ? 'text-copper' : 'text-gray-500' }}">
-                                    {{ $sty['label'] }}
-                                </p>
-                            </div>
-
-                            @if($isPremium && !$hasAccess)
-                                <div class="absolute -top-2 -right-1">
-                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black bg-amber-100 text-amber-700 border border-amber-200 uppercase tracking-tighter">Premium</span>
                                 </div>
-                            @endif
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-bold {{ $aspectRatio === '1:1' ? 'text-copper' : 'text-midnight' }} leading-tight">Carré (1:1)</p>
+                                    <p class="text-[11px] text-gray-400 mt-0.5 font-medium">Le classique Instagram</p>
+                                </div>
+                                @if($aspectRatio === '1:1')
+                                    <div class="absolute top-3 right-3 w-4 h-4 bg-copper rounded-full flex items-center justify-center">
+                                        <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                @endif
+                            </button>
 
-                            @if($visualStyle === $sty['id'] && $hasAccess)
-                            <div class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-copper flex items-center justify-center shadow-sm">
-                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            @endif
-                        </button>
-                        @endforeach
+                            <button type="button"
+                                    wire:click="$set('aspectRatio', '4:5')"
+                                    class="group relative flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all duration-300
+                                        {{ $aspectRatio === '4:5' 
+                                            ? 'border-copper bg-copper/[0.03] shadow-md shadow-copper/5' 
+                                            : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/50' }}">
+                                <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300
+                                    {{ $aspectRatio === '4:5' 
+                                        ? 'bg-copper text-white shadow-lg shadow-copper/20' 
+                                        : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <rect x="6" y="3" width="12" height="18" rx="2" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-1.5">
+                                        <p class="text-sm font-bold {{ $aspectRatio === '4:5' ? 'text-copper' : 'text-midnight' }} leading-tight">Portrait (4:5)</p>
+                                        <span class="text-[9px] font-black bg-copper text-white px-1.5 py-0.5 rounded uppercase tracking-tighter shadow-sm animate-pulse">Standard</span>
+                                    </div>
+                                    <p class="text-[11px] text-gray-400 mt-0.5 font-medium">Recommandé (Plus visible)</p>
+                                </div>
+                                @if($aspectRatio === '4:5')
+                                    <div class="absolute top-3 right-3 w-4 h-4 bg-copper rounded-full flex items-center justify-center">
+                                        <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                @endif
+                            </button>
+                        </div>
+                        @error('aspectRatio') <p class="text-red-500 text-[11px] font-bold mt-2">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- ── Style visuel ── --}}
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Style graphique</p>
+                        
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            @php
+                                $availableStyles = [
+                                    ['id' => 'standard',  'label' => 'Classique',   'icon' => 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z', 'color' => 'gray'],
+                                    ['id' => 'glass',     'label' => 'Glass',      'icon' => 'M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-3', 'color' => 'sky'],
+                                    ['id' => 'blueprint', 'label' => 'Blueprint',  'icon' => 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7', 'color' => 'blue'],
+                                    ['id' => 'kraft',     'label' => 'Kraft',      'icon' => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', 'color' => 'amber'],
+                                    ['id' => 'beton',     'label' => 'Béton Brut', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', 'color' => 'slate'],
+                                ];
+                                $styleColors = [
+                                    'gray'  => ['bg' => 'bg-gray-50',  'text' => 'text-gray-600', 'border' => 'border-gray-200', 'active' => 'border-gray-600 bg-gray-50'],
+                                    'sky'   => ['bg' => 'bg-sky-50',   'text' => 'text-sky-600',  'border' => 'border-sky-200',  'active' => 'border-sky-500 bg-sky-50'],
+                                    'blue'  => ['bg' => 'bg-blue-50',  'text' => 'text-blue-600', 'border' => 'border-blue-200', 'active' => 'border-blue-600 bg-blue-50'],
+                                    'amber' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-600','border' => 'border-amber-200','active' => 'border-amber-600 bg-amber-50'],
+                                    'slate' => ['bg' => 'bg-slate-50', 'text' => 'text-slate-600','border' => 'border-slate-200','active' => 'border-slate-600 bg-slate-50'],
+                                ];
+                            @endphp
+
+                            @foreach($availableStyles as $sty)
+                            @php 
+                                $c = $styleColors[$sty['color']]; 
+                                $isPremium = $sty['id'] !== 'standard';
+                                $hasAccess = Auth::user()->hasFullTemplateAccess() || !$isPremium;
+                            @endphp
+                            <button type="button"
+                                    @if($hasAccess)
+                                        wire:click="$set('visualStyle', '{{ $sty['id'] }}')"
+                                    @else
+                                        x-on:click="$dispatch('notify', { type: 'error', message: 'Ce style est réservé aux membres Premium.' })"
+                                    @endif
+                                    class="group relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200
+                                        {{ $visualStyle === $sty['id'] 
+                                            ? $c['active'] . ' shadow-sm' 
+                                            : 'border-gray-100 bg-white' }}
+                                        {{ !$hasAccess ? 'opacity-60 cursor-not-allowed grayscale' : 'hover:border-gray-200 hover:bg-gray-50' }}">
+                                
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200
+                                    {{ $visualStyle === $sty['id'] 
+                                        ? 'bg-copper text-white' 
+                                        : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
+                                    @if(!$hasAccess)
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    @else
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $sty['icon'] }}" />
+                                        </svg>
+                                    @endif
+                                </div>
+
+                                <div class="text-center">
+                                    <p class="text-[10px] font-bold uppercase tracking-wider {{ $visualStyle === $sty['id'] ? 'text-copper' : 'text-gray-500' }}">
+                                        {{ $sty['label'] }}
+                                    </p>
+                                </div>
+
+                                @if($isPremium && !$hasAccess)
+                                    <div class="absolute -top-2 -right-1">
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black bg-amber-100 text-amber-700 border border-amber-200 uppercase tracking-tighter">Premium</span>
+                                    </div>
+                                @endif
+
+                                @if($visualStyle === $sty['id'] && $hasAccess)
+                                <div class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-copper flex items-center justify-center shadow-sm">
+                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                @endif
+                            </button>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1362,82 +1434,7 @@
                     </button>
                 @else
                     {{-- ── Submit ── --}}
-                    <div class="flex-[2]" x-data="{
-                        isQueuing: false,
-                        async submitOffline() {
-                            if (this.isQueuing) return;
-                            this.isQueuing = true;
-
-                            try {
-                                const formData = {
-                                    template:         @entangle('template'),
-                                    tone:             @entangle('tone'),
-                                    includeHashtags:  @entangle('includeHashtags'),
-                                    clientName:       @entangle('clientName'),
-                                    serviceType:      @entangle('serviceType'),
-                                    workCategory:     @entangle('workCategory'),
-                                    jobDuration:      @entangle('jobDuration'),
-                                    faqCategory:      @entangle('faqCategory'),
-                                    season:           @entangle('season'),
-                                    targetSlides:     @entangle('targetSlides'),
-                                    customNote:       @entangle('customNote'),
-                                    visualStyle:      @entangle('visualStyle'),
-                                    scheduleType:     @entangle('scheduleType'),
-                                    scheduledAt:      @entangle('scheduledAt'),
-                                    textContent:      @entangle('textContent'),
-                                    platforms:        @entangle('platforms'),
-                                    customTemplateId: @entangle('customTemplateId'),
-                                };
-
-                                // ── Audio ──────────────────────────────────────────────
-                                const recorderEl = document.querySelector('[x-data=\"voiceRecorder\"]');
-                                const recorder   = recorderEl ? Alpine.$data(recorderEl) : null;
-                                const audioInput = document.getElementById('audio-input-file');
-
-                                if (recorder && recorder.audioBlob) {
-                                    const type = recorder.audioBlob.type || 'audio/webm';
-                                    const ext  = type.includes('mp4') ? 'm4a' : type.includes('ogg') ? 'ogg' : 'webm';
-                                    formData.audio = new File([recorder.audioBlob], `recording.${ext}`, { type });
-                                } else if (audioInput && audioInput.files && audioInput.files[0]) {
-                                    formData.audio = audioInput.files[0];
-                                }
-
-                                // ── Single photos ──────────────────────────────────────
-                                const imageBeforeInput = document.getElementById('before-input');
-                                const imageAfterInput  = document.getElementById('after-input');
-                                if (imageBeforeInput && imageBeforeInput.files && imageBeforeInput.files[0]) {
-                                    formData.imageBefore = imageBeforeInput.files[0];
-                                }
-                                if (imageAfterInput && imageAfterInput.files && imageAfterInput.files[0]) {
-                                    formData.imageAfter = imageAfterInput.files[0];
-                                }
-
-                                // ── Carousel extra images (chantier_detail / step_by_step) ──
-                                const extraFiles = [];
-                                for (let i = 0; i < 5; i++) {
-                                    const el = document.getElementById(`extra-${i}`);
-                                    if (el && el.files && el.files[0]) {
-                                        extraFiles.push(el.files[0]);
-                                    }
-                                }
-                                if (extraFiles.length > 0) {
-                                    formData.extraImages = extraFiles;
-                                }
-
-                                // ── Queue it ────────────────────────────────────────────
-                                window.dispatchEvent(new CustomEvent('pwa:offline-submit', {
-                                    detail: {
-                                        url: '/api/pwa/queue-generate',
-                                        data: formData,
-                                        redirectTo: '{{ route('posts.index') }}'
-                                    }
-                                }));
-                            } finally {
-                                // Reset after a moment (redirect will navigate away)
-                                setTimeout(() => { this.isQueuing = false; }, 3000);
-                            }
-                        }
-                    }">
+                    <div class="flex-[2]" x-data="postSubmit()">
                         <button type="button"
                                 @click="navigator.onLine ? $wire.generate() : submitOffline()"
                                 :disabled="isQueuing"
@@ -1543,7 +1540,7 @@
                         $totalSlides = count($previewSlides) + 1;
                     @endphp
                     <div x-data="{ current: 0, total: {{ $totalSlides }} }"
-                         class="relative aspect-square select-none bg-black">
+                         class="relative {{ $aspectRatio === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} select-none bg-black">
                         <div class="relative w-full h-full overflow-hidden"
                              x-on:touchstart="$el._tx = $event.changedTouches[0].clientX"
                              x-on:touchend="let dx=$event.changedTouches[0].clientX-$el._tx; if(dx<-40&&current<total-1)current++; if(dx>40&&current>0)current--;">
@@ -1572,6 +1569,7 @@
                                     :email="$company->email"
                                     :website="$company->website"
                                     :trade="$company->trade"
+                                    :aspect-ratio="$aspectRatio"
                                     :preview="true"
                                 />
                             </div>
@@ -1871,6 +1869,81 @@
         formatTime(s) {
             return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
         },
+    }));
+
+    Alpine.data('postSubmit', () => ({
+        isQueuing: false,
+        async submitOffline() {
+            if (this.isQueuing) return;
+            this.isQueuing = true;
+
+            try {
+                const formData = {
+                    template:         this.$wire.get('template'),
+                    tone:             this.$wire.get('tone'),
+                    includeHashtags:  this.$wire.get('includeHashtags'),
+                    clientName:       this.$wire.get('clientName'),
+                    serviceType:      this.$wire.get('serviceType'),
+                    workCategory:     this.$wire.get('workCategory'),
+                    jobDuration:      this.$wire.get('jobDuration'),
+                    faqCategory:      this.$wire.get('faqCategory'),
+                    season:           this.$wire.get('season'),
+                    targetSlides:     this.$wire.get('targetSlides'),
+                    customNote:       this.$wire.get('customNote'),
+                    visualStyle:      this.$wire.get('visualStyle'),
+                    scheduleType:     this.$wire.get('scheduleType'),
+                    scheduledAt:      this.$wire.get('scheduledAt'),
+                    textContent:      this.$wire.get('textContent'),
+                    platforms:        this.$wire.get('platforms'),
+                    customTemplateId: this.$wire.get('customTemplateId'),
+                };
+
+                // ── Audio ──
+                const recorderEl = document.querySelector('[x-data="voiceRecorder"]');
+                const recorder   = recorderEl ? Alpine.$data(recorderEl) : null;
+                const audioInput = document.getElementById('audio-input-file');
+
+                if (recorder && recorder.audioBlob) {
+                    const type = recorder.audioBlob.type || 'audio/webm';
+                    const ext  = type.includes('mp4') ? 'm4a' : type.includes('ogg') ? 'ogg' : 'webm';
+                    formData.audio = new File([recorder.audioBlob], `recording.${ext}`, { type });
+                } else if (audioInput && audioInput.files && audioInput.files[0]) {
+                    formData.audio = audioInput.files[0];
+                }
+
+                // ── Single photos ──
+                const imageBeforeInput = document.getElementById('before-input');
+                const imageAfterInput  = document.getElementById('after-input');
+                if (imageBeforeInput?.files?.[0]) {
+                    formData.imageBefore = imageBeforeInput.files[0];
+                }
+                if (imageAfterInput?.files?.[0]) {
+                    formData.imageAfter = imageAfterInput.files[0];
+                }
+
+                // ── Carousel extra images ──
+                const extraFiles = [];
+                for (let i = 0; i < 5; i++) {
+                    const el = document.getElementById(`extra-${i}`);
+                    if (el?.files?.[0]) {
+                        extraFiles.push(el.files[0]);
+                    }
+                }
+                if (extraFiles.length) {
+                    formData.extraImages = extraFiles;
+                }
+
+                window.dispatchEvent(new CustomEvent('pwa:offline-submit', {
+                    detail: {
+                        url: '/api/pwa/queue-generate',
+                        data: formData,
+                        redirectTo: '/posts'
+                    }
+                }));
+            } finally {
+                setTimeout(() => { this.isQueuing = false; }, 3000);
+            }
+        }
     }));
 </script>
 @endscript

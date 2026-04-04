@@ -30,7 +30,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-square bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Kraft Texture Overlay --}}
     <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
 
@@ -44,11 +44,11 @@
         {{-- Image area --}}
         <div class="flex-1 min-h-0 relative flex items-center justify-center p-10 pb-4">
             <div class="relative w-full h-full border-[8px] border-neutral-800 p-3 bg-white shadow-2xl rotate-1 overflow-hidden">
-                 <div class="w-full h-full overflow-hidden relative">
+                 <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] overflow-hidden relative">
                      @if($imageUrl)
-                         <img src="{{ $imageUrl }}" class="w-full h-full object-contain">
+                         <img src="{{ $imageUrl }}" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] object-contain">
                      @else
-                         <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=600" class="w-full h-full object-cover">
+                         <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=600" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] object-cover">
                      @endif
                      <div class="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.2)]"></div>
                  </div>

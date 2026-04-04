@@ -19,9 +19,12 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             @foreach($posts as $post)
                 @if(($post->status === 'pending' || $post->status === 'processing') && !$post->image_path)
+                    @php
+                        $ratioClass = ($post->template_options['aspect_ratio'] ?? '1:1') === '4:5' ? 'aspect-[4/5]' : 'aspect-square';
+                    @endphp
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col animate-pulse">
                         <!-- Image placeholder -->
-                        <div class="aspect-square relative overflow-hidden bg-gray-50 flex flex-col items-center justify-center">
+                        <div class="{{ $ratioClass }} relative overflow-hidden bg-gray-50 flex flex-col items-center justify-center">
                             <div class="w-8 h-8 border-4 border-gray-200 border-t-copper rounded-full animate-spin"></div>
                             <p class="text-[11px] text-gray-400 font-medium mt-3">Génération...</p>
                         </div>
@@ -45,6 +48,7 @@
                     @php
                         $slides     = $post->slides ?? [];
                         $isCarousel = count($slides) > 1;
+                        $ratioClass = ($post->template_options['aspect_ratio'] ?? '1:1') === '4:5' ? 'aspect-[4/5]' : 'aspect-square';
                         $templateLabels = [
                             'review'            => 'Avis Client',
                             'project'           => 'Avant / Après',
@@ -62,7 +66,7 @@
                     <div wire:click="selectPost({{ $post->id }})" class="cursor-pointer bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col group hover:shadow-lg hover:border-gray-200 transition-all duration-200 hover:-translate-y-0.5">
 
                         <!-- Image / Carousel -->
-                        <div class="aspect-square relative overflow-hidden bg-gray-50">
+                        <div class="{{ $ratioClass }} relative overflow-hidden bg-gray-50">
 
                             @if($isCarousel)
                                 <div x-data="{ current: 0, total: {{ count($slides) }} }"
@@ -253,16 +257,17 @@
     <!-- Modal Preview User -->
     @if($selectedPost)
         <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-midnight/60 backdrop-blur-sm" wire:click.self="closeModal">
-            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl md:h-[550px] max-h-[90vh] overflow-hidden flex flex-col md:flex-row transform transition-all border border-white/20">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl md:h-[650px] max-h-[90vh] overflow-hidden flex flex-col md:flex-row transform transition-all border border-white/20">
                 
                 <!-- Image Side -->
                 <div class="w-full md:w-1/2 bg-gray-50 relative flex items-center justify-center p-8 border-r border-gray-100 min-h-[350px]">
                     @php
                         $selectedSlides = $selectedPost->slides ?? [];
+                        $modalRatioClass = ($selectedPost->template_options['aspect_ratio'] ?? '1:1') === '4:5' ? 'aspect-[4/5]' : 'aspect-square';
                     @endphp
                     @if(count($selectedSlides) > 1)
                         <div x-data="{ current: 0, total: {{ count($selectedSlides) }} }" class="w-full h-full flex flex-col items-center justify-center">
-                            <div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white group/modal">
+                            <div class="relative w-full {{ $modalRatioClass }} rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white group/modal">
                                 @foreach($selectedSlides as $idx => $slidePath)
                                     <div x-show="current === {{ $idx }}" x-transition.opacity class="absolute inset-0">
                                         <img src="{{ Storage::url($slidePath) }}" class="w-full h-full object-cover">
@@ -283,7 +288,9 @@
                             </div>
                         </div>
                     @elseif($selectedPost->image_path)
-                        <img src="{{ Storage::url($selectedPost->image_path) }}" class="max-w-full max-h-full object-contain rounded-2xl shadow-sm border border-gray-200">
+                        <div class="w-full {{ $modalRatioClass }} rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white">
+                            <img src="{{ Storage::url($selectedPost->image_path) }}" class="w-full h-full object-cover">
+                        </div>
                     @else
                         <div class="text-gray-300 font-medium flex flex-col items-center gap-3">
                             <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>

@@ -44,6 +44,7 @@ class PostGenerator extends Component
     public $isAnalyzing     = false;
     public $analysisSuccess  = false;
     public $visualStyle     = 'standard'; // standard | glass | blueprint | kraft | beton
+    public $aspectRatio     = '4:5';      // 1:1 | 4:5 (default 4:5)
     public bool $isFeatureDisabled = false;
     public int $currentStep = 1;
 
@@ -164,6 +165,7 @@ class PostGenerator extends Component
             'scheduledAt'   => $this->scheduleType === 'scheduled' ? 'required|date|after:now' : 'nullable',
             'tone'          => 'required|in:professionnel,chaleureux,expert,dynamique',
             'visualStyle'   => 'required|in:' . (Auth::user()->hasFullTemplateAccess() ? 'standard,glass,blueprint,kraft,beton' : 'standard'),
+            'aspectRatio'   => 'required|in:1:1,4:5',
         ];
     }
 
@@ -344,6 +346,7 @@ class PostGenerator extends Component
             'company_website'        => Auth::user()->company?->website,
             'company_city'           => Auth::user()->company?->city,
             'company_trade'          => Auth::user()->company?->trade,
+            'aspect_ratio'           => $this->aspectRatio,
         ];
 
         // Sanitize platforms array (livewire might cast to string or bool if only one checkbox exists)

@@ -6,7 +6,7 @@
     'preview' => false,
 ])
 
-<div class="w-full aspect-square bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
+<div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
     
     <div class="absolute inset-0 opacity-10 pointer-events-none" 
          style="background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 25px 25px;">
@@ -14,7 +14,7 @@
 
     <div class="flex-1 flex flex-col items-center justify-center p-12 relative z-10">
         
-        <div class="w-full h-full border border-white/40 relative flex flex-col items-center justify-center p-10 bg-white shadow-2xl">
+        <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] border border-white/40 relative flex flex-col items-center justify-center p-10 bg-white shadow-2xl">
             <div class="text-center relative z-20 w-full">
                 <span class="text-[#0047AB]/40 text-[9px] font-black font-mono-technical uppercase tracking-widest block mb-8">Spécification Technique</span>
                 @php

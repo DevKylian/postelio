@@ -105,6 +105,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
         Route::get('/admin/permissions', \App\Livewire\Admin\Permissions\PermissionManager::class)->name('admin.permissions.index');
         Route::get('/admin/server', \App\Livewire\Admin\ServerMonitor::class)->name('admin.server');
         Route::get('/admin/instagram', \App\Livewire\Admin\InstagramPostGenerator::class)->name('admin.instagram');
+        Route::get('/admin/prospects', \App\Livewire\Admin\Prospect\ProspectManager::class)->name('admin.prospects.index');
         Route::get('/admin/announcements', \App\Livewire\Admin\Settings\AnnouncementManager::class)->name('admin.announcements.index');
     });
 

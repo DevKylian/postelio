@@ -180,6 +180,13 @@ $logout = function (Logout $logout) {
                 <span>Instagram Postelio</span>
             </x-sidebar-link>
 
+            <x-sidebar-link :href="route('admin.prospects.index')" :active="request()->routeIs('admin.prospects.*')" wire:navigate>
+                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span>Suivi Prospection</span>
+            </x-sidebar-link>
+
             <x-sidebar-link :href="route('admin.announcements.index')" :active="request()->routeIs('admin.announcements.*')" wire:navigate>
                 <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8 a3 3 0 1 1-5.8-1.6"/>

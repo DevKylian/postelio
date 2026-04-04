@@ -93,7 +93,8 @@ class ImageGeneratorService
 
         for ($i = 0; $i < $totalSlides; $i++) {
             $html = view('render.post', ['post' => $post, 'slideIndex' => $i])->render();
-            $fileName = "posts/{$post->id}_{$i}.jpg";
+            $runId    = $post->template_options['_variant_run'] ?? $post->id;
+            $fileName = "posts/{$runId}_{$i}.jpg";
             $fullPath = storage_path('app/public/' . $fileName);
             
             if (!file_exists(dirname($fullPath))) {

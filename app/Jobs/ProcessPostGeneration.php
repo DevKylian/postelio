@@ -91,8 +91,14 @@ class ProcessPostGeneration implements ShouldQueue
                 }
                 $refined = $fitter->fit($refined, $this->post->template, $templateOptions);
 
-                // Temporarily set refined_content so ImageGenerator can read it
-                $this->post->update(['refined_content' => $refined]);
+                // Temporarily set refined_content + unique run ID so each variant
+                // gets its own image filenames (avoids overwriting between variants)
+                $variantRunId = $this->post->id . '_v' . $i . '_' . uniqid();
+                $variantOptions = array_merge($templateOptions, ['_variant_run' => $variantRunId]);
+                $this->post->update([
+                    'refined_content' => $refined,
+                    'template_options' => $variantOptions,
+                ]);
                 $this->post->refresh();
 
                 // 3. Image generation

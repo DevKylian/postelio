@@ -1654,10 +1654,29 @@
                                 <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                             </div>
                             <p class="text-[11px] font-semibold text-black">247 J'aime</p>
-                            {{-- Texte éditable --}}
-                            <div class="text-[11px] text-black">
-                                <span class="font-semibold">{{ $igUsername }} </span>
+                            {{-- Texte du post (read-only par défaut, éditable sur toggle) --}}
+                            <div class="text-[11px] text-black" x-data="{ editing: false }">
+                                <div class="flex items-center justify-between mb-0.5">
+                                    <span class="font-semibold">{{ $igUsername }}</span>
+                                    <button @click="editing = !editing"
+                                            class="text-[10px] flex items-center gap-1 text-gray-400 hover:text-copper transition-colors">
+                                        <template x-if="!editing">
+                                            <span class="flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                                Modifier
+                                            </span>
+                                        </template>
+                                        <template x-if="editing">
+                                            <span class="flex items-center gap-1 text-copper font-semibold">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                                Valider texte
+                                            </span>
+                                        </template>
+                                    </button>
+                                </div>
+                                <div x-show="!editing" class="mt-0.5 text-[11px] text-black leading-relaxed whitespace-pre-wrap break-words">{{ $editableContents[$vIdx] ?? '' }}</div>
                                 <textarea
+                                    x-show="editing"
                                     wire:model="editableContents.{{ $vIdx }}"
                                     rows="5"
                                     placeholder="Texte du post..."

@@ -439,8 +439,18 @@ class PostGenerator extends Component
 
         if (!$post || !$post->transcription) return;
 
+        $user = Auth::user();
+        $maxRegen = $user->maxRegenerations();
+        $currentCount = $post->regeneration_count ?? 0;
+
+        if ($currentCount >= $maxRegen) {
+            $this->errorMessage = "Vous avez atteint la limite de {$maxRegen} régénération(s) pour ce post. Passez à un plan supérieur pour en obtenir davantage.";
+            return;
+        }
+
         $this->status = Post::STATUS_PROCESSING;
-        
+        $this->errorMessage = null;
+
         $templateOptions = $post->template_options ?? [];
         if ($simplified) {
             $templateOptions['simplified'] = true;
@@ -449,6 +459,7 @@ class PostGenerator extends Component
         $post->update([
             'status' => Post::STATUS_PROCESSING,
             'template_options' => $templateOptions,
+            'regeneration_count' => $currentCount + 1,
         ]);
 
         try {
@@ -558,10 +569,17 @@ class PostGenerator extends Component
             }
         }
 
+        $user       = Auth::user();
+        $regenPost  = $this->generatedPostId ? Post::find($this->generatedPostId) : null;
+        $regenCount = $regenPost?->regeneration_count ?? 0;
+        $maxRegen   = $user->maxRegenerations();
+        $regenLeft  = max(0, $maxRegen - $regenCount);
+
         return view('livewire.pages.post-generator', compact(
             'customTemplates', 'customPhotoMode',
             'company', 'brandColor', 'igUsername', 'igCity', 'hasLogo', 'igProfilePicture',
-            'igConnected', 'fbConnected'
+            'igConnected', 'fbConnected',
+            'regenCount', 'maxRegen', 'regenLeft'
         ));
     }
 

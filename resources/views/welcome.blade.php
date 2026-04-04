@@ -1090,7 +1090,7 @@
                   <div class="h-px bg-slate-100 mb-8"></div>
 
                   <ul class="space-y-4 mb-10 flex-grow">
-                    @foreach(["Jusqu'à 3 posts par mois", "Modèles de posts standards", "Historique des posts sur 7 jours", "Support par email"] as $feature)
+                    @foreach(["Jusqu'à 2 posts par mois", "1 régénération par post", "Modèles de posts standards", "Historique des posts sur 7 jours", "Support par email"] as $feature)
                       <li class="flex items-start gap-3">
                         <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
                           <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
@@ -1142,7 +1142,7 @@
                   <div class="h-px bg-slate-100 mb-8"></div>
 
                   <ul class="space-y-4 mb-10 flex-grow">
-                    @foreach(["Jusqu'à 30 posts par mois", "Modèles de posts standards", "Historique des posts sur 30 jours", "Support prioritaire dédié"] as $feature)
+                    @foreach(["Jusqu'à 15 posts par mois", "2 régénérations par post", "Modèles de posts standards", "Historique des posts sur 30 jours", "Support prioritaire dédié"] as $feature)
                       <li class="flex items-start gap-3">
                         <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
                           <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
@@ -1198,7 +1198,7 @@
                   <div class="h-px bg-slate-100 mb-8"></div>
 
                   <ul class="space-y-4 mb-10 flex-grow">
-                    @foreach(["Jusqu'à 100 posts par mois", "Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium", "Historique des posts illimité", "Support prioritaire dédié"] as $feature)
+                    @foreach(["Jusqu'à 30 posts par mois", "3 régénérations par post", "Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium", "Historique des posts illimité", "Support prioritaire dédié"] as $feature)
                       <li class="flex items-start gap-3">
                         <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
                           <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>

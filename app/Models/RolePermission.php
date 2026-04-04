@@ -9,6 +9,7 @@ class RolePermission extends Model
     protected $fillable = [
         'role_key',
         'monthly_quota',
+        'max_regenerations',
         'can_generate_posts',
         'can_connect_social',
         'has_premium_templates',
@@ -26,6 +27,7 @@ class RolePermission extends Model
     {
         return [
             'monthly_quota' => 'integer',
+            'max_regenerations' => 'integer',
             'can_generate_posts' => 'boolean',
             'can_connect_social' => 'boolean',
             'has_premium_templates' => 'boolean',
@@ -34,7 +36,7 @@ class RolePermission extends Model
             'can_view_statistics' => 'boolean',
         ];
     }
-    
+
     /**
      * Helper to get permissions for a given role key.
      */
@@ -43,7 +45,8 @@ class RolePermission extends Model
         return self::firstOrCreate(
             ['role_key' => $roleKey],
             [
-                'monthly_quota' => 3,
+                'monthly_quota' => 2,
+                'max_regenerations' => 1,
                 'can_generate_posts' => true,
                 'can_connect_social' => false,
                 'has_premium_templates' => false,

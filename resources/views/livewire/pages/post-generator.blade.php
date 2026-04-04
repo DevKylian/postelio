@@ -1659,9 +1659,19 @@
                 {{-- Ligne secondaire : Régénérer · Version courte · Copier · Rejeter --}}
                 <div class="flex flex-wrap justify-center gap-2 w-full max-w-[540px]">
 
+                    {{-- Compteur régénérations --}}
+                    @if($maxRegen < 999)
+                        <div class="w-full text-center mb-1">
+                            <span class="text-[10px] font-medium {{ $regenLeft === 0 ? 'text-red-400' : 'text-gray-400' }}">
+                                {{ $regenLeft }} régénération(s) restante(s) sur {{ $maxRegen }}
+                            </span>
+                        </div>
+                    @endif
+
                     {{-- Régénérer le texte --}}
                     <button wire:click="regeneratePost(false)" wire:loading.attr="disabled"
-                            class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-600 font-medium py-2 px-3.5 rounded-xl hover:border-copper hover:text-copper hover:bg-copper/5 transition-all duration-200 text-xs disabled:opacity-60">
+                            @if($regenLeft === 0) disabled @endif
+                            class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-600 font-medium py-2 px-3.5 rounded-xl hover:border-copper hover:text-copper hover:bg-copper/5 transition-all duration-200 text-xs disabled:opacity-60 disabled:cursor-not-allowed">
                         <svg wire:loading.remove wire:target="regeneratePost(false)" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                         <svg wire:loading wire:target="regeneratePost(false)" class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                         <span wire:loading.remove wire:target="regeneratePost(false)">Régénérer</span>
@@ -1670,7 +1680,8 @@
 
                     {{-- Version courte --}}
                     <button wire:click="regeneratePost(true)" wire:loading.attr="disabled"
-                            class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-500 font-medium py-2 px-3.5 rounded-xl hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50/50 transition-all duration-200 text-xs disabled:opacity-60">
+                            @if($regenLeft === 0) disabled @endif
+                            class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-500 font-medium py-2 px-3.5 rounded-xl hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50/50 transition-all duration-200 text-xs disabled:opacity-60 disabled:cursor-not-allowed">
                         <svg wire:loading.remove wire:target="regeneratePost(true)" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                         <svg wire:loading wire:target="regeneratePost(true)" class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                         <span wire:loading.remove wire:target="regeneratePost(true)">Version courte</span>

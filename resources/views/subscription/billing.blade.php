@@ -112,7 +112,7 @@
                                 </svg>
                             </div>
                             <h4 class="font-semibold text-midnight text-sm">Aucun abonnement actif</h4>
-                            <p class="text-xs text-gray-400 mt-1 mb-4">Vous utilisez le plan gratuit ({{ config('subscription.free_credits', 3) }} posts/mois)</p>
+                            <p class="text-xs text-gray-400 mt-1 mb-4">Vous utilisez le plan gratuit ({{ config('subscription.free_credits', 2) }} posts/mois)</p>
                             <a href="{{ route('subscription.plans') }}" wire:navigate
                                class="inline-flex items-center gap-2 bg-copper hover:bg-amber-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 shadow-lg shadow-copper/20">
                                 Choisir un plan

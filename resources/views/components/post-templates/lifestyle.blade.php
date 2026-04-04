@@ -64,12 +64,25 @@
                 @endif
                 <p class="text-white/90 font-bold text-[9px] tracking-widest font-montserrat truncate">{{ $companyLabel }}</p>
             </div>
-            <div class="flex items-center gap-1.5 overflow-hidden">
+            <div class="flex items-center gap-2 mt-1">
+                @php
+                    $isWhiteTag = true; // Modern white tag style
+                    $tagTextCol = $brandColor;
+                    // Safety check for contrast on white background
+                    $hexTag = str_replace('#', '', $brandColor);
+                    if (strlen($hexTag) == 3) $hexTag = $hexTag[0].$hexTag[0].$hexTag[1].$hexTag[1].$hexTag[2].$hexTag[2];
+                    $rTag = hexdec(substr($hexTag, 0, 2));
+                    $gTag = hexdec(substr($hexTag, 2, 2));
+                    $bTag = hexdec(substr($hexTag, 4, 2));
+                    $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
+                    if ($yiqTag > 235) $tagTextCol = '#1E293B'; // Fallback to dark if brand color is too light
+                @endphp
+
                 @if($trade)
-                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/50 text-[7px] font-bold tracking-wider border border-white/5">{{ $trade }}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/50 text-[7px] font-bold tracking-wider border border-white/5">{{ $city }}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $city }}</span>
                 @endif
             </div>
         </div>

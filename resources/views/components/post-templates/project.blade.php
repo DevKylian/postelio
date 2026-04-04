@@ -163,12 +163,23 @@
         @endphp
         <div class="flex flex-col items-center max-w-full">
             <p class="font-bold tracking-widest {{ $cFontSize }} font-montserrat leading-none mb-1 truncate w-full text-center opacity-60" style="color: {{ $brandTextColor }}">{{ $companyLabel }}</p>
-            <div class="flex items-center gap-1.5 mb-1.5">
+            <div class="flex items-center gap-2 mb-1.5">
+                @php
+                    $tagTextCol = $brandColor;
+                    $hexTag = str_replace('#', '', $brandColor);
+                    if (strlen($hexTag) == 3) $hexTag = $hexTag[0].$hexTag[0].$hexTag[1].$hexTag[1].$hexTag[2].$hexTag[2];
+                    $rTag = hexdec(substr($hexTag, 0, 2));
+                    $gTag = hexdec(substr($hexTag, 2, 2));
+                    $bTag = hexdec(substr($hexTag, 4, 2));
+                    $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
+                    if ($yiqTag > 235) $tagTextCol = '#1E293B'; 
+                @endphp
+                
                 @if($trade)
-                    <span class="px-1.5 py-0.5 rounded-md text-[7px] font-bold tracking-wider border border-current opacity-40 shrink-0" style="color: {{ $brandTextColor }}">{{ $trade }}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-1.5 py-0.5 rounded-md text-[7px] font-bold tracking-wider border border-current opacity-40 shrink-0" style="color: {{ $brandTextColor }}">{{ $city }}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $city }}</span>
                 @endif
             </div>
             <div class="max-h-[30px] overflow-hidden">

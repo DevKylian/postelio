@@ -86,12 +86,23 @@
                 @endif
                 <p class="font-bold text-xs tracking-widest font-montserrat" style="color: {{ $brandTextColor }}">{{ $companyLabel }} • {{ $customerName }}</p>
             </div>
-            <div class="flex items-center gap-1.5 mt-0.5">
+            <div class="flex items-center gap-2 mt-0.5">
+                @php
+                    $tagTextCol = $brandColor;
+                    $hexTag = str_replace('#', '', $brandColor);
+                    if (strlen($hexTag) == 3) $hexTag = $hexTag[0].$hexTag[0].$hexTag[1].$hexTag[1].$hexTag[2].$hexTag[2];
+                    $rTag = hexdec(substr($hexTag, 0, 2));
+                    $gTag = hexdec(substr($hexTag, 2, 2));
+                    $bTag = hexdec(substr($hexTag, 4, 2));
+                    $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
+                    if ($yiqTag > 235) $tagTextCol = '#1E293B'; 
+                @endphp
+                
                 @if($trade)
-                    <span class="px-2 py-0.5 rounded text-[7px] font-bold tracking-wider" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.2)' }}; color: {{ $brandTextColor }}; opacity: 0.7;">{{ $trade }}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-2 py-0.5 rounded text-[7px] font-bold tracking-wider" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.2)' }}; color: {{ $brandTextColor }}; opacity: 0.7;">{{ $city }}</span>
+                    <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $city }}</span>
                 @endif
             </div>
         </div>

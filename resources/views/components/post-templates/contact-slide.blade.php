@@ -53,13 +53,30 @@
         
         @if($trade || $city)
             <div class="mb-4 flex flex-wrap justify-center gap-2">
+                @php
+                    $isStandard = $visualStyle === 'standard';
+                    $tagTextCol = $isStandard ? $brandColor : 'currentColor';
+                    if ($isStandard) {
+                        $hexTag = str_replace('#', '', $brandColor);
+                        if (strlen($hexTag) == 3) $hexTag = $hexTag[0].$hexTag[0].$hexTag[1].$hexTag[1].$hexTag[2].$hexTag[2];
+                        $rTag = hexdec(substr($hexTag, 0, 2));
+                        $gTag = hexdec(substr($hexTag, 2, 2));
+                        $bTag = hexdec(substr($hexTag, 4, 2));
+                        $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
+                        if ($yiqTag > 235) $tagTextCol = '#1E293B';
+                    }
+                    $tagBaseClass = $isStandard 
+                        ? 'px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5'
+                        : 'px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-[0.1em] opacity-40 border border-current shrink-0';
+                @endphp
+                
                 @if($trade)
-                    <span class="px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-[0.1em] opacity-40 border border-current shrink-0">
+                    <span class="{{ $tagBaseClass }}" @if($isStandard) style="color: {{ $tagTextCol }}" @endif>
                         {{ $trade }}
                     </span>
                 @endif
                 @if($city)
-                    <span class="px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-[0.1em] opacity-40 border border-current shrink-0">
+                    <span class="{{ $tagBaseClass }}" @if($isStandard) style="color: {{ $tagTextCol }}" @endif>
                         {{ $city }}
                     </span>
                 @endif

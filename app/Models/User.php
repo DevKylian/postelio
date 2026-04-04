@@ -175,7 +175,16 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function planCredits(): int
     {
-        return (int) $this->getPermission('monthly_quota', 3);
+        return (int) $this->getPermission('monthly_quota', 2);
+    }
+
+    /**
+     * Get how many post variants are generated per post for the current plan/role.
+     */
+    public function postVariantsCount(): int
+    {
+        if ($this->is_admin) return 3;
+        return (int) $this->getPermission('post_variants_count', 1);
     }
 
     /**

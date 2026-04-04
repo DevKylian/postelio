@@ -25,6 +25,9 @@ class Post extends Model
         'template_options',
         'platforms',
         'status',
+        'regeneration_count',
+        'post_variants',
+        'variants_generated',
         'scheduled_at',
         'image_before_path',
         'image_after_path',
@@ -36,12 +39,15 @@ class Post extends Model
     ];
 
     protected $casts = [
-        'slides'           => 'array',
-        'facebook_slides'  => 'array',
-        'extra_images'     => 'array',
-        'template_options' => 'array',
-        'platforms'        => 'array',
-        'scheduled_at'     => 'datetime',
+        'slides'             => 'array',
+        'facebook_slides'    => 'array',
+        'extra_images'       => 'array',
+        'template_options'   => 'array',
+        'platforms'          => 'array',
+        'scheduled_at'       => 'datetime',
+        'regeneration_count' => 'integer',
+        'post_variants'      => 'array',
+        'variants_generated' => 'integer',
     ];
 
     public function user()

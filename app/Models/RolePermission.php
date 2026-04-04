@@ -9,6 +9,7 @@ class RolePermission extends Model
     protected $fillable = [
         'role_key',
         'monthly_quota',
+        'post_variants_count',
         'can_generate_posts',
         'can_connect_social',
         'has_premium_templates',
@@ -25,16 +26,17 @@ class RolePermission extends Model
     protected function casts(): array
     {
         return [
-            'monthly_quota' => 'integer',
-            'can_generate_posts' => 'boolean',
-            'can_connect_social' => 'boolean',
-            'has_premium_templates' => 'boolean',
-            'can_view_calendar' => 'boolean',
-            'can_view_template_previews' => 'boolean',
-            'can_view_statistics' => 'boolean',
+            'monthly_quota'       => 'integer',
+            'post_variants_count' => 'integer',
+            'can_generate_posts'  => 'boolean',
+            'can_connect_social'  => 'boolean',
+            'has_premium_templates'       => 'boolean',
+            'can_view_calendar'           => 'boolean',
+            'can_view_template_previews'  => 'boolean',
+            'can_view_statistics'         => 'boolean',
         ];
     }
-    
+
     /**
      * Helper to get permissions for a given role key.
      */
@@ -43,13 +45,14 @@ class RolePermission extends Model
         return self::firstOrCreate(
             ['role_key' => $roleKey],
             [
-                'monthly_quota' => 3,
-                'can_generate_posts' => true,
-                'can_connect_social' => false,
-                'has_premium_templates' => false,
-                'can_view_calendar' => false,
+                'monthly_quota'       => 2,
+                'post_variants_count' => 1,
+                'can_generate_posts'  => true,
+                'can_connect_social'  => false,
+                'has_premium_templates'      => false,
+                'can_view_calendar'          => false,
                 'can_view_template_previews' => false,
-                'can_view_statistics' => false,
+                'can_view_statistics'        => false,
             ]
         );
     }

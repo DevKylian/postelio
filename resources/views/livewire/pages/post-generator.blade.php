@@ -1479,10 +1479,48 @@
                 </div>
             </div>
             <div>
-                <h3 class="text-xl font-bold text-midnight">Création de votre post...</h3>
-                <p class="text-gray-400 mt-1.5 text-sm">Postelio prépare votre visuel et votre légende sur-mesure.</p>
+                <h3 class="text-xl font-bold text-midnight">
+                    @if($variantCount > 1)
+                        Génération de vos {{ $variantCount }} versions...
+                    @else
+                        Création de votre post...
+                    @endif
+                </h3>
+                @if($variantCount > 1)
+                    <p class="text-gray-400 mt-1.5 text-sm">Postelio génère {{ $variantCount }} versions différentes pour vous laisser le choix.</p>
+                    {{-- Progress indicator --}}
+                    <div class="mt-4 flex items-center justify-center gap-3">
+                        @for($i = 0; $i < $variantCount; $i++)
+                            <div class="flex flex-col items-center gap-1.5">
+                                <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-bold transition-all duration-300
+                                    {{ $variantsGenerated > $i
+                                        ? 'bg-copper border-copper text-white'
+                                        : ($variantsGenerated === $i
+                                            ? 'border-copper text-copper bg-copper/10'
+                                            : 'border-gray-200 text-gray-300 bg-gray-50') }}">
+                                    @if($variantsGenerated > $i)
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                    @elseif($variantsGenerated === $i)
+                                        <div class="w-2.5 h-2.5 rounded-full bg-copper animate-pulse"></div>
+                                    @else
+                                        {{ $i + 1 }}
+                                    @endif
+                                </div>
+                                <span class="text-[10px] font-medium {{ $variantsGenerated > $i ? 'text-copper' : 'text-gray-300' }}">V{{ $i + 1 }}</span>
+                            </div>
+                            @if($i < $variantCount - 1)
+                                <div class="w-8 h-0.5 mb-5 rounded {{ $variantsGenerated > $i ? 'bg-copper' : 'bg-gray-200' }}"></div>
+                            @endif
+                        @endfor
+                    </div>
+                    <p class="text-xs text-gray-400 mt-3">{{ $variantsGenerated }}/{{ $variantCount }} version(s) prête(s)</p>
+                @else
+                    <p class="text-gray-400 mt-1.5 text-sm">Postelio prépare votre visuel et votre légende sur-mesure.</p>
+                @endif
             </div>
-            <p class="text-xs text-gray-300">Cela prend généralement moins d'une minute.</p>
+            @if($variantCount <= 1)
+                <p class="text-xs text-gray-300">Cela prend généralement moins d'une minute.</p>
+            @endif
         </div>
 
     {{-- ── REVIEW PENDING ── --}}
@@ -1490,212 +1528,203 @@
         <div class="space-y-5">
 
             {{-- Header --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center gap-4">
-                <div class="w-10 h-10 bg-copper/10 rounded-xl flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-bold text-midnight text-base">Vérifiez votre post</h3>
-                    <p class="text-sm text-gray-400 mt-0.5">Relisez le contenu avant de valider et publier.</p>
-                </div>
-            </div>
-
-            {{-- Instagram Post Preview --}}
-            <div class="flex justify-center">
-                <div class="w-full max-w-[540px] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
-
-                    {{-- Header Instagram --}}
-                    <div class="flex items-center justify-between px-4 py-3">
-                        <div class="flex items-center gap-3">
-                            {{-- Avatar : photo profil IG > logo > initiale --}}
-                            <div class="w-10 h-10 rounded-full overflow-hidden shrink-0"
-                                 style="box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px {{ $brandColor }}">
-                                @if($igProfilePicture)
-                                    <img src="{{ $igProfilePicture }}" alt="Profil Instagram" class="w-full h-full object-cover">
-                                @elseif($hasLogo)
-                                    <img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="w-full h-full object-cover">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center text-white font-bold text-sm"
-                                         style="background: linear-gradient(135deg, {{ $brandColor }}, {{ $brandColor }}bb)">
-                                        {{ strtoupper(substr($company?->name ?? 'E', 0, 1)) }}
-                                    </div>
-                                @endif
-                            </div>
-                            <div>
-                                <p class="text-[13px] font-semibold text-black leading-none">{{ $igUsername }}</p>
-                                <p class="text-[11px] text-gray-500 leading-none mt-0.5">{{ $igCity }}</p>
-                            </div>
-                        </div>
-                        {{-- Kebab menu --}}
-                        <svg class="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24">
-                            <circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-copper/10 rounded-xl flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                     </div>
-
-                    {{-- Image / Carousel --}}
-                    @php
-                        $totalSlides = count($previewSlides) + 1;
-                    @endphp
-                    <div x-data="{ current: 0, total: {{ $totalSlides }} }"
-                         class="relative {{ $aspectRatio === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} select-none bg-black">
-                        <div class="relative w-full h-full overflow-hidden"
-                             x-on:touchstart="$el._tx = $event.changedTouches[0].clientX"
-                             x-on:touchend="let dx=$event.changedTouches[0].clientX-$el._tx; if(dx<-40&&current<total-1)current++; if(dx>40&&current>0)current--;">
-                            
-                            {{-- Generated Slides --}}
-                            @foreach($previewSlides as $idx => $slideUrl)
-                            <div x-show="current === {{ $idx }}"
-                                 x-transition:enter="transition-opacity duration-200"
-                                 x-transition:enter-start="opacity-0"
-                                 x-transition:enter-end="opacity-100"
-                                 class="absolute inset-0">
-                                <img src="{{ $slideUrl }}" alt="Slide {{ $idx + 1 }}" class="w-full h-full object-cover">
-                            </div>
-                            @endforeach
-
-                            {{-- Final Contact Slide --}}
-                            <div x-show="current === {{ count($previewSlides) }}"
-                                 x-transition:enter="transition-opacity duration-200"
-                                 x-transition:enter-start="opacity-0"
-                                 x-transition:enter-end="opacity-100"
-                                 class="absolute inset-0 bg-white">
-                                <x-post-templates.contact-slide 
-                                    :brand-color="$brandColor" 
-                                    :company-label="$company->name"
-                                    :phone="$company->phone"
-                                    :email="$company->email"
-                                    :website="$company->website"
-                                    :trade="$company->trade"
-                                    :aspect-ratio="$aspectRatio"
-                                    :preview="true"
-                                />
-                            </div>
-                        </div>
-                        
-                        <button x-show="current > 0" @click="current--"
-                                class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center z-10 backdrop-blur-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-                        </button>
-                        <button x-show="current < total - 1" @click="current++"
-                                class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center z-10 backdrop-blur-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                        </button>
-                        {{-- Dots Instagram --}}
-                        <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1 z-10">
-                            @for($i = 0; $i < $totalSlides; $i++)
-                            <div :class="current === {{ $i }} ? 'w-2 h-2 bg-[#3897f0]' : 'w-1.5 h-1.5 bg-white/50'"
-                                 class="rounded-full transition-all duration-200"></div>
-                            @endfor
-                        </div>
-                        <div class="absolute top-3 right-3 bg-black/40 backdrop-blur-sm text-white text-[11px] font-bold px-2 py-0.5 rounded-full z-10"
-                             x-text="(current + 1) + '/' + total"></div>
+                    <div>
+                        <h3 class="font-bold text-midnight text-base">
+                            @if(count($previewVariants) > 1)
+                                Choisissez une version
+                            @else
+                                Vérifiez votre post
+                            @endif
+                        </h3>
+                        <p class="text-sm text-gray-400 mt-0.5">
+                            @if(count($previewVariants) > 1)
+                                {{ count($previewVariants) }} versions générées — cliquez sur "Valider" sous celle que vous préférez.
+                            @else
+                                Relisez le contenu avant de valider et publier.
+                            @endif
+                        </p>
                     </div>
+                </div>
+                {{-- Rejeter --}}
+                <button wire:click="discardPost" wire:loading.attr="disabled"
+                        wire:confirm="Ce post sera supprimé définitivement. Recommencer depuis zéro ?"
+                        class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-400 font-medium py-2 px-3 rounded-xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all duration-200 text-xs disabled:opacity-60 shrink-0">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Tout rejeter
+                </button>
+            </div>
 
-                    {{-- Actions Instagram --}}
-                    <div class="px-3.5 pt-3 pb-5 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                {{-- Like --}}
-                                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                </svg>
-                                {{-- Comment --}}
-                                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                </svg>
-                                {{-- Share --}}
-                                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-                                </svg>
+            {{-- Posts côte à côte (scroll horizontal sur mobile) --}}
+            <div class="flex gap-5 overflow-x-auto pb-3 {{ count($previewVariants) === 1 ? 'justify-center' : '' }}"
+                 style="scrollbar-width: thin; scrollbar-color: #d97706 #f1f5f9;">
+                @foreach($previewVariants as $vIdx => $variant)
+                @php
+                    $vSlides  = $variant['slides'] ?? [];
+                    $vContent = $variant['content'] ?? '';
+                    $vTotal   = count($vSlides);
+                @endphp
+                <div class="flex flex-col shrink-0 {{ count($previewVariants) === 1 ? 'w-full max-w-[420px]' : 'w-[320px]' }}">
+
+                    {{-- Badge version --}}
+                    @if(count($previewVariants) > 1)
+                    <div class="flex items-center justify-center mb-2">
+                        <span class="text-xs font-bold text-gray-500 bg-gray-100 rounded-full px-3 py-1">Version {{ $vIdx + 1 }}</span>
+                    </div>
+                    @endif
+
+                    {{-- Carte Instagram --}}
+                    <div class="bg-white border-2 rounded-2xl overflow-hidden shadow-md transition-all duration-200
+                                {{ count($previewVariants) > 1 ? 'hover:shadow-xl hover:-translate-y-0.5 border-gray-200' : 'border-gray-200' }}">
+
+                        {{-- Header Instagram --}}
+                        <div class="flex items-center justify-between px-3.5 py-2.5">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-full overflow-hidden shrink-0"
+                                     style="box-shadow: 0 0 0 1.5px #fff, 0 0 0 3px {{ $brandColor }}">
+                                    @if($igProfilePicture)
+                                        <img src="{{ $igProfilePicture }}" alt="Profil" class="w-full h-full object-cover">
+                                    @elseif($hasLogo)
+                                        <img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-white font-bold text-xs"
+                                             style="background: linear-gradient(135deg, {{ $brandColor }}, {{ $brandColor }}bb)">
+                                            {{ strtoupper(substr($company?->name ?? 'E', 0, 1)) }}
+                                        </div>
+                                    @endif
+                                </div>
+                                <div>
+                                    <p class="text-[12px] font-semibold text-black leading-none">{{ $igUsername }}</p>
+                                    <p class="text-[10px] text-gray-500 leading-none mt-0.5">{{ $igCity }}</p>
+                                </div>
                             </div>
-                            {{-- Bookmark --}}
-                            <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                            <svg class="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
+                                <circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>
                             </svg>
                         </div>
 
-                        {{-- Likes --}}
-                        <p class="text-[13px] font-semibold text-black">247 J'aime</p>
-
-                        {{-- Caption avec expand --}}
-                        <div x-data="{ exp: false }" class="text-[13px] text-black leading-relaxed">
-                            <p class="font-semibold leading-tight mb-1">{{ $igUsername }}</p>
-                            <div x-show="!exp" class="whitespace-pre-line">{{ Str::limit($previewContent ?? '', 200) }}@if(strlen($previewContent ?? '') > 200) <button @click="exp = true" class="text-gray-400 font-medium">... plus</button>@endif</div>
-                            <div x-show="exp" x-cloak class="whitespace-pre-line">{{ $previewContent }}</div>
+                        {{-- Carousel --}}
+                        <div x-data="{ current: 0, total: {{ $vTotal }} }"
+                             class="relative {{ $aspectRatio === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} select-none bg-black">
+                            <div class="relative w-full h-full overflow-hidden"
+                                 x-on:touchstart="$el._tx = $event.changedTouches[0].clientX"
+                                 x-on:touchend="let dx=$event.changedTouches[0].clientX-$el._tx; if(dx<-40&&current<total-1)current++; if(dx>40&&current>0)current--;">
+                                @foreach($vSlides as $sIdx => $slideUrl)
+                                <div x-show="current === {{ $sIdx }}"
+                                     x-transition:enter="transition-opacity duration-200"
+                                     x-transition:enter-start="opacity-0"
+                                     x-transition:enter-end="opacity-100"
+                                     class="absolute inset-0">
+                                    <img src="{{ $slideUrl }}" alt="Slide {{ $sIdx + 1 }}" class="w-full h-full object-cover">
+                                </div>
+                                @endforeach
+                            </div>
+                            @if($vTotal > 1)
+                            <button x-show="current > 0" @click="current--"
+                                    class="absolute left-1.5 top-1/2 -translate-y-1/2 w-7 h-7 bg-black/40 text-white rounded-full flex items-center justify-center z-10 backdrop-blur-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+                            <button x-show="current < total - 1" @click="current++"
+                                    class="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 bg-black/40 text-white rounded-full flex items-center justify-center z-10 backdrop-blur-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                            <div class="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
+                                @for($s = 0; $s < $vTotal; $s++)
+                                <div :class="current === {{ $s }} ? 'w-2 h-2 bg-[#3897f0]' : 'w-1.5 h-1.5 bg-white/50'"
+                                     class="rounded-full transition-all duration-200"></div>
+                                @endfor
+                            </div>
+                            <div class="absolute top-2 right-2 bg-black/40 backdrop-blur-sm text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full z-10"
+                                 x-text="(current + 1) + '/' + total"></div>
+                            @endif
                         </div>
 
-                        {{-- Date --}}
-                        <p class="text-[11px] text-gray-400 uppercase tracking-wide pt-0.5">Il y a 2 jours</p>
+                        {{-- Caption --}}
+                        <div class="px-3 pt-2.5 pb-1 space-y-1.5">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                                <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                            </div>
+                            <p class="text-[11px] font-semibold text-black">247 J'aime</p>
+                            {{-- Texte du post (read-only par défaut, éditable sur toggle) --}}
+                            <div class="text-[11px] text-black" x-data="{ editing: false }">
+                                <div class="flex items-center justify-between mb-0.5">
+                                    <span class="font-semibold">{{ $igUsername }}</span>
+                                    <button @click="editing = !editing"
+                                            class="text-[10px] flex items-center gap-1 text-gray-400 hover:text-copper transition-colors">
+                                        <template x-if="!editing">
+                                            <span class="flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                                Modifier
+                                            </span>
+                                        </template>
+                                        <template x-if="editing">
+                                            <span class="flex items-center gap-1 text-copper font-semibold">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                                Valider texte
+                                            </span>
+                                        </template>
+                                    </button>
+                                </div>
+                                <div x-show="!editing" class="mt-0.5 text-[11px] text-black leading-relaxed whitespace-pre-wrap break-words">{{ $editableContents[$vIdx] ?? '' }}</div>
+                                <textarea
+                                    x-show="editing"
+                                    wire:model="editableContents.{{ $vIdx }}"
+                                    rows="5"
+                                    placeholder="Texte du post..."
+                                    class="w-full mt-1 text-[11px] text-black leading-relaxed bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-2 resize-none focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper/30 transition-colors placeholder-gray-300"
+                                ></textarea>
+                            </div>
+                            <p class="text-[10px] text-gray-400 uppercase tracking-wide pb-1">Il y a 2 jours</p>
+                        </div>
                     </div>
 
+                    {{-- Bouton Valider sous ce post --}}
+                    <div class="mt-3 space-y-2">
+                        <button wire:click="validatePost({{ $vIdx }})" wire:loading.attr="disabled"
+                                class="w-full flex items-center justify-center gap-2 bg-copper text-white font-semibold py-3 px-4 rounded-xl shadow-md shadow-copper/20 hover:bg-amber-500 transition-all duration-200 active:scale-[0.99] disabled:opacity-60 text-sm">
+                            <svg wire:loading.remove wire:target="validatePost({{ $vIdx }})" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                @if($scheduleType === 'scheduled' && $scheduledAt)
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                @else
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                @endif
+                            </svg>
+                            <svg wire:loading wire:target="validatePost({{ $vIdx }})" class="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <span wire:loading.remove wire:target="validatePost({{ $vIdx }})">
+                                @if($scheduleType === 'scheduled' && $scheduledAt)
+                                    Planifier — {{ \Carbon\Carbon::parse($scheduledAt)->translatedFormat('d/m à H\hi') }}
+                                @elseif(!$igConnected && !$fbConnected)
+                                    Choisir cette version
+                                @else
+                                    Choisir et publier
+                                @endif
+                            </span>
+                            <span wire:loading wire:target="validatePost({{ $vIdx }})">En cours...</span>
+                        </button>
+                        {{-- Copier le texte --}}
+                        <button x-data="{ copied: false }"
+                                @click="navigator.clipboard.writeText({{ Js::from($vContent) }}).then(() => { copied = true; setTimeout(() => copied = false, 2000) })"
+                                class="w-full flex items-center justify-center gap-1.5 border border-gray-200 bg-white font-medium py-2 px-3 rounded-xl transition-all duration-200 text-xs"
+                                :class="copied ? 'border-green-300 text-green-600 bg-green-50' : 'text-gray-500 hover:border-gray-300 hover:text-gray-700'">
+                            <svg x-show="!copied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            <svg x-show="copied" x-cloak class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            <span x-text="copied ? 'Texte copié !' : 'Copier le texte'"></span>
+                        </button>
+                    </div>
                 </div>
+                @endforeach
             </div>
 
-            {{-- Actions --}}
-            <div class="flex flex-col items-center gap-3 w-full">
-
-                {{-- Bouton principal : Valider (label adaptatif selon la planification) --}}
-                <button wire:click="validatePost" wire:loading.attr="disabled"
-                        class="w-full max-w-[540px] flex items-center justify-center gap-2 bg-copper text-white font-semibold py-3.5 px-5 rounded-xl shadow-md shadow-copper/20 hover:bg-amber-500 hover:shadow-lg hover:shadow-copper/30 transition-all duration-200 active:scale-[0.99] disabled:opacity-60 text-sm">
-                    {{-- Icône : calendrier ou check, remplacée par spinner --}}
-                    @if($scheduleType === 'scheduled' && $scheduledAt)
-                        <svg wire:loading.remove wire:target="validatePost" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    @else
-                        <svg wire:loading.remove wire:target="validatePost" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                    @endif
-                    <svg wire:loading wire:target="validatePost" class="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    @if($scheduleType === 'scheduled' && $scheduledAt)
-                        <span>Planifier — {{ \Carbon\Carbon::parse($scheduledAt)->translatedFormat('d/m à H\hi') }}</span>
-                    @elseif(!$igConnected && !$fbConnected)
-                        <span>Valider et sauvegarder</span>
-                    @else
-                        <span>Valider et publier</span>
-                    @endif
-                </button>
-
-                {{-- Ligne secondaire : Régénérer · Version courte · Copier · Rejeter --}}
-                <div class="flex flex-wrap justify-center gap-2 w-full max-w-[540px]">
-
-                    {{-- Régénérer le texte --}}
-                    <button wire:click="regeneratePost(false)" wire:loading.attr="disabled"
-                            class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-600 font-medium py-2 px-3.5 rounded-xl hover:border-copper hover:text-copper hover:bg-copper/5 transition-all duration-200 text-xs disabled:opacity-60">
-                        <svg wire:loading.remove wire:target="regeneratePost(false)" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        <svg wire:loading wire:target="regeneratePost(false)" class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <span wire:loading.remove wire:target="regeneratePost(false)">Régénérer</span>
-                        <span wire:loading wire:target="regeneratePost(false)">En cours...</span>
-                    </button>
-
-                    {{-- Version courte --}}
-                    <button wire:click="regeneratePost(true)" wire:loading.attr="disabled"
-                            class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-500 font-medium py-2 px-3.5 rounded-xl hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50/50 transition-all duration-200 text-xs disabled:opacity-60">
-                        <svg wire:loading.remove wire:target="regeneratePost(true)" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        <svg wire:loading wire:target="regeneratePost(true)" class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <span wire:loading.remove wire:target="regeneratePost(true)">Version courte</span>
-                        <span wire:loading wire:target="regeneratePost(true)">En cours...</span>
-                    </button>
-
-                    {{-- Copier le texte --}}
-                    <button x-data="{ copied: false }"
-                            @click="navigator.clipboard.writeText({{ Js::from($previewContent ?? '') }}).then(() => { copied = true; setTimeout(() => copied = false, 2000) })"
-                            class="flex items-center gap-1.5 border border-gray-200 bg-white font-medium py-2 px-3.5 rounded-xl transition-all duration-200 text-xs"
-                            :class="copied ? 'border-green-300 text-green-600 bg-green-50' : 'text-gray-500 hover:border-gray-300 hover:text-gray-700'">
-                        <svg x-show="!copied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                        <svg x-show="copied" x-cloak class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                        <span x-text="copied ? 'Copié !' : 'Copier le texte'"></span>
-                    </button>
-
-                    {{-- Rejeter --}}
-                    <button wire:click="discardPost" wire:loading.attr="disabled"
-                            wire:confirm="Ce post sera supprimé définitivement. Recommencer depuis zéro ?"
-                            class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-400 font-medium py-2 px-3.5 rounded-xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all duration-200 text-xs disabled:opacity-60">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        Rejeter
-                    </button>
-                </form>
-            </div>
+        </form>
         </div>
 
     {{-- ── FAILED ── --}}

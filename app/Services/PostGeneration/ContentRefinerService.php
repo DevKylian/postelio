@@ -61,6 +61,9 @@ class ContentRefinerService
         // Detect refusals embedded in the JSON or in plain text
         $this->assertNotRefusal($raw);
 
+        // Normalize caption formatting (ensure proper line breaks)
+        $raw = $this->normalizeCaptionInJson($raw);
+
         return $raw;
     }
 
@@ -94,8 +97,9 @@ class ContentRefinerService
         // ── 2. Format rules ──
         $prompt .= "RÈGLE DE FORMAT STRICTE :\n"
             . "- Jamais de Markdown : aucun **, aucun *, aucun _, aucun #. Instagram n'en supporte pas.\n"
-            . "- Structure la légende avec de vrais sauts de ligne entre chaque idée/paragraphe.\n"
-            . "- Exemple de structure : accroche, ligne vide, corps espacé, ligne vide, call-to-action, ligne vide, hashtags.\n\n";
+            . "- Dans la valeur JSON du champ \"caption\", utilise OBLIGATOIREMENT \\n\\n (double saut de ligne) entre chaque section.\n"
+            . "- NE JAMAIS écrire la légende en une seule ligne compacte. Chaque section doit être séparée.\n"
+            . "- Exemple de structure avec \\n\\n : \"🔌 Accroche...\\n\\n📍 Localisation...\\n\\nCorps du texte...\\n\\n✔️ Bénéfice 1\\n✔️ Bénéfice 2\\n\\n👌 Conclusion...\\n\\n📞 Téléphone\\n📧 Email\\n\\n#hashtag1 #hashtag2\"\n\n";
 
         // ── 3. Image text rules ──
         $prompt .= "RÈGLE DE RÉDACTION STRICTE SUR LES TEXTES D'IMAGE :\n"
@@ -286,7 +290,7 @@ class ContentRefinerService
         $clientName = $options['clientName'] ?? null;
         $clientPart = $clientName ? " (mentionne le client : {$clientName})" : "";
 
-        return "\nSTRUCTURE OBLIGATOIRE DE LA LÉGENDE (Respecte ces 7 points dans l'ordre, c'est CRUCIAL) :\n"
+        return "\nSTRUCTURE OBLIGATOIRE DE LA LÉGENDE (Respecte ces 7 points dans l'ordre, séparés par \\n\\n dans le JSON, c'est CRUCIAL) :\n"
             . "1. L'Accroche visuelle (Le Hook) : Un émoji lié au métier + une phrase courte annonçant la fin du projet ou le type de réalisation{$clientPart}.\n"
             . "{$locationPart}\n"
             . "3. Le Contexte et la Technique (Le Corps du texte) : Un court paragraphe (2-3 phrases) qui explique ce qui a été fait, les matériaux ou marques utilisés, la spécificité technique. Intègre ici les éléments clés du mémo vocal.\n"
@@ -379,6 +383,50 @@ class ContentRefinerService
             'targetSlides' => 'Nombre de slides souhaité',
             default => ucfirst($field),
         };
+    }
+
+    /**
+     * Ensure the caption field in the JSON has proper line breaks between sections.
+     * The AI sometimes forgets \n separators and writes everything on one line.
+     */
+    private function normalizeCaptionInJson(string $json): string
+    {
+        $data = json_decode($json, true);
+        if (!is_array($data) || empty($data['caption'])) {
+            return $json;
+        }
+
+        $caption = $data['caption'];
+
+        // Normalize line endings
+        $caption = str_replace(["\r\n", "\r"], "\n", $caption);
+
+        // If caption has very few newlines it is likely compact — reconstruct structure
+        if (substr_count($caption, "\n") < 3) {
+            // Double newline before location emoji (📍) that appears mid-text
+            $caption = preg_replace('/(?<=[^\n]) (📍)/', "\n\n$1", $caption);
+
+            // Double newline before section-level emojis appearing after a period/space mid-text
+            foreach (['👌', '📞', '📧', '💡', '🔑', '🏠', '🔧', '⚡', '🪛', '🧱', '🔌'] as $emoji) {
+                $caption = preg_replace('/(?<=[^\n]) (' . preg_quote($emoji, '/') . ')/', "\n\n$1", $caption);
+            }
+
+            // Single newline before bullet-point emojis (✔️ and 🔹) appearing after a space
+            foreach (['✔️', '🔹'] as $emoji) {
+                $caption = preg_replace('/(?<=[^\n]) (' . preg_quote($emoji, '/') . ')/', "\n$1", $caption);
+            }
+
+            // Double newline before the hashtag block
+            $caption = preg_replace('/(?<=[^\n]) (#\w)/', "\n\n$1", $caption);
+        }
+
+        // Collapse 3+ consecutive newlines
+        $caption = preg_replace("/\n{3,}/", "\n\n", $caption);
+        $caption = trim($caption);
+
+        $data['caption'] = $caption;
+
+        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
     /**

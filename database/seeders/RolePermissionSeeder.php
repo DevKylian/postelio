@@ -15,6 +15,7 @@ class RolePermissionSeeder extends Seeder
         $permissions = [
             'admin' => [
                 'monthly_quota' => 999999,
+                'post_variants_count' => 999,
                 'can_generate_posts' => true,
                 'can_connect_social' => true,
                 'has_premium_templates' => true,
@@ -23,7 +24,8 @@ class RolePermissionSeeder extends Seeder
                 'can_view_statistics' => true,
             ],
             'pro' => [
-                'monthly_quota' => 100,
+                'monthly_quota' => 30,
+                'post_variants_count' => 3,
                 'can_generate_posts' => true,
                 'can_connect_social' => true,
                 'has_premium_templates' => true,
@@ -32,7 +34,8 @@ class RolePermissionSeeder extends Seeder
                 'can_view_statistics' => true,
             ],
             'basic' => [
-                'monthly_quota' => 30,
+                'monthly_quota' => 15,
+                'post_variants_count' => 2,
                 'can_generate_posts' => true,
                 'can_connect_social' => false,
                 'has_premium_templates' => false,
@@ -42,6 +45,7 @@ class RolePermissionSeeder extends Seeder
             ],
             'tester' => [
                 'monthly_quota' => 10,
+                'post_variants_count' => 3,
                 'can_generate_posts' => true,
                 'can_connect_social' => true,
                 'has_premium_templates' => true,
@@ -50,7 +54,8 @@ class RolePermissionSeeder extends Seeder
                 'can_view_statistics' => true,
             ],
             'free' => [
-                'monthly_quota' => 3,
+                'monthly_quota' => 2,
+                'post_variants_count' => 1,
                 'can_generate_posts' => true,
                 'can_connect_social' => false,
                 'has_premium_templates' => false,

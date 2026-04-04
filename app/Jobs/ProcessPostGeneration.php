@@ -33,135 +33,110 @@ class ProcessPostGeneration implements ShouldQueue
         ImageGeneratorService $generator
     ): void {
         Log::info("ProcessPostGeneration handle started", ['post_id' => $this->post->id]);
-        set_time_limit(300);
+        set_time_limit(600);
         try {
             $this->post->update(['status' => Post::STATUS_PROCESSING]);
 
-            // 1. Transcription / Content Acquisition
-            $textContent = $this->post->template_options['text_content'] ?? null;
+            $templateOptions  = $this->post->template_options ?? [];
+            $variantCount     = max(1, (int) ($templateOptions['variant_count'] ?? 1));
+            $company          = $this->post->company;
+            $platforms        = $this->post->platforms ?? [];
+
+            // ── Step 1 : Transcription (shared across all variants) ────────────
+            $textContent = $templateOptions['text_content'] ?? null;
             $audioPath   = $this->post->audio_path;
-            $transcript  = null;
+            $transcript  = $this->post->transcription; // reuse if already set
 
-            if ($textContent) {
-                Log::info("Using provided text content (transcript from UI or manual entry)");
-                $transcript = $textContent;
-            } elseif ($audioPath) {
-                Log::info("Starting transcription from audio file", ['path' => $audioPath]);
-                $transcript = $transcriber->transcribe($audioPath);
-                Log::info("Transcription finished", ['length' => strlen($transcript)]);
-            } else {
-                throw new Exception("Aucun contenu (audio ou texte) fourni pour la génération.");
+            if (!$transcript) {
+                if ($textContent) {
+                    Log::info("Using provided text content");
+                    $transcript = $textContent;
+                } elseif ($audioPath) {
+                    Log::info("Starting transcription from audio file", ['path' => $audioPath]);
+                    $transcript = $transcriber->transcribe($audioPath);
+                    Log::info("Transcription finished", ['length' => strlen($transcript)]);
+                } else {
+                    throw new Exception("Aucun contenu (audio ou texte) fourni pour la génération.");
+                }
+
+                if ($company) {
+                    $transcript = $this->correctKnownTerms($transcript, $company);
+                }
+                $this->post->update(['transcription' => $transcript]);
             }
 
-            // 1b. Correct known company terms in transcript (city, name, trade)
-            $company = $this->post->company;
-            if ($company) {
-                $transcript = $this->correctKnownTerms($transcript, $company);
-            }
-
-            $this->post->update(['transcription' => $transcript]);
-
-            // 2. AI content refinement
-            Log::info("Starting AI refinement", ['template' => $this->post->template]);
+            // Enrich template options with company data (shared)
             $photoCount = count($this->post->extra_images ?? []);
-            $templateOptions = $this->post->template_options ?? [];
             if ($company) {
-                $company->refresh(); // CRITICAL: Get latest city/phone from DB
+                $company->refresh();
                 $templateOptions['company_city']  = $company->city;
                 $templateOptions['company_name']  = $company->name;
                 $templateOptions['company_trade'] = $company->trade;
                 $templateOptions['company_phone'] = $company->phone;
                 $templateOptions['company_email'] = $company->email;
-                // Inject artisan bio for personalized AI generation
                 if (!empty($company->bio_text)) {
                     $templateOptions['artisan_bio'] = $company->bio_text;
                 }
             }
-            $refined = $refiner->refine($transcript, $this->post->template, $photoCount, $templateOptions);
-            Log::info("AI refinement finished");
 
-            // 2b. Correct known company terms in refined content
-            if ($company) {
-                $refined = $this->correctKnownTermsInJson($refined, $company);
-            }
+            // ── Steps 2–4 : Generate each variant ─────────────────────────────
+            $variants = [];
+            for ($i = 0; $i < $variantCount; $i++) {
+                Log::info("Generating variant " . ($i + 1) . "/$variantCount");
 
-            // 2c. Enforce text zone constraints (truncate if AI exceeded limits)
-            $refined = $fitter->fit($refined, $this->post->template, $templateOptions);
-            Log::info("Text fitting applied");
+                // 2. AI text refinement
+                $refined = $refiner->refine($transcript, $this->post->template, $photoCount, $templateOptions);
+                if ($company) {
+                    $refined = $this->correctKnownTermsInJson($refined, $company);
+                }
+                $refined = $fitter->fit($refined, $this->post->template, $templateOptions);
 
-            $this->post->update(['refined_content' => $refined]);
-
-            // 3. Image generation
-            Log::info("Starting image generation");
-            $result = $generator->generate($this->post);
-            Log::info("Image generation finished");
-
-            $updateData = ['status' => Post::STATUS_REVIEW_PENDING];
-
-            if (is_array($result)) {
-                $updateData['image_path'] = $result[0];
-                $updateData['slides']     = $result;
-            } else {
-                $updateData['image_path'] = $result;
-                $updateData['slides']     = [$result];
-            }
-
-            $this->post->update($updateData);
-
-            // 4. Facebook dimensions
-            $platforms = $this->post->platforms ?? ['instagram'];
-            if (in_array('facebook', $platforms)) {
-                Log::info("Starting Facebook image generation");
+                // Temporarily set refined_content + unique run ID so each variant
+                // gets its own image filenames (avoids overwriting between variants)
+                $variantRunId = $this->post->id . '_v' . $i . '_' . uniqid();
+                $variantOptions = array_merge($templateOptions, ['_variant_run' => $variantRunId]);
+                $this->post->update([
+                    'refined_content' => $refined,
+                    'template_options' => $variantOptions,
+                ]);
                 $this->post->refresh();
-                $fbResult = $generator->generateForFacebook($this->post);
-                Log::info("Facebook image generation finished");
 
-                if (is_array($fbResult)) {
-                    $this->post->update([
-                        'facebook_image_path' => $fbResult[0],
-                        'facebook_slides'     => $fbResult,
-                    ]);
-                } else {
-                    $this->post->update([
-                        'facebook_image_path' => $fbResult,
-                        'facebook_slides'     => [$fbResult],
-                    ]);
+                // 3. Image generation
+                $result = $generator->generate($this->post);
+                $slides    = is_array($result) ? $result : [$result];
+                $imagePath = $slides[0];
+
+                $variant = [
+                    'slides'       => $slides,
+                    'image_path'   => $imagePath,
+                    'refined_content' => $refined,
+                ];
+
+                // 4. Facebook dimensions
+                if (in_array('facebook', $platforms)) {
+                    $fbResult = $generator->generateForFacebook($this->post);
+                    $variant['facebook_slides']     = is_array($fbResult) ? $fbResult : [$fbResult];
+                    $variant['facebook_image_path'] = is_array($fbResult) ? $fbResult[0] : $fbResult;
                 }
+
+                $variants[] = $variant;
+                $this->post->increment('variants_generated');
+                Log::info("Variant " . ($i + 1) . " done");
             }
 
-            Log::info("ProcessPostGeneration handle completed successfully");
+            // ── Set first variant as main post data, store all variants ────────
+            $first = $variants[0];
+            $this->post->update([
+                'status'          => Post::STATUS_REVIEW_PENDING,
+                'refined_content' => $first['refined_content'],
+                'image_path'      => $first['image_path'],
+                'slides'          => $first['slides'],
+                'facebook_image_path' => $first['facebook_image_path'] ?? null,
+                'facebook_slides'     => $first['facebook_slides'] ?? null,
+                'post_variants'   => $variants,
+            ]);
 
-            // 5. Set completed and auto-publish
-            $this->post->update(['status' => Post::STATUS_COMPLETED]);
-            $this->post->refresh();
-
-            $company = $this->post->company;
-            if ($company) {
-                // Determine if we need to delay the publishing jobs
-                $delay = null;
-                if ($this->post->scheduled_at && $this->post->scheduled_at->isFuture()) {
-                    $delay = $this->post->scheduled_at;
-                }
-
-                if (in_array('instagram', $platforms) && $company->instagram_connected) {
-                    $job = PublishToInstagramJob::dispatch($this->post->id);
-                    if ($delay) {
-                        $job->delay($delay);
-                        Log::info("Scheduled to Instagram queue", ['time' => $delay->toDateTimeString()]);
-                    } else {
-                        Log::info("Auto-published to Instagram queue");
-                    }
-                }
-                if (in_array('facebook', $platforms) && $company->facebook_connected) {
-                    $job = PublishToFacebookJob::dispatch($this->post->id);
-                    if ($delay) {
-                        $job->delay($delay);
-                        Log::info("Scheduled to Facebook queue", ['time' => $delay->toDateTimeString()]);
-                    } else {
-                        Log::info("Auto-published to Facebook queue");
-                    }
-                }
-            }
+            Log::info("ProcessPostGeneration completed — $variantCount variant(s) ready for review");
 
         } catch (\Throwable $e) {
             $errorMsg = "Post Generation Failed: " . $e->getMessage();

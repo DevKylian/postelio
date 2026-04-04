@@ -431,16 +431,19 @@ class PostGenerator extends Component
         }
     }
 
-    public function regeneratePost(bool $simplified = false): void
+    /**
+     * @param string $mode 'both' | 'text' | 'images'
+     */
+    public function regeneratePost(string $mode = 'both'): void
     {
         $post = Post::where('id', $this->generatedPostId)
                     ->where('user_id', Auth::id())
                     ->first();
 
-        if (!$post || !$post->transcription) return;
+        if (!$post) return;
 
         $user = Auth::user();
-        $maxRegen = $user->maxRegenerations();
+        $maxRegen     = $user->maxRegenerations();
         $currentCount = $post->regeneration_count ?? 0;
 
         if ($currentCount >= $maxRegen) {
@@ -448,17 +451,15 @@ class PostGenerator extends Component
             return;
         }
 
-        $this->status = Post::STATUS_PROCESSING;
+        $this->status       = Post::STATUS_PROCESSING;
         $this->errorMessage = null;
 
-        $templateOptions = $post->template_options ?? [];
-        if ($simplified) {
-            $templateOptions['simplified'] = true;
-        }
+        $templateOptions               = $post->template_options ?? [];
+        $templateOptions['regen_mode'] = $mode;
 
         $post->update([
-            'status' => Post::STATUS_PROCESSING,
-            'template_options' => $templateOptions,
+            'status'             => Post::STATUS_PROCESSING,
+            'template_options'   => $templateOptions,
             'regeneration_count' => $currentCount + 1,
         ]);
 
@@ -467,7 +468,7 @@ class PostGenerator extends Component
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('regeneratePost dispatch failed', ['error' => $e->getMessage()]);
             $this->errorMessage = $e->getMessage();
-            $this->status = Post::STATUS_FAILED;
+            $this->status       = Post::STATUS_FAILED;
             $post->update(['status' => Post::STATUS_FAILED]);
         }
     }

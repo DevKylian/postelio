@@ -37,99 +37,105 @@ class ProcessPostGeneration implements ShouldQueue
         try {
             $this->post->update(['status' => Post::STATUS_PROCESSING]);
 
-            // 1. Transcription / Content Acquisition
-            $textContent = $this->post->template_options['text_content'] ?? null;
-            $audioPath   = $this->post->audio_path;
-            $transcript  = null;
-
-            if ($textContent) {
-                Log::info("Using provided text content (transcript from UI or manual entry)");
-                $transcript = $textContent;
-            } elseif ($audioPath) {
-                Log::info("Starting transcription from audio file", ['path' => $audioPath]);
-                $transcript = $transcriber->transcribe($audioPath);
-                Log::info("Transcription finished", ['length' => strlen($transcript)]);
-            } else {
-                throw new Exception("Aucun contenu (audio ou texte) fourni pour la génération.");
-            }
-
-            // 1b. Correct known company terms in transcript (city, name, trade)
-            $company = $this->post->company;
-            if ($company) {
-                $transcript = $this->correctKnownTerms($transcript, $company);
-            }
-
-            $this->post->update(['transcription' => $transcript]);
-
-            // 2. AI content refinement
-            Log::info("Starting AI refinement", ['template' => $this->post->template]);
-            $photoCount = count($this->post->extra_images ?? []);
             $templateOptions = $this->post->template_options ?? [];
-            if ($company) {
-                $company->refresh(); // CRITICAL: Get latest city/phone from DB
-                $templateOptions['company_city']  = $company->city;
-                $templateOptions['company_name']  = $company->name;
-                $templateOptions['company_trade'] = $company->trade;
-                $templateOptions['company_phone'] = $company->phone;
-                $templateOptions['company_email'] = $company->email;
-                // Inject artisan bio for personalized AI generation
-                if (!empty($company->bio_text)) {
-                    $templateOptions['artisan_bio'] = $company->bio_text;
-                }
-            }
-            $refined = $refiner->refine($transcript, $this->post->template, $photoCount, $templateOptions);
-            Log::info("AI refinement finished");
+            // regen_mode: 'both' (default) | 'text' | 'images'
+            $regenMode = $templateOptions['regen_mode'] ?? 'both';
+            $company   = $this->post->company;
 
-            // 2b. Correct known company terms in refined content
-            if ($company) {
-                $refined = $this->correctKnownTermsInJson($refined, $company);
-            }
+            if ($regenMode !== 'images') {
+                // ── Steps 1 & 2 : Transcription + AI refinement ──────────────────
 
-            // 2c. Enforce text zone constraints (truncate if AI exceeded limits)
-            $refined = $fitter->fit($refined, $this->post->template, $templateOptions);
-            Log::info("Text fitting applied");
+                $textContent = $templateOptions['text_content'] ?? null;
+                $audioPath   = $this->post->audio_path;
+                $transcript  = null;
 
-            $this->post->update(['refined_content' => $refined]);
-
-            // 3. Image generation
-            Log::info("Starting image generation");
-            $result = $generator->generate($this->post);
-            Log::info("Image generation finished");
-
-            $updateData = ['status' => Post::STATUS_REVIEW_PENDING];
-
-            if (is_array($result)) {
-                $updateData['image_path'] = $result[0];
-                $updateData['slides']     = $result;
-            } else {
-                $updateData['image_path'] = $result;
-                $updateData['slides']     = [$result];
-            }
-
-            $this->post->update($updateData);
-
-            // 4. Facebook dimensions
-            $platforms = $this->post->platforms ?? ['instagram'];
-            if (in_array('facebook', $platforms)) {
-                Log::info("Starting Facebook image generation");
-                $this->post->refresh();
-                $fbResult = $generator->generateForFacebook($this->post);
-                Log::info("Facebook image generation finished");
-
-                if (is_array($fbResult)) {
-                    $this->post->update([
-                        'facebook_image_path' => $fbResult[0],
-                        'facebook_slides'     => $fbResult,
-                    ]);
+                if ($textContent) {
+                    Log::info("Using provided text content");
+                    $transcript = $textContent;
+                } elseif ($this->post->transcription && $regenMode === 'text') {
+                    // Re-use existing transcription for text-only regen
+                    $transcript = $this->post->transcription;
+                } elseif ($audioPath) {
+                    Log::info("Starting transcription from audio file", ['path' => $audioPath]);
+                    $transcript = $transcriber->transcribe($audioPath);
+                    Log::info("Transcription finished", ['length' => strlen($transcript)]);
                 } else {
-                    $this->post->update([
-                        'facebook_image_path' => $fbResult,
-                        'facebook_slides'     => [$fbResult],
-                    ]);
+                    throw new Exception("Aucun contenu (audio ou texte) fourni pour la génération.");
                 }
+
+                if ($company) {
+                    $transcript = $this->correctKnownTerms($transcript, $company);
+                }
+
+                $this->post->update(['transcription' => $transcript]);
+
+                // AI refinement
+                Log::info("Starting AI refinement", ['template' => $this->post->template]);
+                $photoCount = count($this->post->extra_images ?? []);
+                if ($company) {
+                    $company->refresh();
+                    $templateOptions['company_city']  = $company->city;
+                    $templateOptions['company_name']  = $company->name;
+                    $templateOptions['company_trade'] = $company->trade;
+                    $templateOptions['company_phone'] = $company->phone;
+                    $templateOptions['company_email'] = $company->email;
+                    if (!empty($company->bio_text)) {
+                        $templateOptions['artisan_bio'] = $company->bio_text;
+                    }
+                }
+                $refined = $refiner->refine($transcript, $this->post->template, $photoCount, $templateOptions);
+                Log::info("AI refinement finished");
+
+                if ($company) {
+                    $refined = $this->correctKnownTermsInJson($refined, $company);
+                }
+
+                $refined = $fitter->fit($refined, $this->post->template, $templateOptions);
+                Log::info("Text fitting applied");
+
+                $this->post->update(['refined_content' => $refined]);
+            } else {
+                Log::info("Skipping text generation (images-only regen)");
             }
 
-            Log::info("ProcessPostGeneration handle completed successfully — waiting for user validation");
+            if ($regenMode !== 'text') {
+                // ── Steps 3 & 4 : Image generation ──────────────────────────────
+
+                Log::info("Starting image generation");
+                $this->post->refresh();
+                $result = $generator->generate($this->post);
+                Log::info("Image generation finished");
+
+                $updateData = ['status' => Post::STATUS_REVIEW_PENDING];
+                if (is_array($result)) {
+                    $updateData['image_path'] = $result[0];
+                    $updateData['slides']     = $result;
+                } else {
+                    $updateData['image_path'] = $result;
+                    $updateData['slides']     = [$result];
+                }
+                $this->post->update($updateData);
+
+                $platforms = $this->post->platforms ?? [];
+                if (in_array('facebook', $platforms)) {
+                    Log::info("Starting Facebook image generation");
+                    $this->post->refresh();
+                    $fbResult = $generator->generateForFacebook($this->post);
+                    Log::info("Facebook image generation finished");
+
+                    if (is_array($fbResult)) {
+                        $this->post->update(['facebook_image_path' => $fbResult[0], 'facebook_slides' => $fbResult]);
+                    } else {
+                        $this->post->update(['facebook_image_path' => $fbResult, 'facebook_slides' => [$fbResult]]);
+                    }
+                }
+            } else {
+                // Text-only regen: keep existing images, go straight to review
+                $this->post->update(['status' => Post::STATUS_REVIEW_PENDING]);
+                Log::info("Skipping image generation (text-only regen)");
+            }
+
+            Log::info("ProcessPostGeneration completed — waiting for user validation");
 
         } catch (\Throwable $e) {
             $errorMsg = "Post Generation Failed: " . $e->getMessage();

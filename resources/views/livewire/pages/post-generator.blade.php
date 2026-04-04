@@ -1503,6 +1503,47 @@
                 </div>
             </div>
 
+            {{-- Régénération --}}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-4">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Régénérer</p>
+                    @if($maxRegen < 999)
+                        <span class="text-[10px] font-medium px-2 py-0.5 rounded-full {{ $regenLeft === 0 ? 'bg-red-50 text-red-400 border border-red-100' : 'bg-gray-50 text-gray-400 border border-gray-100' }}">
+                            {{ $regenLeft }}/{{ $maxRegen }} restante(s)
+                        </span>
+                    @endif
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    {{-- Texte uniquement --}}
+                    <button wire:click="regeneratePost('text')" wire:loading.attr="disabled"
+                            @if($regenLeft === 0) disabled @endif
+                            class="flex flex-col items-center gap-1.5 border border-gray-200 bg-gray-50 py-3 px-2 rounded-xl hover:border-copper hover:bg-copper/5 hover:text-copper transition-all duration-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed group">
+                        <svg wire:loading.remove wire:target="regeneratePost('text')" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        <svg wire:loading wire:target="regeneratePost('text')" class="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span class="text-[11px] font-medium leading-tight text-center">Texte<br>uniquement</span>
+                    </button>
+                    {{-- Images uniquement --}}
+                    <button wire:click="regeneratePost('images')" wire:loading.attr="disabled"
+                            @if($regenLeft === 0) disabled @endif
+                            class="flex flex-col items-center gap-1.5 border border-gray-200 bg-gray-50 py-3 px-2 rounded-xl hover:border-copper hover:bg-copper/5 hover:text-copper transition-all duration-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed group">
+                        <svg wire:loading.remove wire:target="regeneratePost('images')" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <svg wire:loading wire:target="regeneratePost('images')" class="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span class="text-[11px] font-medium leading-tight text-center">Images<br>uniquement</span>
+                    </button>
+                    {{-- Tout régénérer --}}
+                    <button wire:click="regeneratePost('both')" wire:loading.attr="disabled"
+                            @if($regenLeft === 0) disabled @endif
+                            class="flex flex-col items-center gap-1.5 border border-gray-200 bg-gray-50 py-3 px-2 rounded-xl hover:border-copper hover:bg-copper/5 hover:text-copper transition-all duration-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed group">
+                        <svg wire:loading.remove wire:target="regeneratePost('both')" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        <svg wire:loading wire:target="regeneratePost('both')" class="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span class="text-[11px] font-medium leading-tight text-center">Tout<br>régénérer</span>
+                    </button>
+                </div>
+                @if($regenLeft === 0)
+                    <p class="text-[10px] text-red-400 text-center mt-2">Limite atteinte — <a href="{{ route('subscription.plans') }}" wire:navigate class="underline">passer à un plan supérieur</a></p>
+                @endif
+            </div>
+
             {{-- Instagram Post Preview --}}
             <div class="flex justify-center">
                 <div class="w-full max-w-[540px] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg">
@@ -1537,15 +1578,15 @@
 
                     {{-- Image / Carousel --}}
                     @php
-                        $totalSlides = count($previewSlides) + 1;
+                        $totalSlides = count($previewSlides);
                     @endphp
                     <div x-data="{ current: 0, total: {{ $totalSlides }} }"
                          class="relative {{ $aspectRatio === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} select-none bg-black">
                         <div class="relative w-full h-full overflow-hidden"
                              x-on:touchstart="$el._tx = $event.changedTouches[0].clientX"
                              x-on:touchend="let dx=$event.changedTouches[0].clientX-$el._tx; if(dx<-40&&current<total-1)current++; if(dx>40&&current>0)current--;">
-                            
-                            {{-- Generated Slides --}}
+
+                            {{-- Generated Slides (includes contact slide already) --}}
                             @foreach($previewSlides as $idx => $slideUrl)
                             <div x-show="current === {{ $idx }}"
                                  x-transition:enter="transition-opacity duration-200"
@@ -1555,24 +1596,6 @@
                                 <img src="{{ $slideUrl }}" alt="Slide {{ $idx + 1 }}" class="w-full h-full object-cover">
                             </div>
                             @endforeach
-
-                            {{-- Final Contact Slide --}}
-                            <div x-show="current === {{ count($previewSlides) }}"
-                                 x-transition:enter="transition-opacity duration-200"
-                                 x-transition:enter-start="opacity-0"
-                                 x-transition:enter-end="opacity-100"
-                                 class="absolute inset-0 bg-white">
-                                <x-post-templates.contact-slide 
-                                    :brand-color="$brandColor" 
-                                    :company-label="$company->name"
-                                    :phone="$company->phone"
-                                    :email="$company->email"
-                                    :website="$company->website"
-                                    :trade="$company->trade"
-                                    :aspect-ratio="$aspectRatio"
-                                    :preview="true"
-                                />
-                            </div>
                         </div>
                         
                         <button x-show="current > 0" @click="current--"
@@ -1656,37 +1679,8 @@
                     @endif
                 </button>
 
-                {{-- Ligne secondaire : Régénérer · Version courte · Copier · Rejeter --}}
+                {{-- Ligne secondaire : Copier · Rejeter --}}
                 <div class="flex flex-wrap justify-center gap-2 w-full max-w-[540px]">
-
-                    {{-- Compteur régénérations --}}
-                    @if($maxRegen < 999)
-                        <div class="w-full text-center mb-1">
-                            <span class="text-[10px] font-medium {{ $regenLeft === 0 ? 'text-red-400' : 'text-gray-400' }}">
-                                {{ $regenLeft }} régénération(s) restante(s) sur {{ $maxRegen }}
-                            </span>
-                        </div>
-                    @endif
-
-                    {{-- Régénérer le texte --}}
-                    <button wire:click="regeneratePost(false)" wire:loading.attr="disabled"
-                            @if($regenLeft === 0) disabled @endif
-                            class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-600 font-medium py-2 px-3.5 rounded-xl hover:border-copper hover:text-copper hover:bg-copper/5 transition-all duration-200 text-xs disabled:opacity-60 disabled:cursor-not-allowed">
-                        <svg wire:loading.remove wire:target="regeneratePost(false)" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        <svg wire:loading wire:target="regeneratePost(false)" class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <span wire:loading.remove wire:target="regeneratePost(false)">Régénérer</span>
-                        <span wire:loading wire:target="regeneratePost(false)">En cours...</span>
-                    </button>
-
-                    {{-- Version courte --}}
-                    <button wire:click="regeneratePost(true)" wire:loading.attr="disabled"
-                            @if($regenLeft === 0) disabled @endif
-                            class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-500 font-medium py-2 px-3.5 rounded-xl hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50/50 transition-all duration-200 text-xs disabled:opacity-60 disabled:cursor-not-allowed">
-                        <svg wire:loading.remove wire:target="regeneratePost(true)" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        <svg wire:loading wire:target="regeneratePost(true)" class="animate-spin w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <span wire:loading.remove wire:target="regeneratePost(true)">Version courte</span>
-                        <span wire:loading wire:target="regeneratePost(true)">En cours...</span>
-                    </button>
 
                     {{-- Copier le texte --}}
                     <button x-data="{ copied: false }"

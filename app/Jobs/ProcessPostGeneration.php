@@ -129,39 +129,7 @@ class ProcessPostGeneration implements ShouldQueue
                 }
             }
 
-            Log::info("ProcessPostGeneration handle completed successfully");
-
-            // 5. Set completed and auto-publish
-            $this->post->update(['status' => Post::STATUS_COMPLETED]);
-            $this->post->refresh();
-
-            $company = $this->post->company;
-            if ($company) {
-                // Determine if we need to delay the publishing jobs
-                $delay = null;
-                if ($this->post->scheduled_at && $this->post->scheduled_at->isFuture()) {
-                    $delay = $this->post->scheduled_at;
-                }
-
-                if (in_array('instagram', $platforms) && $company->instagram_connected) {
-                    $job = PublishToInstagramJob::dispatch($this->post->id);
-                    if ($delay) {
-                        $job->delay($delay);
-                        Log::info("Scheduled to Instagram queue", ['time' => $delay->toDateTimeString()]);
-                    } else {
-                        Log::info("Auto-published to Instagram queue");
-                    }
-                }
-                if (in_array('facebook', $platforms) && $company->facebook_connected) {
-                    $job = PublishToFacebookJob::dispatch($this->post->id);
-                    if ($delay) {
-                        $job->delay($delay);
-                        Log::info("Scheduled to Facebook queue", ['time' => $delay->toDateTimeString()]);
-                    } else {
-                        Log::info("Auto-published to Facebook queue");
-                    }
-                }
-            }
+            Log::info("ProcessPostGeneration handle completed successfully — waiting for user validation");
 
         } catch (\Throwable $e) {
             $errorMsg = "Post Generation Failed: " . $e->getMessage();

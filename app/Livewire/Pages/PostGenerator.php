@@ -7,6 +7,8 @@ use Livewire\WithFileUploads;
 use App\Models\Post;
 use App\Models\CustomTemplate;
 use App\Jobs\ProcessPostGeneration;
+use App\Jobs\PublishToInstagramJob;
+use App\Jobs\PublishToFacebookJob;
 use Illuminate\Support\Facades\Auth;
 
 class PostGenerator extends Component
@@ -476,11 +478,25 @@ class PostGenerator extends Component
 
         if (!$post || $post->user_id !== Auth::id()) return;
 
-        // Mark as completed (publishing is already handled by ProcessPostGeneration)
         $post->update(['status' => Post::STATUS_COMPLETED]);
 
-        $platforms   = $post->platforms ?? ['instagram'];
+        $platforms   = $post->platforms ?? [];
         $scheduledAt = $post->scheduled_at;
+        $company     = $post->company;
+
+        // Dispatch publish jobs now that the user has validated
+        if ($company) {
+            $delay = ($scheduledAt && $scheduledAt->isFuture()) ? $scheduledAt : null;
+
+            if (in_array('instagram', $platforms) && $company->instagram_connected) {
+                $job = PublishToInstagramJob::dispatch($post->id);
+                if ($delay) $job->delay($delay);
+            }
+            if (in_array('facebook', $platforms) && $company->facebook_connected) {
+                $job = PublishToFacebookJob::dispatch($post->id);
+                if ($delay) $job->delay($delay);
+            }
+        }
 
         $platformNames = [];
         if (in_array('instagram', $platforms)) $platformNames[] = 'Instagram';

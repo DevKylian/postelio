@@ -383,6 +383,7 @@ class PostGenerator extends Component
         $user->deductCredits($cost);
 
         $this->generatedPostId = $post->id;
+        $this->status = Post::STATUS_PROCESSING;
 
         try {
             ProcessPostGeneration::dispatch($post);
@@ -395,9 +396,6 @@ class PostGenerator extends Component
             $this->status = Post::STATUS_FAILED;
             return;
         }
-
-        session()->flash('success', "Génération en cours ! La page se mettra à jour automatiquement.");
-        $this->redirect(route('posts.index'), navigate: true);
     }
 
     /**

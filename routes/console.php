@@ -15,7 +15,7 @@ Schedule::call(function () {
     Post::where('status', 'completed')
         ->whereNotNull('scheduled_at')
         ->where('scheduled_at', '<=', now())
-        ->whereHas('company', fn ($q) => $q->where('instagram_connected', true))
+        ->whereHas('company', fn ($q) => $q->whereNotNull('instagram_access_token'))
         ->each(function (Post $post) {
             PublishToInstagramJob::dispatch($post->id);
             // Effacer scheduled_at pour éviter un double-dispatch lors du prochain tick

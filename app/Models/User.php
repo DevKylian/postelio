@@ -179,12 +179,12 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get max regenerations allowed per post for the current plan/role.
+     * Get how many post variants are generated per post for the current plan/role.
      */
-    public function maxRegenerations(): int
+    public function postVariantsCount(): int
     {
-        if ($this->is_admin) return 999;
-        return (int) $this->getPermission('max_regenerations', 1);
+        if ($this->is_admin) return 3;
+        return (int) $this->getPermission('post_variants_count', 1);
     }
 
     /**

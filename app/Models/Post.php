@@ -26,6 +26,7 @@ class Post extends Model
         'platforms',
         'status',
         'regeneration_count',
+        'post_variants',
         'scheduled_at',
         'image_before_path',
         'image_after_path',
@@ -44,6 +45,7 @@ class Post extends Model
         'platforms'          => 'array',
         'scheduled_at'       => 'datetime',
         'regeneration_count' => 'integer',
+        'post_variants'      => 'array',
     ];
 
     public function user()

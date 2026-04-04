@@ -33,28 +33,24 @@ class ProcessPostGeneration implements ShouldQueue
         ImageGeneratorService $generator
     ): void {
         Log::info("ProcessPostGeneration handle started", ['post_id' => $this->post->id]);
-        set_time_limit(300);
+        set_time_limit(600);
         try {
             $this->post->update(['status' => Post::STATUS_PROCESSING]);
 
-            $templateOptions = $this->post->template_options ?? [];
-            // regen_mode: 'both' (default) | 'text' | 'images'
-            $regenMode = $templateOptions['regen_mode'] ?? 'both';
-            $company   = $this->post->company;
+            $templateOptions  = $this->post->template_options ?? [];
+            $variantCount     = max(1, (int) ($templateOptions['variant_count'] ?? 1));
+            $company          = $this->post->company;
+            $platforms        = $this->post->platforms ?? [];
 
-            if ($regenMode !== 'images') {
-                // ── Steps 1 & 2 : Transcription + AI refinement ──────────────────
+            // ── Step 1 : Transcription (shared across all variants) ────────────
+            $textContent = $templateOptions['text_content'] ?? null;
+            $audioPath   = $this->post->audio_path;
+            $transcript  = $this->post->transcription; // reuse if already set
 
-                $textContent = $templateOptions['text_content'] ?? null;
-                $audioPath   = $this->post->audio_path;
-                $transcript  = null;
-
+            if (!$transcript) {
                 if ($textContent) {
                     Log::info("Using provided text content");
                     $transcript = $textContent;
-                } elseif ($this->post->transcription && $regenMode === 'text') {
-                    // Re-use existing transcription for text-only regen
-                    $transcript = $this->post->transcription;
                 } elseif ($audioPath) {
                     Log::info("Starting transcription from audio file", ['path' => $audioPath]);
                     $transcript = $transcriber->transcribe($audioPath);
@@ -66,76 +62,74 @@ class ProcessPostGeneration implements ShouldQueue
                 if ($company) {
                     $transcript = $this->correctKnownTerms($transcript, $company);
                 }
-
                 $this->post->update(['transcription' => $transcript]);
+            }
 
-                // AI refinement
-                Log::info("Starting AI refinement", ['template' => $this->post->template]);
-                $photoCount = count($this->post->extra_images ?? []);
-                if ($company) {
-                    $company->refresh();
-                    $templateOptions['company_city']  = $company->city;
-                    $templateOptions['company_name']  = $company->name;
-                    $templateOptions['company_trade'] = $company->trade;
-                    $templateOptions['company_phone'] = $company->phone;
-                    $templateOptions['company_email'] = $company->email;
-                    if (!empty($company->bio_text)) {
-                        $templateOptions['artisan_bio'] = $company->bio_text;
-                    }
+            // Enrich template options with company data (shared)
+            $photoCount = count($this->post->extra_images ?? []);
+            if ($company) {
+                $company->refresh();
+                $templateOptions['company_city']  = $company->city;
+                $templateOptions['company_name']  = $company->name;
+                $templateOptions['company_trade'] = $company->trade;
+                $templateOptions['company_phone'] = $company->phone;
+                $templateOptions['company_email'] = $company->email;
+                if (!empty($company->bio_text)) {
+                    $templateOptions['artisan_bio'] = $company->bio_text;
                 }
-                $refined = $refiner->refine($transcript, $this->post->template, $photoCount, $templateOptions);
-                Log::info("AI refinement finished");
+            }
 
+            // ── Steps 2–4 : Generate each variant ─────────────────────────────
+            $variants = [];
+            for ($i = 0; $i < $variantCount; $i++) {
+                Log::info("Generating variant " . ($i + 1) . "/$variantCount");
+
+                // 2. AI text refinement
+                $refined = $refiner->refine($transcript, $this->post->template, $photoCount, $templateOptions);
                 if ($company) {
                     $refined = $this->correctKnownTermsInJson($refined, $company);
                 }
-
                 $refined = $fitter->fit($refined, $this->post->template, $templateOptions);
-                Log::info("Text fitting applied");
 
+                // Temporarily set refined_content so ImageGenerator can read it
                 $this->post->update(['refined_content' => $refined]);
-            } else {
-                Log::info("Skipping text generation (images-only regen)");
-            }
-
-            if ($regenMode !== 'text') {
-                // ── Steps 3 & 4 : Image generation ──────────────────────────────
-
-                Log::info("Starting image generation");
                 $this->post->refresh();
+
+                // 3. Image generation
                 $result = $generator->generate($this->post);
-                Log::info("Image generation finished");
+                $slides    = is_array($result) ? $result : [$result];
+                $imagePath = $slides[0];
 
-                $updateData = ['status' => Post::STATUS_REVIEW_PENDING];
-                if (is_array($result)) {
-                    $updateData['image_path'] = $result[0];
-                    $updateData['slides']     = $result;
-                } else {
-                    $updateData['image_path'] = $result;
-                    $updateData['slides']     = [$result];
-                }
-                $this->post->update($updateData);
+                $variant = [
+                    'slides'       => $slides,
+                    'image_path'   => $imagePath,
+                    'refined_content' => $refined,
+                ];
 
-                $platforms = $this->post->platforms ?? [];
+                // 4. Facebook dimensions
                 if (in_array('facebook', $platforms)) {
-                    Log::info("Starting Facebook image generation");
-                    $this->post->refresh();
                     $fbResult = $generator->generateForFacebook($this->post);
-                    Log::info("Facebook image generation finished");
-
-                    if (is_array($fbResult)) {
-                        $this->post->update(['facebook_image_path' => $fbResult[0], 'facebook_slides' => $fbResult]);
-                    } else {
-                        $this->post->update(['facebook_image_path' => $fbResult, 'facebook_slides' => [$fbResult]]);
-                    }
+                    $variant['facebook_slides']     = is_array($fbResult) ? $fbResult : [$fbResult];
+                    $variant['facebook_image_path'] = is_array($fbResult) ? $fbResult[0] : $fbResult;
                 }
-            } else {
-                // Text-only regen: keep existing images, go straight to review
-                $this->post->update(['status' => Post::STATUS_REVIEW_PENDING]);
-                Log::info("Skipping image generation (text-only regen)");
+
+                $variants[] = $variant;
+                Log::info("Variant " . ($i + 1) . " done");
             }
 
-            Log::info("ProcessPostGeneration completed — waiting for user validation");
+            // ── Set first variant as main post data, store all variants ────────
+            $first = $variants[0];
+            $this->post->update([
+                'status'          => Post::STATUS_REVIEW_PENDING,
+                'refined_content' => $first['refined_content'],
+                'image_path'      => $first['image_path'],
+                'slides'          => $first['slides'],
+                'facebook_image_path' => $first['facebook_image_path'] ?? null,
+                'facebook_slides'     => $first['facebook_slides'] ?? null,
+                'post_variants'   => $variants,
+            ]);
+
+            Log::info("ProcessPostGeneration completed — $variantCount variant(s) ready for review");
 
         } catch (\Throwable $e) {
             $errorMsg = "Post Generation Failed: " . $e->getMessage();

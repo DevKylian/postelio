@@ -28,7 +28,9 @@ class PostGenerator extends Component
     public $generatedPostId;
     public $previewImageUrl;
     public $previewContent;
-    public $previewSlides = [];      // array of URLs for carousel preview
+    public $previewSlides = [];       // slides of the currently selected variant
+    public $previewVariants = [];     // all generated variants [{slides, content, imageUrl}]
+    public int $selectedVariantIndex = 0;
 
     // ── Template customization options ──
     public $tone          = 'professionnel'; // professionnel | chaleureux | expert | dynamique
@@ -349,6 +351,7 @@ class PostGenerator extends Component
             'company_city'           => Auth::user()->company?->city,
             'company_trade'          => Auth::user()->company?->trade,
             'aspect_ratio'           => $this->aspectRatio,
+            'variant_count'          => $user->postVariantsCount(),
         ];
 
         // Sanitize platforms array (livewire might cast to string or bool if only one checkbox exists)
@@ -414,21 +417,45 @@ class PostGenerator extends Component
 
         if ($post->status === Post::STATUS_REVIEW_PENDING) {
             $this->status = Post::STATUS_REVIEW_PENDING;
-            $this->previewImageUrl = $post->image_path ? asset(\Illuminate\Support\Facades\Storage::url($post->image_path)) : null;
-            $this->previewSlides   = $post->slides ? array_map(fn($s) => asset(\Illuminate\Support\Facades\Storage::url($s)), $post->slides) : [];
-            $this->previewContent  = $post->refined_caption ?: $post->transcription; // Fallback to transcription if caption not yet ready
-            
-            // If it's a JSON refined content, extract the caption
-            $contentData = json_decode($post->refined_content, true);
-            if (is_array($contentData)) {
-                $this->previewContent = $contentData['caption'] ?? $this->previewContent;
+
+            // Build variants array for the UI
+            $rawVariants = $post->post_variants ?? [];
+            if (empty($rawVariants)) {
+                // Fallback: single variant from main post fields
+                $rawVariants = [[
+                    'slides'          => $post->slides ?? [],
+                    'image_path'      => $post->image_path,
+                    'refined_content' => $post->refined_content,
+                ]];
             }
+
+            $this->previewVariants = array_map(function ($v) {
+                $slides  = $v['slides'] ?? [];
+                $content = $v['refined_content'] ?? '';
+                $decoded = json_decode($content, true);
+                return [
+                    'slides'  => array_map(fn($s) => asset(\Illuminate\Support\Facades\Storage::url($s)), $slides),
+                    'content' => is_array($decoded) ? ($decoded['caption'] ?? $content) : $content,
+                ];
+            }, $rawVariants);
+
+            $this->selectedVariantIndex = 0;
+            $this->previewSlides  = $this->previewVariants[0]['slides'] ?? [];
+            $this->previewContent = $this->previewVariants[0]['content'] ?? '';
         } elseif ($post->status === Post::STATUS_COMPLETED) {
             $this->status = Post::STATUS_COMPLETED;
         } elseif ($post->status === Post::STATUS_FAILED) {
             $this->status = Post::STATUS_FAILED;
             $this->errorMessage = "La génération a échoué. Veuillez réessayer.";
         }
+    }
+
+    public function selectVariant(int $index): void
+    {
+        if (!isset($this->previewVariants[$index])) return;
+        $this->selectedVariantIndex = $index;
+        $this->previewSlides  = $this->previewVariants[$index]['slides'];
+        $this->previewContent = $this->previewVariants[$index]['content'];
     }
 
     /**
@@ -478,6 +505,19 @@ class PostGenerator extends Component
         $post = Post::find($this->generatedPostId);
 
         if (!$post || $post->user_id !== Auth::id()) return;
+
+        // Copy selected variant data to the main post fields
+        $variants = $post->post_variants ?? [];
+        if (!empty($variants[$this->selectedVariantIndex])) {
+            $v = $variants[$this->selectedVariantIndex];
+            $post->update([
+                'refined_content'     => $v['refined_content'],
+                'image_path'          => $v['image_path'],
+                'slides'              => $v['slides'],
+                'facebook_image_path' => $v['facebook_image_path'] ?? null,
+                'facebook_slides'     => $v['facebook_slides'] ?? null,
+            ]);
+        }
 
         $post->update(['status' => Post::STATUS_COMPLETED]);
 
@@ -534,12 +574,14 @@ class PostGenerator extends Component
             $post->delete();
         }
 
-        $this->status            = 'idle';
-        $this->errorMessage      = null;
-        $this->generatedPostId   = null;
-        $this->previewImageUrl   = null;
-        $this->previewContent    = null;
-        $this->previewSlides     = [];
+        $this->status                = 'idle';
+        $this->errorMessage          = null;
+        $this->generatedPostId       = null;
+        $this->previewImageUrl       = null;
+        $this->previewContent        = null;
+        $this->previewSlides         = [];
+        $this->previewVariants       = [];
+        $this->selectedVariantIndex  = 0;
     }
 
     public function render()
@@ -584,17 +626,14 @@ class PostGenerator extends Component
             }
         }
 
-        $user       = Auth::user();
-        $regenPost  = $this->generatedPostId ? Post::find($this->generatedPostId) : null;
-        $regenCount = $regenPost?->regeneration_count ?? 0;
-        $maxRegen   = $user->maxRegenerations();
-        $regenLeft  = max(0, $maxRegen - $regenCount);
+        $user         = Auth::user();
+        $variantCount = $user->postVariantsCount();
 
         return view('livewire.pages.post-generator', compact(
             'customTemplates', 'customPhotoMode',
             'company', 'brandColor', 'igUsername', 'igCity', 'hasLogo', 'igProfilePicture',
             'igConnected', 'fbConnected',
-            'regenCount', 'maxRegen', 'regenLeft'
+            'variantCount'
         ));
     }
 

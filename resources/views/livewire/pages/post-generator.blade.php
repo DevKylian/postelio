@@ -1479,10 +1479,28 @@
                 </div>
             </div>
             <div>
-                <h3 class="text-xl font-bold text-midnight">Création de votre post...</h3>
-                <p class="text-gray-400 mt-1.5 text-sm">Postelio prépare votre visuel et votre légende sur-mesure.</p>
+                <h3 class="text-xl font-bold text-midnight">
+                    @if($variantCount > 1)
+                        Génération de {{ $variantCount }} versions...
+                    @else
+                        Création de votre post...
+                    @endif
+                </h3>
+                <p class="text-gray-400 mt-1.5 text-sm">
+                    @if($variantCount > 1)
+                        Postelio génère {{ $variantCount }} versions différentes pour vous laisser le choix.
+                    @else
+                        Postelio prépare votre visuel et votre légende sur-mesure.
+                    @endif
+                </p>
             </div>
-            <p class="text-xs text-gray-300">Cela prend généralement moins d'une minute.</p>
+            <p class="text-xs text-gray-300">
+                @if($variantCount > 1)
+                    Cela peut prendre {{ $variantCount > 1 ? 'quelques minutes' : 'moins d\'une minute' }}.
+                @else
+                    Cela prend généralement moins d'une minute.
+                @endif
+            </p>
         </div>
 
     {{-- ── REVIEW PENDING ── --}}
@@ -1503,46 +1521,38 @@
                 </div>
             </div>
 
-            {{-- Régénération --}}
+            {{-- Sélecteur de variante (masqué si 1 seule variante) --}}
+            @if(count($previewVariants) > 1)
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-4">
-                <div class="flex items-center justify-between mb-3">
-                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Régénérer</p>
-                    @if($maxRegen < 999)
-                        <span class="text-[10px] font-medium px-2 py-0.5 rounded-full {{ $regenLeft === 0 ? 'bg-red-50 text-red-400 border border-red-100' : 'bg-gray-50 text-gray-400 border border-gray-100' }}">
-                            {{ $regenLeft }}/{{ $maxRegen }} restante(s)
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                    Choisissez une version
+                    <span class="ml-1 text-[10px] font-normal text-gray-400 normal-case">({{ count($previewVariants) }} générées)</span>
+                </p>
+                <div class="grid gap-2 {{ count($previewVariants) === 2 ? 'grid-cols-2' : 'grid-cols-3' }}">
+                    @foreach($previewVariants as $vIdx => $variant)
+                    <button wire:click="selectVariant({{ $vIdx }})"
+                            class="relative flex flex-col items-center gap-2 border-2 rounded-xl p-2 transition-all duration-200 overflow-hidden
+                                   {{ $selectedVariantIndex === $vIdx
+                                        ? 'border-copper bg-copper/5 shadow-sm'
+                                        : 'border-gray-200 bg-gray-50 hover:border-copper/40' }}">
+                        {{-- Thumbnail de la première slide --}}
+                        @if(!empty($variant['slides'][0]))
+                            <img src="{{ $variant['slides'][0] }}" alt="Version {{ $vIdx + 1 }}"
+                                 class="w-full aspect-square object-cover rounded-lg">
+                        @endif
+                        <span class="text-[11px] font-semibold {{ $selectedVariantIndex === $vIdx ? 'text-copper' : 'text-gray-500' }}">
+                            Version {{ $vIdx + 1 }}
                         </span>
-                    @endif
+                        @if($selectedVariantIndex === $vIdx)
+                        <div class="absolute top-1.5 right-1.5 w-5 h-5 bg-copper rounded-full flex items-center justify-center shadow">
+                            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        @endif
+                    </button>
+                    @endforeach
                 </div>
-                <div class="grid grid-cols-3 gap-2">
-                    {{-- Texte uniquement --}}
-                    <button wire:click="regeneratePost('text')" wire:loading.attr="disabled"
-                            @if($regenLeft === 0) disabled @endif
-                            class="flex flex-col items-center gap-1.5 border border-gray-200 bg-gray-50 py-3 px-2 rounded-xl hover:border-copper hover:bg-copper/5 hover:text-copper transition-all duration-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed group">
-                        <svg wire:loading.remove wire:target="regeneratePost('text')" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        <svg wire:loading wire:target="regeneratePost('text')" class="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <span class="text-[11px] font-medium leading-tight text-center">Texte<br>uniquement</span>
-                    </button>
-                    {{-- Images uniquement --}}
-                    <button wire:click="regeneratePost('images')" wire:loading.attr="disabled"
-                            @if($regenLeft === 0) disabled @endif
-                            class="flex flex-col items-center gap-1.5 border border-gray-200 bg-gray-50 py-3 px-2 rounded-xl hover:border-copper hover:bg-copper/5 hover:text-copper transition-all duration-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed group">
-                        <svg wire:loading.remove wire:target="regeneratePost('images')" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <svg wire:loading wire:target="regeneratePost('images')" class="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <span class="text-[11px] font-medium leading-tight text-center">Images<br>uniquement</span>
-                    </button>
-                    {{-- Tout régénérer --}}
-                    <button wire:click="regeneratePost('both')" wire:loading.attr="disabled"
-                            @if($regenLeft === 0) disabled @endif
-                            class="flex flex-col items-center gap-1.5 border border-gray-200 bg-gray-50 py-3 px-2 rounded-xl hover:border-copper hover:bg-copper/5 hover:text-copper transition-all duration-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed group">
-                        <svg wire:loading.remove wire:target="regeneratePost('both')" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        <svg wire:loading wire:target="regeneratePost('both')" class="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <span class="text-[11px] font-medium leading-tight text-center">Tout<br>régénérer</span>
-                    </button>
-                </div>
-                @if($regenLeft === 0)
-                    <p class="text-[10px] text-red-400 text-center mt-2">Limite atteinte — <a href="{{ route('subscription.plans') }}" wire:navigate class="underline">passer à un plan supérieur</a></p>
-                @endif
             </div>
+            @endif
 
             {{-- Instagram Post Preview --}}
             <div class="flex justify-center">

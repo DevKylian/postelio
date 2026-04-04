@@ -1654,10 +1654,15 @@
                                 <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                             </div>
                             <p class="text-[11px] font-semibold text-black">247 J'aime</p>
-                            <div x-data="{ exp: false }" class="text-[11px] text-black leading-relaxed">
-                                <span class="font-semibold">{{ $igUsername }}</span>
-                                <span x-show="!exp" class="whitespace-pre-line"> {{ Str::limit($vContent, 120) }}@if(strlen($vContent) > 120)<button @click="exp = true" class="text-gray-400 font-medium">... plus</button>@endif</span>
-                                <span x-show="exp" x-cloak class="whitespace-pre-line"> {{ $vContent }}</span>
+                            {{-- Texte éditable --}}
+                            <div class="text-[11px] text-black">
+                                <span class="font-semibold">{{ $igUsername }} </span>
+                                <textarea
+                                    wire:model="editableContents.{{ $vIdx }}"
+                                    rows="5"
+                                    placeholder="Texte du post..."
+                                    class="w-full mt-1 text-[11px] text-black leading-relaxed bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-2 resize-none focus:outline-none focus:border-copper focus:ring-1 focus:ring-copper/30 transition-colors placeholder-gray-300"
+                                ></textarea>
                             </div>
                             <p class="text-[10px] text-gray-400 uppercase tracking-wide pb-1">Il y a 2 jours</p>
                         </div>

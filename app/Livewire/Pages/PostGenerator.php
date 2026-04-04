@@ -32,6 +32,7 @@ class PostGenerator extends Component
     public $previewVariants = [];     // all generated variants [{slides, content, imageUrl}]
     public int $selectedVariantIndex = 0;
     public int $variantsGenerated = 0; // live counter during processing
+    public array $editableContents = []; // user-edited captions indexed by variant index
 
     // ── Template customization options ──
     public $tone          = 'professionnel'; // professionnel | chaleureux | expert | dynamique
@@ -443,6 +444,11 @@ class PostGenerator extends Component
                 ];
             }, $rawVariants);
 
+            // Initialize editable contents only on first load (don't overwrite user edits)
+            if (empty($this->editableContents)) {
+                $this->editableContents = array_column($this->previewVariants, 'content');
+            }
+
             $this->selectedVariantIndex = 0;
             $this->previewSlides  = $this->previewVariants[0]['slides'] ?? [];
             $this->previewContent = $this->previewVariants[0]['content'] ?? '';
@@ -519,8 +525,22 @@ class PostGenerator extends Component
         $variants = $post->post_variants ?? [];
         if (!empty($variants[$this->selectedVariantIndex])) {
             $v = $variants[$this->selectedVariantIndex];
+
+            // Apply user-edited caption if present
+            $refinedContent = $v['refined_content'];
+            $editedCaption  = trim($this->editableContents[$this->selectedVariantIndex] ?? '');
+            if ($editedCaption !== '') {
+                $decoded = json_decode($refinedContent, true);
+                if (is_array($decoded)) {
+                    $decoded['caption'] = $editedCaption;
+                    $refinedContent = json_encode($decoded, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                } else {
+                    $refinedContent = $editedCaption;
+                }
+            }
+
             $post->update([
-                'refined_content'     => $v['refined_content'],
+                'refined_content'     => $refinedContent,
                 'image_path'          => $v['image_path'],
                 'slides'              => $v['slides'],
                 'facebook_image_path' => $v['facebook_image_path'] ?? null,
@@ -592,6 +612,7 @@ class PostGenerator extends Component
         $this->previewVariants       = [];
         $this->selectedVariantIndex  = 0;
         $this->variantsGenerated     = 0;
+        $this->editableContents      = [];
     }
 
     public function render()

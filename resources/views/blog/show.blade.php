@@ -301,6 +301,7 @@
             "@@id": "{{ route('blog.show', $post->slug) }}"
         }
     }
+    </script>
     <!-- Umami Event Tracking (Blog Views) -->
     @if(config('services.umami.id'))
     <script>

@@ -132,6 +132,14 @@ Route::view('profile', 'profile')
 
 Route::get('/render/post/{post}', [\App\Http\Controllers\RenderPostController::class, 'show'])->name('render.post');
 
+// Dynamic Sitemap
+Route::get('/sitemap.xml', function () {
+    $posts = \App\Models\BlogPost::where('is_published', true)->latest()->get();
+    return response()->view('sitemap', [
+        'posts' => $posts
+    ])->header('Content-Type', 'text/xml');
+})->name('sitemap');
+
 // Social Auth
 Route::get('/auth/google', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');

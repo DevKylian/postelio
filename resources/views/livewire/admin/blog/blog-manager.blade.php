@@ -507,9 +507,9 @@
                 $watch('$wire.json_pasted', value => syncTitleFromPastedJson(value));
                 $watch('bannerTitle', value => fitTitle());
                 window.addEventListener('resize', () => fitTitle());
-                $wire.on('banner-saved', () => { bannerSaved = true; setTimeout(() => bannerSaved = false, 3000); });
              "
-             x-on:json-imported.window="syncTitleFromPastedJson($wire.json_pasted); fitTitle();">
+             x-on:json-imported.window="syncTitleFromPastedJson($wire.json_pasted); fitTitle();"
+             x-on:banner-saved.window="bannerSaved = true; setTimeout(() => bannerSaved = false, 3000)">
             <div class="fixed inset-0 bg-slate-900/45 backdrop-blur-md" wire:click="closeAIModal"></div>
             
             <div class="relative w-full max-w-5xl mx-4 sm:mx-6 bg-white/95 backdrop-blur-md border border-white/40 shadow-2xl rounded-[2.5rem] overflow-hidden flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh] animate-in zoom-in-95 duration-300">

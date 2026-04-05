@@ -390,23 +390,23 @@
                             return Math.round(el.scrollHeight / lh);
                         };
 
-                        el.style.maxWidth = '780px';
-                        
+                        el.style.maxWidth = '950px';
+
                         let lineCount = getLineCount();
-                        
+
                         while (getLineCount() > 2 && fontSize > minSize) {
                             fontSize -= 1;
                             el.style.fontSize = fontSize + 'px';
                         }
-                        
+
                         while (getLineCount() < 2 && fontSize < maxSize) {
                             fontSize += 1;
                             el.style.fontSize = fontSize + 'px';
                             if (getLineCount() === 2) break;
                         }
-                        
-                        let currentMaxWidth = 780;
-                        while (getLineCount() < 2 && currentMaxWidth > 400) {
+
+                        let currentMaxWidth = 950;
+                        while (getLineCount() < 2 && currentMaxWidth > 500) {
                             currentMaxWidth -= 10;
                             el.style.maxWidth = currentMaxWidth + 'px';
                         }
@@ -627,16 +627,19 @@ Réponds UNIQUEMENT en JSON valide :
                                     <div class="banner-canvas-wrapper" x-ref="bannerCanvas">
                                         <div class="banner-glow banner-glow-1"></div>
                                         <div class="banner-glow banner-glow-2"></div>
-                                        
+                                        <div class="banner-accent-line"></div>
+
                                         <div class="banner-content-inner">
-                                            <div class="banner-badge">
-                                                Article de blog
+                                            <div class="banner-top-row">
+                                                <div class="banner-badge">Article de blog</div>
+                                                <div class="banner-domain">postelio.fr</div>
                                             </div>
-                                            
+
                                             <div class="banner-title-text-wrap">
                                                 <h1 class="banner-title-text" x-ref="bannerTitle" x-html="formatBannerTitle(bannerTitle)"></h1>
                                             </div>
-                                            
+
+                                            <div class="banner-bottom-bar"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -673,34 +676,54 @@ Réponds UNIQUEMENT en JSON valide :
             .banner-canvas-wrapper {
                 width: 1200px;
                 height: 630px;
-                background-color: #fcfcfc;
+                background: linear-gradient(140deg, #070C18 0%, #0C1422 55%, #080C19 100%);
                 position: relative;
                 overflow: hidden;
-                box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
                 border-radius: 12px;
                 transform-origin: top left;
+                font-family: 'Outfit', sans-serif;
+            }
+
+            .banner-canvas-wrapper::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background-image: radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
+                background-size: 38px 38px;
+                z-index: 1;
             }
 
             .banner-glow {
                 position: absolute;
                 border-radius: 50%;
-                z-index: 1;
+                z-index: 2;
+                pointer-events: none;
             }
 
             .banner-glow-1 {
-                width: 1200px;
-                height: 1200px;
-                top: -50%;
-                left: -30%;
-                background: radial-gradient(circle, rgba(253, 230, 138, 0.15) 0%, rgba(253, 230, 138, 0) 70%);
+                width: 950px;
+                height: 950px;
+                top: -35%;
+                right: -15%;
+                background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, transparent 65%);
             }
 
             .banner-glow-2 {
-                width: 1000px;
-                height: 1000px;
-                top: 20%;
-                right: -40%;
-                background: radial-gradient(circle, rgba(254, 215, 170, 0.08) 0%, rgba(254, 215, 170, 0) 70%);
+                width: 550px;
+                height: 550px;
+                bottom: -15%;
+                left: 0%;
+                background: radial-gradient(circle, rgba(249, 115, 22, 0.07) 0%, transparent 65%);
+            }
+
+            .banner-accent-line {
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 5px;
+                background: linear-gradient(180deg, transparent 0%, #F59E0B 25%, #FB923C 75%, transparent 100%);
+                z-index: 5;
             }
 
             .banner-content-inner {
@@ -709,87 +732,92 @@ Réponds UNIQUEMENT en JSON valide :
                 z-index: 10;
                 display: flex;
                 flex-direction: column;
-                align-items: center;
-                justify-content: space-between; 
-                padding: 100px 80px 90px 80px; /* Increased top/bottom padding for branding */
+                justify-content: space-between;
+                padding: 65px 90px 60px 100px;
                 box-sizing: border-box;
             }
 
-            .banner-badge {
-                position: absolute;
-                top: 110px;
-                left: 50%;
-                transform: translateX(-50%);
-                display: inline-flex;
+            .banner-top-row {
+                display: flex;
                 align-items: center;
-                background: rgba(245, 158, 11, 0.04); 
-                color: #d97706; 
-                border: 1px solid rgba(245, 158, 11, 0.18); 
-                padding: 10px 28px;
-                border-radius: 9999px;
-                font-weight: 700;
-                font-size: 16px; /* Smaller badge */
-                white-space: nowrap;
-                letter-spacing: 0.06em;
-                text-transform: uppercase;
-                z-index: 20;
+                justify-content: space-between;
+                width: 100%;
             }
 
-             .banner-title-text {
-                color: var(--midnight);
-                font-family: 'Outfit', sans-serif !important;
-                font-size: 90px; 
+            .banner-badge {
+                display: inline-flex;
+                align-items: center;
+                background: rgba(245, 158, 11, 0.08);
+                color: #F59E0B;
+                border: 1px solid rgba(245, 158, 11, 0.28);
+                padding: 9px 22px;
+                border-radius: 6px;
+                font-weight: 700;
+                font-size: 14px;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                font-family: 'Outfit', sans-serif;
+            }
+
+            .banner-domain {
+                color: rgba(255, 255, 255, 0.22);
+                font-size: 15px;
                 font-weight: 600;
-                text-align: center;
+                letter-spacing: 0.1em;
+                font-family: 'Outfit', sans-serif;
+                text-transform: uppercase;
+            }
+
+            .banner-title-text {
+                color: #FFFFFF;
+                font-family: 'Outfit', sans-serif !important;
+                font-size: 90px;
+                font-weight: 700;
+                text-align: left;
                 line-height: 1.05;
-                letter-spacing: -0.05em;
-                max-width: 780px; 
+                letter-spacing: -0.045em;
+                max-width: 950px;
                 margin: 0;
                 white-space: pre-wrap;
                 word-break: keep-all;
                 box-sizing: border-box;
-                display: block; /* Reliable scrollHeight for line counting */
+                display: block;
                 width: 100%;
                 overflow: visible !important;
-            }
-
-            .banner-content-inner {
-                position: absolute;
-                inset: 0;
-                z-index: 10;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center; /* Center main content */
-                padding: 60px; 
-                box-sizing: border-box;
             }
 
             .banner-title-text-wrap {
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                align-items: center;
+                align-items: flex-start;
                 width: 100%;
                 overflow: visible;
-                padding: 40px;
                 flex: 1;
+                padding: 20px 0;
             }
-            
+
             .banner-title-text span {
-                background: linear-gradient(to right, #f59e0b, #fb923c, #d97706);
+                background: linear-gradient(to right, #f59e0b, #fb923c, #f97316);
                 -webkit-background-clip: text;
                 background-clip: text;
                 -webkit-text-fill-color: transparent;
-                color: transparent; 
+                color: transparent;
                 font-style: italic;
-                font-weight: 700;
+                font-weight: 800;
                 display: inline-block;
-                padding-right: 0.8em; /* Massive defensive buffer for italics */
-                padding-bottom: 0.1em; 
-                margin-right: -0.75em; /* Balanced to maintain spacing while providing buffer */
+                padding-right: 0.8em;
+                padding-bottom: 0.1em;
+                margin-right: -0.75em;
                 letter-spacing: 0;
                 overflow: visible !important;
+            }
+
+            .banner-bottom-bar {
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(to right, #F59E0B, #FB923C 40%, transparent);
+                border-radius: 2px;
             }
 
 

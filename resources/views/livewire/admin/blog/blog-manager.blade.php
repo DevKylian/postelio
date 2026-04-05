@@ -642,7 +642,10 @@ Réponds UNIQUEMENT en JSON valide :
 
                                         <div class="banner-content-inner">
                                             <div class="banner-top-row">
-                                                <div class="banner-badge">Article de blog</div>
+                                                <div class="banner-badge">
+                                                    <span class="banner-badge-dot"></span>
+                                                    Article de blog
+                                                </div>
                                                 <div class="banner-domain">postelio.fr</div>
                                             </div>
 
@@ -651,6 +654,7 @@ Réponds UNIQUEMENT en JSON valide :
                                             </div>
 
                                             <div class="banner-bottom-bar">
+                                                <span class="banner-bottom-line"></span>
                                                 <span class="banner-bottom-label">Blog</span>
                                             </div>
                                         </div>
@@ -714,14 +718,14 @@ Réponds UNIQUEMENT en JSON valide :
                 background: radial-gradient(circle, rgba(251, 146, 60, 0.07) 0%, transparent 70%);
             }
 
-            /* Thin copper top border */
+            /* Ligne copper pleine largeur en haut */
             .banner-accent-line {
                 position: absolute;
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 3px;
-                background: linear-gradient(to right, #F59E0B, #FB923C 50%, transparent);
+                height: 4px;
+                background: linear-gradient(to right, #F59E0B, #FB923C);
             }
 
             .banner-content-inner {
@@ -730,7 +734,7 @@ Réponds UNIQUEMENT en JSON valide :
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
-                padding: 64px 80px 56px 80px;
+                padding: 72px 88px 68px 88px;
                 box-sizing: border-box;
             }
 
@@ -742,34 +746,35 @@ Réponds UNIQUEMENT en JSON valide :
             }
 
             .banner-badge {
-                display: inline-flex;
+                display: flex;
                 align-items: center;
-                gap: 8px;
+                gap: 10px;
                 color: #F59E0B;
-                font-size: 13px;
+                font-size: 16px;
                 font-weight: 700;
                 letter-spacing: 0.14em;
                 text-transform: uppercase;
                 font-family: 'Outfit', sans-serif;
+                line-height: 1;
             }
 
-            .banner-badge::before {
-                content: '';
-                display: inline-block;
-                width: 6px;
-                height: 6px;
+            .banner-badge-dot {
+                width: 8px;
+                height: 8px;
                 border-radius: 50%;
                 background: #F59E0B;
                 flex-shrink: 0;
+                display: block;
             }
 
             .banner-domain {
-                color: rgba(255, 255, 255, 0.2);
-                font-size: 13px;
+                color: rgba(255, 255, 255, 0.22);
+                font-size: 16px;
                 font-weight: 600;
                 letter-spacing: 0.12em;
                 font-family: 'Outfit', sans-serif;
                 text-transform: uppercase;
+                line-height: 1;
             }
 
             .banner-title-text-wrap {
@@ -802,7 +807,6 @@ Réponds UNIQUEMENT en JSON valide :
                 color: transparent;
                 font-style: italic;
                 font-weight: 800;
-                /* inline-block + padding-right évite le clip des lettres italiques */
                 display: inline-block;
                 padding-right: 0.12em;
                 vertical-align: baseline;
@@ -811,25 +815,26 @@ Réponds UNIQUEMENT en JSON valide :
             .banner-bottom-bar {
                 display: flex;
                 align-items: center;
-                gap: 16px;
+                gap: 18px;
+                line-height: 1;
             }
 
-            .banner-bottom-bar::before {
-                content: '';
+            .banner-bottom-line {
                 display: block;
-                height: 1px;
-                width: 48px;
-                background: rgba(245, 158, 11, 0.5);
+                height: 2px;
+                width: 64px;
+                background: rgba(245, 158, 11, 0.55);
                 flex-shrink: 0;
             }
 
             .banner-bottom-label {
                 color: rgba(255, 255, 255, 0.3);
-                font-size: 12px;
+                font-size: 15px;
                 font-weight: 600;
                 letter-spacing: 0.12em;
                 text-transform: uppercase;
                 font-family: 'Outfit', sans-serif;
+                line-height: 1;
             }
 
 

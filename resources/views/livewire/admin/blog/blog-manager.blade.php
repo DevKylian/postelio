@@ -849,9 +849,13 @@ Réponds UNIQUEMENT en JSON valide :
                                 if (!blob) { reject(new Error('toBlob a échoué')); return; }
                                 const fd = new FormData();
                                 fd.append('banner', blob, 'banner.png');
-                                fd.append('_token', csrfToken);
-                                fetch('/admin/blog/banner-upload', { method: 'POST', body: fd })
-                                    .then(r => r.ok ? r.json() : r.text().then(t => Promise.reject(t)))
+                                fetch('/admin/blog/banner-upload', {
+                                    method: 'POST',
+                                    credentials: 'same-origin',
+                                    headers: { 'X-CSRF-TOKEN': csrfToken },
+                                    body: fd
+                                })
+                                    .then(r => r.ok ? r.json() : Promise.reject('HTTP ' + r.status + ' — ' + r.statusText))
                                     .then(data => { resolve(data.path); })
                                     .catch(reject);
                             }, 'image/png');

@@ -360,7 +360,7 @@
         <div class="fixed inset-0 z-[9999] flex items-center justify-center"
              x-data="blogModal"
              x-init="initModal($wire)"
-             x-on:banner-saved.window="bannerSaved = true; setTimeout(() => bannerSaved = false, 3000)">
+">
             <div class="fixed inset-0 bg-slate-900/45 backdrop-blur-md" wire:click="closeAIModal"></div>
             
             <div class="relative w-full max-w-5xl mx-4 sm:mx-6 bg-white/95 backdrop-blur-md border border-white/40 shadow-2xl rounded-[2.5rem] overflow-hidden flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh] animate-in zoom-in-95 duration-300">
@@ -497,17 +497,11 @@ Réponds UNIQUEMENT en JSON valide :
                                     Générer la bannière
                                 </h4>
                                 <div class="flex items-center gap-2">
-                                    <button @click="applyBanner()"
-                                            :disabled="isExporting || !bannerTitle"
-                                            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-xs font-black uppercase tracking-widest transition-all shadow-lg disabled:opacity-50"
-                                            :class="bannerSaved ? 'bg-green-500 shadow-green-500/20' : 'bg-copper hover:bg-amber-600 shadow-copper/20'">
-                                        <svg x-show="!isExporting && !bannerSaved" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                    <button @click="exportBanner()" :disabled="isExporting || !bannerTitle"
+                                            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-xs font-black uppercase tracking-widest transition-all shadow-lg bg-copper hover:bg-amber-600 shadow-copper/20 disabled:opacity-50">
+                                        <svg x-show="!isExporting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                         <svg x-show="isExporting" class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                                        <span x-text="isExporting ? 'Génération...' : (bannerSaved ? 'Appliquée !' : 'Appliquer à l\'article')"></span>
-                                    </button>
-                                    <button @click="exportBanner()" :disabled="isExporting" title="Télécharger en PNG"
-                                            class="p-2.5 rounded-xl border border-slate-200 text-slate-400 hover:text-copper hover:border-copper/30 transition-all disabled:opacity-40">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                        <span x-text="isExporting ? 'Génération...' : 'Télécharger PNG'"></span>
                                     </button>
                                 </div>
                             </div>
@@ -766,7 +760,6 @@ Réponds UNIQUEMENT en JSON valide :
                 bannerTitle: '',
                 isExporting: false,
                 isSimplifying: false,
-                bannerSaved: false,
 
                 initModal(wire) {
                     // Watch the Livewire property — fires reliably after every server response
@@ -800,78 +793,29 @@ Réponds UNIQUEMENT en JSON valide :
                     }
                 },
 
-                captureCanvas() {
-                    return new Promise((resolve, reject) => {
-                        const source = this.$refs.bannerCanvas;
-                        if (!source) { reject(new Error('bannerCanvas ref not found')); return; }
-                        const clone = source.cloneNode(true);
-                        const wrap = document.createElement('div');
-                        wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;pointer-events:none;';
-                        wrap.appendChild(clone);
-                        document.body.appendChild(wrap);
-                        // Replace gradient text with solid colour for html2canvas
-                        clone.querySelectorAll('.banner-title-text span').forEach(span => {
-                            span.style.cssText = 'background:none;-webkit-text-fill-color:#F59E0B;color:#F59E0B;font-style:italic;font-weight:800;padding-right:0;display:inline;';
-                        });
-                        document.fonts.ready
-                            .then(() => html2canvas(clone, {
-                                width: 1200, height: 630, scale: 1,
-                                useCORS: true, allowTaint: false,
-                                backgroundColor: '#0B1120', logging: false
-                            }))
-                            .then(canvas => { document.body.removeChild(wrap); resolve(canvas); })
-                            .catch(err => { document.body.removeChild(wrap); reject(err); });
-                    });
-                },
-
                 exportBanner() {
                     if (this.isExporting) return;
                     this.isExporting = true;
-                    this.captureCanvas()
+                    const source = this.$refs.bannerCanvas;
+                    if (!source) { this.isExporting = false; return; }
+                    const clone = source.cloneNode(true);
+                    const wrap = document.createElement('div');
+                    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;pointer-events:none;';
+                    wrap.appendChild(clone);
+                    document.body.appendChild(wrap);
+                    clone.querySelectorAll('.banner-title-text span').forEach(span => {
+                        span.style.cssText = 'background:none;-webkit-text-fill-color:#F59E0B;color:#F59E0B;font-style:italic;font-weight:800;padding-right:0;display:inline;';
+                    });
+                    document.fonts.ready
+                        .then(() => html2canvas(clone, { width: 1200, height: 630, scale: 1, useCORS: true, allowTaint: false, backgroundColor: '#0B1120', logging: false }))
                         .then(canvas => {
                             const link = document.createElement('a');
                             link.download = 'banniere-blog.png';
                             link.href = canvas.toDataURL('image/png');
                             link.click();
                         })
-                        .catch(err => { console.error('Export error:', err); alert('Erreur export PNG : ' + err.message); })
-                        .finally(() => { this.isExporting = false; });
-                },
-
-                applyBanner() {
-                    if (this.isExporting) return;
-                    this.isExporting = true;
-                    const wire = this.$wire;
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                    this.captureCanvas()
-                        .then(canvas => new Promise((resolve, reject) => {
-                            canvas.toBlob(blob => {
-                                if (!blob) { reject(new Error('toBlob a échoué')); return; }
-                                const fd = new FormData();
-                                fd.append('banner', blob, 'banner.png');
-                                fetch('/admin/blog/banner-upload', {
-                                    method: 'POST',
-                                    credentials: 'same-origin',
-                                    headers: { 'X-CSRF-TOKEN': csrfToken },
-                                    body: fd
-                                })
-                                    .then(r => r.ok ? r.json() : Promise.reject('HTTP ' + r.status + ' — ' + r.statusText))
-                                    .then(data => { resolve(data.path); })
-                                    .catch(reject);
-                            }, 'image/png');
-                        }))
-                        .then(path => {
-                            return wire.setBannerImagePath(path);
-                        })
-                        .then(() => {
-                            this.bannerSaved = true;
-                            setTimeout(() => {
-                                this.bannerSaved = false;
-                                wire.closeAIModal();
-                            }, 1500);
-                        })
-                        .catch(err => { console.error('Banner apply error:', err); alert('Erreur : ' + err); })
-                        .finally(() => { this.isExporting = false; });
+                        .catch(err => console.error('Export error:', err))
+                        .finally(() => { document.body.removeChild(wrap); this.isExporting = false; });
                 },
             }));
         });

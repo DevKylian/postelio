@@ -107,12 +107,6 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
         Route::get('/admin/instagram', \App\Livewire\Admin\InstagramPostGenerator::class)->name('admin.instagram');
         Route::get('/admin/prospects', \App\Livewire\Admin\Prospect\ProspectManager::class)->name('admin.prospects.index');
         Route::get('/admin/announcements', \App\Livewire\Admin\Settings\AnnouncementManager::class)->name('admin.announcements.index');
-
-        Route::post('/admin/blog/banner-upload', function (\Illuminate\Http\Request $request) {
-            $request->validate(['banner' => 'required|file|mimetypes:image/png,image/jpeg|max:5120']);
-            $path = $request->file('banner')->store('blog', 'public');
-            return response()->json(['path' => $path]);
-        })->name('admin.blog.banner-upload');
     });
 
     // Social & Sync routes (Premium only)

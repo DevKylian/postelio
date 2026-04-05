@@ -479,7 +479,7 @@
                                 const fd = new FormData();
                                 fd.append('banner', blob, 'banner.png');
                                 fd.append('_token', csrfToken);
-                                fetch('{{ route("admin.blog.banner-upload") }}', { method: 'POST', body: fd })
+                                fetch('/admin/blog/banner-upload', { method: 'POST', body: fd })
                                     .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
                                     .then(data => { wire.setBannerImagePath(data.path); resolve(); })
                                     .catch(reject);

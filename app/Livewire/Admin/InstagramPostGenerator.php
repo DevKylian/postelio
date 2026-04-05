@@ -870,10 +870,13 @@ class InstagramPostGenerator extends Component
             - AÉRE TON TEXTE (CRITICAL) : Utilise des retours à la ligne (`\n`) pour aérer le corps du texte. INTERDIT de faire des blocs de plus de 2 lignes sans saut.
             - SI Comparaison : Les listes "col_sans" et "col_avec" doivent avoir EXACTEMENT 3 ou 4 points percutants.
             - "instagram_caption" (CRITICAL) : Toujours présent à la racine du JSON.
-                STRUCTURE OBLIGATOIRE :
-                1. Une accroche percutante.
-                2. 2-3 phrases de développement sur le sujet.
-                3. SIGNATURE (Copie-colle exactement ce bloc) :
+                STRUCTURE OBLIGATOIRE avec SAUTS DE LIGNE entre chaque bloc (utilise \n\n) :
+
+                [ACCROCHE] — 1 phrase forte, seule sur sa ligne.
+
+                [DÉVELOPPEMENT] — 2 à 3 phrases MAX. Chaque phrase sur sa propre ligne, séparées par \n\n. Jamais plus de 1 phrase par paragraphe.
+
+                [SIGNATURE] — Copie-colle exactement ce bloc, précédé de \n\n—\n :
                 —
                 Postelio | L'assistant digital des pros du bâtiment.
                 Mettez en valeur votre savoir-faire technique, sans y passer vos soirées.
@@ -883,8 +886,10 @@ class InstagramPostGenerator extends Component
 
                 👉 Testez gratuitement dès maintenant sur Postelio.fr
 
-                4. HASHTAGS (Important: Laisse au moins 2 sauts de ligne avant cette partie pour bien l'espacer du texte) :
-                Une dizaine de hashtags globaux très utilisés par les artisans (ex: #menuiserie, #plomberie, #renovation, #artisanat, #chantier, #btp, #travaux, #deco, #outillage, #amenagement) et TOUJOURS finir par #Postelio.
+                [HASHTAGS] — Précédés de \n\n. Une dizaine de hashtags très utilisés par les artisans (ex: #menuiserie, #plomberie, #renovation, #artisanat, #chantier, #btp, #travaux, #deco, #outillage, #amenagement) et TOUJOURS finir par #Postelio.
+
+                EXEMPLE DE RENDU ATTENDU (respecte exactement cette aération) :
+                "Tu travailles dur. Mais est-ce que tes clients le voient vraiment ?\n\nUn artisan invisible sur les réseaux laisse des chantiers aux concurrents.\n\nPostelio te donne une vitrine pro en 30 secondes.\n\n—\nPostelio | L'assistant digital des pros du bâtiment.\n...\n\n#btp #artisan #renovation #Postelio"
 
             $templateDesc
 PROMPT;

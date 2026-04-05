@@ -746,9 +746,6 @@ Réponds UNIQUEMENT en JSON valide :
             }
 
             .banner-badge {
-                display: flex;
-                align-items: center;
-                gap: 10px;
                 color: #F59E0B;
                 font-size: 16px;
                 font-weight: 700;
@@ -759,13 +756,20 @@ Réponds UNIQUEMENT en JSON valide :
             }
 
             .banner-badge-dot {
+                display: inline-block;
+                vertical-align: middle;
                 width: 8px;
                 height: 8px;
                 border-radius: 50%;
                 background: #F59E0B;
-                flex-shrink: 0;
-                display: block;
-                align-self: center;
+                margin-right: 10px;
+                position: relative;
+                top: -1px;
+            }
+
+            .banner-badge span:last-child {
+                display: inline-block;
+                vertical-align: middle;
             }
 
             .banner-domain {
@@ -814,22 +818,21 @@ Réponds UNIQUEMENT en JSON valide :
             }
 
             .banner-bottom-bar {
-                display: flex;
-                align-items: center;
-                gap: 18px;
                 line-height: 1;
             }
 
             .banner-bottom-line {
-                display: block;
+                display: inline-block;
+                vertical-align: middle;
                 height: 2px;
                 width: 64px;
                 background: rgba(245, 158, 11, 0.55);
-                flex-shrink: 0;
-                align-self: center;
+                margin-right: 18px;
             }
 
             .banner-bottom-label {
+                display: inline-block;
+                vertical-align: middle;
                 color: rgba(255, 255, 255, 0.3);
                 font-size: 15px;
                 font-weight: 600;

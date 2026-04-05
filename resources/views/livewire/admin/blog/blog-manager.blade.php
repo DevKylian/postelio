@@ -410,6 +410,16 @@
                     wrap.appendChild(clone);
                     document.body.appendChild(wrap);
 
+                    // background-clip:text non supporté par html2canvas → couleur solide
+                    clone.querySelectorAll('.banner-title-text span').forEach(span => {
+                        span.style.background           = 'none';
+                        span.style.webkitBackgroundClip = 'unset';
+                        span.style.backgroundClip       = 'unset';
+                        span.style.webkitTextFillColor  = '#F59E0B';
+                        span.style.color                = '#F59E0B';
+                        span.style.paddingRight         = '0';
+                    });
+
                     // Attendre que la police soit prête avant de capturer
                     document.fonts.ready.then(() => {
                         return html2canvas(clone, {

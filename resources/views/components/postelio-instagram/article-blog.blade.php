@@ -8,140 +8,73 @@
 
 <div style="
     width: 360px; height: 450px;
-    background: #080F1C;
+    background: #0F1629;
     position: relative; overflow: hidden;
     font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
 ">
-    {{-- === TOP EDITORIAL HEADER BAND === --}}
+    {{-- Top accent line --}}
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, #F59E0B, #FB923C);"></div>
+
+    {{-- Subtle ambient glow --}}
+    <div style="position: absolute; top: -80px; right: -80px; width: 280px; height: 280px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 65%);
+        pointer-events: none;"></div>
+
+    {{-- Left vertical accent bar --}}
+    <div style="position: absolute; left: 32px; top: 50px; bottom: 70px; width: 2px;
+        background: linear-gradient(to bottom, #F59E0B, rgba(245,158,11,0));
+        border-radius: 2px;"></div>
+
+    {{-- Main content --}}
     <div style="
-        position: absolute; top: 0; left: 0; right: 0; height: 100px;
-        background: linear-gradient(135deg, #F59E0B 0%, #D97706 60%, #92400E 100%);
-        overflow: hidden;
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        padding: 44px 32px 44px 52px;
+        display: flex; flex-direction: column; justify-content: space-between;
     ">
-        {{-- Noise texture overlay --}}
-        <div style="
-            position: absolute; inset: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 3px,
-                rgba(0,0,0,0.06) 3px,
-                rgba(0,0,0,0.06) 4px
-            );
-        "></div>
-
-        {{-- "BLOG" giant watermark inside header --}}
-        <div style="
-            position: absolute; right: -8px; top: -18px;
-            font-size: 110px; font-weight: 900; line-height: 1;
-            color: rgba(0,0,0,0.12);
-            letter-spacing: -0.04em;
-            user-select: none;
-        ">BLOG</div>
-
-        {{-- Header content --}}
-        <div style="
-            position: relative; z-index: 1;
-            padding: 20px 28px 0 28px;
-        ">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                {{-- Mini book icon made of CSS --}}
-                <div style="
-                    width: 14px; height: 14px;
-                    border: 2px solid rgba(0,0,0,0.4);
-                    border-radius: 1px;
-                    position: relative;
-                    display: flex; align-items: center; justify-content: center;
-                ">
-                    <div style="
-                        position: absolute; left: 50%; top: 1px; bottom: 1px;
-                        width: 1px; background: rgba(0,0,0,0.4);
-                        transform: translateX(-50%);
-                    "></div>
-                </div>
+        <div>
+            {{-- Tag --}}
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
                 <span style="
-                    color: rgba(0,0,0,0.55);
-                    font-size: 9px; font-weight: 900;
+                    color: #F59E0B; font-size: 9px; font-weight: 800;
                     letter-spacing: 0.22em; text-transform: uppercase;
                 ">{{ $tag }}</span>
             </div>
-            <div style="
-                width: 32px; height: 2px;
-                background: rgba(0,0,0,0.3);
-                border-radius: 2px;
-            "></div>
-        </div>
-    </div>
 
-    {{-- === MAIN CONTENT AREA === --}}
-    <div style="
-        position: absolute;
-        top: 100px; left: 0; right: 0; bottom: 52px;
-        padding: 22px 28px 16px 28px;
-        display: flex; flex-direction: column; justify-content: space-between;
-    ">
-        {{-- Article title --}}
-        <div>
+            {{-- Title --}}
             <h1 style="
-                color: #FFFFFF;
-                font-size: 20px; font-weight: 900;
+                color: #FFFFFF; font-size: 21px; font-weight: 900;
                 line-height: 1.22; letter-spacing: -0.02em;
-                margin: 0 0 14px 0;
+                margin: 0 0 20px 0;
             ">{{ $title }}</h1>
 
-            {{-- Decorative paragraph lines (suggest written content) --}}
-            <div style="margin-bottom: 14px; opacity: 0.18;">
-                <div style="height: 2px; background: #F59E0B; border-radius: 2px; margin-bottom: 6px; width: 100%;"></div>
-                <div style="height: 2px; background: rgba(255,255,255,0.5); border-radius: 2px; margin-bottom: 6px; width: 88%;"></div>
-                <div style="height: 2px; background: rgba(255,255,255,0.5); border-radius: 2px; width: 72%;"></div>
-            </div>
+            {{-- Separator --}}
+            <div style="width: 28px; height: 2px; background: #F59E0B;
+                border-radius: 2px; margin-bottom: 16px;"></div>
 
             {{-- Excerpt --}}
             <p style="
-                color: #6B7280;
-                font-size: 11.5px; font-weight: 400;
-                line-height: 1.65; margin: 0;
-                white-space: pre-line;
+                color: #64748B; font-size: 12px; font-weight: 400;
+                line-height: 1.7; margin: 0;
             ">{{ $excerpt }}</p>
         </div>
 
-        {{-- CTA row --}}
-        <div style="
-            display: flex; align-items: center;
-            justify-content: space-between;
-            margin-top: 12px;
-        ">
+        {{-- Bottom: CTA + read time --}}
+        <div style="display: flex; align-items: center; justify-content: space-between;">
             <span style="
                 display: inline-flex; align-items: center; gap: 6px;
-                background: #F59E0B;
-                color: #080F1C;
-                font-size: 11px; font-weight: 900;
-                letter-spacing: 0.04em;
-                padding: 8px 18px; border-radius: 8px;
+                background: #F59E0B; color: #0F1629;
+                font-size: 11px; font-weight: 900; letter-spacing: 0.04em;
+                padding: 9px 20px; border-radius: 8px;
             ">{{ $cta }} &#x2192;</span>
 
-            {{-- Read time indicator --}}
-            <span style="
-                color: rgba(255,255,255,0.25);
-                font-size: 10px; font-weight: 600;
-                letter-spacing: 0.06em;
-            ">~ 5 min</span>
+            <div style="text-align: right;">
+                <div style="color: rgba(255,255,255,0.18); font-size: 9px;
+                    font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+                    margin-bottom: 3px;">Postelio</div>
+                <div style="color: rgba(255,255,255,0.13); font-size: 9px;
+                    letter-spacing: 0.06em;">{{ $url }}</div>
+            </div>
         </div>
-    </div>
-
-    {{-- === BOTTOM BRANDING BAR === --}}
-    <div style="
-        position: absolute; bottom: 0; left: 0; right: 0;
-        height: 52px;
-        background: rgba(245,158,11,0.07);
-        border-top: 1px solid rgba(245,158,11,0.15);
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 0 28px;
-    ">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 5px; height: 5px; border-radius: 50%; background: #F59E0B;"></div>
-            <span style="color: #F59E0B; font-size: 10px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;">Postelio</span>
-        </div>
-        <span style="color: rgba(255,255,255,0.2); font-size: 10px; letter-spacing: 0.06em;">{{ $url }}</span>
     </div>
 </div>

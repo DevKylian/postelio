@@ -528,7 +528,7 @@ Réponds UNIQUEMENT en JSON valide :
 
 {
 "titre": "Titre percutant, max 60 caractères",
-"titre_miniature": "3 à 5 mots max pour la miniature — percutant, sans deux-points ni point d'interrogation. Tu peux entourer un mot clé avec *astérisques* pour le mettre en valeur visuellement. Exemples : *Convaincre* sans brader, Arrête de perdre des chantiers, *Devis* qui convertissent",
+"titre_miniature": "Reformule le titre de l'article en une phrase courte (5 à 8 mots) qui dit clairement de quoi parle l'article. Pas de deux-points, pas de point d'interrogation, pas de style teaser vague. Écris une affirmation directe. Tu peux mettre *un mot clé* entre astérisques pour l'accentuer visuellement. Exemples pour 'Devis trop cher : comment convaincre ton client ?' → 'Vendre ton *devis* même quand il est cher' ou 'Convaincre un client face à un devis élevé'",
 "extrait": "2 phrases choc pour accrocher le lecteur",
 "meta_title": "Titre SEO optimisé, max 60 caractères",
 "meta_description": "Description sans guillemets ni HTML, max 150 caractères",

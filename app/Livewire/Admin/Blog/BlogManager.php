@@ -29,6 +29,7 @@ class BlogManager extends Component
     public $existing_featured_image = '';
     public $json_pasted = '';
     public $showAIPromptModal = false;
+    public $banner_image_path = '';
 
     public $isEditing = false;
     public $editingId = null;
@@ -75,6 +76,24 @@ class BlogManager extends Component
         $this->json_pasted = '';
     }
 
+    public function saveBannerAsFeaturedImage(string $dataUrl): void
+    {
+        $base64    = preg_replace('/^data:image\/\w+;base64,/', '', $dataUrl);
+        $imageData = base64_decode($base64);
+
+        if ($this->banner_image_path && Storage::disk('public')->exists($this->banner_image_path)) {
+            Storage::disk('public')->delete($this->banner_image_path);
+        }
+
+        $filename = 'blog/banner-' . uniqid() . '.png';
+        Storage::disk('public')->put($filename, $imageData);
+
+        $this->banner_image_path      = $filename;
+        $this->existing_featured_image = $filename;
+
+        $this->dispatch('banner-saved');
+    }
+
     public function resetFields()
     {
         $this->title = '';
@@ -85,8 +104,9 @@ class BlogManager extends Component
         $this->meta_keywords = '';
         $this->status = 'draft';
         $this->published_at = Carbon::now()->format('Y-m-d');
-        $this->featured_image_upload = null;
+        $this->featured_image_upload   = null;
         $this->existing_featured_image = '';
+        $this->banner_image_path       = '';
         $this->isEditing = false;
         $this->editingId = null;
         $this->json_pasted = '';
@@ -145,6 +165,8 @@ class BlogManager extends Component
                 Storage::disk('public')->delete($this->existing_featured_image);
             }
             $data['featured_image'] = $this->featured_image_upload->store('blog', 'public');
+        } elseif ($this->banner_image_path) {
+            $data['featured_image'] = $this->banner_image_path;
         }
 
         if ($this->isEditing) {

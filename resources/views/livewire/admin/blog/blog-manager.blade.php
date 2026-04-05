@@ -365,6 +365,7 @@
                 bannerTitle: '',
                 isExporting: false,
                 isSimplifying: false,
+                bannerSaved: false,
                 
                 formatBannerTitle(text) {
                     if (!text) return '';
@@ -447,6 +448,41 @@
                     });
                 },
 
+                applyBanner() {
+                    this.isExporting = true;
+                    const source = this.$refs.bannerCanvas;
+                    const clone  = source.cloneNode(true);
+                    const wrap   = document.createElement('div');
+                    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;';
+                    wrap.appendChild(clone);
+                    document.body.appendChild(wrap);
+
+                    clone.querySelectorAll('.banner-title-text span').forEach(span => {
+                        span.style.background           = 'none';
+                        span.style.webkitBackgroundClip = 'unset';
+                        span.style.backgroundClip       = 'unset';
+                        span.style.webkitTextFillColor  = '#F59E0B';
+                        span.style.color                = '#F59E0B';
+                        span.style.paddingRight         = '0';
+                    });
+
+                    document.fonts.ready.then(() => {
+                        return html2canvas(clone, {
+                            width: 1200, height: 630, scale: 1,
+                            useCORS: true, allowTaint: false,
+                            backgroundColor: null, logging: false,
+                        });
+                    })
+                    .then((canvas) => {
+                        return $wire.saveBannerAsFeaturedImage(canvas.toDataURL('image/png'));
+                    })
+                    .catch((error) => { console.error('Banner apply error:', error); })
+                    .finally(() => {
+                        document.body.removeChild(wrap);
+                        this.isExporting = false;
+                    });
+                },
+
                 syncTitleFromPastedJson(jsonString) {
                     try {
                         const data = JSON.parse(jsonString);
@@ -462,6 +498,7 @@
                 $watch('$wire.json_pasted', value => syncTitleFromPastedJson(value));
                 $watch('bannerTitle', value => fitTitle());
                 window.addEventListener('resize', () => fitTitle());
+                $wire.on('banner-saved', () => { bannerSaved = true; setTimeout(() => bannerSaved = false, 3000); });
              "
              x-on:json-imported.window="syncTitleFromPastedJson($wire.json_pasted); fitTitle();">
             <div class="fixed inset-0 bg-slate-900/45 backdrop-blur-md" wire:click="closeAIModal"></div>
@@ -599,13 +636,20 @@ Réponds UNIQUEMENT en JSON valide :
                                     <span class="w-5 h-5 rounded-full bg-copper/20 text-copper flex items-center justify-center text-xs">3</span>
                                     Générer la bannière
                                 </h4>
-                                <button @click="exportBanner()" 
-                                        :disabled="isExporting"
-                                        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-copper text-white text-xs font-black uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg shadow-copper/20 disabled:opacity-50">
-                                    <svg x-show="!isExporting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                    <svg x-show="isExporting" class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                    <span x-text="isExporting ? 'Exportation...' : 'Exporter la bannière'"></span>
-                                </button>
+                                <div class="flex items-center gap-2">
+                                    <button @click="applyBanner()"
+                                            :disabled="isExporting || !bannerTitle"
+                                            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-xs font-black uppercase tracking-widest transition-all shadow-lg disabled:opacity-50"
+                                            :class="bannerSaved ? 'bg-green-500 shadow-green-500/20' : 'bg-copper hover:bg-amber-600 shadow-copper/20'">
+                                        <svg x-show="!isExporting && !bannerSaved" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        <svg x-show="isExporting" class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                        <span x-text="isExporting ? 'Génération...' : (bannerSaved ? 'Appliquée !' : 'Appliquer à l\'article')"></span>
+                                    </button>
+                                    <button @click="exportBanner()" :disabled="isExporting" title="Télécharger en PNG"
+                                            class="p-2.5 rounded-xl border border-slate-200 text-slate-400 hover:text-copper hover:border-copper/30 transition-all disabled:opacity-40">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    </button>
+                                </div>
                             </div>
                             
                             <div class="relative flex items-center gap-2">

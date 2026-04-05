@@ -76,21 +76,10 @@ class BlogManager extends Component
         $this->json_pasted = '';
     }
 
-    public function saveBannerAsFeaturedImage(string $dataUrl): void
+    public function setBannerImagePath(string $path): void
     {
-        $base64    = preg_replace('/^data:image\/\w+;base64,/', '', $dataUrl);
-        $imageData = base64_decode($base64);
-
-        if ($this->banner_image_path && Storage::disk('public')->exists($this->banner_image_path)) {
-            Storage::disk('public')->delete($this->banner_image_path);
-        }
-
-        $filename = 'blog/banner-' . uniqid() . '.png';
-        Storage::disk('public')->put($filename, $imageData);
-
-        $this->banner_image_path      = $filename;
-        $this->existing_featured_image = $filename;
-
+        $this->banner_image_path       = $path;
+        $this->existing_featured_image = $path;
         $this->dispatch('banner-saved');
     }
 

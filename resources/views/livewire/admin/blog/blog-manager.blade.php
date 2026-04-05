@@ -450,6 +450,7 @@
 
                 applyBanner() {
                     this.isExporting = true;
+                    const wire   = this.$wire;
                     const source = this.$refs.bannerCanvas;
                     const clone  = source.cloneNode(true);
                     const wrap   = document.createElement('div');
@@ -458,29 +459,37 @@
                     document.body.appendChild(wrap);
 
                     clone.querySelectorAll('.banner-title-text span').forEach(span => {
-                        span.style.background           = 'none';
-                        span.style.webkitBackgroundClip = 'unset';
-                        span.style.backgroundClip       = 'unset';
-                        span.style.webkitTextFillColor  = '#F59E0B';
-                        span.style.color                = '#F59E0B';
-                        span.style.paddingRight         = '0';
+                        span.style.background          = 'none';
+                        span.style.webkitTextFillColor = '#F59E0B';
+                        span.style.color               = '#F59E0B';
+                        span.style.paddingRight        = '0';
                     });
 
-                    document.fonts.ready.then(() => {
-                        return html2canvas(clone, {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                    document.fonts.ready
+                        .then(() => html2canvas(clone, {
                             width: 1200, height: 630, scale: 1,
                             useCORS: true, allowTaint: false,
                             backgroundColor: null, logging: false,
+                        }))
+                        .then(canvas => new Promise((resolve, reject) => {
+                            canvas.toBlob(blob => {
+                                if (!blob) { reject(new Error('toBlob failed')); return; }
+                                const fd = new FormData();
+                                fd.append('banner', blob, 'banner.png');
+                                fd.append('_token', csrfToken);
+                                fetch('{{ route("admin.blog.banner-upload") }}', { method: 'POST', body: fd })
+                                    .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
+                                    .then(data => { wire.setBannerImagePath(data.path); resolve(); })
+                                    .catch(reject);
+                            }, 'image/png');
+                        }))
+                        .catch(err => console.error('Banner apply error:', err))
+                        .finally(() => {
+                            document.body.removeChild(wrap);
+                            this.isExporting = false;
                         });
-                    })
-                    .then((canvas) => {
-                        return $wire.saveBannerAsFeaturedImage(canvas.toDataURL('image/png'));
-                    })
-                    .catch((error) => { console.error('Banner apply error:', error); })
-                    .finally(() => {
-                        document.body.removeChild(wrap);
-                        this.isExporting = false;
-                    });
                 },
 
                 syncTitleFromPastedJson(jsonString) {

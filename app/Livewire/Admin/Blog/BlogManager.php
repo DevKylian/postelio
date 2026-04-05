@@ -10,6 +10,7 @@ use Livewire\WithPagination;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use OpenAI\Laravel\Facades\OpenAI;
 
 #[Layout('layouts.app')]
 class BlogManager extends Component
@@ -197,6 +198,34 @@ class BlogManager extends Component
         } else {
             $post->update(['status' => 'draft']);
         }
+    }
+
+    public function simplifyBannerTitle(string $title): array
+    {
+        if (empty(trim($title))) {
+            return ['title' => ''];
+        }
+
+        $response = OpenAI::chat()->create([
+            'model'    => 'gpt-4o',
+            'messages' => [
+                [
+                    'role'    => 'system',
+                    'content' => "Tu es expert en communication digitale. Génère un titre court et percutant pour une miniature de blog (3 à 6 mots maximum, pas de ponctuation lourde, pas de deux-points, pas de point d'interrogation). Tu peux utiliser *mot* pour mettre un mot en italique coloré si c'est pertinent. Réponds uniquement en JSON : {\"title\": \"...\"}",
+                ],
+                [
+                    'role'    => 'user',
+                    'content' => "Titre d'article : " . $title,
+                ],
+            ],
+            'max_tokens'      => 60,
+            'temperature'     => 0.7,
+            'response_format' => ['type' => 'json_object'],
+        ]);
+
+        $data = json_decode($response->choices[0]->message->content, true);
+
+        return ['title' => $data['title'] ?? $title];
     }
 
     public function render()

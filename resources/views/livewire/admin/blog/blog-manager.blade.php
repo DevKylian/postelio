@@ -364,6 +364,7 @@
                 axe: '',
                 bannerTitle: '',
                 isExporting: false,
+                isSimplifying: false,
                 
                 formatBannerTitle(text) {
                     if (!text) return '';
@@ -585,9 +586,24 @@ Réponds UNIQUEMENT en JSON valide :
                                 </button>
                             </div>
                             
-                            <div class="relative">
-                                <input type="text" x-model="bannerTitle" placeholder="Titre de la bannière (*mot* pour l'effet orange)..." 
+                            <div class="relative flex items-center gap-2">
+                                <input type="text" x-model="bannerTitle" placeholder="Titre de la bannière (*mot* pour l'effet orange)..."
                                        class="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-4 text-sm font-medium text-midnight focus:border-copper focus:ring-2 focus:ring-copper/10 outline-none transition-all">
+                                <button @click="
+                                            isSimplifying = true;
+                                            $wire.simplifyBannerTitle(bannerTitle).then(r => {
+                                                bannerTitle = r.title;
+                                                isSimplifying = false;
+                                                $nextTick(() => fitTitle());
+                                            }).catch(() => isSimplifying = false);
+                                        "
+                                        :disabled="isSimplifying || !bannerTitle"
+                                        title="Générer un titre simplifié avec l'IA"
+                                        class="shrink-0 flex items-center gap-1.5 px-4 py-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 text-xs font-bold hover:bg-amber-100 transition-all disabled:opacity-40 whitespace-nowrap">
+                                    <svg x-show="!isSimplifying" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+                                    <svg x-show="isSimplifying" class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                    <span x-text="isSimplifying ? '' : 'IA'"></span>
+                                </button>
                             </div>
                             
                             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Aperçu en temps réel (1200x630)</p>

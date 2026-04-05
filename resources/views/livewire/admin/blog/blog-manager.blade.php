@@ -698,7 +698,7 @@ Réponds UNIQUEMENT en JSON valide :
                 font-weight: 800;
                 display: inline-block;
                 padding-right: 0.1em;
-                margin-right: 0.18em;
+                margin-right: 0.08em;
                 vertical-align: baseline;
             }
 

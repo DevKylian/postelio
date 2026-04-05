@@ -70,6 +70,12 @@ class PostGenerator extends Component
         if ($company?->instagram_connected) $this->platforms[] = 'instagram';
         if ($company?->facebook_connected) $this->platforms[] = 'facebook';
 
+        // Set a valid default template if 'review' is disabled
+        $allowed = $this->getAllowedTemplates();
+        if (!empty($allowed) && !in_array($this->template, $allowed)) {
+            $this->template = $allowed[0];
+        }
+
         // Restore review_pending state from ?resume=POST_ID
         $resumeId = request()->query('resume');
         if ($resumeId) {
@@ -110,6 +116,21 @@ class PostGenerator extends Component
                 $this->status                = Post::STATUS_REVIEW_PENDING;
             }
         }
+    }
+
+    protected function getAllowedTemplates(): array
+    {
+        $baseSlugs = ['review','project','faq','lifestyle','quality_focus','conseil_saisonnier','erreur_a_eviter','chantier_detail','step_by_step','guide_pedagogique'];
+        $nativeSettings = \App\Models\NativeTemplateSetting::all()->pluck('is_active', 'slug');
+        
+        $allowed = [];
+        foreach ($baseSlugs as $slug) {
+            if ($nativeSettings[$slug] ?? true) {
+                $allowed[] = $slug;
+            }
+        }
+        
+        return array_merge($allowed, ['custom']);
     }
 
     public function updatedAudio()
@@ -189,12 +210,7 @@ class PostGenerator extends Component
             $needsExtra = $photoMode === 'carousel';
         }
 
-        $nativeSettings = \App\Models\NativeTemplateSetting::all()->pluck('is_active', 'slug');
-        $activeNativeSlugs = collect($nativeSettings)->filter(fn($active) => $active)->keys()->toArray();
-        $baseSlugs = ['review','project','faq','lifestyle','quality_focus','conseil_saisonnier','erreur_a_eviter','chantier_detail','step_by_step','guide_pedagogique'];
-        // Fallback to defaults if table is empty
-        $finalNativeSlugs = count($nativeSettings) > 0 ? $activeNativeSlugs : $baseSlugs;
-        $allowedTemplates = array_merge($finalNativeSlugs, ['custom']);
+        $allowedTemplates = $this->getAllowedTemplates();
 
         $hasInput = $this->audio || !empty(trim($this->textContent));
 

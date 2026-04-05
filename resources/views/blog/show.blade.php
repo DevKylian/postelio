@@ -155,7 +155,7 @@
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
                 <div class="rounded-3xl overflow-hidden shadow-xl shadow-midnight/5">
                     <img src="{{ Storage::url($post->featured_image) }}" alt="{{ $post->title }}"
-                         class="w-full aspect-[16/9] object-contain bg-midnight">
+                         class="w-full aspect-[16/9] object-cover">
                 </div>
             </div>
             @endif

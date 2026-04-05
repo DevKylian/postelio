@@ -88,13 +88,14 @@
                 $slideAlpine = $slideIndex === null ? "x-show=\"current === $realIdx\" style=\"display: none;\"" : '';
             @endphp
             <div class="absolute inset-0 p-10 pb-20 flex flex-col justify-center text-center" {!! $slideAlpine !!} style="{{ $slideStyle }}">
-                <div class="rounded-2xl shadow-xl border relative overflow-hidden" style="background: white; border-color: rgba(0,0,0,0.06); padding: 2rem 2rem 2rem">
-                    {{-- Number badge --}}
-                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shadow-lg" style="background-color: {{ $brandColor }}; color: {{ $brandTextColor }}">
+                <div class="rounded-2xl shadow-xl border relative" style="background: white; border-color: rgba(0,0,0,0.06); padding: 1.5rem 1.75rem 1.5rem">
+                    {{-- Top accent --}}
+                    <div class="absolute top-0 inset-x-0 h-0.5 rounded-t-2xl" style="background: linear-gradient(90deg, transparent, {{ $brandColor }}, transparent)"></div>
+
+                    {{-- Number badge (in flow, centered) --}}
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shadow-md mx-auto mb-4" style="background-color: {{ $brandColor }}; color: {{ $brandTextColor }}">
                         {{ $realIdx }}
                     </div>
-                    {{-- Top accent --}}
-                    <div class="absolute top-0 inset-x-0 h-0.5" style="background: linear-gradient(90deg, transparent, {{ $brandColor }}, transparent)"></div>
 
                     @php
                         $cLen = mb_strlen($content);
@@ -103,7 +104,7 @@
                         elseif ($cLen > 80) $cFontSize = 'text-base';
                         elseif ($cLen > 40) $cFontSize = 'text-lg';
                     @endphp
-                    <div class="max-h-[180px] overflow-hidden mt-3">
+                    <div class="max-h-[180px] overflow-hidden">
                         <p class="text-gray-800 font-black {{ $cFontSize }} tracking-tight leading-tight font-montserrat">
                             {{ $content }}
                         </p>

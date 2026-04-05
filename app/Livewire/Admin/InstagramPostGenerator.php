@@ -87,6 +87,12 @@ class InstagramPostGenerator extends Component
     public string $appmockup_headline    = '';
     public string $appmockup_subheadline = '';
 
+    // ── Editable fields: feature-app ──────────────────────────────────────────
+    public string $feature_tag         = '';
+    public string $feature_name        = '';
+    public string $feature_description = '';
+    public string $feature_cta         = '';
+
     // ── Editable fields: educatif ─────────────────────────────────────────────
     public string $educatif_tag     = '';
     public string $educatif_title   = '';
@@ -111,7 +117,7 @@ class InstagramPostGenerator extends Component
     public string $photo_caption  = '';
 
     // ── Image-based templates ─────────────────────────────────────────────────
-    private const IMAGE_TEMPLATES = ['avantapres', 'appmockup'];
+    private const IMAGE_TEMPLATES = ['avantapres', 'appmockup', 'feature-app'];
 
     public function mount(): void
     {
@@ -147,6 +153,8 @@ class InstagramPostGenerator extends Component
         $this->col_sans = ['', '', '', ''];
         $this->col_avec = ['', '', '', ''];
         $this->avantapres_tag = $this->avantapres_headline = '';
+        $this->appmockup_tag = $this->appmockup_headline = $this->appmockup_subheadline = '';
+        $this->feature_tag = $this->feature_name = $this->feature_description = $this->feature_cta = '';
         $this->educatif_tag = $this->educatif_title = $this->educatif_body = $this->educatif_insight = '';
         $this->hero_tag = $this->hero_headline = $this->hero_body = '';
         $this->article_blog_tag = 'NOUVEL ARTICLE';
@@ -188,7 +196,7 @@ class InstagramPostGenerator extends Component
     {
         $this->validate([
             'topic'    => 'required|min:3',
-            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog',
+            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog,feature-app',
             'tone'     => 'required|in:professionnel,accessible,dynamique,inspirant',
         ]);
 
@@ -332,6 +340,12 @@ class InstagramPostGenerator extends Component
                 'tag'         => $this->appmockup_tag,
                 'headline'    => $this->appmockup_headline,
                 'subheadline' => $this->appmockup_subheadline,
+            ],
+            'feature-app' => [
+                'feature_tag'         => $this->feature_tag,
+                'feature_name'        => $this->feature_name,
+                'feature_description' => $this->feature_description,
+                'feature_cta'         => $this->feature_cta,
             ],
             'educatif' => [
                 'tag'     => $this->educatif_tag,
@@ -499,6 +513,13 @@ class InstagramPostGenerator extends Component
                 'tag' => $tag, 'headline' => $title, 'subheadline' => $body,
                 'image1_b64' => $slide['image1_b64'] ?? null,
             ],
+            'feature-app' => [
+                'feature_tag'         => $slide['feature_tag'] ?? $tag,
+                'feature_name'        => $slide['feature_name'] ?? $title,
+                'feature_description' => $slide['feature_description'] ?? $body,
+                'feature_cta'         => $slide['feature_cta'] ?? $cta,
+                'image1_b64'          => $slide['image1_b64'] ?? null,
+            ],
             'chantier' => [
                 'tag' => $tag, 'headline' => $title, 'caption' => $body,
                 'image_url' => $slide['image1_b64'] ?? null,
@@ -547,6 +568,7 @@ class InstagramPostGenerator extends Component
                 'educatif'    => $this->fillEducatif($data),
                 'hero'        => $this->fillHero($data),
                 'article-blog' => $this->fillArticleBlog($data),
+                'feature-app'  => $this->fillFeatureApp($data),
             };
         }
     }
@@ -633,6 +655,12 @@ class InstagramPostGenerator extends Component
         $this->photo_tag = $tag;
         $this->photo_headline = $title;
         $this->photo_caption = $body;
+
+        // For feature-app
+        $this->feature_tag         = $slide['feature_tag']         ?? $tag;
+        $this->feature_name        = $slide['feature_name']        ?? $title;
+        $this->feature_description = $slide['feature_description'] ?? $body;
+        $this->feature_cta         = $slide['feature_cta']         ?? $cta;
     }
 
     private function fillAnnonce(array $d): void
@@ -733,6 +761,14 @@ class InstagramPostGenerator extends Component
         $this->article_blog_excerpt = $d['excerpt'] ?? $d['body']     ?? '';
         $this->article_blog_cta     = $d['cta']     ?? 'Lire l\'article';
         $this->article_blog_url     = $d['url']     ?? 'postelio.fr/blog';
+    }
+
+    private function fillFeatureApp(array $d): void
+    {
+        $this->feature_tag         = $d['feature_tag']         ?? $d['tag']   ?? 'FONCTIONNALITÉ';
+        $this->feature_name        = $d['feature_name']        ?? $d['title'] ?? '';
+        $this->feature_description = $d['feature_description'] ?? $d['body']  ?? '';
+        $this->feature_cta         = $d['feature_cta']         ?? $d['cta']   ?? 'Essayer gratuitement';
     }
 
     private function fillChantier(array $data): void
@@ -841,6 +877,18 @@ class InstagramPostGenerator extends Component
                 }
                 RÈGLE : Le titre doit rester fidèle à l'article. L'extrait doit créer de la curiosité sans être vague.
                 PROMPT,
+            'feature-app' => <<<PROMPT
+                Post "Mise en avant d'une fonctionnalité Postelio". IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
+                Objectif : présenter UNE fonctionnalité précise de Postelio avec son bénéfice concret pour l'artisan.
+                JSON : {
+                    "feature_tag": "FONCTIONNALITÉ" (ou "NOUVEAUTÉ", "EN ACTION", "ASTUCE PRO" selon le contexte),
+                    "feature_name": "Nom court et mémorable de la fonctionnalité (3-6 mots, ex: 'Générateur de Posts IA')",
+                    "feature_description": "Bénéfice concret pour l'artisan (20-30 mots). Commence par un verbe d'action. Termine par un bénéfice chiffré si possible.",
+                    "feature_cta": "Texte du bouton (2-4 mots percutants)",
+                    "instagram_caption": "..."
+                }
+                RÈGLE : feature_name doit donner envie de cliquer. feature_description doit parler RÉSULTAT, pas technicité.
+                PROMPT,
             default => '',
         };
 
@@ -859,7 +907,7 @@ class InstagramPostGenerator extends Component
             Règles de STRUCTURE (CRITICAL) :
             - Réponds UNIQUEMENT en JSON valide.
             - POLITIQUES DE SLIDES :
-                - SI stats, cta, temoignage, question, avantapres, appmockup, comparaison, educatif : INTERDIT DE FAIRE UN CARROUSEL. Réponds avec un seul objet JSON simple à la racine.
+                - SI stats, cta, temoignage, question, avantapres, appmockup, comparaison, educatif, feature-app : INTERDIT DE FAIRE UN CARROUSEL. Réponds avec un seul objet JSON simple à la racine.
                 - SI conseil, annonce, avantages : CARROUSEL AUTORISÉ (tableau "slides": [ ... ]).
             - "title" : Titre principal (4-8 mots). OBLIGATOIRE.
             - "body" : Texte descriptif (15-25 mots).

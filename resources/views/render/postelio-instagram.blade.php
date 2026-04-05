@@ -114,6 +114,14 @@
                 :cta="$data['cta'] ?? 'Lire l\'article'"
                 :url="$data['url'] ?? 'postelio.fr/blog'"
             />
+        @elseif($template === 'feature-app')
+            <x-postelio-instagram.feature-app
+                :image_url="$data['image_url'] ?? $data['image1_b64'] ?? null"
+                :feature_tag="$data['feature_tag'] ?? 'FONCTIONNALITÉ'"
+                :feature_name="$data['feature_name'] ?? ''"
+                :feature_description="$data['feature_description'] ?? ''"
+                :feature_cta="$data['feature_cta'] ?? 'Essayer gratuitement'"
+            />
         @endif
     </div>
 </body>

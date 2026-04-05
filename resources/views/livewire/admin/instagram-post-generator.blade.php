@@ -142,8 +142,9 @@
                                     </h4>
                                     <div class="grid grid-cols-1 gap-1.5">
                                         @foreach([
-                                            ['avantapres', '↔️', 'Avant / Après'],
-                                            ['appmockup',  '💻', 'Interface App'],
+                                            ['avantapres',   '↔️', 'Avant / Après'],
+                                            ['appmockup',    '💻', 'Interface App'],
+                                            ['feature-app',  '🚀', 'Feature Spotlight'],
                                         ] as [$val, $icon, $label])
                                         <button 
                                             wire:click="$set('template', '{{ $val }}')"
@@ -488,6 +489,39 @@
                                     <textarea wire:model.live="appmockup_subheadline" rows="2" maxlength="95" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
                                 </div>
 
+                            @elseif($template === 'feature-app')
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Screenshot de la feature</label>
+                                    <p class="text-[10px] text-gray-400 mb-2">Photo ou capture d'écran de la fonctionnalité</p>
+                                    <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-lg cursor-pointer transition-all h-32
+                                        {{ $uploadImage1 ? 'border-copper bg-copper/5' : 'border-gray-200 hover:border-copper/50 bg-gray-50' }}">
+                                        @if($uploadImage1)
+                                            <img src="{{ $uploadImage1->temporaryUrl() }}" class="w-full h-full object-cover rounded-lg">
+                                        @else
+                                            <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                            <span class="text-xs text-gray-400">Uploader un screenshot</span>
+                                        @endif
+                                        <input wire:model="uploadImage1" type="file" accept="image/*" class="hidden">
+                                    </label>
+                                </div>
+                                <p class="text-[10px] text-gray-400">Max 8 Mo • JPG, PNG, WEBP</p>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Badge</label>
+                                    <input wire:model.live="feature_tag" type="text" maxlength="18" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nom de la fonctionnalité</label>
+                                    <input wire:model.live="feature_name" type="text" maxlength="45" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Description du bénéfice</label>
+                                    <textarea wire:model.live="feature_description" rows="2" maxlength="120" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Texte CTA</label>
+                                    <input wire:model.live="feature_cta" type="text" maxlength="30" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
+
                             @elseif($template === 'educatif')
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Badge</label>
@@ -582,6 +616,7 @@
                                             'comparaison' => '⚖️',
                                             'avantapres' => '↔️',
                                             'appmockup' => '💻',
+                                            'feature-app' => '🚀',
                                             'educatif' => '🎓',
                                             'hero' => '💎',
                                             default => '📄'
@@ -657,6 +692,8 @@
                                                     <x-postelio-instagram.avantapres :image_before_url="$uploadImage1 ? $uploadImage1->temporaryUrl() : null" :image_after_url="$uploadImage2 ? $uploadImage2->temporaryUrl() : null" :headline="$avantapres_headline" :tag="$avantapres_tag" />
                                                 @elseif($template === 'appmockup')
                                                     <x-postelio-instagram.appmockup :image_url="$uploadImage1 ? $uploadImage1->temporaryUrl() : null" :tag="$appmockup_tag" :headline="$appmockup_headline" :subheadline="$appmockup_subheadline" />
+                                                @elseif($template === 'feature-app')
+                                                    <x-postelio-instagram.feature-app :image_url="$uploadImage1 ? $uploadImage1->temporaryUrl() : null" :feature_tag="$feature_tag" :feature_name="$feature_name" :feature_description="$feature_description" :feature_cta="$feature_cta" />
                                                 @elseif($template === 'educatif')
                                                     <x-postelio-instagram.educatif :tag="$educatif_tag" :title="$educatif_title" :body="$educatif_body" :insight="$educatif_insight" />
                                                 @elseif($template === 'hero')

@@ -757,19 +757,18 @@ Réponds UNIQUEMENT en JSON valide :
 
             .banner-badge-dot {
                 display: inline-block;
-                vertical-align: middle;
+                vertical-align: top;
+                margin-top: 3px;
                 width: 8px;
                 height: 8px;
                 border-radius: 50%;
                 background: #F59E0B;
                 margin-right: 10px;
-                position: relative;
-                top: -1px;
             }
 
             .banner-badge span:last-child {
                 display: inline-block;
-                vertical-align: middle;
+                vertical-align: top;
             }
 
             .banner-domain {
@@ -823,7 +822,8 @@ Réponds UNIQUEMENT en JSON valide :
 
             .banner-bottom-line {
                 display: inline-block;
-                vertical-align: middle;
+                vertical-align: top;
+                margin-top: 5px;
                 height: 2px;
                 width: 64px;
                 background: rgba(245, 158, 11, 0.55);
@@ -832,7 +832,7 @@ Réponds UNIQUEMENT en JSON valide :
 
             .banner-bottom-label {
                 display: inline-block;
-                vertical-align: middle;
+                vertical-align: top;
                 color: rgba(255, 255, 255, 0.3);
                 font-size: 15px;
                 font-weight: 600;

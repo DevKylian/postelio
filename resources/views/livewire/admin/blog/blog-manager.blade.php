@@ -642,10 +642,7 @@ Réponds UNIQUEMENT en JSON valide :
 
                                         <div class="banner-content-inner">
                                             <div class="banner-top-row">
-                                                <div class="banner-badge">
-                                                    <span class="banner-badge-dot"></span>
-                                                    <span>Article de blog</span>
-                                                </div>
+                                                <div class="banner-badge"><span class="banner-badge-dot">●</span> Article de blog</div>
                                                 <div class="banner-domain">postelio.fr</div>
                                             </div>
 
@@ -654,8 +651,7 @@ Réponds UNIQUEMENT en JSON valide :
                                             </div>
 
                                             <div class="banner-bottom-bar">
-                                                <span class="banner-bottom-line"></span>
-                                                <span class="banner-bottom-label">Blog</span>
+                                                <span class="banner-bottom-line">——</span><span class="banner-bottom-label">Blog</span>
                                             </div>
                                         </div>
                                     </div>
@@ -756,19 +752,8 @@ Réponds UNIQUEMENT en JSON valide :
             }
 
             .banner-badge-dot {
-                display: inline-block;
-                vertical-align: top;
-                margin-top: 3px;
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background: #F59E0B;
-                margin-right: 10px;
-            }
-
-            .banner-badge span:last-child {
-                display: inline-block;
-                vertical-align: top;
+                font-size: 10px;
+                margin-right: 4px;
             }
 
             .banner-domain {
@@ -817,29 +802,22 @@ Réponds UNIQUEMENT en JSON valide :
             }
 
             .banner-bottom-bar {
+                font-family: 'Outfit', sans-serif;
+                font-size: 15px;
+                font-weight: 600;
                 line-height: 1;
             }
 
             .banner-bottom-line {
-                display: inline-block;
-                vertical-align: top;
-                margin-top: 5px;
-                height: 2px;
-                width: 64px;
-                background: rgba(245, 158, 11, 0.55);
-                margin-right: 18px;
+                color: rgba(245, 158, 11, 0.7);
+                letter-spacing: -0.05em;
+                margin-right: 14px;
             }
 
             .banner-bottom-label {
-                display: inline-block;
-                vertical-align: top;
                 color: rgba(255, 255, 255, 0.3);
-                font-size: 15px;
-                font-weight: 600;
                 letter-spacing: 0.12em;
                 text-transform: uppercase;
-                font-family: 'Outfit', sans-serif;
-                line-height: 1;
             }
 
 

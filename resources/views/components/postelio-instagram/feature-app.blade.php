@@ -45,25 +45,12 @@
             background: linear-gradient(90deg, #F59E0B 0%, #D97706 60%, #92400E 100%);
         "></div>
 
-        {{-- Soft gradient fade → dark at bottom of image --}}
+        {{-- Copper gradient fade at bottom of image --}}
         <div style="
             position: absolute; bottom: 0; left: 0; right: 0; height: 90px;
-            background: linear-gradient(to bottom, transparent 0%, rgba(17,24,39,0.92) 100%);
+            background: linear-gradient(to bottom, transparent 0%, rgba(245,158,11,0.55) 100%);
             pointer-events: none;
         "></div>
-
-        {{-- Feature tag – overlaid on image, top-left --}}
-        <div style="position: absolute; top: 18px; left: 20px;">
-            <span style="
-                display: inline-block;
-                background: rgba(17,24,39,0.72);
-                border: 1px solid rgba(245,158,11,0.55);
-                color: #F59E0B;
-                font-size: 8.5px; font-weight: 800;
-                letter-spacing: 0.2em; text-transform: uppercase;
-                padding: 4px 11px; border-radius: 100px;
-            ">{{ $feature_tag }}</span>
-        </div>
 
         {{-- Postelio wordmark – top-right --}}
         <div style="

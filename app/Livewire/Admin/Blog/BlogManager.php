@@ -29,7 +29,6 @@ class BlogManager extends Component
     public $existing_featured_image = '';
     public $json_pasted = '';
     public $showAIPromptModal = false;
-    public $banner_title_for_modal = '';
 
     public $isEditing = false;
     public $editingId = null;
@@ -88,7 +87,6 @@ class BlogManager extends Component
         $this->published_at = Carbon::now()->format('Y-m-d');
         $this->featured_image_upload   = null;
         $this->existing_featured_image = '';
-        $this->banner_title_for_modal  = '';
         $this->isEditing = false;
         $this->editingId = null;
         $this->json_pasted = '';
@@ -117,9 +115,8 @@ class BlogManager extends Component
             $this->isEditing = false;
             $this->editingId = null;
             $this->showForm = true;
-            // Keep modal open so banner section stays interactive
+            $this->showAIPromptModal = false;
 
-            $this->banner_title_for_modal = $data['titre_miniature'] ?? ($data['titre'] ?? ($data['title'] ?? ''));
             $this->dispatch('notify', 'Article importé avec succès.');
         } else {
             $this->dispatch('notify', 'Erreur : Le texte collé n\'est pas un JSON valide.');

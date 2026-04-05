@@ -464,7 +464,15 @@ Réponds UNIQUEMENT en JSON valide :
                         </div>
                         
                         <div class="relative flex-1 min-h-[250px] lg:min-h-0">
-                            <textarea wire:model="json_pasted" placeholder="Collez le code JSON ici...
+                            <textarea wire:model="json_pasted"
+                                      @input="
+                                          try {
+                                              const d = JSON.parse($event.target.value);
+                                              const t = d.titre_miniature || d.titre || d.title || '';
+                                              if (t) { bannerTitle = t; $nextTick(() => fitTitle()); }
+                                          } catch(e) {}
+                                      "
+                                      placeholder="Collez le code JSON ici...
 {
   &quot;titre&quot;: &quot;...&quot;,
   ...
@@ -762,14 +770,6 @@ Réponds UNIQUEMENT en JSON valide :
                 isSimplifying: false,
 
                 initModal(wire) {
-                    // Watch the Livewire property — fires reliably after every server response
-                    wire.$watch('banner_title_for_modal', (val) => {
-                        if (val) {
-                            this.bannerTitle = val;
-                            this.$nextTick(() => this.fitTitle());
-                        }
-                    });
-                    // Also watch bannerTitle to update preview on manual edits
                     this.$watch('bannerTitle', () => {
                         this.$nextTick(() => this.fitTitle());
                     });

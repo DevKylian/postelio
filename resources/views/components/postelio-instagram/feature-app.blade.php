@@ -52,17 +52,6 @@
             pointer-events: none;
         "></div>
 
-        {{-- Postelio wordmark – top-right --}}
-        <div style="
-            position: absolute; top: 18px; right: 20px;
-            display: flex; align-items: center; gap: 5px;
-        ">
-            <div style="width: 4px; height: 4px; border-radius: 50%; background: #F59E0B;"></div>
-            <span style="
-                color: rgba(255,255,255,0.4); font-size: 8.5px; font-weight: 700;
-                letter-spacing: 0.14em; text-transform: uppercase;
-            ">Postelio</span>
-        </div>
     </div>
 
     {{-- ── Text content : bottom zone ─────────────────────────────────────── --}}

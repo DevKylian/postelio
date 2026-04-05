@@ -5,7 +5,6 @@ use App\Http\Controllers\FacebookController;
 use App\Http\Controllers\InstagramController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\PwaController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
@@ -40,19 +39,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('onboarding.transcribe-bio');
 });
 
-// PWA offline support
-Route::view('/offline', 'pwa.offline')->name('pwa.offline');
-
-// Fresh CSRF token endpoint (used by SW sync on reconnect)
-Route::get('/csrf-token', function () {
-    return response()->json(['token' => csrf_token()]);
-})->middleware('web')->name('csrf.token');
-
-// PWA offline queue status & sync
-Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
-    Route::get('/pwa/pending-queue', [PwaController::class, 'pendingQueue'])->name('pwa.pending-queue');
-    Route::post('/api/pwa/queue-generate', [PwaController::class, 'queueGenerate'])->name('api.pwa.queue-generate');
-});
 
 // Subscription routes (auth required, but no subscription check)
 Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {

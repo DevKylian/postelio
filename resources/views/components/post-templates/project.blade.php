@@ -149,7 +149,7 @@
         $brandingAlpine = $slideIndex === null ? 'x-show="current === 0"' : '';
     @endphp
     @if($showBranding)
-    <div {!! $brandingAlpine !!} class="shrink-0 flex flex-col items-center justify-center px-6 py-2 gap-1 z-20" style="background-color: {{ $brandColor }}">
+    <div {!! $brandingAlpine !!} class="shrink-0 flex flex-col items-center justify-center px-6 py-2.5 gap-1 z-20" style="background-color: {{ $brandColor }}">
         @php
             $cLen = mb_strlen($companyLabel);
             $cFontSize = 'text-[8px]';
@@ -162,7 +162,10 @@
             elseif ($tLen > 25) $tFontSize = 'text-[13px]';
         @endphp
         <div class="flex flex-col items-center max-w-full">
-            <p class="font-bold tracking-widest {{ $cFontSize }} font-montserrat leading-none mb-1 truncate w-full text-center opacity-60" style="color: {{ $brandTextColor }}">{{ $companyLabel }}</p>
+            <div class="inline-flex items-center gap-1.5 mb-1">
+                <span class="inline-block w-1.5 h-1.5 rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.5)' }}"></span>
+                <p class="font-bold tracking-widest {{ $cFontSize }} font-montserrat leading-none truncate" style="color: {{ $brandTextColor }}; opacity: 0.65">{{ $companyLabel }}</p>
+            </div>
             <div class="flex items-center gap-2 mb-1.5">
                 @php
                     $tagTextCol = $brandColor;
@@ -172,9 +175,9 @@
                     $gTag = hexdec(substr($hexTag, 2, 2));
                     $bTag = hexdec(substr($hexTag, 4, 2));
                     $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
-                    if ($yiqTag > 235) $tagTextCol = '#1E293B'; 
+                    if ($yiqTag > 235) $tagTextCol = '#1E293B';
                 @endphp
-                
+
                 @if($trade)
                     <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $trade }}</span>
                 @endif

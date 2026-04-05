@@ -95,7 +95,7 @@
                 font-size: 8px; font-weight: 900;
                 letter-spacing: 0.12em; text-transform: uppercase;
                 margin-bottom: 8px;
-            ">💡 Point Expert</span>
+">&#x2726; Point Expert</span>
             <p style="
                 color: #F3F4F6;
                 font-size: {{ $insightSize }}; font-weight: 600;

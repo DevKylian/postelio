@@ -33,7 +33,7 @@
 @endphp
 
 <div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] bg-gray-700 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
-    
+
     {{-- Slide 0: Main Content --}}
     @php
         $isSlide0 = (int)$slideIndex === 0 || $slideIndex === null;
@@ -53,29 +53,30 @@
             </div>
         @endif
 
-        {{-- Dark gradient on lower half --}}
-        <div class="absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-black/80 via-black/40 to-transparent z-[1]"></div>
+        {{-- Dark gradient lower half --}}
+        <div class="absolute inset-x-0 bottom-0 h-[55%] pointer-events-none" style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)"></div>
+
+        {{-- Gradient top bar --}}
+        <div class="absolute top-0 inset-x-0 h-0.5" style="background: linear-gradient(90deg, {{ $brandColor }}, {{ $brandColor }}55)"></div>
 
         {{-- Company label — bottom bar --}}
-        <div class="absolute inset-x-0 bottom-0 py-2 px-5 bg-black/40 backdrop-blur-sm flex flex-col items-center z-10 border-t-2" style="border-top-color: {{ $brandColor }}">
+        <div class="absolute inset-x-0 bottom-0 py-2.5 px-5 flex flex-col items-center z-10" style="background: rgba(0,0,0,0.3); backdrop-filter: blur(4px)">
             <div class="w-full flex items-center justify-center gap-2 mb-1.5">
                 @if ($logoUrl)
-                    <img src="{{ $logoUrl }}" alt="Logo" class="h-4 w-4 object-contain rounded">
+                    <img src="{{ $logoUrl }}" alt="Logo" class="h-3.5 w-3.5 object-contain rounded">
                 @endif
-                <p class="text-white/90 font-bold text-[9px] tracking-widest font-montserrat truncate">{{ $companyLabel }}</p>
+                <p class="text-white/80 font-bold text-[9px] tracking-widest font-montserrat truncate">{{ $companyLabel }}</p>
             </div>
-            <div class="flex items-center gap-2 mt-1">
+            <div class="flex items-center gap-2">
                 @php
-                    $isWhiteTag = true; // Modern white tag style
                     $tagTextCol = $brandColor;
-                    // Safety check for contrast on white background
                     $hexTag = str_replace('#', '', $brandColor);
                     if (strlen($hexTag) == 3) $hexTag = $hexTag[0].$hexTag[0].$hexTag[1].$hexTag[1].$hexTag[2].$hexTag[2];
                     $rTag = hexdec(substr($hexTag, 0, 2));
                     $gTag = hexdec(substr($hexTag, 2, 2));
                     $bTag = hexdec(substr($hexTag, 4, 2));
                     $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
-                    if ($yiqTag > 235) $tagTextCol = '#1E293B'; // Fallback to dark if brand color is too light
+                    if ($yiqTag > 235) $tagTextCol = '#1E293B';
                 @endphp
 
                 @if($trade)
@@ -87,7 +88,7 @@
             </div>
         </div>
 
-        {{-- Text overlay — centered in lower third, above company label --}}
+        {{-- Text overlay --}}
         @if($text)
             @php
                 $len = mb_strlen($text);
@@ -95,9 +96,13 @@
                 if ($len > 25) $fontSize = 'text-[10px]';
                 elseif ($len > 18) $fontSize = 'text-xs';
             @endphp
-            <div class="absolute inset-x-6 bottom-[42px] top-[60%] flex items-center justify-center z-10 overflow-hidden">
-                <div class="bg-black/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/10">
-                    <h3 class="text-white font-black {{ $fontSize }} leading-snug font-montserrat text-center" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</h3>
+            <div class="absolute inset-x-5 bottom-[52px] flex items-end justify-start z-10 pb-2 overflow-hidden">
+                <div class="backdrop-blur-sm px-3.5 py-2.5 rounded-xl border" style="background: rgba(0,0,0,0.45); border-color: rgba(255,255,255,0.08)">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <span class="inline-block w-1 h-1 rounded-full" style="background-color: {{ $brandColor }}"></span>
+                        <span class="text-[8px] font-bold uppercase tracking-widest font-montserrat" style="color: {{ $brandColor }}">Réalisation</span>
+                    </div>
+                    <h3 class="text-white font-black {{ $fontSize }} leading-snug font-montserrat" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</h3>
                 </div>
             </div>
         @endif
@@ -111,8 +116,8 @@
     @endphp
     @if($hasContactInfo)
     <div class="absolute inset-0 bg-gray-900" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
-         <x-post-templates.contact-slide 
-            :brand-color="$brandColor" 
+         <x-post-templates.contact-slide
+            :brand-color="$brandColor"
             :company-label="$companyLabel"
             :phone="$phone"
             :email="$email"

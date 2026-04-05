@@ -91,6 +91,6 @@
             <div style="width: 5px; height: 5px; border-radius: 50%; background: #F59E0B;"></div>
             <span style="color: #F59E0B; font-size: 10px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;">Postelio</span>
         </div>
-        <span style="color: rgba(255,255,255,0.2); font-size: 10px; letter-spacing: 0.08em;">Répondez en commentaire 👇</span>
+        <span style="color: rgba(255,255,255,0.2); font-size: 10px; letter-spacing: 0.08em;">Répondez en commentaire ↓</span>
     </div>
 </div>

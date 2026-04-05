@@ -32,8 +32,11 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] bg-white relative overflow-hidden flex flex-col justify-end {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="border: 6px solid {{ $brandColor }}">
-    
+<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] bg-white relative overflow-hidden flex flex-col justify-end {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
+
+    {{-- Gradient top bar --}}
+    <div class="absolute top-0 inset-x-0 h-0.5 z-20" style="background: linear-gradient(90deg, {{ $brandColor }}, {{ $brandColor }}88)"></div>
+
     {{-- Slide 0 --}}
     @php
         $isSlide0 = (int)$slideIndex === 0 || $slideIndex === null;
@@ -51,23 +54,34 @@
                 </div>
             </div>
         @endif
-        
-        <div class="absolute inset-x-4 bottom-20 bg-black/70 backdrop-blur-sm p-4 rounded-2xl border border-white/10 shadow-xl z-10 text-center">
-            @php
-                $len = mb_strlen($text);
-                $fontSize = 'text-xs';
-                if ($len > 80) $fontSize = 'text-[9px]';
-                elseif ($len > 40) $fontSize = 'text-[10px]';
-            @endphp
-            <p class="text-[10px] font-bold uppercase tracking-[0.2em] mb-2 text-white/50">Focus Qualité</p>
-            <div class="max-h-[80px] overflow-hidden">
-                <h3 class="text-white font-black {{ $fontSize }} leading-snug font-montserrat">{!! nl2br(e($text)) !!}</h3>
+
+        {{-- Gradient overlay for readability --}}
+        <div class="absolute inset-0 pointer-events-none" style="background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)"></div>
+
+        {{-- Text overlay --}}
+        <div class="absolute inset-x-4 bottom-20 z-10">
+            <div class="backdrop-blur-md p-4 rounded-2xl border shadow-xl" style="background: rgba(0,0,0,0.55); border-color: rgba(255,255,255,0.08)">
+                {{-- Label --}}
+                <div class="inline-flex items-center gap-1.5 mb-2.5">
+                    <span class="inline-block w-1.5 h-1.5 rounded-full" style="background-color: {{ $brandColor }}"></span>
+                    <p class="text-[9px] font-bold uppercase tracking-[0.2em] font-montserrat" style="color: {{ $brandColor }}">Focus Qualité</p>
+                </div>
+                @php
+                    $len = mb_strlen($text);
+                    $fontSize = 'text-xs';
+                    if ($len > 80) $fontSize = 'text-[9px]';
+                    elseif ($len > 40) $fontSize = 'text-[10px]';
+                @endphp
+                <div class="max-h-[80px] overflow-hidden">
+                    <h3 class="text-white font-black {{ $fontSize }} leading-snug font-montserrat">{!! nl2br(e($text)) !!}</h3>
+                </div>
             </div>
         </div>
 
-        <div class="absolute inset-x-0 bottom-0 py-2 px-6 flex flex-col items-center justify-center bg-black/80">
-            <p class="font-bold text-[9px] tracking-widest font-montserrat text-white/90 mb-1">{{ $companyLabel }}</p>
-            <div class="flex items-center gap-2 mt-1">
+        {{-- Footer --}}
+        <div class="absolute inset-x-0 bottom-0 py-2.5 px-6 flex flex-col items-center justify-center z-10" style="background: rgba(0,0,0,0.72); backdrop-filter: blur(4px)">
+            <p class="font-bold text-[9px] tracking-widest font-montserrat text-white/80 mb-1.5">{{ $companyLabel }}</p>
+            <div class="flex items-center gap-2">
                 @php
                     $tagTextCol = $brandColor;
                     $hexTag = str_replace('#', '', $brandColor);
@@ -76,9 +90,9 @@
                     $gTag = hexdec(substr($hexTag, 2, 2));
                     $bTag = hexdec(substr($hexTag, 4, 2));
                     $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
-                    if ($yiqTag > 235) $tagTextCol = '#1E293B'; 
+                    if ($yiqTag > 235) $tagTextCol = '#1E293B';
                 @endphp
-                
+
                 @if($trade)
                     <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $trade }}</span>
                 @endif

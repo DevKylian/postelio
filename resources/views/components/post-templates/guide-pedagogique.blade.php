@@ -38,17 +38,19 @@
 
 <div {!! $alpineData !!} class="w-full relative">
     <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-gray-50 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
-        
+
+        {{-- Subtle dot pattern --}}
         <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 2px 2px, black 1px, transparent 0); background-size: 24px 24px;"></div>
-        <div class="absolute inset-x-0 top-0 h-1.5 z-10" style="background-color: {{ $brandColor }}"></div>
+
+        {{-- Gradient top bar --}}
+        <div class="absolute inset-x-0 top-0 h-0.5 z-10" style="background: linear-gradient(90deg, {{ $brandColor }}, {{ $brandColor }}66)"></div>
 
         {{-- Cover Slide --}}
         @php
             $isCoverVisible = $slideIndex === null || $slideIndex === 0;
             $coverStyle = "background-color: $brandColor;" . (!$isCoverVisible ? ' display: none;' : '');
             $coverAlpine = $slideIndex === null ? 'x-show="current === 0"' : '';
-            
-            // Dynamic Font Sizing for title
+
             $titleLen = mb_strlen($title ?? '');
             $fontSizeClass = 'text-2xl';
             if ($titleLen > 80) {
@@ -57,8 +59,13 @@
                 $fontSizeClass = 'text-xl';
             }
         @endphp
-        <div class="absolute inset-0 p-10 pb-28 flex flex-col justify-center text-center" {!! $coverAlpine !!} style="{{ $coverStyle }}">
-            <p class="font-bold text-[10px] uppercase tracking-[0.2em] mb-6 select-none opacity-40" style="color: {{ $brandTextColor }}">CONSEIL D'EXPERT</p>
+        <div class="absolute inset-0 p-10 pb-24 flex flex-col justify-center text-center" {!! $coverAlpine !!} style="{{ $coverStyle }}">
+            {{-- Label --}}
+            <div class="inline-flex items-center justify-center gap-1.5 mb-5">
+                <span class="inline-block w-1.5 h-1.5 rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.5)' }}"></span>
+                <p class="font-bold text-[10px] uppercase tracking-[0.2em] font-montserrat select-none" style="color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.5)' }}">CONSEIL D'EXPERT</p>
+            </div>
+
             @if($title)
                 <div class="max-h-[160px] overflow-hidden">
                     <h2 class="font-black {{ $fontSizeClass }} leading-tight font-montserrat" style="color: {{ $brandTextColor }}">{!! nl2br(e($title)) !!}</h2>
@@ -81,27 +88,32 @@
                 $slideAlpine = $slideIndex === null ? "x-show=\"current === $realIdx\" style=\"display: none;\"" : '';
             @endphp
             <div class="absolute inset-0 p-10 pb-20 flex flex-col justify-center text-center" {!! $slideAlpine !!} style="{{ $slideStyle }}">
-                <div class="bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-gray-100 relative">
-                     <div class="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full flex items-center justify-center font-black text-lg shadow-xl" style="background-color: {{ $brandColor }}; color: {{ $brandTextColor }}; border: 1px solid {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }};">
-                         {{ $realIdx }}
-                     </div>
-                     @php
-                         $cLen = mb_strlen($content);
-                         $cFontSize = 'text-xl';
-                         if ($cLen > 150) $cFontSize = 'text-sm';
-                         elseif ($cLen > 80) $cFontSize = 'text-base';
-                         elseif ($cLen > 40) $cFontSize = 'text-lg';
-                     @endphp
-                     <div class="max-h-[180px] overflow-hidden">
-                         <p class="text-gray-800 font-black {{ $cFontSize }} tracking-tight leading-tight font-montserrat">
-                             {{ $content }}
-                         </p>
-                     </div>
+                <div class="rounded-2xl shadow-xl border relative" style="background: white; border-color: rgba(0,0,0,0.06); padding: 1.5rem 1.75rem 1.5rem">
+                    {{-- Top accent --}}
+                    <div class="absolute top-0 inset-x-0 h-0.5 rounded-t-2xl" style="background: linear-gradient(90deg, transparent, {{ $brandColor }}, transparent)"></div>
+
+                    {{-- Number badge (in flow, centered) --}}
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shadow-md mx-auto mb-4" style="background-color: {{ $brandColor }}; color: {{ $brandTextColor }}">
+                        {{ $realIdx }}
+                    </div>
+
+                    @php
+                        $cLen = mb_strlen($content);
+                        $cFontSize = 'text-xl';
+                        if ($cLen > 150) $cFontSize = 'text-sm';
+                        elseif ($cLen > 80) $cFontSize = 'text-base';
+                        elseif ($cLen > 40) $cFontSize = 'text-lg';
+                    @endphp
+                    <div class="max-h-[180px] overflow-hidden">
+                        <p class="text-gray-800 font-black {{ $cFontSize }} tracking-tight leading-tight font-montserrat">
+                            {{ $content }}
+                        </p>
+                    </div>
                 </div>
             </div>
         @endforeach
-        
-        {{-- Slide Index (Contact) --}}
+
+        {{-- Contact Slide --}}
         @php
             $contactIdx = count($slideContents) + 1;
             $isContactVisible = $slideIndex === null || (int)$slideIndex === $contactIdx;
@@ -110,8 +122,8 @@
         @endphp
         @if($hasContactInfo)
         <div class="absolute inset-0 bg-white" {!! $contactAlpine !!} style="{{ $contactStyle }}">
-             <x-post-templates.contact-slide 
-                :brand-color="$brandColor" 
+             <x-post-templates.contact-slide
+                :brand-color="$brandColor"
                 :company-label="$companyLabel"
                 :phone="$phone"
                 :email="$email"
@@ -124,9 +136,9 @@
         @endif
 
         {{-- Footer --}}
-        <div class="absolute bottom-0 inset-x-0 py-2.5 flex flex-col items-center justify-center px-6 gap-1" style="background-color: #1E293B">
-            <p class="text-white/80 font-bold tracking-widest text-[9px] font-montserrat">{{ $companyLabel }}</p>
-            <div class="flex items-center gap-2 mt-0.5">
+        <div class="absolute bottom-0 inset-x-0 py-2.5 flex flex-col items-center justify-center px-6 gap-1.5" style="background-color: #1E293B">
+            <p class="text-white/70 font-bold tracking-widest text-[9px] font-montserrat">{{ $companyLabel }}</p>
+            <div class="flex items-center gap-2">
                 @php
                     $tagTextCol = $brandColor;
                     $hexTag = str_replace('#', '', $brandColor);
@@ -135,9 +147,9 @@
                     $gTag = hexdec(substr($hexTag, 2, 2));
                     $bTag = hexdec(substr($hexTag, 4, 2));
                     $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
-                    if ($yiqTag > 235) $tagTextCol = '#1E293B'; 
+                    if ($yiqTag > 235) $tagTextCol = '#1E293B';
                 @endphp
-                
+
                 @if($trade)
                     <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $trade }}</span>
                 @endif

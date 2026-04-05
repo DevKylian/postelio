@@ -33,11 +33,19 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-midnight flex flex-col p-10 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="border-top: 8px solid {{ $brandColor }}">
-    
+<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] flex flex-col p-10 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: #0F172A; border-top: 3px solid {{ $brandColor }}">
+
+    {{-- Ambient glows --}}
+    <div class="absolute -top-16 -right-16 w-52 h-52 rounded-full blur-3xl pointer-events-none" style="background: radial-gradient(circle, {{ $brandColor }}26, transparent 70%)"></div>
+    <div class="absolute bottom-20 -left-10 w-36 h-36 rounded-full blur-3xl pointer-events-none" style="background: radial-gradient(circle, {{ $brandColor }}1A, transparent 70%)"></div>
+
+    {{-- Decorative question mark --}}
+    <svg class="absolute -bottom-4 -right-4 w-28 h-28 pointer-events-none" fill="currentColor" viewBox="0 0 24 24" style="color: rgba(255,255,255,0.04)">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+    </svg>
+
     <div class="flex-1 flex flex-col justify-center">
-        <span class="inline-block w-12 h-1 mb-6" style="background-color: {{ $brandColor }}"></span>
-        
+
         {{-- Slide 0: Question --}}
         @php
             $isSlide0 = (int)$slideIndex === 0 || $slideIndex === null;
@@ -45,7 +53,15 @@
             $slide0Style = (int)$slideIndex !== 0 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         <div {!! $slide0Alpine !!} style="{{ $slide0Style }}">
-            <h3 class="font-black uppercase tracking-widest text-sm mb-4" style="color: white; opacity: 0.6;">FAQ Artisan</h3>
+            {{-- Label badge --}}
+            <div class="inline-flex items-center gap-1.5 mb-5">
+                <span class="inline-block w-1.5 h-1.5 rounded-full opacity-50" style="background-color: white"></span>
+                <span class="font-black uppercase tracking-[0.2em] text-[10px] font-montserrat" style="color: rgba(255,255,255,0.4)">FAQ Artisan</span>
+            </div>
+
+            {{-- Accent line --}}
+            <span class="block w-8 h-px mb-5" style="background-color: {{ $brandColor }}; opacity: 0.5"></span>
+
             @php
                 $qLen = mb_strlen($question);
                 $qFontSize = 'text-2xl';
@@ -64,7 +80,15 @@
             $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         <div {!! $slide1Alpine !!} style="{{ $slide1Style }}">
-            <h3 class="font-black uppercase tracking-widest text-sm mb-4" style="color: {{ $brandColor }}">La Réponse</h3>
+            {{-- Label badge --}}
+            <div class="inline-flex items-center gap-1.5 mb-5">
+                <span class="inline-block w-1.5 h-1.5 rounded-full" style="background-color: {{ $brandColor }}"></span>
+                <span class="font-black uppercase tracking-[0.2em] text-[10px] font-montserrat" style="color: {{ $brandColor }}">La Réponse</span>
+            </div>
+
+            {{-- Accent line --}}
+            <span class="block w-8 h-px mb-5" style="background-color: {{ $brandColor }}; opacity: 0.5"></span>
+
             @php
                 $aLen = mb_strlen($answer);
                 $aFontSize = 'text-lg';
@@ -83,9 +107,9 @@
             $slide2Style = (int)$slideIndex !== 2 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         @if($hasContactInfo)
-        <div class="absolute inset-0 flex items-center justify-center bg-midnight" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
-             <x-post-templates.contact-slide 
-                :brand-color="$brandColor" 
+        <div class="absolute inset-0 flex items-center justify-center" style="background-color: #0F172A" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
+             <x-post-templates.contact-slide
+                :brand-color="$brandColor"
                 :company-label="$companyLabel"
                 :phone="$phone"
                 :email="$email"
@@ -100,27 +124,27 @@
     </div>
 
     {{-- Footer --}}
-    <div class="pt-4 border-t border-white/10 flex flex-col gap-2">
+    <div class="pt-4 flex flex-col gap-1.5" style="border-top: 1px solid rgba(255,255,255,0.08)">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
                 @if ($logoUrl)
-                    <img src="{{ $logoUrl }}" alt="Logo" class="h-5 w-5 object-contain rounded">
+                    <img src="{{ $logoUrl }}" alt="Logo" class="h-3.5 w-3.5 object-contain rounded">
                 @endif
-                <p class="font-bold text-xs tracking-widest font-montserrat" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
+                <p class="font-bold text-[9px] tracking-widest font-montserrat truncate" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
             </div>
-            
+
             @if($preview || $slideIndex !== null)
                 @php
                     $showTotal = $hasContactInfo ? ((int)$slideIndex !== 2) : true;
                 @endphp
                 @if($showTotal)
-                <div class="text-white/40 text-[10px] font-bold" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
+                <div class="text-[10px] font-bold" style="color: rgba(255,255,255,0.25)" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
                     @if(!$preview) {{ (int)$slideIndex + 1 }} / {{ $total }} @endif
                 </div>
                 @endif
             @endif
         </div>
-        <div class="flex items-center gap-2 mt-0.5">
+        <div class="flex items-center gap-2">
             @php
                 $tagTextCol = $brandColor;
                 $hexTag = str_replace('#', '', $brandColor);
@@ -129,9 +153,9 @@
                 $gTag = hexdec(substr($hexTag, 2, 2));
                 $bTag = hexdec(substr($hexTag, 4, 2));
                 $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
-                if ($yiqTag > 235) $tagTextCol = '#1E293B'; 
+                if ($yiqTag > 235) $tagTextCol = '#1E293B';
             @endphp
-            
+
             @if($trade)
                 <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $trade }}</span>
             @endif
@@ -152,8 +176,4 @@
             </button>
         </div>
     @endif
-
-    <svg class="absolute -bottom-4 -right-4 w-32 h-32 text-white/5 pointer-events-none" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-    </svg>
 </div>

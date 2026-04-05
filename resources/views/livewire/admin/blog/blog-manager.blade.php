@@ -357,118 +357,10 @@
 
         {{-- AI Prompt Modal --}}
         @if($showAIPromptModal)
-        <div class="fixed inset-0 z-[9999] flex items-center justify-center" 
-             x-data="{ 
-                copied: false, 
-                subject: '',
-                axe: '',
-                bannerTitle: '',
-                isExporting: false,
-                
-                formatBannerTitle(text) {
-                    if (!text) return '';
-                    let html = text.replace(/\*([^*]+)\*/g, '<span>$1</span>');
-                    return html.replace(/\s([\u2700-\u27bf\u1f300-\u1f5ff\u1f600-\u1f64f\u1f680-\u1f6ff\u1f900-\u1f9ff\u1f1e6-\u1f1ff])/g, '&nbsp;$1');
-                },
-
-                fitTitle() {
-                    this.$nextTick(() => {
-                        const el = this.$refs.bannerTitle;
-                        if (!el || !this.bannerTitle) return;
-
-                        let fontSize = 100;
-                        const minSize = 40;
-                        const maxSize = 220; // Even larger titles allowed
-                        
-                        // Start high and shrink until it reaches 2 lines max
-                        el.style.fontSize = fontSize + 'px';
-                        
-                        const getLineCount = () => {
-                            const style = window.getComputedStyle(el);
-                            const lh = parseFloat(style.lineHeight);
-                            if (isNaN(lh)) return Math.round(el.scrollHeight / (fontSize * 1.05));
-                            return Math.round(el.scrollHeight / lh);
-                        };
-
-                        el.style.maxWidth = '780px';
-                        
-                        let lineCount = getLineCount();
-                        
-                        while (getLineCount() > 2 && fontSize > minSize) {
-                            fontSize -= 1;
-                            el.style.fontSize = fontSize + 'px';
-                        }
-                        
-                        while (getLineCount() < 2 && fontSize < maxSize) {
-                            fontSize += 1;
-                            el.style.fontSize = fontSize + 'px';
-                            if (getLineCount() === 2) break;
-                        }
-                        
-                        let currentMaxWidth = 780;
-                        while (getLineCount() < 2 && currentMaxWidth > 400) {
-                            currentMaxWidth -= 10;
-                            el.style.maxWidth = currentMaxWidth + 'px';
-                        }
-                        
-                        while (getLineCount() === 2 && fontSize < maxSize) {
-                            fontSize += 1;
-                            el.style.fontSize = fontSize + 'px';
-                            if (getLineCount() > 2) {
-                                fontSize -= 1;
-                                el.style.fontSize = fontSize + 'px';
-                                break;
-                            }
-                        }
-                    });
-                },
-
-                exportBanner() {
-                    const node = this.$refs.bannerCanvas;
-                    const filename = (this.bannerTitle || 'banniere').toLowerCase().replace(/[^a-z0-9]/g, '-') + '.png';
-                    const scale = 2;
-                    this.isExporting = true;
-
-                    setTimeout(() => {
-                        domtoimage.toPng(node, {
-                            width: 1200,
-                            height: 630,
-                            style: {
-                                transform: 'scale(1)',
-                                transformOrigin: 'top left',
-                                width: '1200px',
-                                height: '630px'
-                            }
-                        })
-                        .then((dataUrl) => {
-                            const link = document.createElement('a');
-                            link.download = filename;
-                            link.href = dataUrl;
-                            link.click();
-                            this.isExporting = false;
-                        })
-                        .catch((error) => {
-                            console.error('oops, something went wrong!', error);
-                            this.isExporting = false;
-                        });
-                    }, 200);
-                },
-
-                syncTitleFromPastedJson(jsonString) {
-                    try {
-                        const data = JSON.parse(jsonString);
-                        if (data.titre || data.title) {
-                            this.bannerTitle = data.titre || data.title;
-                        }
-                    } catch (e) {}
-                }
-             }"
-             x-init="
-                $watch('$wire.json_pasted', value => syncTitleFromPastedJson(value));
-                $watch('bannerTitle', value => fitTitle());
-                window.addEventListener('resize', () => fitTitle());
-             "
-             x-on:json-imported.window="syncTitleFromPastedJson($wire.json_pasted); fitTitle();">
+        <div class="fixed inset-0 z-[9999] flex items-center justify-center"
+             x-data="blogModal"
+             x-init="initModal($wire)"
+">
             <div class="fixed inset-0 bg-slate-900/45 backdrop-blur-md" wire:click="closeAIModal"></div>
             
             <div class="relative w-full max-w-5xl mx-4 sm:mx-6 bg-white/95 backdrop-blur-md border border-white/40 shadow-2xl rounded-[2.5rem] overflow-hidden flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh] animate-in zoom-in-95 duration-300">
@@ -552,6 +444,7 @@ Réponds UNIQUEMENT en JSON valide :
 
 {
 "titre": "Titre percutant, max 60 caractères",
+"titre_miniature": "Reformule le titre de l'article en une phrase courte (5 à 8 mots) qui dit clairement de quoi parle l'article. Pas de deux-points, pas de point d'interrogation, pas de style teaser vague. Écris une affirmation directe. Tu peux mettre *un mot clé* entre astérisques pour l'accentuer visuellement. Exemples pour 'Devis trop cher : comment convaincre ton client ?' → 'Vendre ton *devis* même quand il est cher' ou 'Convaincre un client face à un devis élevé'",
 "extrait": "2 phrases choc pour accrocher le lecteur",
 "meta_title": "Titre SEO optimisé, max 60 caractères",
 "meta_description": "Description sans guillemets ni HTML, max 150 caractères",
@@ -571,7 +464,9 @@ Réponds UNIQUEMENT en JSON valide :
                         </div>
                         
                         <div class="relative flex-1 min-h-[250px] lg:min-h-0">
-                            <textarea wire:model="json_pasted" placeholder="Collez le code JSON ici...
+                            <textarea wire:model="json_pasted"
+                                      @input="extractBannerTitle($event.target.value)"
+                                      placeholder="Collez le code JSON ici...
 {
   &quot;titre&quot;: &quot;...&quot;,
   ...
@@ -603,18 +498,34 @@ Réponds UNIQUEMENT en JSON valide :
                                     <span class="w-5 h-5 rounded-full bg-copper/20 text-copper flex items-center justify-center text-xs">3</span>
                                     Générer la bannière
                                 </h4>
-                                <button @click="exportBanner()" 
-                                        :disabled="isExporting"
-                                        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-copper text-white text-xs font-black uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg shadow-copper/20 disabled:opacity-50">
-                                    <svg x-show="!isExporting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                    <svg x-show="isExporting" class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                    <span x-text="isExporting ? 'Exportation...' : 'Exporter la bannière'"></span>
-                                </button>
+                                <div class="flex items-center gap-2">
+                                    <button @click="exportBanner()" :disabled="isExporting || !bannerTitle"
+                                            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-xs font-black uppercase tracking-widest transition-all shadow-lg bg-copper hover:bg-amber-600 shadow-copper/20 disabled:opacity-50">
+                                        <svg x-show="!isExporting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                        <svg x-show="isExporting" class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                        <span x-text="isExporting ? 'Génération...' : 'Télécharger PNG'"></span>
+                                    </button>
+                                </div>
                             </div>
                             
-                            <div class="relative">
-                                <input type="text" x-model="bannerTitle" placeholder="Titre de la bannière (*mot* pour l'effet orange)..." 
+                            <div class="relative flex items-center gap-2">
+                                <input type="text" x-model="bannerTitle" placeholder="Titre de la bannière (*mot* pour l'effet orange)..."
                                        class="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-4 text-sm font-medium text-midnight focus:border-copper focus:ring-2 focus:ring-copper/10 outline-none transition-all">
+                                <button @click="
+                                            isSimplifying = true;
+                                            $wire.simplifyBannerTitle(bannerTitle).then(r => {
+                                                bannerTitle = r.title;
+                                                isSimplifying = false;
+                                                $nextTick(() => fitTitle());
+                                            }).catch(() => isSimplifying = false);
+                                        "
+                                        :disabled="isSimplifying || !bannerTitle"
+                                        title="Générer un titre simplifié avec l'IA"
+                                        class="shrink-0 flex items-center gap-1.5 px-4 py-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 text-xs font-bold hover:bg-amber-100 transition-all disabled:opacity-40 whitespace-nowrap">
+                                    <svg x-show="!isSimplifying" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+                                    <svg x-show="isSimplifying" class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                    <span x-text="isSimplifying ? '' : 'IA'"></span>
+                                </button>
                             </div>
                             
                             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Aperçu en temps réel (1200x630)</p>
@@ -627,16 +538,21 @@ Réponds UNIQUEMENT en JSON valide :
                                     <div class="banner-canvas-wrapper" x-ref="bannerCanvas">
                                         <div class="banner-glow banner-glow-1"></div>
                                         <div class="banner-glow banner-glow-2"></div>
-                                        
+                                        <div class="banner-accent-line"></div>
+
                                         <div class="banner-content-inner">
-                                            <div class="banner-badge">
-                                                Article de blog
+                                            <div class="banner-top-row">
+                                                <div class="banner-badge"><span class="banner-badge-dot">●</span> Article de blog</div>
+                                                <div class="banner-domain">postelio.fr</div>
                                             </div>
-                                            
+
                                             <div class="banner-title-text-wrap">
-                                                <h1 class="banner-title-text" x-ref="bannerTitle" x-html="formatBannerTitle(bannerTitle)"></h1>
+                                                <h1 class="banner-title-text" x-ref="bannerTitle" x-html="formatBannerTitle(bannerTitle) || 'Titre de votre article'"></h1>
                                             </div>
-                                            
+
+                                            <div class="banner-bottom-bar">
+                                                <span class="banner-bottom-line">——</span><span class="banner-bottom-label">Blog</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -663,133 +579,146 @@ Réponds UNIQUEMENT en JSON valide :
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
         <style>
             /* --- Banner Generator Internal Styles --- */
-            .banner-preview-container {
-                --midnight: #1e293b;
-                --copper-from: #f59e0b;
-                --copper-via: #fb923c;
-                --copper-to: #d97706;
-            }
-
             .banner-canvas-wrapper {
                 width: 1200px;
                 height: 630px;
-                background-color: #fcfcfc;
+                background: #0B1120;
                 position: relative;
                 overflow: hidden;
-                box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
-                border-radius: 12px;
+                border-radius: 0;
                 transform-origin: top left;
+                font-family: 'Outfit', sans-serif;
+                box-sizing: border-box;
             }
 
+            /* Ambient warm glow top-right */
             .banner-glow {
                 position: absolute;
                 border-radius: 50%;
-                z-index: 1;
+                pointer-events: none;
             }
 
             .banner-glow-1 {
-                width: 1200px;
-                height: 1200px;
-                top: -50%;
-                left: -30%;
-                background: radial-gradient(circle, rgba(253, 230, 138, 0.15) 0%, rgba(253, 230, 138, 0) 70%);
+                width: 700px;
+                height: 700px;
+                top: -180px;
+                right: -100px;
+                background: radial-gradient(circle, rgba(245, 158, 11, 0.13) 0%, transparent 70%);
             }
 
             .banner-glow-2 {
-                width: 1000px;
-                height: 1000px;
-                top: 20%;
-                right: -40%;
-                background: radial-gradient(circle, rgba(254, 215, 170, 0.08) 0%, rgba(254, 215, 170, 0) 70%);
+                width: 400px;
+                height: 400px;
+                bottom: -120px;
+                left: 60px;
+                background: radial-gradient(circle, rgba(251, 146, 60, 0.07) 0%, transparent 70%);
+            }
+
+            /* Ligne copper pleine largeur en haut */
+            .banner-accent-line {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(to right, #F59E0B, #FB923C);
             }
 
             .banner-content-inner {
                 position: absolute;
                 inset: 0;
-                z-index: 10;
                 display: flex;
                 flex-direction: column;
-                align-items: center;
-                justify-content: space-between; 
-                padding: 100px 80px 90px 80px; /* Increased top/bottom padding for branding */
+                justify-content: space-between;
+                padding: 72px 88px 68px 88px;
                 box-sizing: border-box;
+            }
+
+            .banner-top-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
             }
 
             .banner-badge {
-                position: absolute;
-                top: 110px;
-                left: 50%;
-                transform: translateX(-50%);
-                display: inline-flex;
-                align-items: center;
-                background: rgba(245, 158, 11, 0.04); 
-                color: #d97706; 
-                border: 1px solid rgba(245, 158, 11, 0.18); 
-                padding: 10px 28px;
-                border-radius: 9999px;
+                color: #F59E0B;
+                font-size: 16px;
                 font-weight: 700;
-                font-size: 16px; /* Smaller badge */
-                white-space: nowrap;
-                letter-spacing: 0.06em;
+                letter-spacing: 0.14em;
                 text-transform: uppercase;
-                z-index: 20;
+                font-family: 'Outfit', sans-serif;
+                line-height: 1;
             }
 
-             .banner-title-text {
-                color: var(--midnight);
-                font-family: 'Outfit', sans-serif !important;
-                font-size: 90px; 
+            .banner-badge-dot {
+                font-size: 10px;
+                margin-right: 4px;
+            }
+
+            .banner-domain {
+                color: rgba(255, 255, 255, 0.22);
+                font-size: 16px;
                 font-weight: 600;
-                text-align: center;
-                line-height: 1.05;
-                letter-spacing: -0.05em;
-                max-width: 780px; 
-                margin: 0;
-                white-space: pre-wrap;
-                word-break: keep-all;
-                box-sizing: border-box;
-                display: block; /* Reliable scrollHeight for line counting */
-                width: 100%;
-                overflow: visible !important;
-            }
-
-            .banner-content-inner {
-                position: absolute;
-                inset: 0;
-                z-index: 10;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center; /* Center main content */
-                padding: 60px; 
-                box-sizing: border-box;
+                letter-spacing: 0.12em;
+                font-family: 'Outfit', sans-serif;
+                text-transform: uppercase;
+                line-height: 1;
             }
 
             .banner-title-text-wrap {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                width: 100%;
-                overflow: visible;
-                padding: 40px;
                 flex: 1;
+                display: flex;
+                align-items: center;
             }
-            
+
+            .banner-title-text {
+                color: #F8FAFC;
+                font-family: 'Outfit', sans-serif !important;
+                font-size: 90px;
+                font-weight: 700;
+                text-align: left;
+                line-height: 1.1;
+                letter-spacing: -0.03em;
+                margin: 0;
+                max-width: 1000px;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                display: block;
+                box-sizing: border-box;
+            }
+
             .banner-title-text span {
-                background: linear-gradient(to right, #f59e0b, #fb923c, #d97706);
+                background: linear-gradient(90deg, #F59E0B, #FB923C);
                 -webkit-background-clip: text;
                 background-clip: text;
                 -webkit-text-fill-color: transparent;
-                color: transparent; 
+                color: transparent;
                 font-style: italic;
-                font-weight: 700;
+                font-weight: 800;
                 display: inline-block;
-                padding-right: 0.8em; /* Massive defensive buffer for italics */
-                padding-bottom: 0.1em; 
-                margin-right: -0.75em; /* Balanced to maintain spacing while providing buffer */
-                letter-spacing: 0;
-                overflow: visible !important;
+                padding-right: 0.1em;
+                margin-right: 0.08em;
+                vertical-align: baseline;
+            }
+
+            .banner-bottom-bar {
+                font-family: 'Outfit', sans-serif;
+                font-size: 15px;
+                font-weight: 600;
+                line-height: 1;
+            }
+
+            .banner-bottom-line {
+                color: rgba(245, 158, 11, 0.7);
+                letter-spacing: -0.05em;
+                margin-right: 14px;
+            }
+
+            .banner-bottom-label {
+                color: rgba(255, 255, 255, 0.3);
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
             }
 
 
@@ -824,6 +753,78 @@ Réponds UNIQUEMENT en JSON valide :
 
     @push('scripts')
         <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('blogModal', () => ({
+                copied: false,
+                subject: '',
+                axe: '',
+                bannerTitle: '',
+                isExporting: false,
+                isSimplifying: false,
+
+                initModal(wire) {
+                    this.$watch('bannerTitle', () => {
+                        this.$nextTick(() => this.fitTitle());
+                    });
+                },
+
+                extractBannerTitle(val) {
+                    try {
+                        const d = JSON.parse(val);
+                        const t = d.titre_miniature || d.titre || d.title || '';
+                        if (t) {
+                            this.bannerTitle = t;
+                            this.$nextTick(() => this.fitTitle());
+                        }
+                    } catch (e) {}
+                },
+
+                formatBannerTitle(text) {
+                    if (!text) return '';
+                    return text.replace(/\*([^*]+)\*/g, '<span>$1</span>');
+                },
+
+                fitTitle() {
+                    const el = this.$refs.bannerTitle;
+                    if (!el) return;
+                    const wrapper = el.parentElement;
+                    const maxH = wrapper ? wrapper.offsetHeight : 220;
+                    let size = 90;
+                    el.style.fontSize = size + 'px';
+                    while (size > 32 && el.scrollHeight > maxH) {
+                        size -= 4;
+                        el.style.fontSize = size + 'px';
+                    }
+                },
+
+                exportBanner() {
+                    if (this.isExporting) return;
+                    this.isExporting = true;
+                    const source = this.$refs.bannerCanvas;
+                    if (!source) { this.isExporting = false; return; }
+                    const clone = source.cloneNode(true);
+                    const wrap = document.createElement('div');
+                    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;pointer-events:none;';
+                    wrap.appendChild(clone);
+                    document.body.appendChild(wrap);
+                    clone.querySelectorAll('.banner-title-text span').forEach(span => {
+                        span.style.cssText = 'background:none;-webkit-text-fill-color:#F59E0B;color:#F59E0B;font-style:italic;font-weight:800;padding-right:0;display:inline;';
+                    });
+                    document.fonts.ready
+                        .then(() => html2canvas(clone, { width: 1200, height: 630, scale: 1, useCORS: true, allowTaint: false, backgroundColor: '#0B1120', logging: false }))
+                        .then(canvas => {
+                            const link = document.createElement('a');
+                            link.download = 'banniere-blog.png';
+                            link.href = canvas.toDataURL('image/png');
+                            link.click();
+                        })
+                        .catch(err => console.error('Export error:', err))
+                        .finally(() => { document.body.removeChild(wrap); this.isExporting = false; });
+                },
+            }));
+        });
+        </script>
     @endpush
 </div>

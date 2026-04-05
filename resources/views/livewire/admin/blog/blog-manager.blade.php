@@ -697,6 +697,7 @@ Réponds UNIQUEMENT en JSON valide :
                 font-style: italic;
                 font-weight: 800;
                 display: inline-block;
+                padding-right: 0.1em;
                 margin-right: 0.18em;
                 vertical-align: baseline;
             }

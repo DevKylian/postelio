@@ -119,6 +119,22 @@
                                     </div>
                                 </div>
 
+                                {{-- Blog Section --}}
+                                <div>
+                                    <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3 px-2">
+                                        Blog
+                                    </h4>
+                                    <div class="grid grid-cols-1 gap-1.5">
+                                        <button
+                                            wire:click="$set('template', 'article-blog')"
+                                            class="group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all {{ $template === 'article-blog' ? 'bg-copper text-midnight shadow-md shadow-copper/10' : 'text-gray-600 hover:bg-gray-50' }}"
+                                        >
+                                            <span class="text-lg transition-transform group-hover:scale-110">&#x1F4F0;</span>
+                                            Article de blog
+                                        </button>
+                                    </div>
+                                </div>
+
                                 {{-- Visual Section --}}
                                 <div>
                                     <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3 px-2">
@@ -502,6 +518,30 @@
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Message</label>
                                     <textarea wire:model.live="hero_body" rows="3" maxlength="160" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
                                 </div>
+
+                            @elseif($template === 'article-blog')
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Badge</label>
+                                    <input wire:model.live="article_blog_tag" type="text" maxlength="25" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Titre de l'article</label>
+                                    <textarea wire:model.live="article_blog_title" rows="2" maxlength="100" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Extrait / Accroche</label>
+                                    <textarea wire:model.live="article_blog_excerpt" rows="3" maxlength="160" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-600 mb-1">CTA</label>
+                                        <input wire:model.live="article_blog_cta" type="text" maxlength="25" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-600 mb-1">URL</label>
+                                        <input wire:model.live="article_blog_url" type="text" maxlength="40" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                    </div>
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -621,6 +661,8 @@
                                                     <x-postelio-instagram.educatif :tag="$educatif_tag" :title="$educatif_title" :body="$educatif_body" :insight="$educatif_insight" />
                                                 @elseif($template === 'hero')
                                                     <x-postelio-instagram.hero :tag="$hero_tag" :headline="$hero_headline" :body="$hero_body" />
+                                                @elseif($template === 'article-blog')
+                                                    <x-postelio-instagram.article-blog :tag="$article_blog_tag" :title="$article_blog_title" :excerpt="$article_blog_excerpt" :cta="$article_blog_cta" :url="$article_blog_url" />
                                                 @elseif($template === 'chantier')
                                                     <x-postelio-instagram.chantier 
                                                         :tag="$photo_tag" 

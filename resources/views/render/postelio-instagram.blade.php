@@ -106,6 +106,14 @@
                 :headline="$data['headline'] ?? ''"
                 :body="$data['body'] ?? ''"
             />
+        @elseif($template === 'article-blog')
+            <x-postelio-instagram.article-blog
+                :tag="$data['tag'] ?? 'NOUVEL ARTICLE'"
+                :title="$data['title'] ?? ''"
+                :excerpt="$data['excerpt'] ?? ''"
+                :cta="$data['cta'] ?? 'Lire l\'article'"
+                :url="$data['url'] ?? 'postelio.fr/blog'"
+            />
         @endif
     </div>
 </body>

@@ -98,6 +98,13 @@ class InstagramPostGenerator extends Component
     public string $hero_headline = '';
     public string $hero_body     = '';
 
+    // ── Editable fields: article-blog ─────────────────────────────────────────
+    public string $article_blog_tag     = 'NOUVEL ARTICLE';
+    public string $article_blog_title   = '';
+    public string $article_blog_excerpt = '';
+    public string $article_blog_cta     = 'Lire l\'article';
+    public string $article_blog_url     = 'postelio.fr/blog';
+
     // ── Editable fields: chantier ─────────────────────────────────────────────
     public string $photo_tag      = 'RÉALISATION';
     public string $photo_headline = '';
@@ -142,6 +149,9 @@ class InstagramPostGenerator extends Component
         $this->avantapres_tag = $this->avantapres_headline = '';
         $this->educatif_tag = $this->educatif_title = $this->educatif_body = $this->educatif_insight = '';
         $this->hero_tag = $this->hero_headline = $this->hero_body = '';
+        $this->article_blog_tag = 'NOUVEL ARTICLE';
+        $this->article_blog_title = $this->article_blog_excerpt = $this->article_blog_cta = '';
+        $this->article_blog_url = 'postelio.fr/blog';
         $this->uploadImage1 = null;
         $this->uploadImage2 = null;
         $this->hasContent   = false;
@@ -178,7 +188,7 @@ class InstagramPostGenerator extends Component
     {
         $this->validate([
             'topic'    => 'required|min:3',
-            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero',
+            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog',
             'tone'     => 'required|in:professionnel,accessible,dynamique,inspirant',
         ]);
 
@@ -333,6 +343,13 @@ class InstagramPostGenerator extends Component
                 'tag'      => $this->hero_tag,
                 'headline' => $this->hero_headline,
                 'body'     => $this->hero_body,
+            ],
+            'article-blog' => [
+                'tag'     => $this->article_blog_tag,
+                'title'   => $this->article_blog_title,
+                'excerpt' => $this->article_blog_excerpt,
+                'cta'     => $this->article_blog_cta,
+                'url'     => $this->article_blog_url,
             ],
             'chantier' => [
                 'tag'      => $this->photo_tag,
@@ -529,6 +546,7 @@ class InstagramPostGenerator extends Component
                 'appmockup'   => $this->fillAppmockup($data),
                 'educatif'    => $this->fillEducatif($data),
                 'hero'        => $this->fillHero($data),
+                'article-blog' => $this->fillArticleBlog($data),
             };
         }
     }
@@ -708,6 +726,15 @@ class InstagramPostGenerator extends Component
         $this->hero_body     = $data['body'] ?? '';
     }
 
+    private function fillArticleBlog(array $d): void
+    {
+        $this->article_blog_tag     = $d['tag']     ?? 'NOUVEL ARTICLE';
+        $this->article_blog_title   = $d['title']   ?? $d['headline'] ?? '';
+        $this->article_blog_excerpt = $d['excerpt'] ?? $d['body']     ?? '';
+        $this->article_blog_cta     = $d['cta']     ?? 'Lire l\'article';
+        $this->article_blog_url     = $d['url']     ?? 'postelio.fr/blog';
+    }
+
     private function fillChantier(array $data): void
     {
         $this->photo_tag      = $data['tag'] ?? 'RÉALISATION';
@@ -800,6 +827,19 @@ class InstagramPostGenerator extends Component
             'appmockup' => <<<PROMPT
                 Post "Démo App". IMAGE UNIQUE (Interdit : Pas de carrousel).
                 JSON : { "title": "Titre", "body": "Sous-titre", "tag": "...", "instagram_caption": "..." }
+                PROMPT,
+            'article-blog' => <<<PROMPT
+                Post "Promotion d'article de blog". IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
+                Objectif : donner envie de lire l'article en mettant en avant son titre et un extrait accrocheur.
+                JSON : {
+                    "tag": "NOUVEL ARTICLE",
+                    "title": "Titre de l'article (tel quel ou légèrement simplifié, max 65 car.)",
+                    "excerpt": "Accroche courte qui résume la valeur de l'article (25-40 mots, sans spoiler la conclusion)",
+                    "cta": "Lire l'article",
+                    "url": "postelio.fr/blog",
+                    "instagram_caption": "Caption engageante avec le lien en bio, 2-3 hashtags pertinents"
+                }
+                RÈGLE : Le titre doit rester fidèle à l'article. L'extrait doit créer de la curiosité sans être vague.
                 PROMPT,
             default => '',
         };

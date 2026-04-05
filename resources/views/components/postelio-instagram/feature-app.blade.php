@@ -120,7 +120,7 @@
     "></div>
 
     {{-- Decorative dots grid – right edge at image/text junction --}}
-    <div style="position: absolute; top: 210px; right: -10px; opacity: 0.18;">
+    <div style="position: absolute; top: 322px; right: -10px; opacity: 0.18;">
         @for($r = 0; $r < 5; $r++)
             <div style="display: flex; gap: 8px; margin-bottom: 8px;">
                 @for($c = 0; $c < 4; $c++)

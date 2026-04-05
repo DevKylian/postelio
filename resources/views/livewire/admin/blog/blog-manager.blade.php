@@ -431,8 +431,10 @@
                 syncTitleFromPastedJson(jsonString) {
                     try {
                         const data = JSON.parse(jsonString);
-                        if (data.titre || data.title) {
-                            this.bannerTitle = data.titre || data.title;
+                        const title = data.titre_miniature || data.titre || data.title;
+                        if (title) {
+                            this.bannerTitle = title;
+                            this.$nextTick(() => fitTitle());
                         }
                     } catch (e) {}
                 }
@@ -526,6 +528,7 @@ Réponds UNIQUEMENT en JSON valide :
 
 {
 "titre": "Titre percutant, max 60 caractères",
+"titre_miniature": "3 à 5 mots max pour la miniature — percutant, sans deux-points ni point d'interrogation. Tu peux entourer un mot clé avec *astérisques* pour le mettre en valeur visuellement. Exemples : *Convaincre* sans brader, Arrête de perdre des chantiers, *Devis* qui convertissent",
 "extrait": "2 phrases choc pour accrocher le lecteur",
 "meta_title": "Titre SEO optimisé, max 60 caractères",
 "meta_description": "Description sans guillemets ni HTML, max 150 caractères",

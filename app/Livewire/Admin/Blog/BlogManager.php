@@ -124,8 +124,8 @@ class BlogManager extends Component
             $this->isEditing = false;
             $this->editingId = null;
             $this->showForm = true;
-            $this->showAIPromptModal = false;
-            
+            // Keep modal open so banner section stays interactive
+
             $bannerTitle = $data['titre_miniature'] ?? ($data['titre'] ?? ($data['title'] ?? ''));
             $this->dispatch('notify', 'Article importé avec succès.');
             $this->dispatch('json-imported', bannerTitle: $bannerTitle);

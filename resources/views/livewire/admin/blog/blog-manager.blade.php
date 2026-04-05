@@ -858,7 +858,11 @@ Réponds UNIQUEMENT en JSON valide :
                                 fd.append('_token', csrfToken);
                                 fetch('/admin/blog/banner-upload', { method: 'POST', body: fd })
                                     .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-                                    .then(data => { wire.setBannerImagePath(data.path); resolve(); })
+                                    .then(data => {
+                                        wire.setBannerImagePath(data.path);
+                                        setTimeout(() => wire.closeAIModal(), 1500);
+                                        resolve();
+                                    })
                                     .catch(reject);
                             }, 'image/png');
                         }))

@@ -644,7 +644,7 @@ Réponds UNIQUEMENT en JSON valide :
                                             <div class="banner-top-row">
                                                 <div class="banner-badge">
                                                     <span class="banner-badge-dot"></span>
-                                                    Article de blog
+                                                    <span>Article de blog</span>
                                                 </div>
                                                 <div class="banner-domain">postelio.fr</div>
                                             </div>
@@ -765,6 +765,7 @@ Réponds UNIQUEMENT en JSON valide :
                 background: #F59E0B;
                 flex-shrink: 0;
                 display: block;
+                align-self: center;
             }
 
             .banner-domain {
@@ -825,6 +826,7 @@ Réponds UNIQUEMENT en JSON valide :
                 width: 64px;
                 background: rgba(245, 158, 11, 0.55);
                 flex-shrink: 0;
+                align-self: center;
             }
 
             .banner-bottom-label {

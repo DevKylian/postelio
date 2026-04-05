@@ -44,11 +44,11 @@
 
 <div {!! $alpineData !!} class="w-full relative">
     <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-gray-800 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
-        
+
         @foreach($slides as $index => $imageUrl)
             @php
                 $isSlideVisible = $slideIndex === null || $slideIndex === $index;
-                $slideAlpine = $slideIndex === null 
+                $slideAlpine = $slideIndex === null
                     ? "x-show=\"current === $index\"" . ($index > 0 ? ' style="display: none;"' : '')
                     : '';
                 $slideStyle = !$isSlideVisible ? 'display: none;' : '';
@@ -60,11 +60,14 @@
                 @else
                     <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] flex items-center justify-center {{ $index % 2 === 0 ? 'bg-gray-600' : 'bg-gray-500' }}">
                          <div class="text-center">
-                            <svg class="w-10 h-10 mx-auto mb-2 opacity-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <svg class="w-10 h-10 mx-auto mb-2 opacity-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                             <p class="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Photo {{ $index + 1 }}</p>
                          </div>
                     </div>
                 @endif
+
+                {{-- Gradient top bar on every slide --}}
+                <div class="absolute top-0 inset-x-0 h-0.5 z-10" style="background: linear-gradient(90deg, {{ $brandColor }}, {{ $brandColor }}55)"></div>
 
                 @php
                     $slideText = $slideContents[$index] ?? (($index === 0) ? $title : '');
@@ -77,7 +80,7 @@
                         if ($sLen > 120) $sFontSize = 'text-[7px]';
                         elseif ($sLen > 60) $sFontSize = 'text-[9px]';
                     @endphp
-                     <div class="absolute inset-x-4 bottom-20 bg-black/70 backdrop-blur-sm p-4 rounded-xl border border-white/10 shadow-xl">
+                     <div class="absolute inset-x-4 bottom-20 backdrop-blur-sm p-4 rounded-xl border shadow-xl" style="background: rgba(0,0,0,0.65); border-color: rgba(255,255,255,0.08)">
                         <div class="max-h-[60px] overflow-hidden">
                              <p class="text-white font-black {{ $sFontSize }} leading-snug font-montserrat text-center">{{ $slideText }}</p>
                         </div>
@@ -86,7 +89,7 @@
             </div>
         @endforeach
 
-        {{-- Slide Index (Contact) --}}
+        {{-- Contact Slide --}}
         @php
             $contactIdx = count($slides);
             $isContactVisible = $slideIndex === null || (int)$slideIndex === $contactIdx;
@@ -95,8 +98,8 @@
         @endphp
         @if($hasContactInfo)
         <div class="absolute inset-0 bg-white" {!! $contactAlpine !!} style="{{ $contactStyle }}">
-             <x-post-templates.contact-slide 
-                :brand-color="$brandColor" 
+             <x-post-templates.contact-slide
+                :brand-color="$brandColor"
                 :company-label="$companyLabel"
                 :phone="$phone"
                 :email="$email"
@@ -108,13 +111,14 @@
         </div>
         @endif
 
+        {{-- Brand bar --}}
         @php
             $showBrandBar = $slideIndex === null || (int)$slideIndex < $contactIdx;
             $brandBarAlpine = $slideIndex === null ? "x-show=\"current < $contactIdx\"" : '';
         @endphp
-        <div class="absolute inset-x-0 bottom-0 py-2 px-6 flex flex-col items-center justify-center bg-black/85" {!! $brandBarAlpine !!} style="{{ !$showBrandBar ? 'display:none;' : '' }}">
-            <p class="text-white font-bold tracking-widest text-[9px] font-montserrat mb-1">{{ $companyLabel }}</p>
-            <div class="flex items-center gap-2 mt-1">
+        <div class="absolute inset-x-0 bottom-0 py-2.5 px-6 flex flex-col items-center justify-center" {!! $brandBarAlpine !!} style="{{ !$showBrandBar ? 'display:none;' : '' }}; background: rgba(0,0,0,0.78); backdrop-filter: blur(4px)">
+            <p class="text-white/75 font-bold tracking-widest text-[9px] font-montserrat mb-1.5">{{ $companyLabel }}</p>
+            <div class="flex items-center gap-2">
                 @php
                     $tagTextCol = $brandColor;
                     $hexTag = str_replace('#', '', $brandColor);
@@ -123,9 +127,9 @@
                     $gTag = hexdec(substr($hexTag, 2, 2));
                     $bTag = hexdec(substr($hexTag, 4, 2));
                     $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
-                    if ($yiqTag > 235) $tagTextCol = '#1E293B'; 
+                    if ($yiqTag > 235) $tagTextCol = '#1E293B';
                 @endphp
-                
+
                 @if($trade)
                     <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $trade }}</span>
                 @endif

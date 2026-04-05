@@ -376,8 +376,8 @@
                         const el = this.$refs.bannerTitle;
                         if (!el || !this.bannerTitle) return;
 
-                        let fontSize = 68;
-                        const minSize = 28;
+                        let fontSize = 90;
+                        const minSize = 32;
 
                         el.style.fontSize = fontSize + 'px';
 
@@ -737,20 +737,19 @@ Réponds UNIQUEMENT en JSON valide :
             .banner-title-text-wrap {
                 flex: 1;
                 display: flex;
-                align-items: flex-end;
-                padding-bottom: 40px;
+                align-items: center;
             }
 
             .banner-title-text {
                 color: #F8FAFC;
                 font-family: 'Outfit', sans-serif !important;
-                font-size: 68px;
+                font-size: 90px;
                 font-weight: 700;
                 text-align: left;
                 line-height: 1.1;
                 letter-spacing: -0.03em;
                 margin: 0;
-                max-width: 900px;
+                max-width: 1000px;
                 word-break: break-word;
                 overflow-wrap: break-word;
                 display: block;
@@ -765,7 +764,10 @@ Réponds UNIQUEMENT en JSON valide :
                 color: transparent;
                 font-style: italic;
                 font-weight: 800;
-                display: inline;
+                /* inline-block + padding-right évite le clip des lettres italiques */
+                display: inline-block;
+                padding-right: 0.12em;
+                vertical-align: baseline;
             }
 
             .banner-bottom-bar {

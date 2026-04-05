@@ -42,13 +42,13 @@
         {{-- Copper top bar --}}
         <div style="
             position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, #F59E0B 0%, #D97706 60%, #92400E 100%);
+            background: linear-gradient(90deg, #FCD34D 0%, #F59E0B 50%, #D97706 100%);
         "></div>
 
-        {{-- Copper gradient fade at bottom of image --}}
+        {{-- Soft gradient fade → dark at bottom of image --}}
         <div style="
             position: absolute; bottom: 0; left: 0; right: 0; height: 90px;
-            background: linear-gradient(to bottom, transparent 0%, rgba(245,158,11,0.55) 100%);
+            background: linear-gradient(to bottom, transparent 0%, rgba(17,24,39,0.92) 100%);
             pointer-events: none;
         "></div>
 

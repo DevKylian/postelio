@@ -401,36 +401,40 @@
                     const filename = (this.bannerTitle || 'banniere').toLowerCase().replace(/[^a-z0-9]/g, '-') + '.png';
                     this.isExporting = true;
 
-                    // Clone le canvas dans un container off-screen pleine taille,
-                    // sans le parent scale(0.4) qui casse le layout à l'export.
-                    const clone = this.$refs.bannerCanvas.cloneNode(true);
-                    const wrap = document.createElement('div');
-                    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;z-index:-1;';
+                    // Clone le canvas hors du parent scale(0.4) pour que html2canvas
+                    // voie l'élément à sa vraie taille 1200×630.
+                    const source = this.$refs.bannerCanvas;
+                    const clone  = source.cloneNode(true);
+                    const wrap   = document.createElement('div');
+                    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;';
                     wrap.appendChild(clone);
                     document.body.appendChild(wrap);
 
-                    // dom-to-image ne supporte pas background-clip:text — on force
-                    // une couleur solide sur les spans pour l'export.
-                    clone.querySelectorAll('.banner-title-text span').forEach(span => {
-                        span.style.cssText += ';background:none;-webkit-text-fill-color:#F59E0B;color:#F59E0B;';
-                    });
-
-                    setTimeout(() => {
-                        domtoimage.toPng(clone, { width: 1200, height: 630 })
-                        .then((dataUrl) => {
-                            const link = document.createElement('a');
-                            link.download = filename;
-                            link.href = dataUrl;
-                            link.click();
-                        })
-                        .catch((error) => {
-                            console.error('Export error:', error);
-                        })
-                        .finally(() => {
-                            document.body.removeChild(wrap);
-                            this.isExporting = false;
+                    // Attendre que la police soit prête avant de capturer
+                    document.fonts.ready.then(() => {
+                        return html2canvas(clone, {
+                            width: 1200,
+                            height: 630,
+                            scale: 1,
+                            useCORS: true,
+                            allowTaint: false,
+                            backgroundColor: null,
+                            logging: false,
                         });
-                    }, 300);
+                    })
+                    .then((canvas) => {
+                        const link = document.createElement('a');
+                        link.download = filename;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                    })
+                    .catch((error) => {
+                        console.error('Export error:', error);
+                    })
+                    .finally(() => {
+                        document.body.removeChild(wrap);
+                        this.isExporting = false;
+                    });
                 },
 
                 syncTitleFromPastedJson(jsonString) {
@@ -850,6 +854,6 @@ Réponds UNIQUEMENT en JSON valide :
 
     @push('scripts')
         <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     @endpush
 </div>

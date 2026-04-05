@@ -48,7 +48,7 @@
         {{-- Soft gradient fade → dark at bottom of image --}}
         <div style="
             position: absolute; bottom: 0; left: 0; right: 0; height: 90px;
-            background: linear-gradient(to bottom, transparent 0%, rgba(17,24,39,0.92) 100%);
+            background: linear-gradient(to bottom, transparent 0%, rgba(17,24,39,0.65) 100%);
             pointer-events: none;
         "></div>
 
@@ -67,7 +67,7 @@
 
     {{-- ── Text content : bottom zone ─────────────────────────────────────── --}}
     <div style="
-        position: absolute; top: 205px; left: 0; right: 0; bottom: 0;
+        position: absolute; top: 248px; left: 0; right: 0; bottom: 0;
         padding: 0 24px 28px 24px;
         display: flex; flex-direction: column; justify-content: flex-end;
     ">

@@ -360,7 +360,6 @@
         <div class="fixed inset-0 z-[9999] flex items-center justify-center"
              x-data="blogModal"
              x-init="initModal($wire)"
-             x-on:json-imported.window="syncTitleFromPastedJson($event.detail.bannerTitle)"
              x-on:banner-saved.window="bannerSaved = true; setTimeout(() => bannerSaved = false, 3000)">
             <div class="fixed inset-0 bg-slate-900/45 backdrop-blur-md" wire:click="closeAIModal"></div>
             
@@ -770,22 +769,17 @@ Réponds UNIQUEMENT en JSON valide :
                 bannerSaved: false,
 
                 initModal(wire) {
-                    this.$nextTick(() => {
-                        if (wire.title) {
-                            this.bannerTitle = wire.title;
+                    // Watch the Livewire property — fires reliably after every server response
+                    wire.$watch('banner_title_for_modal', (val) => {
+                        if (val) {
+                            this.bannerTitle = val;
                             this.$nextTick(() => this.fitTitle());
                         }
                     });
+                    // Also watch bannerTitle to update preview on manual edits
                     this.$watch('bannerTitle', () => {
                         this.$nextTick(() => this.fitTitle());
                     });
-                },
-
-                syncTitleFromPastedJson(bannerTitle) {
-                    if (bannerTitle) {
-                        this.bannerTitle = bannerTitle;
-                        this.$nextTick(() => this.fitTitle());
-                    }
                 },
 
                 formatBannerTitle(text) {
@@ -806,68 +800,74 @@ Réponds UNIQUEMENT en JSON valide :
                     }
                 },
 
-                exportBanner() {
-                    this.isExporting = true;
-                    const source = this.$refs.bannerCanvas;
-                    const clone = source.cloneNode(true);
-                    const wrap = document.createElement('div');
-                    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;';
-                    wrap.appendChild(clone);
-                    document.body.appendChild(wrap);
-                    clone.querySelectorAll('.banner-title-text span').forEach(span => {
-                        span.style.background = 'none';
-                        span.style.webkitTextFillColor = '#F59E0B';
-                        span.style.color = '#F59E0B';
-                        span.style.paddingRight = '0';
+                captureCanvas() {
+                    return new Promise((resolve, reject) => {
+                        const source = this.$refs.bannerCanvas;
+                        if (!source) { reject(new Error('bannerCanvas ref not found')); return; }
+                        const clone = source.cloneNode(true);
+                        const wrap = document.createElement('div');
+                        wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;pointer-events:none;';
+                        wrap.appendChild(clone);
+                        document.body.appendChild(wrap);
+                        // Replace gradient text with solid colour for html2canvas
+                        clone.querySelectorAll('.banner-title-text span').forEach(span => {
+                            span.style.cssText = 'background:none;-webkit-text-fill-color:#F59E0B;color:#F59E0B;font-style:italic;font-weight:800;padding-right:0;display:inline;';
+                        });
+                        document.fonts.ready
+                            .then(() => html2canvas(clone, {
+                                width: 1200, height: 630, scale: 1,
+                                useCORS: true, allowTaint: false,
+                                backgroundColor: '#0B1120', logging: false
+                            }))
+                            .then(canvas => { document.body.removeChild(wrap); resolve(canvas); })
+                            .catch(err => { document.body.removeChild(wrap); reject(err); });
                     });
-                    document.fonts.ready
-                        .then(() => html2canvas(clone, { width: 1200, height: 630, scale: 1, useCORS: true, allowTaint: false, backgroundColor: null, logging: false }))
+                },
+
+                exportBanner() {
+                    if (this.isExporting) return;
+                    this.isExporting = true;
+                    this.captureCanvas()
                         .then(canvas => {
                             const link = document.createElement('a');
                             link.download = 'banniere-blog.png';
                             link.href = canvas.toDataURL('image/png');
                             link.click();
                         })
-                        .catch(err => console.error('Export error:', err))
-                        .finally(() => { document.body.removeChild(wrap); this.isExporting = false; });
+                        .catch(err => { console.error('Export error:', err); alert('Erreur export PNG : ' + err.message); })
+                        .finally(() => { this.isExporting = false; });
                 },
 
                 applyBanner() {
+                    if (this.isExporting) return;
                     this.isExporting = true;
                     const wire = this.$wire;
-                    const source = this.$refs.bannerCanvas;
-                    const clone = source.cloneNode(true);
-                    const wrap = document.createElement('div');
-                    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;';
-                    wrap.appendChild(clone);
-                    document.body.appendChild(wrap);
-                    clone.querySelectorAll('.banner-title-text span').forEach(span => {
-                        span.style.background = 'none';
-                        span.style.webkitTextFillColor = '#F59E0B';
-                        span.style.color = '#F59E0B';
-                        span.style.paddingRight = '0';
-                    });
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                    document.fonts.ready
-                        .then(() => html2canvas(clone, { width: 1200, height: 630, scale: 1, useCORS: true, allowTaint: false, backgroundColor: null, logging: false }))
+                    this.captureCanvas()
                         .then(canvas => new Promise((resolve, reject) => {
                             canvas.toBlob(blob => {
-                                if (!blob) { reject(new Error('toBlob failed')); return; }
+                                if (!blob) { reject(new Error('toBlob a échoué')); return; }
                                 const fd = new FormData();
                                 fd.append('banner', blob, 'banner.png');
                                 fd.append('_token', csrfToken);
                                 fetch('/admin/blog/banner-upload', { method: 'POST', body: fd })
-                                    .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-                                    .then(data => {
-                                        wire.setBannerImagePath(data.path);
-                                        setTimeout(() => wire.closeAIModal(), 1500);
-                                        resolve();
-                                    })
+                                    .then(r => r.ok ? r.json() : r.text().then(t => Promise.reject(t)))
+                                    .then(data => { resolve(data.path); })
                                     .catch(reject);
                             }, 'image/png');
                         }))
-                        .catch(err => console.error('Banner apply error:', err))
-                        .finally(() => { document.body.removeChild(wrap); this.isExporting = false; });
+                        .then(path => {
+                            return wire.setBannerImagePath(path);
+                        })
+                        .then(() => {
+                            this.bannerSaved = true;
+                            setTimeout(() => {
+                                this.bannerSaved = false;
+                                wire.closeAIModal();
+                            }, 1500);
+                        })
+                        .catch(err => { console.error('Banner apply error:', err); alert('Erreur : ' + err); })
+                        .finally(() => { this.isExporting = false; });
                 },
             }));
         });

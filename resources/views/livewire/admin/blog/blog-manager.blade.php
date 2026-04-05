@@ -398,34 +398,39 @@
                 },
 
                 exportBanner() {
-                    const node = this.$refs.bannerCanvas;
                     const filename = (this.bannerTitle || 'banniere').toLowerCase().replace(/[^a-z0-9]/g, '-') + '.png';
-                    const scale = 2;
                     this.isExporting = true;
 
+                    // Clone le canvas dans un container off-screen pleine taille,
+                    // sans le parent scale(0.4) qui casse le layout à l'export.
+                    const clone = this.$refs.bannerCanvas.cloneNode(true);
+                    const wrap = document.createElement('div');
+                    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;z-index:-1;';
+                    wrap.appendChild(clone);
+                    document.body.appendChild(wrap);
+
+                    // dom-to-image ne supporte pas background-clip:text — on force
+                    // une couleur solide sur les spans pour l'export.
+                    clone.querySelectorAll('.banner-title-text span').forEach(span => {
+                        span.style.cssText += ';background:none;-webkit-text-fill-color:#F59E0B;color:#F59E0B;';
+                    });
+
                     setTimeout(() => {
-                        domtoimage.toPng(node, {
-                            width: 1200,
-                            height: 630,
-                            style: {
-                                transform: 'scale(1)',
-                                transformOrigin: 'top left',
-                                width: '1200px',
-                                height: '630px'
-                            }
-                        })
+                        domtoimage.toPng(clone, { width: 1200, height: 630 })
                         .then((dataUrl) => {
                             const link = document.createElement('a');
                             link.download = filename;
                             link.href = dataUrl;
                             link.click();
-                            this.isExporting = false;
                         })
                         .catch((error) => {
-                            console.error('oops, something went wrong!', error);
+                            console.error('Export error:', error);
+                        })
+                        .finally(() => {
+                            document.body.removeChild(wrap);
                             this.isExporting = false;
                         });
-                    }, 200);
+                    }, 300);
                 },
 
                 syncTitleFromPastedJson(jsonString) {

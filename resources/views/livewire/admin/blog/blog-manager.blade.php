@@ -360,7 +360,7 @@
         <div class="fixed inset-0 z-[9999] flex items-center justify-center"
              x-data="blogModal"
              x-init="initModal($wire)"
-             x-on:json-imported.window="syncTitleFromPastedJson($wire.json_pasted)"
+             x-on:json-imported.window="syncTitleFromPastedJson($event.detail.bannerTitle)"
              x-on:banner-saved.window="bannerSaved = true; setTimeout(() => bannerSaved = false, 3000)">
             <div class="fixed inset-0 bg-slate-900/45 backdrop-blur-md" wire:click="closeAIModal"></div>
             
@@ -781,14 +781,11 @@ Réponds UNIQUEMENT en JSON valide :
                     });
                 },
 
-                syncTitleFromPastedJson(json) {
-                    try {
-                        const data = JSON.parse(json);
-                        if (data && (data.titre_miniature || data.titre || data.title)) {
-                            this.bannerTitle = data.titre_miniature || data.titre || data.title;
-                            this.$nextTick(() => this.fitTitle());
-                        }
-                    } catch (e) {}
+                syncTitleFromPastedJson(bannerTitle) {
+                    if (bannerTitle) {
+                        this.bannerTitle = bannerTitle;
+                        this.$nextTick(() => this.fitTitle());
+                    }
                 },
 
                 formatBannerTitle(text) {

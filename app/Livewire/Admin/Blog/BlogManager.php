@@ -126,8 +126,9 @@ class BlogManager extends Component
             $this->showForm = true;
             $this->showAIPromptModal = false;
             
+            $bannerTitle = $data['titre_miniature'] ?? ($data['titre'] ?? ($data['title'] ?? ''));
             $this->dispatch('notify', 'Article importé avec succès.');
-            $this->dispatch('json-imported'); // Event for Alpine to switch to HTML mode
+            $this->dispatch('json-imported', bannerTitle: $bannerTitle);
         } else {
             $this->dispatch('notify', 'Erreur : Le texte collé n\'est pas un JSON valide.');
         }

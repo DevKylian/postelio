@@ -376,49 +376,22 @@
                         const el = this.$refs.bannerTitle;
                         if (!el || !this.bannerTitle) return;
 
-                        let fontSize = 100;
-                        const minSize = 40;
-                        const maxSize = 220; // Even larger titles allowed
-                        
-                        // Start high and shrink until it reaches 2 lines max
+                        let fontSize = 68;
+                        const minSize = 28;
+
                         el.style.fontSize = fontSize + 'px';
-                        
+
                         const getLineCount = () => {
-                            const style = window.getComputedStyle(el);
-                            const lh = parseFloat(style.lineHeight);
-                            if (isNaN(lh)) return Math.round(el.scrollHeight / (fontSize * 1.05));
-                            return Math.round(el.scrollHeight / lh);
+                            const lh = parseFloat(window.getComputedStyle(el).lineHeight);
+                            return isNaN(lh)
+                                ? Math.round(el.scrollHeight / (fontSize * 1.2))
+                                : Math.round(el.scrollHeight / lh);
                         };
 
-                        el.style.maxWidth = '950px';
-
-                        let lineCount = getLineCount();
-
-                        while (getLineCount() > 2 && fontSize > minSize) {
-                            fontSize -= 1;
+                        // Only shrink if text overflows 3 lines
+                        while (getLineCount() > 3 && fontSize > minSize) {
+                            fontSize -= 2;
                             el.style.fontSize = fontSize + 'px';
-                        }
-
-                        while (getLineCount() < 2 && fontSize < maxSize) {
-                            fontSize += 1;
-                            el.style.fontSize = fontSize + 'px';
-                            if (getLineCount() === 2) break;
-                        }
-
-                        let currentMaxWidth = 950;
-                        while (getLineCount() < 2 && currentMaxWidth > 500) {
-                            currentMaxWidth -= 10;
-                            el.style.maxWidth = currentMaxWidth + 'px';
-                        }
-                        
-                        while (getLineCount() === 2 && fontSize < maxSize) {
-                            fontSize += 1;
-                            el.style.fontSize = fontSize + 'px';
-                            if (getLineCount() > 2) {
-                                fontSize -= 1;
-                                el.style.fontSize = fontSize + 'px';
-                                break;
-                            }
                         }
                     });
                 },
@@ -636,10 +609,12 @@ Réponds UNIQUEMENT en JSON valide :
                                             </div>
 
                                             <div class="banner-title-text-wrap">
-                                                <h1 class="banner-title-text" x-ref="bannerTitle" x-html="formatBannerTitle(bannerTitle)"></h1>
+                                                <h1 class="banner-title-text" x-ref="bannerTitle" x-html="formatBannerTitle(bannerTitle) || 'Titre de votre article'"></h1>
                                             </div>
 
-                                            <div class="banner-bottom-bar"></div>
+                                            <div class="banner-bottom-bar">
+                                                <span class="banner-bottom-label">Blog</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -666,74 +641,58 @@ Réponds UNIQUEMENT en JSON valide :
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
         <style>
             /* --- Banner Generator Internal Styles --- */
-            .banner-preview-container {
-                --midnight: #1e293b;
-                --copper-from: #f59e0b;
-                --copper-via: #fb923c;
-                --copper-to: #d97706;
-            }
-
             .banner-canvas-wrapper {
                 width: 1200px;
                 height: 630px;
-                background: linear-gradient(140deg, #070C18 0%, #0C1422 55%, #080C19 100%);
+                background: #0B1120;
                 position: relative;
                 overflow: hidden;
-                border-radius: 12px;
+                border-radius: 0;
                 transform-origin: top left;
                 font-family: 'Outfit', sans-serif;
+                box-sizing: border-box;
             }
 
-            .banner-canvas-wrapper::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                background-image: radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
-                background-size: 38px 38px;
-                z-index: 1;
-            }
-
+            /* Ambient warm glow top-right */
             .banner-glow {
                 position: absolute;
                 border-radius: 50%;
-                z-index: 2;
                 pointer-events: none;
             }
 
             .banner-glow-1 {
-                width: 950px;
-                height: 950px;
-                top: -35%;
-                right: -15%;
-                background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, transparent 65%);
+                width: 700px;
+                height: 700px;
+                top: -180px;
+                right: -100px;
+                background: radial-gradient(circle, rgba(245, 158, 11, 0.13) 0%, transparent 70%);
             }
 
             .banner-glow-2 {
-                width: 550px;
-                height: 550px;
-                bottom: -15%;
-                left: 0%;
-                background: radial-gradient(circle, rgba(249, 115, 22, 0.07) 0%, transparent 65%);
+                width: 400px;
+                height: 400px;
+                bottom: -120px;
+                left: 60px;
+                background: radial-gradient(circle, rgba(251, 146, 60, 0.07) 0%, transparent 70%);
             }
 
+            /* Thin copper top border */
             .banner-accent-line {
                 position: absolute;
-                left: 0;
                 top: 0;
-                bottom: 0;
-                width: 5px;
-                background: linear-gradient(180deg, transparent 0%, #F59E0B 25%, #FB923C 75%, transparent 100%);
-                z-index: 5;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(to right, #F59E0B, #FB923C 50%, transparent);
             }
 
             .banner-content-inner {
                 position: absolute;
                 inset: 0;
-                z-index: 10;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
-                padding: 65px 90px 60px 100px;
+                padding: 64px 80px 56px 80px;
                 box-sizing: border-box;
             }
 
@@ -747,77 +706,90 @@ Réponds UNIQUEMENT en JSON valide :
             .banner-badge {
                 display: inline-flex;
                 align-items: center;
-                background: rgba(245, 158, 11, 0.08);
+                gap: 8px;
                 color: #F59E0B;
-                border: 1px solid rgba(245, 158, 11, 0.28);
-                padding: 9px 22px;
-                border-radius: 6px;
+                font-size: 13px;
                 font-weight: 700;
-                font-size: 14px;
-                letter-spacing: 0.1em;
+                letter-spacing: 0.14em;
                 text-transform: uppercase;
                 font-family: 'Outfit', sans-serif;
+            }
+
+            .banner-badge::before {
+                content: '';
+                display: inline-block;
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: #F59E0B;
+                flex-shrink: 0;
             }
 
             .banner-domain {
-                color: rgba(255, 255, 255, 0.22);
-                font-size: 15px;
+                color: rgba(255, 255, 255, 0.2);
+                font-size: 13px;
                 font-weight: 600;
-                letter-spacing: 0.1em;
+                letter-spacing: 0.12em;
                 font-family: 'Outfit', sans-serif;
                 text-transform: uppercase;
             }
 
-            .banner-title-text {
-                color: #FFFFFF;
-                font-family: 'Outfit', sans-serif !important;
-                font-size: 90px;
-                font-weight: 700;
-                text-align: left;
-                line-height: 1.05;
-                letter-spacing: -0.045em;
-                max-width: 950px;
-                margin: 0;
-                white-space: pre-wrap;
-                word-break: keep-all;
-                box-sizing: border-box;
-                display: block;
-                width: 100%;
-                overflow: visible !important;
+            .banner-title-text-wrap {
+                flex: 1;
+                display: flex;
+                align-items: flex-end;
+                padding-bottom: 40px;
             }
 
-            .banner-title-text-wrap {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: flex-start;
-                width: 100%;
-                overflow: visible;
-                flex: 1;
-                padding: 20px 0;
+            .banner-title-text {
+                color: #F8FAFC;
+                font-family: 'Outfit', sans-serif !important;
+                font-size: 68px;
+                font-weight: 700;
+                text-align: left;
+                line-height: 1.1;
+                letter-spacing: -0.03em;
+                margin: 0;
+                max-width: 900px;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                display: block;
+                box-sizing: border-box;
             }
 
             .banner-title-text span {
-                background: linear-gradient(to right, #f59e0b, #fb923c, #f97316);
+                background: linear-gradient(90deg, #F59E0B, #FB923C);
                 -webkit-background-clip: text;
                 background-clip: text;
                 -webkit-text-fill-color: transparent;
                 color: transparent;
                 font-style: italic;
                 font-weight: 800;
-                display: inline-block;
-                padding-right: 0.8em;
-                padding-bottom: 0.1em;
-                margin-right: -0.75em;
-                letter-spacing: 0;
-                overflow: visible !important;
+                display: inline;
             }
 
             .banner-bottom-bar {
-                width: 100%;
-                height: 2px;
-                background: linear-gradient(to right, #F59E0B, #FB923C 40%, transparent);
-                border-radius: 2px;
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+
+            .banner-bottom-bar::before {
+                content: '';
+                display: block;
+                height: 1px;
+                width: 48px;
+                background: rgba(245, 158, 11, 0.5);
+                flex-shrink: 0;
+            }
+
+            .banner-bottom-label {
+                color: rgba(255, 255, 255, 0.3);
+                font-size: 12px;
+                font-weight: 600;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                font-family: 'Outfit', sans-serif;
             }
 
 

@@ -357,158 +357,10 @@
 
         {{-- AI Prompt Modal --}}
         @if($showAIPromptModal)
-        <div class="fixed inset-0 z-[9999] flex items-center justify-center" 
-             x-data="{ 
-                copied: false, 
-                subject: '',
-                axe: '',
-                bannerTitle: '',
-                isExporting: false,
-                isSimplifying: false,
-                bannerSaved: false,
-                
-                formatBannerTitle(text) {
-                    if (!text) return '';
-                    let html = text.replace(/\*([^*]+)\*/g, '<span>$1</span>');
-                    return html.replace(/\s([\u2700-\u27bf\u1f300-\u1f5ff\u1f600-\u1f64f\u1f680-\u1f6ff\u1f900-\u1f9ff\u1f1e6-\u1f1ff])/g, '&nbsp;$1');
-                },
-
-                fitTitle() {
-                    this.$nextTick(() => {
-                        const el = this.$refs.bannerTitle;
-                        if (!el || !this.bannerTitle) return;
-
-                        let fontSize = 90;
-                        const minSize = 32;
-
-                        el.style.fontSize = fontSize + 'px';
-
-                        const getLineCount = () => {
-                            const lh = parseFloat(window.getComputedStyle(el).lineHeight);
-                            return isNaN(lh)
-                                ? Math.round(el.scrollHeight / (fontSize * 1.2))
-                                : Math.round(el.scrollHeight / lh);
-                        };
-
-                        // Only shrink if text overflows 3 lines
-                        while (getLineCount() > 3 && fontSize > minSize) {
-                            fontSize -= 2;
-                            el.style.fontSize = fontSize + 'px';
-                        }
-                    });
-                },
-
-                exportBanner() {
-                    const filename = (this.bannerTitle || 'banniere').toLowerCase().replace(/[^a-z0-9]/g, '-') + '.png';
-                    this.isExporting = true;
-
-                    // Clone le canvas hors du parent scale(0.4) pour que html2canvas
-                    // voie l'élément à sa vraie taille 1200×630.
-                    const source = this.$refs.bannerCanvas;
-                    const clone  = source.cloneNode(true);
-                    const wrap   = document.createElement('div');
-                    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;';
-                    wrap.appendChild(clone);
-                    document.body.appendChild(wrap);
-
-                    // background-clip:text non supporté par html2canvas → couleur solide
-                    clone.querySelectorAll('.banner-title-text span').forEach(span => {
-                        span.style.background           = 'none';
-                        span.style.webkitBackgroundClip = 'unset';
-                        span.style.backgroundClip       = 'unset';
-                        span.style.webkitTextFillColor  = '#F59E0B';
-                        span.style.color                = '#F59E0B';
-                        span.style.paddingRight         = '0';
-                    });
-
-                    // Attendre que la police soit prête avant de capturer
-                    document.fonts.ready.then(() => {
-                        return html2canvas(clone, {
-                            width: 1200,
-                            height: 630,
-                            scale: 1,
-                            useCORS: true,
-                            allowTaint: false,
-                            backgroundColor: null,
-                            logging: false,
-                        });
-                    })
-                    .then((canvas) => {
-                        const link = document.createElement('a');
-                        link.download = filename;
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
-                    })
-                    .catch((error) => {
-                        console.error('Export error:', error);
-                    })
-                    .finally(() => {
-                        document.body.removeChild(wrap);
-                        this.isExporting = false;
-                    });
-                },
-
-                applyBanner() {
-                    this.isExporting = true;
-                    const wire   = this.$wire;
-                    const source = this.$refs.bannerCanvas;
-                    const clone  = source.cloneNode(true);
-                    const wrap   = document.createElement('div');
-                    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;';
-                    wrap.appendChild(clone);
-                    document.body.appendChild(wrap);
-
-                    clone.querySelectorAll('.banner-title-text span').forEach(span => {
-                        span.style.background          = 'none';
-                        span.style.webkitTextFillColor = '#F59E0B';
-                        span.style.color               = '#F59E0B';
-                        span.style.paddingRight        = '0';
-                    });
-
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-                    document.fonts.ready
-                        .then(() => html2canvas(clone, {
-                            width: 1200, height: 630, scale: 1,
-                            useCORS: true, allowTaint: false,
-                            backgroundColor: null, logging: false,
-                        }))
-                        .then(canvas => new Promise((resolve, reject) => {
-                            canvas.toBlob(blob => {
-                                if (!blob) { reject(new Error('toBlob failed')); return; }
-                                const fd = new FormData();
-                                fd.append('banner', blob, 'banner.png');
-                                fd.append('_token', csrfToken);
-                                fetch('/admin/blog/banner-upload', { method: 'POST', body: fd })
-                                    .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-                                    .then(data => { wire.setBannerImagePath(data.path); resolve(); })
-                                    .catch(reject);
-                            }, 'image/png');
-                        }))
-                        .catch(err => console.error('Banner apply error:', err))
-                        .finally(() => {
-                            document.body.removeChild(wrap);
-                            this.isExporting = false;
-                        });
-                },
-
-                syncTitleFromPastedJson(jsonString) {
-                    try {
-                        const data = JSON.parse(jsonString);
-                        const title = data.titre_miniature || data.titre || data.title;
-                        if (title) {
-                            this.bannerTitle = title;
-                            this.$nextTick(() => fitTitle());
-                        }
-                    } catch (e) {}
-                }
-             }"
-             x-init="
-                $watch('$wire.json_pasted', value => syncTitleFromPastedJson(value));
-                $watch('bannerTitle', value => fitTitle());
-                window.addEventListener('resize', () => fitTitle());
-             "
-             x-on:json-imported.window="syncTitleFromPastedJson($wire.json_pasted); fitTitle();"
+        <div class="fixed inset-0 z-[9999] flex items-center justify-center"
+             x-data="blogModal"
+             x-init="initModal($wire)"
+             x-on:json-imported.window="syncTitleFromPastedJson($wire.json_pasted)"
              x-on:banner-saved.window="bannerSaved = true; setTimeout(() => bannerSaved = false, 3000)">
             <div class="fixed inset-0 bg-slate-900/45 backdrop-blur-md" wire:click="closeAIModal"></div>
             
@@ -906,5 +758,118 @@ Réponds UNIQUEMENT en JSON valide :
     @push('scripts')
         <script src="https://cdn.ckeditor.com/ckeditor5/41.1.0/classic/ckeditor.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('blogModal', () => ({
+                copied: false,
+                subject: '',
+                axe: '',
+                bannerTitle: '',
+                isExporting: false,
+                isSimplifying: false,
+                bannerSaved: false,
+
+                initModal(wire) {
+                    this.$nextTick(() => {
+                        if (wire.title) {
+                            this.bannerTitle = wire.title;
+                            this.$nextTick(() => this.fitTitle());
+                        }
+                    });
+                    this.$watch('bannerTitle', () => {
+                        this.$nextTick(() => this.fitTitle());
+                    });
+                },
+
+                syncTitleFromPastedJson(json) {
+                    try {
+                        const data = JSON.parse(json);
+                        if (data && (data.titre_miniature || data.titre || data.title)) {
+                            this.bannerTitle = data.titre_miniature || data.titre || data.title;
+                            this.$nextTick(() => this.fitTitle());
+                        }
+                    } catch (e) {}
+                },
+
+                formatBannerTitle(text) {
+                    if (!text) return '';
+                    return text.replace(/\*([^*]+)\*/g, '<span>$1</span>');
+                },
+
+                fitTitle() {
+                    const el = this.$refs.bannerTitle;
+                    if (!el) return;
+                    const wrapper = el.parentElement;
+                    const maxH = wrapper ? wrapper.offsetHeight : 220;
+                    let size = 90;
+                    el.style.fontSize = size + 'px';
+                    while (size > 32 && el.scrollHeight > maxH) {
+                        size -= 4;
+                        el.style.fontSize = size + 'px';
+                    }
+                },
+
+                exportBanner() {
+                    this.isExporting = true;
+                    const source = this.$refs.bannerCanvas;
+                    const clone = source.cloneNode(true);
+                    const wrap = document.createElement('div');
+                    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;';
+                    wrap.appendChild(clone);
+                    document.body.appendChild(wrap);
+                    clone.querySelectorAll('.banner-title-text span').forEach(span => {
+                        span.style.background = 'none';
+                        span.style.webkitTextFillColor = '#F59E0B';
+                        span.style.color = '#F59E0B';
+                        span.style.paddingRight = '0';
+                    });
+                    document.fonts.ready
+                        .then(() => html2canvas(clone, { width: 1200, height: 630, scale: 1, useCORS: true, allowTaint: false, backgroundColor: null, logging: false }))
+                        .then(canvas => {
+                            const link = document.createElement('a');
+                            link.download = 'banniere-blog.png';
+                            link.href = canvas.toDataURL('image/png');
+                            link.click();
+                        })
+                        .catch(err => console.error('Export error:', err))
+                        .finally(() => { document.body.removeChild(wrap); this.isExporting = false; });
+                },
+
+                applyBanner() {
+                    this.isExporting = true;
+                    const wire = this.$wire;
+                    const source = this.$refs.bannerCanvas;
+                    const clone = source.cloneNode(true);
+                    const wrap = document.createElement('div');
+                    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1200px;height:630px;overflow:hidden;';
+                    wrap.appendChild(clone);
+                    document.body.appendChild(wrap);
+                    clone.querySelectorAll('.banner-title-text span').forEach(span => {
+                        span.style.background = 'none';
+                        span.style.webkitTextFillColor = '#F59E0B';
+                        span.style.color = '#F59E0B';
+                        span.style.paddingRight = '0';
+                    });
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    document.fonts.ready
+                        .then(() => html2canvas(clone, { width: 1200, height: 630, scale: 1, useCORS: true, allowTaint: false, backgroundColor: null, logging: false }))
+                        .then(canvas => new Promise((resolve, reject) => {
+                            canvas.toBlob(blob => {
+                                if (!blob) { reject(new Error('toBlob failed')); return; }
+                                const fd = new FormData();
+                                fd.append('banner', blob, 'banner.png');
+                                fd.append('_token', csrfToken);
+                                fetch('/admin/blog/banner-upload', { method: 'POST', body: fd })
+                                    .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
+                                    .then(data => { wire.setBannerImagePath(data.path); resolve(); })
+                                    .catch(reject);
+                            }, 'image/png');
+                        }))
+                        .catch(err => console.error('Banner apply error:', err))
+                        .finally(() => { document.body.removeChild(wrap); this.isExporting = false; });
+                },
+            }));
+        });
+        </script>
     @endpush
 </div>

@@ -119,12 +119,12 @@
         pointer-events: none;
     "></div>
 
-    {{-- Decorative dots grid bottom-right --}}
-    <div style="position: absolute; bottom: 26px; right: 22px; opacity: 0.07;">
-        @for($r = 0; $r < 3; $r++)
-            <div style="display: flex; gap: 5px; margin-bottom: 5px;">
-                @for($c = 0; $c < 3; $c++)
-                    <div style="width: 2.5px; height: 2.5px; border-radius: 50%; background: #F59E0B;"></div>
+    {{-- Decorative dots grid – right edge at image/text junction --}}
+    <div style="position: absolute; top: 210px; right: -10px; opacity: 0.18;">
+        @for($r = 0; $r < 5; $r++)
+            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                @for($c = 0; $c < 4; $c++)
+                    <div style="width: 4px; height: 4px; border-radius: 50%; background: #F59E0B;"></div>
                 @endfor
             </div>
         @endfor

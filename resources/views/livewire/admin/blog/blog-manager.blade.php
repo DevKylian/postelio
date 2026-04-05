@@ -465,13 +465,7 @@ Réponds UNIQUEMENT en JSON valide :
                         
                         <div class="relative flex-1 min-h-[250px] lg:min-h-0">
                             <textarea wire:model="json_pasted"
-                                      @input="
-                                          try {
-                                              const d = JSON.parse($event.target.value);
-                                              const t = d.titre_miniature || d.titre || d.title || '';
-                                              if (t) { bannerTitle = t; $nextTick(() => fitTitle()); }
-                                          } catch(e) {}
-                                      "
+                                      @input="extractBannerTitle($event.target.value)"
                                       placeholder="Collez le code JSON ici...
 {
   &quot;titre&quot;: &quot;...&quot;,
@@ -773,6 +767,17 @@ Réponds UNIQUEMENT en JSON valide :
                     this.$watch('bannerTitle', () => {
                         this.$nextTick(() => this.fitTitle());
                     });
+                },
+
+                extractBannerTitle(val) {
+                    try {
+                        const d = JSON.parse(val);
+                        const t = d.titre_miniature || d.titre || d.title || '';
+                        if (t) {
+                            this.bannerTitle = t;
+                            this.$nextTick(() => this.fitTitle());
+                        }
+                    } catch (e) {}
                 },
 
                 formatBannerTitle(text) {

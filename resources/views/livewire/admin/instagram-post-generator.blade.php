@@ -555,6 +555,19 @@
 
                             @elseif($template === 'article-blog')
                                 <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-2 font-bold uppercase tracking-wider">Miniature de l'article (Photo centrale)</label>
+                                    <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl cursor-pointer transition-all h-32
+                                        {{ $uploadImage1 ? 'border-copper bg-copper/5' : 'border-gray-200 hover:border-copper/50 bg-gray-50' }}">
+                                        @if($uploadImage1)
+                                            <img src="{{ $uploadImage1->temporaryUrl() }}" class="w-full h-full object-cover rounded-lg">
+                                        @else
+                                            <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                            <span class="text-xs text-gray-400 font-bold">Uploader la miniature</span>
+                                        @endif
+                                        <input wire:model="uploadImage1" type="file" accept="image/*" class="hidden">
+                                    </label>
+                                </div>
+                                <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Badge</label>
                                     <input wire:model.live="article_blog_tag" type="text" maxlength="25" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
                                 </div>
@@ -699,7 +712,7 @@
                                                 @elseif($template === 'hero')
                                                     <x-postelio-instagram.hero :tag="$hero_tag" :headline="$hero_headline" :body="$hero_body" />
                                                 @elseif($template === 'article-blog')
-                                                    <x-postelio-instagram.article-blog :tag="$article_blog_tag" :title="$article_blog_title" :excerpt="$article_blog_excerpt" :cta="$article_blog_cta" :url="$article_blog_url" />
+                                                    <x-postelio-instagram.article-blog :tag="$article_blog_tag" :title="$article_blog_title" :excerpt="$article_blog_excerpt" :cta="$article_blog_cta" :url="$article_blog_url" :image_url="$uploadImage1 ? $uploadImage1->temporaryUrl() : null" />
                                                 @elseif($template === 'chantier')
                                                     <x-postelio-instagram.chantier 
                                                         :tag="$photo_tag" 

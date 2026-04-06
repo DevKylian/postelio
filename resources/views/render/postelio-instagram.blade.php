@@ -18,6 +18,31 @@
 </head>
 <body>
     <div style="width: 360px; height: 450px; overflow: hidden; position: relative;">
+        @php
+            // Base64 logic for export reliability
+            $base64Image = null;
+            $image_url = $data['image_url'] ?? $data['image1_b64'] ?? null;
+            if ($image_url && str_contains($image_url, 'livewire-tmp')) {
+                try {
+                    $pathParts = explode('/', parse_url($image_url, PHP_URL_PATH));
+                    $fileName = end($pathParts);
+                    $localPath = storage_path('app/livewire-tmp/' . $fileName);
+                    if (file_exists($localPath)) {
+                        $type = pathinfo($localPath, PATHINFO_EXTENSION);
+                        $data_file = @file_get_contents($localPath);
+                        if ($data_file) {
+                            $base64Image = 'data:image/' . $type . ';base64,' . base64_encode($data_file);
+                        }
+                    }
+                } catch (\Exception $e) {}
+            }
+            
+            // In case image_url is already base64 (passed by controller during export)
+            if ($image_url && str_starts_with($image_url, 'data:image')) {
+                $base64Image = $image_url;
+            }
+        @endphp
+
         @if($template === 'annonce')
             <x-postelio-instagram.annonce
                 :tag="$data['tag'] ?? 'NOUVEAUTÉ'"
@@ -113,6 +138,7 @@
                 :excerpt="$data['excerpt'] ?? ''"
                 :cta="$data['cta'] ?? 'Lire l\'article'"
                 :url="$data['url'] ?? 'postelio.fr/blog'"
+                :image_url="$data['image_url'] ?? $data['image1_b64'] ?? null"
             />
         @elseif($template === 'feature-app')
             <x-postelio-instagram.feature-app

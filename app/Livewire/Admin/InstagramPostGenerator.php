@@ -117,7 +117,7 @@ class InstagramPostGenerator extends Component
     public string $photo_caption  = '';
 
     // ── Image-based templates ─────────────────────────────────────────────────
-    private const IMAGE_TEMPLATES = ['avantapres', 'appmockup', 'feature-app'];
+    private const IMAGE_TEMPLATES = ['avantapres', 'appmockup', 'feature-app', 'article-blog'];
 
     public function mount(): void
     {
@@ -827,26 +827,39 @@ class InstagramPostGenerator extends Component
 
         // 4. Reconstruction avec aération forcée
         $finalLines = [];
+        $currentBuffer = "";
+
         foreach ($cleanLines as $i => $line) {
-            $finalLines[] = $line;
-            
-            if (isset($cleanLines[$i+1])) {
-                $nextLine = $cleanLines[$i+1];
-                
-                // Cas particuliers pour NE PAS mettre d'espace
-                // - Entre le titre Postelio et la baseline juste en dessous
-                if (str_contains($line, 'Postelio |') && !str_starts_with($nextLine, '✅')) {
-                    continue;
+            if (empty($currentBuffer)) {
+                $currentBuffer = $line;
+                continue;
+            }
+
+            // Si la ligne commence par une minuscule, c'est une suite de phrase : on fusionne avec un espace
+            if (preg_match('/^[a-zà-ÿ0-9]/u', $line) && !str_starts_with($line, '✅') && $currentBuffer !== '—' && $line !== '—') {
+                $currentBuffer .= ' ' . $line;
+            } else {
+                // Sinon, c'est un nouveau bloc
+                $finalLines[] = $currentBuffer;
+
+                // On décide si on met un saut de ligne double (paragraphe) ou simple
+                $skipBlank = (
+                    (str_contains($currentBuffer, 'Postelio |') && !str_starts_with($line, '✅')) || // Titre vers baseline
+                    (str_starts_with($currentBuffer, '✅') && str_starts_with($line, '✅')) ||       // Liste de checkmarks
+                    $currentBuffer === '—' || // Après le tiret
+                    $line === '—'          // Avant le tiret
+                );
+
+                if (!$skipBlank) {
+                    $finalLines[] = ""; // Saut de ligne double (paragraphe)
                 }
 
-                // - Entre deux checkmarks consécutifs
-                if (str_starts_with($line, '✅') && str_starts_with($nextLine, '✅')) {
-                    continue;
-                }
-                
-                // Par défaut, on met un espace (double saut) pour aérer les phrases
-                $finalLines[] = "";
+                $currentBuffer = $line;
             }
+        }
+        
+        if (!empty($currentBuffer)) {
+            $finalLines[] = $currentBuffer;
         }
 
         // Ajouter les hashtags regroupés à la fin

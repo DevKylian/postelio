@@ -19,7 +19,7 @@
                 </a>
                 @endif
 
-                <x-primary-button :href="route('generate-post')" wire:navigate class="!rounded-xl !gap-2 !py-2.5">
+                <x-primary-button id="tour-generate" :href="route('generate-post')" wire:navigate class="!rounded-xl !gap-2 !py-2.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
@@ -115,7 +115,7 @@
             @endif
 
             {{-- ── Stats Row ── --}}
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            <div id="tour-stats" class="grid grid-cols-2 lg:grid-cols-5 gap-4">
 
                 {{-- Total Posts --}}
                 <div class="glass-panel rounded-2xl p-5 group card-hover">
@@ -178,7 +178,7 @@
                 </div>
 
                 {{-- Instagram --}}
-                <div class="glass-panel rounded-2xl p-5 group card-hover">
+                <div id="tour-instagram" class="glass-panel rounded-2xl p-5 group card-hover">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center"
                              style="background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)">
@@ -223,7 +223,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 {{-- Recent Creations (2/3) --}}
-                <div class="lg:col-span-2">
+                <div id="tour-posts" class="lg:col-span-2">
                     <div class="glass-panel rounded-2xl overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
                             <h3 class="font-semibold text-midnight text-sm">Dernières créations</h3>
@@ -302,7 +302,7 @@
                     </div>
 
                     {{-- Quota Card --}}
-                    <div class="glass-panel rounded-2xl p-5 group relative overflow-hidden">
+                    <div id="tour-quota" class="glass-panel rounded-2xl p-5 group relative overflow-hidden">
                         <div class="absolute -right-6 -top-6 w-16 h-16 bg-copper/5 rounded-full blur-xl"></div>
                         <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                             <div class="flex items-center gap-2">
@@ -345,4 +345,281 @@
 
         </div>
     </div>
+
+    {{-- ─── Spotlight Tour ─── --}}
+    @php
+        $tourPerms = [
+            'can_generate_posts' => $user->getPermission('can_generate_posts', true),
+            'can_connect_social' => $user->getPermission('can_connect_social', false),
+        ];
+    @endphp
+
+    <div id="dashboard-tour"
+         x-data="dashboardTour()"
+         x-init="init()"
+         data-perms='@json($tourPerms)'
+         x-show="active"
+         x-cloak>
+
+        {{-- Click-to-skip overlay (behind everything) --}}
+        <div class="tour-overlay"></div>
+
+        {{-- Spotlight cutout --}}
+        <div x-show="hasTarget" class="tour-spotlight" :style="spotlightStyle"></div>
+
+        {{-- Tooltip card --}}
+        <div class="tour-card" :style="cardStyle">
+
+            {{-- Close --}}
+            <button @click="skip()"
+                    class="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-full text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition-all">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            {{-- Progress dots --}}
+            <div class="flex items-center gap-1.5 mb-5">
+                <template x-for="(s, i) in steps" :key="i">
+                    <div class="h-1.5 rounded-full transition-all duration-300"
+                         :class="i === stepIndex ? 'w-5 bg-copper' : (i < stepIndex ? 'w-1.5 bg-copper/30' : 'w-1.5 bg-slate-200')">
+                    </div>
+                </template>
+            </div>
+
+            {{-- Icon + content --}}
+            <div class="flex items-start gap-3 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center text-lg shrink-0 shadow-sm">
+                    <span x-text="currentStep.icon"></span>
+                </div>
+                <div class="flex-1 min-w-0 pt-0.5">
+                    <p class="font-bold text-midnight text-sm leading-snug mb-1.5" x-text="currentStep.title"></p>
+                    <p class="text-xs text-slate-500 leading-relaxed" x-text="currentStep.desc"></p>
+                </div>
+            </div>
+
+            {{-- Actions --}}
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <button @click="prev()"
+                        x-show="!isFirst"
+                        class="text-xs font-semibold text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    Précédent
+                </button>
+                <span x-show="isFirst" class="text-[11px] text-slate-400 font-medium">Visite rapide</span>
+                <button @click="next()"
+                        class="inline-flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-amber-500 to-copper text-white text-xs font-bold rounded-lg shadow-sm hover:shadow-md hover:brightness-105 transition-all"
+                        x-text="isLast ? 'C\'est parti ! 🚀' : 'Suivant →'">
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    @push('styles')
+    <style>
+        [x-cloak] { display: none !important; }
+
+        .tour-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9997;
+            background: transparent;
+        }
+
+        .tour-spotlight {
+            position: fixed;
+            z-index: 9998;
+            border-radius: 16px;
+            pointer-events: none;
+            box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.70);
+            transition: top 0.35s cubic-bezier(0.16,1,0.3,1),
+                        left 0.35s cubic-bezier(0.16,1,0.3,1),
+                        width 0.35s cubic-bezier(0.16,1,0.3,1),
+                        height 0.35s cubic-bezier(0.16,1,0.3,1);
+        }
+
+        .tour-card {
+            position: fixed;
+            z-index: 10000;
+            width: 320px;
+            max-width: calc(100vw - 32px);
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 32px 64px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.04);
+            transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16,1,0.3,1);
+        }
+
+        #dashboard-tour[x-cloak] { display: none !important; }
+    </style>
+    @endpush
+
+    @push('scripts')
+    <script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('dashboardTour', () => ({
+            active: false,
+            stepIndex: 0,
+            steps: [],
+            _spotlight: null,
+            _cardStyle: 'top:50%;left:50%;transform:translate(-50%,-50%)',
+
+            get currentStep() {
+                return this.steps[this.stepIndex] ?? {};
+            },
+            get isFirst() { return this.stepIndex === 0; },
+            get isLast()  { return this.stepIndex === this.steps.length - 1; },
+            get hasTarget() { return !!this.currentStep.target && !!this._spotlight; },
+            get spotlightStyle() {
+                const s = this._spotlight;
+                if (!s) return 'display:none';
+                return `top:${s.top}px;left:${s.left}px;width:${s.width}px;height:${s.height}px`;
+            },
+            get cardStyle() {
+                return this._cardStyle;
+            },
+
+            init() {
+                const perms = JSON.parse(this.$el.dataset.perms || '{}');
+
+                const allSteps = [
+                    {
+                        target: null,
+                        icon: '👋',
+                        title: 'Bienvenue sur Postelio !',
+                        desc: 'En deux minutes, je te montre comment tirer le meilleur de l\'outil. Prêt ?',
+                        perm: null,
+                    },
+                    {
+                        target: '#tour-generate',
+                        icon: '✨',
+                        title: 'Génère un post IA',
+                        desc: 'En un clic, crée un post professionnel adapté à ton activité. L\'IA rédige, toi tu publies.',
+                        perm: 'can_generate_posts',
+                        position: 'bottom',
+                    },
+                    {
+                        target: '#tour-stats',
+                        icon: '📊',
+                        title: 'Tes statistiques',
+                        desc: 'Suis tes posts créés ce mois, cette semaine et l\'état de tes réseaux sociaux en un coup d\'œil.',
+                        perm: null,
+                        position: 'bottom',
+                    },
+                    {
+                        target: '#tour-posts',
+                        icon: '🖼️',
+                        title: 'Tes créations',
+                        desc: 'Retrouve ici tous tes posts générés. Visualise-les, télécharge-les, ou crée-en de nouveaux.',
+                        perm: null,
+                        position: 'top',
+                    },
+                    {
+                        target: '#tour-quota',
+                        icon: '⚡',
+                        title: 'Ton quota mensuel',
+                        desc: 'Surveille le nombre de générations restantes. Le compteur se remet à zéro chaque mois.',
+                        perm: null,
+                        position: 'top',
+                    },
+                    {
+                        target: '#tour-instagram',
+                        icon: '📱',
+                        title: 'Connecte tes réseaux',
+                        desc: 'Lie Instagram et Facebook pour suivre l\'état de ta connexion directement depuis le tableau de bord.',
+                        perm: 'can_connect_social',
+                        position: 'bottom',
+                    },
+                    {
+                        target: null,
+                        icon: '🎉',
+                        title: 'Tu es prêt !',
+                        desc: 'Tu connais l\'essentiel. Maintenant, génère ton premier post et fais briller ton activité !',
+                        perm: null,
+                    },
+                ];
+
+                this.steps = allSteps.filter(s => !s.perm || perms[s.perm]);
+
+                if (!localStorage.getItem('postelio_tour_done')) {
+                    setTimeout(() => {
+                        this.active = true;
+                        this._positionStep();
+                    }, 900);
+                }
+            },
+
+            _positionStep() {
+                const step = this.currentStep;
+
+                if (!step.target) {
+                    this._spotlight = null;
+                    this._cardStyle = 'top:50%;left:50%;transform:translate(-50%,-50%)';
+                    return;
+                }
+
+                const el = document.querySelector(step.target);
+                if (!el) {
+                    this._spotlight = null;
+                    this._cardStyle = 'top:50%;left:50%;transform:translate(-50%,-50%)';
+                    return;
+                }
+
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                setTimeout(() => {
+                    const rect = el.getBoundingClientRect();
+                    const pad  = 10;
+                    const cardW = 320;
+
+                    this._spotlight = {
+                        top:    rect.top    - pad,
+                        left:   rect.left   - pad,
+                        width:  rect.width  + pad * 2,
+                        height: rect.height + pad * 2,
+                    };
+
+                    // Horizontal center on target, clamped to viewport
+                    let left = rect.left + rect.width / 2 - cardW / 2;
+                    left = Math.max(16, Math.min(left, window.innerWidth - cardW - 16));
+
+                    if (step.position === 'top') {
+                        const bottom = window.innerHeight - (rect.top - pad) + 14;
+                        this._cardStyle = `bottom:${bottom}px;left:${left}px;transform:none`;
+                    } else {
+                        const top = rect.bottom + pad + 14;
+                        this._cardStyle = `top:${top}px;left:${left}px;transform:none`;
+                    }
+                }, 380);
+            },
+
+            next() {
+                if (this.isLast) { this.finish(); return; }
+                this.stepIndex++;
+                this.$nextTick(() => this._positionStep());
+            },
+
+            prev() {
+                if (this.stepIndex > 0) {
+                    this.stepIndex--;
+                    this.$nextTick(() => this._positionStep());
+                }
+            },
+
+            skip() {
+                this.finish();
+            },
+
+            finish() {
+                this.active = false;
+                localStorage.setItem('postelio_tour_done', '1');
+            },
+        }));
+    });
+    </script>
+    @endpush
+
 </x-app-layout>

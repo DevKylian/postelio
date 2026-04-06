@@ -126,12 +126,14 @@
                                         @endif
                                     </div>
                                     <div class="p-6">
-                                        <div class="flex items-center gap-3 mb-4">
+                                        <div class="flex items-center gap-3 mb-4 flex-wrap">
                                             <time datetime="{{ $post->published_at->toDateString() }}" class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                                                 {{ $post->published_at->translatedFormat('d M Y') }}
                                             </time>
                                             <span class="text-slate-200">|</span>
                                             <span class="text-[11px] font-bold text-slate-400">{{ $post->read_time }} min</span>
+                                            <span class="text-slate-200">|</span>
+                                            <span class="text-[11px] font-bold text-slate-500">{{ $post->author_name ?? 'Kylian Dev' }}</span>
                                         </div>
                                         <h2 class="font-display font-bold text-midnight text-lg leading-snug mb-3 group-hover:text-copper transition-colors line-clamp-2">
                                             {{ $post->title }}

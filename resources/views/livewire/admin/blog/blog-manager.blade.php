@@ -59,12 +59,20 @@
                 </h2>
 
                 <form wire:submit.prevent="save" class="space-y-8 relative z-10">
-                    {{-- Title --}}
-                    <div class="space-y-2">
-                        <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">Titre de l'article</label>
-                        <input type="text" wire:model="title" placeholder="Un titre accrocheur pour votre article..."
-                               class="w-full bg-white/50 border-slate-100 rounded-2xl p-4 text-sm font-bold text-midnight focus:ring-2 focus:ring-copper/20 focus:border-copper transition-all outline-none">
-                        @error('title') <span class="text-rose-500 text-xs font-bold px-1">{{ $message }}</span> @enderror
+                    {{-- Title + Author --}}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-2 space-y-2">
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">Titre de l'article</label>
+                            <input type="text" wire:model="title" placeholder="Un titre accrocheur pour votre article..."
+                                   class="w-full bg-white/50 border-slate-100 rounded-2xl p-4 text-sm font-bold text-midnight focus:ring-2 focus:ring-copper/20 focus:border-copper transition-all outline-none">
+                            @error('title') <span class="text-rose-500 text-xs font-bold px-1">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">Auteur</label>
+                            <input type="text" wire:model="author_name" placeholder="Kylian Dev"
+                                   class="w-full bg-white/50 border-slate-100 rounded-2xl p-4 text-sm font-medium text-midnight focus:ring-2 focus:ring-copper/20 focus:border-copper transition-all outline-none">
+                            @error('author_name') <span class="text-rose-500 text-xs font-bold px-1">{{ $message }}</span> @enderror
+                        </div>
                     </div>
 
                     {{-- Featured Image --}}
@@ -444,6 +452,7 @@ Réponds UNIQUEMENT en JSON valide :
 
 {
 "titre": "Titre percutant, max 60 caractères",
+"auteur": "Kylian Dev",
 "titre_miniature": "Reformule le titre de l'article en une phrase courte (5 à 8 mots) qui dit clairement de quoi parle l'article. Pas de deux-points, pas de point d'interrogation, pas de style teaser vague. Écris une affirmation directe. Tu peux mettre *un mot clé* entre astérisques pour l'accentuer visuellement. Exemples pour 'Devis trop cher : comment convaincre ton client ?' → 'Vendre ton *devis* même quand il est cher' ou 'Convaincre un client face à un devis élevé'",
 "extrait": "2 phrases choc pour accrocher le lecteur",
 "meta_title": "Titre SEO optimisé, max 60 caractères",

@@ -212,6 +212,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return (bool) $this->getPermission('has_premium_templates', false);
     }
 
+    /**
+     * Whether the user can manually customize the generated content (Step 2).
+     */
+    public function canCustomizeTemplate(): bool
+    {
+        return (bool) $this->getPermission('can_customize_template', true);
+    }
+
     public function company()
     {
         return $this->hasOne(Company::class);

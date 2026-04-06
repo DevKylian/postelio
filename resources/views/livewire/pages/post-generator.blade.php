@@ -22,7 +22,7 @@
         <div class="py-8 px-4 sm:px-6 lg:px-8">
             <div class="max-w-4xl mx-auto space-y-8">
                 {{-- STEPPER --}}
-                <div class="mb-10">
+                <div class="mb-10" id="tour-gen-stepper">
                     <div class="relative flex items-center justify-between px-2">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-gray-100 -z-10">
                             <div class="h-full bg-copper transition-all duration-500" style="width: {{ (($currentStep - 1) / 3) * 100 }}%"></div>
@@ -45,6 +45,37 @@
                         @endforeach
                     </div>
                 </div>
+
+        @if($currentStep === 1)
+            <x-onboarding-tour name="gen_step1" :steps="[
+                ['target' => null, 'icon' => '🎨', 'title' => 'Nouveau Post', 'desc' => 'Prêt à briller ? On commence par choisir le gabarit idéal.'],
+                ['target' => '#tour-gen-stepper', 'icon' => '🚩', 'title' => 'Ton parcours', 'desc' => 'Le processus se fait en 4 étapes simples. Tu es à l\'étape 1.'],
+                ['target' => '#tour-gen-templates', 'icon' => '📂', 'title' => 'Choisis un modèle', 'desc' => 'Avis client, Avant/Après, Conseil utile... Sélectionne celui qui correspond à ton besoin.'],
+                ['target' => '#tour-gen-next', 'icon' => '➡️', 'title' => 'Passe à la suite', 'desc' => 'Une fois ton modèle choisi, clique sur Continuer pour passer au brief vocal !'],
+            ]" />
+        @endif
+
+        @if($currentStep === 2)
+            <x-onboarding-tour name="gen_step2" :steps="[
+                ['target' => '#tour-gen-brief', 'icon' => '🎙️', 'title' => 'Le Brief', 'desc' => 'C\'est ici que la magie opère. Enregistre un mémo vocal ou écris quelques mots.'],
+                ['target' => '#tour-gen-brief', 'icon' => '💡', 'title' => 'Précision', 'desc' => 'Plus tu donnes de détails sur tes travaux (lieu, matériaux, satisfaction client), plus l\'IA sera percutante.'],
+            ]" />
+        @endif
+
+        @if($currentStep === 3)
+            <x-onboarding-tour name="gen_step3" :steps="[
+                ['target' => '#tour-gen-design', 'icon' => '✨', 'title' => 'Design & Style', 'desc' => 'Choisis l\'ambiance visuelle (Classique, Glassmorphism, etc.) et ajoute tes photos.'],
+                ['target' => '#tour-gen-design', 'icon' => '🖼️', 'title' => 'Photos', 'desc' => 'Uploade tes plus beaux clichés de chantier pour illustrer ton post.'],
+            ]" />
+        @endif
+
+        @if($currentStep === 4)
+            <x-onboarding-tour name="gen_step4" :steps="[
+                ['target' => '#tour-gen-platforms', 'icon' => '📱', 'title' => 'Réseaux Sociaux', 'desc' => 'Sélectionne où tu souhaites diffuser ton post : Instagram, Facebook ou les deux !'],
+                ['target' => '#tour-gen-schedule', 'icon' => '⏰', 'title' => 'Planification', 'desc' => 'Tu peux publier immédiatement ou programmer ton post pour le moment idéal.'],
+                ['target' => '#tour-gen-submit', 'icon' => '🚀', 'title' => 'Lancement !', 'desc' => 'C\'est fini. Clique sur le bouton pour lancer l\'analyse IA et générer tes versions.'],
+            ]" />
+        @endif
 
                 <form wire:submit.prevent="generate" class="space-y-6">
 
@@ -155,7 +186,7 @@
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0">
-                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
+                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4" id="tour-gen-templates">
                     <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">1</div>
                     <div>
                         <h3 class="font-semibold text-midnight text-base">Choisissez votre gabarit</h3>
@@ -288,7 +319,7 @@
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0">
-                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
+                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4" id="tour-gen-brief">
                     <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">2</div>
                     <div>
                         <h3 class="font-semibold text-midnight text-base">Votre mémo vocal</h3>
@@ -535,6 +566,7 @@
             </div>
 
 
+            @if(auth()->user()->canCustomizeTemplate())
             {{-- ── PERSONNALISATION DU GABARIT ── --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" x-data="{ expanded: false }">
                 <button type="button" 
@@ -796,6 +828,7 @@
                 </div>
             </div>
             @endif
+            @endif
 
             @if($currentStep === 3)
             {{-- ── STEP 3 : Style Visuel ── --}}
@@ -803,7 +836,7 @@
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0">
-                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4">
+                <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4" id="tour-gen-design">
                     <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
                     <div>
                         <h3 class="font-semibold text-midnight text-base">Choisissez votre ambiance</h3>
@@ -818,14 +851,14 @@
                             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Format du post</p>
                             <span class="text-[10px] font-bold text-copper bg-copper/10 px-2 py-0.5 rounded-md uppercase tracking-tighter">Impact Maximum</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <button type="button"
                                     wire:click="$set('aspectRatio', '1:1')"
-                                    class="group relative flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all duration-300
+                                    class="group relative flex flex-col sm:flex-row items-center gap-2 sm:gap-3 p-3 rounded-2xl border-2 text-center sm:text-left transition-all duration-300
                                         {{ $aspectRatio === '1:1' 
                                             ? 'border-copper bg-copper/[0.03] shadow-md shadow-copper/5' 
                                             : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/50' }}">
-                                <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300
                                     {{ $aspectRatio === '1:1' 
                                         ? 'bg-copper text-white shadow-lg shadow-copper/20' 
                                         : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
@@ -834,11 +867,11 @@
                                     </svg>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-bold {{ $aspectRatio === '1:1' ? 'text-copper' : 'text-midnight' }} leading-tight">Carré (1:1)</p>
-                                    <p class="text-[11px] text-gray-400 mt-0.5 font-medium">Le classique Instagram</p>
+                                    <p class="text-xs sm:text-sm font-bold {{ $aspectRatio === '1:1' ? 'text-copper' : 'text-midnight' }} leading-tight">Carré (1:1)</p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5 font-medium">Le classique Instagram</p>
                                 </div>
                                 @if($aspectRatio === '1:1')
-                                    <div class="absolute top-3 right-3 w-4 h-4 bg-copper rounded-full flex items-center justify-center">
+                                    <div class="absolute top-2 right-2 w-4 h-4 bg-copper rounded-full flex items-center justify-center">
                                         <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                                         </svg>
@@ -848,11 +881,11 @@
 
                             <button type="button"
                                     wire:click="$set('aspectRatio', '4:5')"
-                                    class="group relative flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all duration-300
+                                    class="group relative flex flex-col sm:flex-row items-center gap-2 sm:gap-3 p-3 rounded-2xl border-2 text-center sm:text-left transition-all duration-300
                                         {{ $aspectRatio === '4:5' 
                                             ? 'border-copper bg-copper/[0.03] shadow-md shadow-copper/5' 
                                             : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50/50' }}">
-                                <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300
                                     {{ $aspectRatio === '4:5' 
                                         ? 'bg-copper text-white shadow-lg shadow-copper/20' 
                                         : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
@@ -861,14 +894,14 @@
                                     </svg>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <div class="flex items-center gap-1.5">
-                                        <p class="text-sm font-bold {{ $aspectRatio === '4:5' ? 'text-copper' : 'text-midnight' }} leading-tight">Portrait (4:5)</p>
+                                    <div class="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1">
+                                        <p class="text-xs sm:text-sm font-bold {{ $aspectRatio === '4:5' ? 'text-copper' : 'text-midnight' }} leading-tight whitespace-nowrap">Portrait (4:5)</p>
                                         <span class="text-[9px] font-black bg-copper text-white px-1.5 py-0.5 rounded uppercase tracking-tighter shadow-sm animate-pulse">Standard</span>
                                     </div>
-                                    <p class="text-[11px] text-gray-400 mt-0.5 font-medium">Recommandé (Plus visible)</p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5 font-medium">Recommandé</p>
                                 </div>
                                 @if($aspectRatio === '4:5')
-                                    <div class="absolute top-3 right-3 w-4 h-4 bg-copper rounded-full flex items-center justify-center">
+                                    <div class="absolute top-2 right-2 w-4 h-4 bg-copper rounded-full flex items-center justify-center">
                                         <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                                         </svg>
@@ -883,7 +916,7 @@
                     <div>
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Style graphique</p>
                         
-                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
                             @php
                                 $availableStyles = [
                                     ['id' => 'standard',  'label' => 'Classique',   'icon' => 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z', 'color' => 'gray'],
@@ -913,42 +946,42 @@
                                     @else
                                         x-on:click="$dispatch('notify', { type: 'error', message: 'Ce style est réservé aux membres Premium.' })"
                                     @endif
-                                    class="group relative flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200
+                                    class="group relative flex flex-col items-center gap-1.5 sm:gap-3 p-2.5 sm:p-4 rounded-xl border-2 transition-all duration-200
                                         {{ $visualStyle === $sty['id'] 
                                             ? $c['active'] . ' shadow-sm' 
                                             : 'border-gray-100 bg-white' }}
                                         {{ !$hasAccess ? 'opacity-60 cursor-not-allowed grayscale' : 'hover:border-gray-200 hover:bg-gray-50' }}">
                                 
-                                <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200
+                                @if($isPremium && !$hasAccess)
+                                    <div class="absolute -top-1 -left-1 z-10">
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[7px] sm:text-[8px] font-black bg-amber-100 text-amber-700 border border-amber-200 uppercase tracking-tighter shadow-sm">Premium</span>
+                                    </div>
+                                @endif
+
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all duration-200
                                     {{ $visualStyle === $sty['id'] 
                                         ? 'bg-copper text-white' 
                                         : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600' }}">
                                     @if(!$hasAccess)
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                         </svg>
                                     @else
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $sty['icon'] }}" />
                                         </svg>
                                     @endif
                                 </div>
 
-                                <div class="text-center">
-                                    <p class="text-[10px] font-bold uppercase tracking-wider {{ $visualStyle === $sty['id'] ? 'text-copper' : 'text-gray-500' }}">
+                                <div class="text-center min-w-0">
+                                    <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-tight {{ $visualStyle === $sty['id'] ? 'text-midnight' : 'text-gray-500' }} leading-none">
                                         {{ $sty['label'] }}
                                     </p>
                                 </div>
 
-                                @if($isPremium && !$hasAccess)
-                                    <div class="absolute -top-2 -right-1">
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black bg-amber-100 text-amber-700 border border-amber-200 uppercase tracking-tighter">Premium</span>
-                                    </div>
-                                @endif
-
                                 @if($visualStyle === $sty['id'] && $hasAccess)
-                                <div class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-copper flex items-center justify-center shadow-sm">
-                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full bg-copper flex items-center justify-center shadow-md border border-white z-10">
+                                    <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
@@ -1116,6 +1149,7 @@
             @if($currentStep === 4)
             {{-- ── Plateformes ── --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative"
+                 id="tour-gen-platforms"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0">
@@ -1149,10 +1183,10 @@
                     @endphp
                     <div class="grid grid-cols-2 gap-3">
                         {{-- Instagram --}}
-                        <label class="relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200
+                        <label class="relative flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl border-2 transition-all duration-200
                             {{ (!$isPremium || !$igConnected) ? 'opacity-50 grayscale cursor-not-allowed bg-gray-50 border-gray-100' : (in_array('instagram', $safePlatforms) ? 'border-pink-400 bg-pink-50/50 cursor-pointer' : 'border-gray-100 bg-gray-50 hover:border-gray-200 cursor-pointer') }}">
                             <input type="checkbox" wire:model.live="platforms" value="instagram" class="hidden" {{ (!$isPremium || !$igConnected) ? 'disabled' : '' }} />
-                            <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center shrink-0"
                                  style="background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)">
                                 <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
@@ -1183,10 +1217,10 @@
                         </label>
 
                         {{-- Facebook --}}
-                        <label class="relative flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200
+                        <label class="relative flex items-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl border-2 transition-all duration-200
                             {{ (!$isPremium || !$fbConnected) ? 'opacity-50 grayscale cursor-not-allowed bg-gray-50 border-gray-100' : (in_array('facebook', $safePlatforms) ? 'border-blue-400 bg-blue-50/50 cursor-pointer' : 'border-gray-100 bg-gray-50 hover:border-gray-200 cursor-pointer') }}">
                             <input type="checkbox" wire:model.live="platforms" value="facebook" class="hidden" {{ (!$isPremium || !$fbConnected) ? 'disabled' : '' }} />
-                            <div class="w-9 h-9 rounded-lg bg-[#1877F2] flex items-center justify-center shrink-0 shadow-sm">
+                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#1877F2] flex items-center justify-center shrink-0 shadow-sm">
                                 <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                                 </svg>
@@ -1228,7 +1262,7 @@
             </div>
 
             {{-- ── Planification ── --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden relative" id="tour-gen-schedule">
                 @if(!$igConnected && !$fbConnected)
                     <div class="absolute inset-0 bg-white/60 backdrop-blur-sm z-20 flex flex-col items-center justify-center p-6 text-center">
                         <div class="flex flex-col items-center gap-2">
@@ -1429,6 +1463,7 @@
 
                 @if($currentStep < 4)
                     <button type="button" 
+                            id="tour-gen-next"
                             wire:click="nextStep"
                             wire:loading.attr="disabled"
                             @if(auth()->user()->remaining_credits <= 0) disabled @endif
@@ -1441,7 +1476,7 @@
                     </button>
                 @else
                     {{-- ── Submit ── --}}
-                    <div class="flex-[2]" x-data="postSubmit()">
+                    <div class="flex-[2]" x-data="postSubmit()" id="tour-gen-submit">
                         <button type="button"
                                 @click="navigator.onLine ? $wire.generate() : submitOffline()"
                                 :disabled="isQueuing"

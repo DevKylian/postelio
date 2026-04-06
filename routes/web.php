@@ -120,7 +120,7 @@ Route::get('/render/post/{post}', [\App\Http\Controllers\RenderPostController::c
 
 // Dynamic Sitemap
 Route::get('/sitemap.xml', function () {
-    $posts = \App\Models\BlogPost::where('is_published', true)->latest()->get();
+    $posts = \App\Models\BlogPost::published()->latest()->get();
     return response()->view('sitemap', [
         'posts' => $posts
     ])->header('Content-Type', 'text/xml');

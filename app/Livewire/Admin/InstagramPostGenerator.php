@@ -216,10 +216,15 @@ class InstagramPostGenerator extends Component
                 'response_format' => ['type' => 'json_object'],
             ]);
 
-            $data = json_decode(trim($response->choices[0]->message->content), true);
+            $content = trim($response->choices[0]->message->content);
+            $data = json_decode($content, true);
 
-            if (!is_array($data)) {
-                throw new \RuntimeException('Réponse AI invalide.');
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                \Illuminate\Support\Facades\Log::error('InstagramPostGenerator: Invalid AI Response', [
+                    'json_error' => json_last_error_msg(),
+                    'raw_content' => $content
+                ]);
+                throw new \Exception("Réponse AI invalide. L'IA a rencontré un problème de formatage.");
             }
 
             $this->fillFields($data);
@@ -957,12 +962,12 @@ class InstagramPostGenerator extends Component
             - "cta" : Texte du bouton (2-4 mots). Obligatoire si demandé dans la structure.
             - PAS D'ENTITÉS HTML (pas de &#039;). Utilise des caractères normaux.
             - TOUTES LES VALEURS DOIVENT ÊTRE REMPLIES. PAS DE VALEURS VIDES.
-            - AÉRE TON TEXTE DE MANIÈRE EXTRÊME (CRITICAL) : Utilise systématiquement des DOUBLES retours à la ligne (`\n\n`) entre CHAQUE idée. 
-            - INTERDIT de faire des paragraphes de plus de 2 lignes.
-            - Chaque point d'une liste doit être sur sa propre ligne.
+            - AÉRE TON TEXTE DE MANIÈRE EXTRÊME (CRITICAL) : Utilise systématiquement la séquence de caractères \\n\\n (double antislash n) entre CHAQUE idée. 
+            - NE METS JAMAIS de vrais sauts de ligne physiques à l'intérieur des valeurs du JSON.
+            - Chaque point d'une liste doit être sur sa propre ligne (en utilisant \\n).
             - SI Comparaison : Les listes "col_sans" et "col_avec" doivent avoir EXACTEMENT 3 ou 4 points percutants.
             - "instagram_caption" (CRITICAL) : Toujours présent à la racine du JSON.
-                STRUCTURE OBLIGATOIRE avec SAUTS DE LIGNE entre chaque bloc (utilise \n\n) :
+                STRUCTURE OBLIGATOIRE avec la séquence \\n\\n entre chaque bloc :
 
                 [ACCROCHE] — 1 phrase forte, seule sur sa ligne.
 

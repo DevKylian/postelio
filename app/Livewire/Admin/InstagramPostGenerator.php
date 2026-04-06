@@ -533,11 +533,13 @@ class InstagramPostGenerator extends Component
     private function fillFields(array $data): void
     {
         // Robust Extraction: check root first, with fallback keys
-        $this->caption = $data['instagram_caption'] ?? 
-                         $data['caption'] ?? 
-                         $data['légende'] ?? 
-                         $data['description'] ?? 
-                         $data['text'] ?? '';
+        $rawCaption = $data['instagram_caption'] ?? 
+                      $data['caption'] ?? 
+                      $data['légende'] ?? 
+                      $data['description'] ?? 
+                      $data['text'] ?? '';
+        
+        $this->caption = $this->normalizeCaption($rawCaption);
 
         // Handle Carousel (Multi-Slide) response
         if (isset($data['slides']) && is_array($data['slides'])) {
@@ -778,7 +780,56 @@ class InstagramPostGenerator extends Component
         $this->photo_caption  = $data['caption'] ?? '';
     }
 
-    // ── Image helper ──────────────────────────────────────────────────────────
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    private function normalizeCaption(string $caption): string
+    {
+        if (empty($caption)) return '';
+
+        // 1. Normaliser les sauts de ligne (éviter les \r)
+        $caption = str_replace(["\r\n", "\r"], "\n", $caption);
+
+        // 2. Si l'IA a généré des blocs trop denses (peu de sauts de ligne)
+        // On force des doubles sauts de ligne avant les sections clés
+        if (substr_count($caption, "\n") < 4) {
+            // Avant la localisation
+            $caption = preg_replace('/(?<=[^\n])\s*(📍)/u', "\n\n$1", $caption);
+            // Avant la signature
+            $caption = preg_replace('/(?<=[^\n])\s*(—)/u', "\n\n$1", $caption);
+            // Avant les hashtags
+            $caption = preg_replace('/(?<=[^\n])\s*(#\w)/u', "\n\n$1", $caption);
+            // Autour des listes à puces
+            foreach (['✔️', '🔹', '✅'] as $emoji) {
+                $caption = preg_replace('/(?<=[^\n])\s*(' . preg_quote($emoji, '/') . ')/u', "\n$1", $caption);
+            }
+        }
+
+        // 3. Nettoyage : transformer les sauts simples en doubles pour l'aération "Postelio"
+        // sauf pour les listes à puces qui restent groupées
+        $lines = explode("\n", $caption);
+        $newLines = [];
+        foreach ($lines as $i => $line) {
+            $trimmed = trim($line);
+            if (empty($trimmed)) continue;
+            
+            $newLines[] = $trimmed;
+            
+            // Si la ligne suivante n'est pas une puce, on ajoute un espace
+            if (isset($lines[$i+1])) {
+                $nextLine = trim($lines[$i+1]);
+                if (!empty($nextLine) && !preg_match('/^[✔️🔹✅\-\*]/u', $nextLine)) {
+                    $newLines[] = ""; 
+                }
+            }
+        }
+
+        $caption = implode("\n", $newLines);
+
+        // 4. Final : S'assurer qu'il n'y a pas plus de 2 sauts consécutifs
+        $caption = preg_replace("/\n{3,}/", "\n\n", $caption);
+
+        return trim($caption);
+    }
 
     private function fileToDataUri($file): string
     {
@@ -915,7 +966,9 @@ class InstagramPostGenerator extends Component
             - "cta" : Texte du bouton (2-4 mots). Obligatoire si demandé dans la structure.
             - PAS D'ENTITÉS HTML (pas de &#039;). Utilise des caractères normaux.
             - TOUTES LES VALEURS DOIVENT ÊTRE REMPLIES. PAS DE VALEURS VIDES.
-            - AÉRE TON TEXTE (CRITICAL) : Utilise des retours à la ligne (`\n`) pour aérer le corps du texte. INTERDIT de faire des blocs de plus de 2 lignes sans saut.
+            - AÉRE TON TEXTE DE MANIÈRE EXTRÊME (CRITICAL) : Utilise systématiquement des DOUBLES retours à la ligne (`\n\n`) entre CHAQUE idée. 
+            - INTERDIT de faire des paragraphes de plus de 2 lignes.
+            - Chaque point d'une liste doit être sur sa propre ligne.
             - SI Comparaison : Les listes "col_sans" et "col_avec" doivent avoir EXACTEMENT 3 ou 4 points percutants.
             - "instagram_caption" (CRITICAL) : Toujours présent à la racine du JSON.
                 STRUCTURE OBLIGATOIRE avec SAUTS DE LIGNE entre chaque bloc (utilise \n\n) :
@@ -936,7 +989,7 @@ class InstagramPostGenerator extends Component
 
                 [HASHTAGS] — Précédés de \n\n. Une dizaine de hashtags très utilisés par les artisans (ex: #menuiserie, #plomberie, #renovation, #artisanat, #chantier, #btp, #travaux, #deco, #outillage, #amenagement) et TOUJOURS finir par #Postelio.
 
-                EXEMPLE DE RENDU ATTENDU (respecte exactement cette aération) :
+                EXEMPLE DE RENDU ATTENDU (respecte exactement cette aération très large) :
                 "Tu travailles dur. Mais est-ce que tes clients le voient vraiment ?\n\nUn artisan invisible sur les réseaux laisse des chantiers aux concurrents.\n\nPostelio te donne une vitrine pro en 30 secondes.\n\n—\nPostelio | L'assistant digital des pros du bâtiment.\n...\n\n#btp #artisan #renovation #Postelio"
 
             $templateDesc

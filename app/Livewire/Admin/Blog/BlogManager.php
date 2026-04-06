@@ -18,6 +18,7 @@ class BlogManager extends Component
     use WithFileUploads, WithPagination;
 
     public $title = '';
+    public $author_name = 'Kylian Dev';
     public $content = '';
     public $excerpt = '';
     public $meta_title = '';
@@ -39,6 +40,7 @@ class BlogManager extends Component
     {
         return [
             'title' => 'required|string|max:255',
+            'author_name' => 'nullable|string|max:100',
             'content' => 'required|string',
             'excerpt' => 'nullable|string|max:500',
             'meta_title' => 'nullable|string|max:70',
@@ -53,6 +55,7 @@ class BlogManager extends Component
     public function mount()
     {
         $this->published_at = Carbon::now()->format('Y-m-d');
+        $this->author_name = Auth::user()?->name ?? 'Kylian Dev';
     }
 
     public function toggleForm()
@@ -78,6 +81,7 @@ class BlogManager extends Component
     public function resetFields()
     {
         $this->title = '';
+        $this->author_name = Auth::user()?->name ?? 'Kylian Dev';
         $this->content = '';
         $this->excerpt = '';
         $this->meta_title = '';
@@ -103,12 +107,13 @@ class BlogManager extends Component
         if (json_last_error() === JSON_ERROR_NONE && is_array($data)) {
             $this->resetFields();
             $this->title = $data['titre'] ?? ($data['title'] ?? '');
+            $this->author_name = $data['auteur'] ?? ($data['author'] ?? (Auth::user()?->name ?? 'Kylian Dev'));
             $this->excerpt = $data['extrait'] ?? ($data['excerpt'] ?? '');
             $this->content = $data['contenu_html'] ?? ($data['content'] ?? '');
             $this->meta_title = $data['meta_title'] ?? '';
             $this->meta_description = $data['meta_description'] ?? '';
-            $this->meta_keywords = isset($data['mots_cles']) && is_array($data['mots_cles']) 
-                                    ? implode(', ', $data['mots_cles']) 
+            $this->meta_keywords = isset($data['mots_cles']) && is_array($data['mots_cles'])
+                                    ? implode(', ', $data['mots_cles'])
                                     : ($data['mots_cles'] ?? ($data['meta_keywords'] ?? ''));
             $this->status = in_array($data['status'] ?? '', ['draft', 'published']) ? $data['status'] : 'draft';
             
@@ -129,6 +134,7 @@ class BlogManager extends Component
 
         $data = [
             'title' => $this->title,
+            'author_name' => $this->author_name ?: (Auth::user()?->name ?? 'Kylian Dev'),
             'content' => $this->content,
             'excerpt' => strip_tags($this->excerpt) ?: \Illuminate\Support\Str::limit(strip_tags($this->content), 200),
             'meta_title' => $this->meta_title ?: $this->title,
@@ -167,6 +173,7 @@ class BlogManager extends Component
         $post = BlogPost::findOrFail($id);
         $this->editingId = $id;
         $this->title = $post->title;
+        $this->author_name = $post->author_name ?? ($post->user?->name ?? 'Kylian Dev');
         $this->content = $post->content;
         $this->excerpt = $post->excerpt;
         $this->meta_title = $post->meta_title;

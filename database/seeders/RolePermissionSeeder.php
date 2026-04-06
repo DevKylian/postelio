@@ -22,6 +22,7 @@ class RolePermissionSeeder extends Seeder
                 'can_view_calendar' => true,
                 'can_view_template_previews' => true,
                 'can_view_statistics' => true,
+                'can_customize_template' => true,
             ],
             'pro' => [
                 'monthly_quota' => 30,
@@ -32,6 +33,7 @@ class RolePermissionSeeder extends Seeder
                 'can_view_calendar' => true,
                 'can_view_template_previews' => true,
                 'can_view_statistics' => true,
+                'can_customize_template' => true,
             ],
             'basic' => [
                 'monthly_quota' => 15,
@@ -42,6 +44,7 @@ class RolePermissionSeeder extends Seeder
                 'can_view_calendar' => true,
                 'can_view_template_previews' => true,
                 'can_view_statistics' => false,
+                'can_customize_template' => true,
             ],
             'tester' => [
                 'monthly_quota' => 10,
@@ -52,6 +55,7 @@ class RolePermissionSeeder extends Seeder
                 'can_view_calendar' => true,
                 'can_view_template_previews' => true,
                 'can_view_statistics' => true,
+                'can_customize_template' => true,
             ],
             'free' => [
                 'monthly_quota' => 2,
@@ -62,6 +66,7 @@ class RolePermissionSeeder extends Seeder
                 'can_view_calendar' => true,
                 'can_view_template_previews' => true,
                 'can_view_statistics' => false,
+                'can_customize_template' => true,
             ],
         ];
 

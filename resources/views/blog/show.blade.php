@@ -40,8 +40,10 @@
     <meta name="twitter:image" content="{{ Storage::url($post->featured_image) }}">
     @endif
 
+    @php $authorName = $post->author_name ?? ($post->user?->name ?? 'Kylian Dev'); @endphp
     <meta property="article:published_time" content="{{ $post->published_at->toIso8601String() }}">
     <meta property="article:modified_time" content="{{ $post->updated_at->toIso8601String() }}">
+    <meta name="author" content="{{ $authorName }}">
 
     <link rel="canonical" href="{{ route('blog.show', $post->slug) }}">
 
@@ -130,12 +132,19 @@
                         Retour au blog
                     </a>
 
-                    <div class="flex items-center gap-4 mb-6">
+                    <div class="flex flex-wrap items-center gap-3 mb-6">
                         <time datetime="{{ $post->published_at->toDateString() }}" class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
                             {{ $post->published_at->translatedFormat('d F Y') }}
                         </time>
                         <span class="w-1 h-1 rounded-full bg-slate-300"></span>
                         <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{{ $post->read_time }} min de lecture</span>
+                        <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
+                            <span class="w-5 h-5 rounded-full bg-copper/15 flex items-center justify-center text-copper font-black text-[9px] uppercase flex-shrink-0">
+                                {{ mb_strtoupper(mb_substr($authorName, 0, 1)) }}
+                            </span>
+                            {{ $authorName }}
+                        </span>
                     </div>
 
                     <h1 class="text-3xl sm:text-4xl lg:text-5xl font-display font-bold tracking-tight text-midnight leading-tight mb-6">
@@ -275,31 +284,71 @@
         </footer>
     </div>
 
+    @php
+        $jsonWordCount = str_word_count(strip_tags($post->content));
+        $jsonDescription = addslashes($post->meta_description ?: ($post->excerpt ?: ''));
+        $jsonAuthor = addslashes($authorName);
+    @endphp
     <script type="application/ld+json">
     {
         "@@context": "https://schema.org",
         "@@type": "BlogPosting",
-        "headline": "{{ $post->meta_title ?: $post->title }}",
-        "description": "{{ $post->meta_description ?: $post->excerpt }}",
+        "headline": {{ json_encode($post->meta_title ?: $post->title) }},
+        "description": {{ json_encode($post->meta_description ?: ($post->excerpt ?: '')) }},
         "url": "{{ route('blog.show', $post->slug) }}",
         @if($post->featured_image)
-        "image": "{{ Storage::url($post->featured_image) }}",
+        "image": {
+            "@@type": "ImageObject",
+            "url": "{{ Storage::url($post->featured_image) }}"
+        },
         @endif
         "datePublished": "{{ $post->published_at->toIso8601String() }}",
         "dateModified": "{{ $post->updated_at->toIso8601String() }}",
+        "wordCount": {{ $jsonWordCount }},
+        "inLanguage": "fr-FR",
         "author": {
-            "@@type": "Organization",
-            "name": "Postelio"
+            "@@type": "Person",
+            "name": {{ json_encode($authorName) }}
         },
         "publisher": {
             "@@type": "Organization",
             "name": "Postelio",
-            "url": "{{ url('/') }}"
+            "url": "{{ url('/') }}",
+            "logo": {
+                "@@type": "ImageObject",
+                "url": "{{ asset('images/postelio-logo-gradient.svg') }}"
+            }
         },
         "mainEntityOfPage": {
             "@@type": "WebPage",
             "@@id": "{{ route('blog.show', $post->slug) }}"
         }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@@type": "ListItem",
+                "position": 1,
+                "name": "Accueil",
+                "item": "{{ url('/') }}"
+            },
+            {
+                "@@type": "ListItem",
+                "position": 2,
+                "name": "Blog",
+                "item": "{{ route('blog.index') }}"
+            },
+            {
+                "@@type": "ListItem",
+                "position": 3,
+                "name": {{ json_encode($post->title) }},
+                "item": "{{ route('blog.show', $post->slug) }}"
+            }
+        ]
     }
     </script>
     <!-- Umami Event Tracking (Blog Views) -->

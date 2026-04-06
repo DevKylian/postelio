@@ -19,7 +19,7 @@
                 </a>
                 @endif
 
-                <x-primary-button :href="route('generate-post')" wire:navigate class="!rounded-xl !gap-2 !py-2.5">
+                <x-primary-button id="tour-generate" :href="route('generate-post')" wire:navigate class="!rounded-xl !gap-2 !py-2.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
@@ -115,7 +115,7 @@
             @endif
 
             {{-- ── Stats Row ── --}}
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            <div id="tour-stats" class="grid grid-cols-2 lg:grid-cols-5 gap-4">
 
                 {{-- Total Posts --}}
                 <div class="glass-panel rounded-2xl p-5 group card-hover">
@@ -178,7 +178,7 @@
                 </div>
 
                 {{-- Instagram --}}
-                <div class="glass-panel rounded-2xl p-5 group card-hover">
+                <div id="tour-instagram" class="glass-panel rounded-2xl p-5 group card-hover">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center"
                              style="background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)">
@@ -223,7 +223,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 {{-- Recent Creations (2/3) --}}
-                <div class="lg:col-span-2">
+                <div id="tour-posts" class="lg:col-span-2">
                     <div class="glass-panel rounded-2xl overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
                             <h3 class="font-semibold text-midnight text-sm">Dernières créations</h3>
@@ -302,7 +302,7 @@
                     </div>
 
                     {{-- Quota Card --}}
-                    <div class="glass-panel rounded-2xl p-5 group relative overflow-hidden">
+                    <div id="tour-quota" class="glass-panel rounded-2xl p-5 group relative overflow-hidden">
                         <div class="absolute -right-6 -top-6 w-16 h-16 bg-copper/5 rounded-full blur-xl"></div>
                         <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                             <div class="flex items-center gap-2">
@@ -345,4 +345,25 @@
 
         </div>
     </div>
+
+    {{-- ─── Spotlight Tour ─── --}}
+    @php
+    $tourPerms = [
+        'can_generate_posts' => $user->getPermission('can_generate_posts', true),
+        'can_connect_social' => $user->getPermission('can_connect_social', false),
+    ];
+    $tourSteps = [
+        ['target' => null, 'icon' => '👋', 'title' => 'Bienvenue sur Postelio !', 'desc' => 'En deux minutes, je te montre comment tirer le meilleur de l\'outil. Prêt ?'],
+        ['target' => '#sidebar', 'icon' => '🗺️', 'title' => 'Menu de navigation', 'desc' => 'Retrouve ici tous tes outils : calendrier, statistiques, et paramètres de compte.', 'position' => 'right'],
+        ['target' => '#tour-generate', 'icon' => '✨', 'title' => 'Génère un post IA', 'desc' => 'En un clic, crée un post professionnel adapté à ton activité. L\'IA rédige, toi tu publies.', 'perm' => 'can_generate_posts'],
+        ['target' => '#tour-stats', 'icon' => '📊', 'title' => 'Tes statistiques', 'desc' => 'Suis tes posts créés ce mois, cette semaine et l\'état de tes réseaux sociaux en un coup d\'œil.'],
+        ['target' => '#tour-posts', 'icon' => '🖼️', 'title' => 'Tes créations', 'desc' => 'Retrouve ici tous tes posts générés. Visualise-les, télécharge-les, ou crée-en de nouveaux.', 'position' => 'top'],
+        ['target' => '#tour-quota', 'icon' => '⚡', 'title' => 'Ton quota mensuel', 'desc' => 'Surveille le nombre de générations restantes. Le compteur se remet à zéro chaque mois.', 'position' => 'top'],
+        ['target' => '#tour-instagram', 'icon' => '📱', 'title' => 'Connecte tes réseaux', 'desc' => 'Lie Instagram et Facebook pour suivre l\'état de ta connexion directement depuis le tableau de bord.', 'perm' => 'can_connect_social'],
+        ['target' => null, 'icon' => '🎉', 'title' => 'Tu es prêt !', 'desc' => 'Tu connais l\'essentiel. Maintenant, génère ton premier post et fais briller ton activité !'],
+    ];
+    @endphp
+    <x-onboarding-tour name="dashboard_v2" :steps="$tourSteps" :perms="$tourPerms" />
+
+
 </x-app-layout>

@@ -16,6 +16,7 @@ class RolePermission extends Model
         'can_view_calendar',
         'can_view_template_previews',
         'can_view_statistics',
+        'can_customize_template',
     ];
 
     /**
@@ -34,6 +35,7 @@ class RolePermission extends Model
             'can_view_calendar'           => 'boolean',
             'can_view_template_previews'  => 'boolean',
             'can_view_statistics'         => 'boolean',
+            'can_customize_template'      => 'boolean',
         ];
     }
 
@@ -53,6 +55,7 @@ class RolePermission extends Model
                 'can_view_calendar'          => false,
                 'can_view_template_previews' => false,
                 'can_view_statistics'        => false,
+                'can_customize_template'     => true,
             ]
         );
     }

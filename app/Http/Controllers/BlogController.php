@@ -27,6 +27,13 @@ class BlogController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
+        // Increment views count once per session
+        $sessionKey = 'viewed_post_' . $post->id;
+        if (!session()->has($sessionKey)) {
+            $post->increment('views_count');
+            session()->put($sessionKey, true);
+        }
+
         $related = BlogPost::published()
             ->where('id', '!=', $post->id)
             ->orderByDesc('published_at')

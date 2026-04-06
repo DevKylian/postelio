@@ -22,6 +22,7 @@ class BlogPost extends Model
         'og_image',
         'status',
         'read_time',
+        'views_count',
         'published_at',
     ];
 

@@ -35,6 +35,8 @@ class BlogManager extends Component
     public $editingId = null;
     public $showForm = false;
     public $search = '';
+    public $sortField = 'created_at';
+    public $sortDirection = 'desc';
 
     protected function rules()
     {
@@ -196,6 +198,16 @@ class BlogManager extends Component
         $this->dispatch('notify', 'Article supprimé.');
     }
 
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
+
     public function toggleStatus($id)
     {
         $post = BlogPost::findOrFail($id);
@@ -238,7 +250,7 @@ class BlogManager extends Component
     {
         $posts = BlogPost::query()
             ->when($this->search, fn($q) => $q->where('title', 'like', "%{$this->search}%"))
-            ->orderByDesc('created_at')
+            ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(15);
 
         return view('livewire.admin.blog.blog-manager', compact('posts'));

@@ -260,9 +260,31 @@
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-slate-100">
                         <tr>
-                            <th class="px-8 py-5">Article</th>
+                            <th class="px-8 py-5 cursor-pointer hover:text-copper transition-colors" wire:click="sortBy('title')">
+                                <div class="flex items-center gap-2">
+                                    Article
+                                    @if($sortField === 'title')
+                                        <svg class="w-3 h-3 {{ $sortDirection === 'asc' ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
+                                    @endif
+                                </div>
+                            </th>
                             <th class="px-8 py-5">Statut</th>
-                            <th class="px-8 py-5">Date</th>
+                            <th class="px-8 py-5 cursor-pointer hover:text-copper transition-colors" wire:click="sortBy('created_at')">
+                                <div class="flex items-center gap-2">
+                                    Date
+                                    @if($sortField === 'created_at')
+                                        <svg class="w-3 h-3 {{ $sortDirection === 'asc' ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
+                                    @endif
+                                </div>
+                            </th>
+                            <th class="px-8 py-5 cursor-pointer hover:text-copper transition-colors" wire:click="sortBy('views_count')">
+                                <div class="flex items-center gap-2">
+                                    Vues
+                                    @if($sortField === 'views_count')
+                                        <svg class="w-3 h-3 {{ $sortDirection === 'asc' ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
+                                    @endif
+                                </div>
+                            </th>
                             <th class="px-8 py-5 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -311,6 +333,14 @@
                                     {{ $post->read_time }} min de lecture
                                 </div>
                             </td>
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-blue-400/20 flex items-center justify-center">
+                                        <div class="w-1 h-1 rounded-full bg-blue-500"></div>
+                                    </div>
+                                    <span class="text-xs font-bold text-slate-600">{{ number_format($post->views_count, 0, ',', ' ') }}</span>
+                                </div>
+                            </td>
                             <td class="px-8 py-6 text-right">
                                 <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                     @if($post->status === 'published')
@@ -337,7 +367,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="px-8 py-20 text-center">
+                            <td colspan="5" class="px-8 py-20 text-center">
                                 <div class="flex flex-col items-center gap-3">
                                     <div class="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center text-slate-200">
                                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">

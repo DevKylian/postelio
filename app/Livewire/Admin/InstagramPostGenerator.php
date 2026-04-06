@@ -786,26 +786,17 @@ class InstagramPostGenerator extends Component
     {
         if (empty($caption)) return '';
 
-        // 1. Normaliser les sauts de ligne (éviter les \r)
+        // 1. Normalisation initiale
         $caption = str_replace(["\r\n", "\r"], "\n", $caption);
 
-        // 2. Si l'IA a généré des blocs trop denses (peu de sauts de ligne)
-        // On force des doubles sauts de ligne avant les sections clés
-        if (substr_count($caption, "\n") < 4) {
-            // Avant la localisation
-            $caption = preg_replace('/(?<=[^\n])\s*(📍)/u', "\n\n$1", $caption);
-            // Avant la signature
-            $caption = preg_replace('/(?<=[^\n])\s*(—)/u', "\n\n$1", $caption);
-            // Avant les hashtags
-            $caption = preg_replace('/(?<=[^\n])\s*(#\w)/u', "\n\n$1", $caption);
-            // Autour des listes à puces
-            foreach (['✔️', '🔹', '✅'] as $emoji) {
-                $caption = preg_replace('/(?<=[^\n])\s*(' . preg_quote($emoji, '/') . ')/u', "\n$1", $caption);
-            }
-        }
+        // 2. Découpage par phrase pour les paragraphes denses
+        // On cherche une ponctuation (. ! ?) suivie d'un espace et d'une majuscule (incluant accents)
+        $caption = preg_replace('/(?<=[.!?])\s+(?=[A-ZÀ-ÖØ-Þ])/u', "\n\n", $caption);
 
-        // 3. Nettoyage : transformer les sauts simples en doubles pour l'aération "Postelio"
-        // sauf pour les listes à puces qui restent groupées
+        // 3. Forcer l'aération entre les sections critiques (accroche, signature, hashtags)
+        $caption = preg_replace('/(?<=[^\n])\s*(📍|—|#|✅|👉)/u', "\n\n$1", $caption);
+
+        // 4. Reconstruction pour l'aération globale (saut de ligne entre chaque paragraphe)
         $lines = explode("\n", $caption);
         $newLines = [];
         foreach ($lines as $i => $line) {
@@ -814,10 +805,10 @@ class InstagramPostGenerator extends Component
             
             $newLines[] = $trimmed;
             
-            // Si la ligne suivante n'est pas une puce, on ajoute un espace
+            // Toujours un espace entre les lignes, SAUF si la suivante est une puce de liste
             if (isset($lines[$i+1])) {
                 $nextLine = trim($lines[$i+1]);
-                if (!empty($nextLine) && !preg_match('/^[✔️🔹✅\-\*]/u', $nextLine)) {
+                if (!empty($nextLine) && !preg_match('/^[✔️🔹✅\-*]/u', $nextLine)) {
                     $newLines[] = ""; 
                 }
             }
@@ -825,7 +816,7 @@ class InstagramPostGenerator extends Component
 
         $caption = implode("\n", $newLines);
 
-        // 4. Final : S'assurer qu'il n'y a pas plus de 2 sauts consécutifs
+        // 5. Nettoyage final (pas plus de 2 sauts consécutifs)
         $caption = preg_replace("/\n{3,}/", "\n\n", $caption);
 
         return trim($caption);

@@ -838,18 +838,14 @@ class InstagramPostGenerator extends Component
                 if (str_contains($line, 'Postelio |') && !str_starts_with($nextLine, '✅')) {
                     continue;
                 }
-                
-                // Cas où on MET un espace (Double saut)
-                // - Avant le tiret de signature
-                // - Après le tiret de signature
-                // - Avant le bloc de checkmarks
-                // - Après le bloc de checkmarks (avant le CTA)
-                if ($line === '—' || $nextLine === '—' || str_starts_with($nextLine, '✅') || str_starts_with($line, '✅')) {
-                    $finalLines[] = "";
-                } else {
-                    // Par défaut, double saut pour aérer les phrases de l'accroche
-                    $finalLines[] = "";
+
+                // - Entre deux checkmarks consécutifs
+                if (str_starts_with($line, '✅') && str_starts_with($nextLine, '✅')) {
+                    continue;
                 }
+                
+                // Par défaut, on met un espace (double saut) pour aérer les phrases
+                $finalLines[] = "";
             }
         }
 

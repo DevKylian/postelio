@@ -730,7 +730,7 @@
             <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
               
               <!-- Left: Text & Audio Transcript -->
-              <div class="flex-1 text-center lg:text-left">
+              <div class="flex-1 text-center lg:text-left" x-intersect.once="$el.classList.add('reveal-left')">
                 <div class="badge badge-copper inline-flex items-center mb-6 shadow-sm">
                   <i data-lucide="wand-2" class="w-3.5 h-3.5 mr-2 text-amber-500"></i>
                   Votre texte pro, généré en un clic.
@@ -776,7 +776,7 @@
               </div>
 
               <!-- Right: Phone Mockup -->
-              <div class="flex-1 relative w-full max-w-[340px] mx-auto lg:max-w-none lg:mx-0 flex justify-center mt-12 lg:mt-0">
+              <div class="flex-1 relative w-full max-w-[340px] mx-auto lg:max-w-none lg:mx-0 flex justify-center mt-12 lg:mt-0" x-intersect.once="$el.classList.add('reveal-right')">
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-amber-200/40 to-blue-200/40 blur-[70px] rounded-full pointer-events-none"></div>
                 
                 <div class="relative w-[320px] bg-white rounded-[3rem] border-[10px] border-slate-900 shadow-2xl overflow-hidden z-10">
@@ -880,7 +880,7 @@
         <!-- Bento Grid: How it works -->
         <section id="methode" class="py-32">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-20">
+            <div class="text-center max-w-3xl mx-auto mb-20" x-intersect.once="$el.classList.add('reveal-up')">
               <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">En ligne en <span class="text-gradient-copper italic">30 secondes chrono.</span></h2>
               <p class="text-xl font-light text-slate-600">Pas besoin d'être un pro du digital. Rangez vos outils, sortez votre téléphone, et laissez l'application faire le reste.</p>
             </div>
@@ -913,7 +913,8 @@
                   ];
                 @endphp
                 @foreach($steps as $idx => $step)
-                  <div class="flex flex-col items-center text-center group">
+                  @php $revealDelay = ['', 'reveal-d1', 'reveal-d2'][$idx]; @endphp
+                  <div class="flex flex-col items-center text-center group {{ $revealDelay }}" x-intersect.once="$el.classList.add('reveal-up')">
                     <div class="relative mb-10">
                       <!-- Icon Circle -->
                       <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center border border-slate-50 shadow-[0_15px_40px_rgba(0,0,0,0.06)] group-hover:scale-110 group-hover:border-copper/30 group-hover:shadow-copper/10 transition-all duration-500 text-copper">
@@ -939,27 +940,27 @@
           <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-copper/10 blur-[100px] rounded-full pointer-events-none"></div>
           <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none"></div>
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center max-w-3xl mx-auto mb-16">
+            <div class="text-center max-w-3xl mx-auto mb-16" x-intersect.once="$el.classList.add('reveal-up')">
               <h2 class="text-3xl sm:text-4xl font-display font-semibold tracking-tight mb-4">Pourquoi vous allez signer plus ?</h2>
               <p class="text-lg font-light text-slate-300">La psychologie de vos clients est simple. Voici pourquoi ils vous choisiront vous.</p>
             </div>
             
             <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto text-copper">
-              <div class="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors">
+              <div class="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors" x-intersect.once="$el.classList.add('reveal-up')">
                 <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
                   <i data-lucide="camera" class="w-6 h-6"></i>
                 </div>
                 <h3 class="text-xl font-display font-medium mb-3 text-white">L'expertise visuelle</h3>
                 <p class="text-slate-400 font-light leading-relaxed">Montrer votre travail lève les doutes instantanément.</p>
               </div>
-              <div class="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors">
+              <div class="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors reveal-d1" x-intersect.once="$el.classList.add('reveal-up')">
                 <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
                   <i data-lucide="shield-check" class="w-6 h-6"></i>
                 </div>
                 <h3 class="text-xl font-display font-medium mb-3 text-white">La confiance</h3>
                 <p class="text-slate-400 font-light leading-relaxed">Un post propre et technique justifie vos prix.</p>
               </div>
-              <div class="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors">
+              <div class="bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur-sm hover:bg-white/10 transition-colors reveal-d2" x-intersect.once="$el.classList.add('reveal-up')">
                 <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
                   <i data-lucide="map-pin" class="w-6 h-6"></i>
                 </div>
@@ -974,17 +975,17 @@
         <section class="py-24 border-y border-slate-200/40 bg-white/40 backdrop-blur-sm">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid sm:grid-cols-3 gap-12 sm:gap-6 text-center divide-y sm:divide-y-0 sm:divide-x divide-slate-200/60">
-              <div class="pt-8 sm:pt-0">
+              <div class="pt-8 sm:pt-0" x-intersect.once="$el.classList.add('reveal-up')">
                 <div class="text-6xl sm:text-7xl font-display font-light text-midnight mb-4 tracking-tighter">30<span class="text-copper">s</span></div>
                 <div class="font-medium text-slate-700 text-lg">Chrono en main</div>
                 <div class="text-sm text-slate-500 mt-2 font-light">Pour créer et publier un post</div>
               </div>
-              <div class="pt-8 sm:pt-0">
+              <div class="pt-8 sm:pt-0 reveal-d1" x-intersect.once="$el.classList.add('reveal-up')">
                 <div class="text-6xl sm:text-7xl font-display font-light text-midnight mb-4 tracking-tighter">100<span class="text-copper">%</span></div>
                 <div class="font-medium text-slate-700 text-lg">Automatique</div>
                 <div class="text-sm text-slate-500 mt-2 font-light">De la note vocale à la publication</div>
               </div>
-              <div class="pt-8 sm:pt-0">
+              <div class="pt-8 sm:pt-0 reveal-d2" x-intersect.once="$el.classList.add('reveal-up')">
                 <div class="text-6xl sm:text-7xl font-display font-light text-midnight mb-4 tracking-tighter">4<span class="text-copper">h</span></div>
                 <div class="font-medium text-slate-700 text-lg">Gagnées par semaine</div>
                 <div class="text-sm text-slate-500 mt-2 font-light">Fini les soirées sur les réseaux</div>
@@ -996,7 +997,7 @@
         <!-- Testimonials -->
         <section class="py-24">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-20">
+            <div class="text-center max-w-3xl mx-auto mb-20" x-intersect.once="$el.classList.add('reveal-up')">
               <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Ils ont arrêté de chercher des chantiers. <span class="text-gradient-copper italic">Leurs chantiers parlent pour eux.</span></h2>
             </div>
 
@@ -1009,7 +1010,8 @@
                 ];
               @endphp
               @foreach($testimonials as $t)
-                <div class="glass-card p-8 flex flex-col">
+                @php $revealDelay = ['', 'reveal-d1', 'reveal-d2'][$loop->index]; @endphp
+                <div class="glass-card p-8 flex flex-col {{ $revealDelay }}" x-intersect.once="$el.classList.add('reveal-up')">
                   <div class="flex gap-1.5 mb-6 text-copper">
                     @for($i=0; $i<5; $i++)
                       <i data-lucide="star" class="w-4 h-4 fill-copper"></i>
@@ -1034,7 +1036,7 @@
         <!-- CTAs -->
         <section class="py-32 text-center px-4 relative">
           <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-300/10 blur-[120px] rounded-full pointer-events-none"></div>
-          <div class="max-w-4xl mx-auto relative z-10">
+          <div class="max-w-4xl mx-auto relative z-10" x-intersect.once="$el.classList.add('reveal-up')">
             <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Rentrez chez vous, et laissez vos chantiers continuer à vous trouver des clients.</h2>
             <p class="text-xl font-light text-slate-600 mb-10">Prêt à transformer vos réalisations en aimants à clients premium ?</p>
             @auth
@@ -1052,7 +1054,7 @@
         <!-- Pricing -->
         <section id="tarifs" class="py-32 relative" x-data="{ billingPeriod: 'monthly' }">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-10">
+            <div class="text-center max-w-3xl mx-auto mb-10" x-intersect.once="$el.classList.add('reveal-up')">
               <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Un investissement <span class="text-gradient-copper italic">dérisoire.</span></h2>
               <p class="text-xl font-light text-slate-600">Un abonnement rentabilisé à la seconde où vous signez un seul chantier sans devoir baisser votre prix.</p>
             </div>
@@ -1075,7 +1077,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch">
 
               {{-- Offre Starter --}}
-              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" x-intersect.once="$el.classList.add('reveal-up')">
                 <div class="p-8 flex flex-col flex-grow">
                   <div class="mb-8">
                     <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-slate-50 border border-slate-100 shadow-sm">
@@ -1123,7 +1125,7 @@
               </div>
 
               {{-- Offre Basic --}}
-              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 reveal-d1" x-intersect.once="$el.classList.add('reveal-up')">
                 <div class="p-8 flex flex-col flex-grow">
                   <div class="mb-8">
                     <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-blue-50 border border-blue-100 shadow-sm">
@@ -1175,7 +1177,7 @@
               </div>
 
               {{-- Offre Professionnel --}}
-              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ring-2 ring-copper/20">
+              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ring-2 ring-copper/20 reveal-d2" x-intersect.once="$el.classList.add('reveal-up')">
                 <div class="absolute top-0 right-0 bg-copper text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm">
                   Meilleure offre
                 </div>
@@ -1237,7 +1239,7 @@
         @if($latestPosts->count())
         <section class="py-32 border-t border-slate-200/40">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16">
+            <div class="text-center max-w-3xl mx-auto mb-16" x-intersect.once="$el.classList.add('reveal-up')">
               <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-copper/10 text-copper text-xs font-bold uppercase tracking-widest mb-6">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
                 Blog
@@ -1280,7 +1282,8 @@
             @else
               <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
                 @foreach($latestPosts as $blogPost)
-                  <article class="group bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                  @php $revealDelay = ['', 'reveal-d1', 'reveal-d2'][$loop->index]; @endphp
+                  <article class="group bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 {{ $revealDelay }}" x-intersect.once="$el.classList.add('reveal-up')">
                     <a href="{{ route('blog.show', $blogPost->slug) }}">
                       <div class="overflow-hidden bg-slate-50" style="aspect-ratio: 16/8">
                         @if($blogPost->featured_image)
@@ -1324,7 +1327,7 @@
         <!-- FAQ -->
         <section class="py-32 border-t border-slate-200/40 bg-white/40 backdrop-blur-sm">
           <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
+            <div class="text-center mb-16" x-intersect.once="$el.classList.add('reveal-up')">
               <h2 class="text-4xl font-display font-semibold tracking-tight text-midnight mb-6">Questions fréquentes</h2>
             </div>
 

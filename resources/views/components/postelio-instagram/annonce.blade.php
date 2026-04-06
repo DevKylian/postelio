@@ -5,6 +5,13 @@
     'cta'         => 'Essayer gratuitement',
 ])
 
+@php
+    $h = html_entity_decode($headline, ENT_QUOTES, 'UTF-8');
+    $sh = html_entity_decode($subheadline, ENT_QUOTES, 'UTF-8');
+    $c = html_entity_decode($cta, ENT_QUOTES, 'UTF-8');
+    $t = html_entity_decode($tag, ENT_QUOTES, 'UTF-8');
+@endphp
+
 <div style="
     width: 360px; height: 450px;
     background: #111827;
@@ -57,42 +64,9 @@
                 display: inline-block;
                 background: rgba(245,158,11,0.12);
                 border: 1px solid rgba(245,158,11,0.5);
-                color: #F59E0B;
-                font-size: 9px; font-weight: 800;
-                letter-spacing: 0.18em;
-                text-transform: uppercase;
+                color: #F59E0B; font-size: 9px; font-weight: 800;
+                letter-spacing: 0.15em; text-transform: uppercase;
                 padding: 4px 12px; border-radius: 100px;
-            ">{{ $tag }}</span>
-        </div>
-
-        {{-- Headline --}}
-        <h1 style="
-            color: #FFFFFF;
-            font-size: 30px; font-weight: 900;
-            line-height: 1.15; letter-spacing: -0.02em;
-            margin: 0 0 20px 0;
-        ">{{ $headline }}</h1>
-
-        {{-- Separator line --}}
-        <div style="
-            width: 40px; height: 2px;
-            background: linear-gradient(90deg, #F59E0B, #D97706);
-            border-radius: 2px; margin-bottom: 20px;
-        "></div>
-
-        {{-- Subheadline --}}
-        <p style="
-            color: #9CA3AF;
-            font-size: 13.5px; font-weight: 400; line-height: 1.6;
-            margin: 0 0 24px 0;
-            white-space: pre-line;
-        ">{{ $subheadline }}</p>
-
-        {{-- CTA button --}}
-        <div>
-            <span style="
-                display: inline-block;
-                background: #F59E0B;
                 color: #111827;
                 font-size: 12px; font-weight: 800;
                 letter-spacing: 0.04em;

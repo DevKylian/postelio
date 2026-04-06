@@ -9,6 +9,8 @@
 
 @php
     $cleanTitle = html_entity_decode($title, ENT_QUOTES, 'UTF-8');
+    $cleanTag = html_entity_decode($tag, ENT_QUOTES, 'UTF-8');
+    $cleanCta = html_entity_decode($cta, ENT_QUOTES, 'UTF-8');
     $titleLen = mb_strlen($cleanTitle);
     $titleSize = $titleLen > 60 ? '18px' : ($titleLen > 40 ? '20px' : '22px');
 
@@ -71,7 +73,7 @@
                 font-size: 8px; font-weight: 800;
                 letter-spacing: 0.2em; text-transform: uppercase;
                 padding: 4px 12px; border-radius: 100px;
-            ">{{ $tag }}</span>
+            ">{!! $cleanTag !!}</span>
             
             <span style="color: #9CA3AF; font-size: 9px; font-weight: 600; letter-spacing: 0.05em;">{{ $url }}</span>
         </div>
@@ -136,7 +138,7 @@
                     border-radius: 8px;
                     box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.2);
                 ">
-                    {{ $cta }} →
+                    {!! html_entity_decode($cta, ENT_QUOTES, 'UTF-8') !!} →
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 6px;">

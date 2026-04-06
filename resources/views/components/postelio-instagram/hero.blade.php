@@ -52,7 +52,7 @@
             line-height: 1.2; letter-spacing: -0.015em;
             margin: 0 0 14px 0;
             white-space: pre-line;
-        ">{{ $headline }}</h1>
+        ">{!! html_entity_decode($headline, ENT_QUOTES, 'UTF-8') !!}</h1>
 
         <div style="width: 32px; height: 3px; background: #F59E0B; border-radius: 1.5px; margin: 0 auto 16px auto; opacity: 0.6;"></div>
 
@@ -61,7 +61,7 @@
             font-size: 14.5px; font-weight: 400;
             line-height: 1.55; margin: 0;
             white-space: pre-line;
-        ">{{ $body }}</p>
+        ">{!! html_entity_decode($body, ENT_QUOTES, 'UTF-8') !!}</p>
     </div>
 
     {{-- Bottom branding --}}

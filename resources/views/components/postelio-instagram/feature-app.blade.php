@@ -67,13 +67,17 @@
             border-radius: 2px; margin-bottom: 13px;
         "></div>
 
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <span style="color: #F59E0B; font-size: 9px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;">{!! html_entity_decode($feature_tag, ENT_QUOTES, 'UTF-8') !!}</span>
+        </div>
+
         {{-- Feature name --}}
         <h2 style="
             color: #FFFFFF;
             font-size: 22px; font-weight: 900;
             line-height: 1.15; letter-spacing: -0.02em;
             margin: 0 0 10px 0;
-        ">{{ $feature_name }}</h2>
+        ">{!! html_entity_decode($feature_name, ENT_QUOTES, 'UTF-8') !!}</h2>
 
         {{-- Feature description --}}
         <p style="
@@ -81,7 +85,7 @@
             font-size: 12px; font-weight: 400;
             line-height: 1.65; margin: 0 0 20px 0;
             white-space: pre-line;
-        ">{{ $feature_description }}</p>
+        ">{!! html_entity_decode($feature_description, ENT_QUOTES, 'UTF-8') !!}</p>
 
         {{-- CTA row --}}
         <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -92,7 +96,7 @@
                 font-size: 11px; font-weight: 800;
                 letter-spacing: 0.04em;
                 padding: 9px 20px; border-radius: 9px;
-            ">{{ $feature_cta }}</span>
+            ">{!! html_entity_decode($feature_cta, ENT_QUOTES, 'UTF-8') !!}</span>
             <span style="
                 color: rgba(255,255,255,0.18); font-size: 9px; font-weight: 600;
                 letter-spacing: 0.1em; text-transform: uppercase;

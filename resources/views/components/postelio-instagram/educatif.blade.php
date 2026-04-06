@@ -85,23 +85,12 @@
             padding: 18px 24px;
             border-radius: 0 12px 12px 0;
             width: 100%;
-            flex-shrink: 0;
-            margin-top: 24px;
-            backdrop-filter: blur(4px);
+            background: rgba(245,158,11,0.1);
+            border-left: 3px solid #F59E0B;
+            padding: 12px 18px; border-radius: 4px 12px 12px 4px;
         ">
-            <span style="
-                display: block;
-                color: #F59E0B;
-                font-size: 8px; font-weight: 900;
-                letter-spacing: 0.12em; text-transform: uppercase;
-                margin-bottom: 8px;
-">&#x2726; Point Expert</span>
-            <p style="
-                color: #F3F4F6;
-                font-size: {{ $insightSize }}; font-weight: 600;
-                line-height: 1.5; margin: 0;
-                white-space: pre-line;
-            ">{!! html_entity_decode($insight, ENT_QUOTES, 'UTF-8') !!}</p>
+            <span style="display: block; color: #F59E0B; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px;">À retenir</span>
+            <p style="color: #F3F4F6; font-size: 11.5px; font-weight: 600; line-height: 1.5; margin: 0;">{!! html_entity_decode($insight, ENT_QUOTES, 'UTF-8') !!}</p>
         </div>
     </div>
 

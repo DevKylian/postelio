@@ -1055,7 +1055,7 @@
         <section id="tarifs" class="py-32 relative" x-data="{ billingPeriod: 'monthly' }">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-10" x-intersect.once="$el.classList.add('reveal-up')">
-              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Un investissement <span class="text-gradient-copper italic">dérisoire.</span></h2>
+              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Rentable dès le <span class="text-gradient-copper italic">1er client.</span></h2>
               <p class="text-xl font-light text-slate-600">Un abonnement rentabilisé à la seconde où vous signez un seul chantier sans devoir baisser votre prix.</p>
             </div>
 

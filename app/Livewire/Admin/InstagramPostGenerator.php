@@ -794,34 +794,74 @@ class InstagramPostGenerator extends Component
         // 1. Normalisation initiale
         $caption = str_replace(["\r\n", "\r"], "\n", $caption);
 
-        // 2. Découpage par phrase pour les paragraphes denses
-        // On cherche une ponctuation (. ! ?) suivie d'un espace et d'une majuscule (incluant accents)
+        // 2. Découpage par phrase pour les paragraphes denses de l'accroche
         $caption = preg_replace('/(?<=[.!?])\s+(?=[A-ZÀ-ÖØ-Þ])/u', "\n\n", $caption);
 
-        // 3. Forcer l'aération entre les sections critiques (accroche, signature, hashtags)
-        $caption = preg_replace('/(?<=[^\n])\s*(📍|—|#|✅|👉)/u', "\n\n$1", $caption);
-
-        // 4. Reconstruction pour l'aération globale (saut de ligne entre chaque paragraphe)
+        // 3. Identification et regroupement des hashtags
         $lines = explode("\n", $caption);
-        $newLines = [];
-        foreach ($lines as $i => $line) {
+        $cleanLines = [];
+        $hashtags = [];
+        
+        foreach ($lines as $line) {
             $trimmed = trim($line);
             if (empty($trimmed)) continue;
+
+            // Extraire les hashtags (qu'ils soient seuls ou collés)
+            if (str_contains($trimmed, '#')) {
+                // Si la ligne contient du texte avant le #, on garde le texte et on extrait le #
+                if (preg_match_all('/#\w+/u', $trimmed, $matches)) {
+                    foreach ($matches[0] as $tag) {
+                        $hashtags[] = $tag;
+                    }
+                    $textBefore = trim(preg_replace('/#\w+/u', '', $trimmed));
+                    if (!empty($textBefore)) {
+                        $cleanLines[] = $textBefore;
+                    }
+                } else {
+                    $cleanLines[] = $trimmed;
+                }
+            } else {
+                $cleanLines[] = $trimmed;
+            }
+        }
+
+        // 4. Reconstruction avec aération forcée
+        $finalLines = [];
+        foreach ($cleanLines as $i => $line) {
+            $finalLines[] = $line;
             
-            $newLines[] = $trimmed;
-            
-            // Toujours un espace entre les lignes, SAUF si la suivante est une puce de liste
-            if (isset($lines[$i+1])) {
-                $nextLine = trim($lines[$i+1]);
-                if (!empty($nextLine) && !preg_match('/^[✔️🔹✅\-*]/u', $nextLine)) {
-                    $newLines[] = ""; 
+            if (isset($cleanLines[$i+1])) {
+                $nextLine = $cleanLines[$i+1];
+                
+                // Cas particuliers pour NE PAS mettre d'espace
+                // - Entre le titre Postelio et la baseline juste en dessous
+                if (str_contains($line, 'Postelio |') && !str_starts_with($nextLine, '✅')) {
+                    continue;
+                }
+                
+                // Cas où on MET un espace (Double saut)
+                // - Avant le tiret de signature
+                // - Après le tiret de signature
+                // - Avant le bloc de checkmarks
+                // - Après le bloc de checkmarks (avant le CTA)
+                if ($line === '—' || $nextLine === '—' || str_starts_with($nextLine, '✅') || str_starts_with($line, '✅')) {
+                    $finalLines[] = "";
+                } else {
+                    // Par défaut, double saut pour aérer les phrases de l'accroche
+                    $finalLines[] = "";
                 }
             }
         }
 
-        $caption = implode("\n", $newLines);
+        // Ajouter les hashtags regroupés à la fin
+        if (!empty($hashtags)) {
+            $finalLines[] = ""; // Espace avant les hashtags
+            $finalLines[] = implode(' ', array_unique($hashtags));
+        }
 
-        // 5. Nettoyage final (pas plus de 2 sauts consécutifs)
+        $caption = implode("\n", $finalLines);
+
+        // 5. Nettoyage final
         $caption = preg_replace("/\n{3,}/", "\n\n", $caption);
 
         return trim($caption);

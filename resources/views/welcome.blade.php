@@ -749,7 +749,7 @@
                     <div class="flex items-center gap-3">
                       <div @click="start()" class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center shadow-sm cursor-pointer hover:scale-105 transition-transform text-white">
                         <svg x-show="!isPlaying" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-0.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                        <svg x-show="isPlaying" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="10" x2="10" y1="4" y2="20"/><line x1="14" x2="14" y1="4" y2="20"/></svg>
+                        <svg x-show="isPlaying" style="display:none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="3" width="4" height="18" rx="1.5"/><rect x="15" y="3" width="4" height="18" rx="1.5"/></svg>
                       </div>
                       <div class="text-left">
                         <span class="block text-sm font-semibold text-midnight">Note vocale</span>
@@ -986,7 +986,7 @@
                 <div class="text-sm text-slate-500 mt-2 font-light">De la note vocale à la publication</div>
               </div>
               <div class="pt-8 sm:pt-0 reveal-d2" x-intersect.once="$el.classList.add('reveal-up')">
-                <div class="text-6xl sm:text-7xl font-display font-light text-midnight mb-4 tracking-tighter">4<span class="text-copper">h</span></div>
+                <div class="text-6xl sm:text-7xl font-display font-light text-midnight mb-4 tracking-tighter">8<span class="text-copper">h</span></div>
                 <div class="font-medium text-slate-700 text-lg">Gagnées par semaine</div>
                 <div class="text-sm text-slate-500 mt-2 font-light">Fini les soirées sur les réseaux</div>
               </div>

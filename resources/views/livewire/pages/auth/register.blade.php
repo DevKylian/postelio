@@ -18,7 +18,7 @@ state([
     'email' => '',
     'password' => '',
     'password_confirmation' => '',
-    'newsletter_opt_in' => false,
+    'newsletter_opt_in' => true,
     'terms' => false,
 ]);
 
@@ -121,8 +121,8 @@ $redirectToGoogle = function () {
         <div class="mt-8 space-y-4 pt-4 border-t border-gray-50">
             <!-- Terms & Conditions (Required) -->
             <div>
-                <label for="terms" class="inline-flex items-start group cursor-pointer">
-                    <div class="relative flex items-center mt-0.5">
+                <label for="terms" class="inline-flex items-center group cursor-pointer">
+                    <div class="relative flex items-center">
                         <input id="terms" type="checkbox" wire:model="terms" name="terms" class="w-5 h-5 rounded border-gray-300 text-copper shadow-sm focus:ring-copper transition-all duration-200">
                     </div>
                     <span class="ms-3 text-sm font-medium text-slate-600 group-hover:text-midnight transition-colors leading-tight">
@@ -134,8 +134,8 @@ $redirectToGoogle = function () {
 
             <!-- Newsletter Opt-in (Optional) -->
             <div>
-                <label for="newsletter_opt_in" class="inline-flex items-start group cursor-pointer">
-                    <div class="relative flex items-center mt-0.5">
+                <label for="newsletter_opt_in" class="inline-flex items-center group cursor-pointer">
+                    <div class="relative flex items-center">
                         <input id="newsletter_opt_in" type="checkbox" wire:model ="newsletter_opt_in" name="newsletter_opt_in" class="w-5 h-5 rounded border-gray-300 text-copper shadow-sm focus:ring-copper transition-all duration-200">
                     </div>
                     <span class="ms-3 text-sm font-medium text-slate-500 group-hover:text-midnight transition-colors leading-tight">

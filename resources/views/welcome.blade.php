@@ -191,9 +191,8 @@
         <!-- Hero Section -->
         <section class="relative pt-40 pb-20 lg:pt-52 lg:pb-32">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-4xl mx-auto"
-                 x-intersect="$el.classList.add('animate-fade-up')">
-                <div class="inline-flex items-center gap-2.5 sm:gap-3 px-4 py-2 sm:px-4 sm:py-2 rounded-full bg-white/80 border border-slate-200/60 shadow-sm backdrop-blur-md mb-8 animate-fade-in group hover:bg-white transition-all duration-300 max-w-[95vw] sm:max-w-none mx-auto">
+            <div class="text-center max-w-4xl mx-auto">
+                <div class="inline-flex items-center gap-2.5 sm:gap-3 px-4 py-2 sm:px-4 sm:py-2 rounded-full bg-white/80 border border-slate-200/60 shadow-sm backdrop-blur-md mb-8 animate-blur-in group hover:bg-white transition-all duration-300 max-w-[95vw] sm:max-w-none mx-auto">
                   <div class="flex items-center gap-2 sm:gap-2.5 overflow-hidden">
                     <svg class="w-4.5 h-3 sm:w-5 sm:h-3.5 rounded-[1px] sm:rounded-[2px] shadow-sm overflow-hidden shrink-0" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg">
                       <rect width="1" height="2" fill="#052B6F"/>
@@ -206,14 +205,14 @@
                     </span>
                   </div>
                 </div>
-              <h1 class="text-4xl sm:text-6xl lg:text-7xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.05]">
+              <h1 class="text-4xl sm:text-6xl lg:text-7xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.05] animate-blur-in delay-100">
                 Ne bradez plus vos devis <br class="hidden sm:block" />
                 <span class="text-gradient-copper italic">à cause de mauvais posts.</span>
               </h1>
-              <p class="text-xl sm:text-2xl font-light text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+              <p class="text-xl sm:text-2xl font-light text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed animate-blur-in delay-200">
                 10 secondes pour transformer vos fins de chantier en vitrine premium. Attirez de vrais clients, sans y passer vos soirées.
               </p>
-              <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-blur-in delay-300">
                 @auth
                     <a href="{{ route('generate-post') }}" wire:navigate class="btn-primary w-full sm:w-auto flex justify-center items-center gap-2 text-base">
                         Créer mon 1er post (Gratuit)
@@ -229,7 +228,7 @@
                   Découvrir la méthode
                 </a>
               </div>
-              <div class="flex flex-col items-center gap-6 mt-10">
+              <div class="flex flex-col items-center gap-6 mt-10 animate-blur-in delay-400">
                 <div class="flex items-center gap-3">
                   <div class="flex -space-x-3">
                     @foreach(range(1, 4) as $i)
@@ -245,7 +244,7 @@
                     <span class="font-bold text-midnight">+200 avis artisans</span> certifiés
                   </div>
                 </div>
-                <div class="flex flex-wrap justify-center items-center gap-4 text-xs font-medium text-slate-400 uppercase tracking-widest">
+                <div class="flex flex-wrap justify-center items-center gap-4 text-xs font-medium text-slate-400 uppercase tracking-widest animate-blur-in delay-500">
                   <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-copper"></i> Offre gratuite disponible</span>
                   <span class="hidden sm:block">&bull;</span>
                   <span class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4 text-copper"></i> Sans engagement</span>

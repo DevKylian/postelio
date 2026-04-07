@@ -46,7 +46,7 @@ class NewsletterManager extends Component
     /**
      * Returns opted-in users filtered by audience segment.
      */
-    public function getRecipientsQuery(string $audience = null)
+    public function getRecipientsQuery(?string $audience = null)
     {
         $audience ??= $this->audience;
 

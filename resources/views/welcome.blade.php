@@ -193,12 +193,22 @@
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-4xl mx-auto"
                  x-intersect="$el.classList.add('animate-fade-up')">
-                <div class="badge badge-copper gap-2 mb-8 shadow-sm">
-                  L'appli des artisans fiers de leur travail.
+                <div class="inline-flex items-center gap-2.5 sm:gap-3 px-4 py-2 sm:px-4 sm:py-2 rounded-full bg-white/80 border border-slate-200/60 shadow-sm backdrop-blur-md mb-8 animate-fade-in group hover:bg-white transition-all duration-300 max-w-[95vw] sm:max-w-none mx-auto">
+                  <div class="flex items-center gap-2 sm:gap-2.5 overflow-hidden">
+                    <svg class="w-4.5 h-3 sm:w-5 sm:h-3.5 rounded-[1px] sm:rounded-[2px] shadow-sm overflow-hidden shrink-0" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg">
+                      <rect width="1" height="2" fill="#052B6F"/>
+                      <rect x="1" width="1" height="2" fill="#FFFFFF"/>
+                      <rect x="2" width="1" height="2" fill="#E62117"/>
+                    </svg>
+                    <div class="w-px h-3.5 bg-slate-200 mx-1 shrink-0"></div>
+                    <span class="text-[10.5px] sm:text-[11px] lg:text-xs font-bold text-slate-600 tracking-tight sm:tracking-widest uppercase whitespace-nowrap">
+                      Application <span class="text-midnight">100% Française</span> <span class="mx-1 text-slate-300">·</span> Conçue en <span class="text-midnight">Bretagne</span>
+                    </span>
+                  </div>
                 </div>
               <h1 class="text-4xl sm:text-6xl lg:text-7xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.05]">
                 Ne bradez plus vos devis <br class="hidden sm:block" />
-                <span class="text-gradient-copper italic">à cause de mauvaises photos.</span>
+                <span class="text-gradient-copper italic">à cause de mauvais posts.</span>
               </h1>
               <p class="text-xl sm:text-2xl font-light text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
                 10 secondes pour transformer vos fins de chantier en vitrine premium. Attirez de vrais clients, sans y passer vos soirées.
@@ -998,7 +1008,10 @@
         <section class="py-24">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-20" x-intersect.once="$el.classList.add('reveal-up')">
-              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Ils ont arrêté de chercher des chantiers. <span class="text-gradient-copper italic">Leurs chantiers parlent pour eux.</span></h2>
+              <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">
+                Ils ne cherchent plus de chantiers. <br class="hidden sm:block" />
+                <span class="text-gradient-copper italic">Leurs réalisations parlent pour eux.</span>
+              </h2>
             </div>
 
             <div class="grid md:grid-cols-3 gap-6">
@@ -1019,8 +1032,8 @@
                   </div>
                   <p class="text-lg text-slate-700 mb-10 font-light leading-relaxed flex-1">"{{ $t['text'] }}"</p>
                   <div class="flex items-center gap-4 mt-auto">
-                    <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 shadow-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-100 to-orange-50 text-copper border border-copper/20 flex items-center justify-center shadow-sm font-display font-bold text-xl">
+                      {{ mb_substr($t['name'], 0, 1) }}
                     </div>
                     <div>
                       <div class="font-medium text-midnight">{{ $t['name'] }}</div>
@@ -1225,6 +1238,17 @@
               </div>
 
             </div>
+
+            <!-- Anti-trap reassurance -->
+            <div class="flex items-center justify-center mt-12 animate-fade-in">
+                <div class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-50 border border-slate-100 shadow-sm">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Sans engagement. Annulez en 1 clic à tout moment.</span>
+                </div>
+            </div>
           </div>
         </section>
 
@@ -1337,7 +1361,8 @@
                   ['q' => "Est-ce que j'ai besoin de beaucoup d'abonnés ?", 'short' => "Non. Quelque centaines de locaux suffisent.", 'a' => "Non. Quelques centaines de personnes locales (vos anciens clients, vos partenaires) suffisent pour créer un bouche-à-oreille qualifié et puissant."],
                   ['q' => "Je suis nul en informatique, c'est pour moi ?", 'short' => "Si vous utilisez WhatsApp, c'est bon.", 'a' => "Si vous savez envoyer un message vocal sur WhatsApp, vous savez utiliser Postelio. L'application gère toute la technique."],
                   ['q' => "Combien de temps ça prend par jour ?", 'short' => "Strictement 30 secondes.", 'a' => "Strictement 30 secondes par chantier. Vous parlez, on publie."],
-                  ['q' => "Est-ce vraiment rentable ?", 'short' => "Remboursé pour 5 ans dès le 1er devis.", 'a' => "Oui. Un seul devis haut de gamme signé au prix fort grâce à l'image professionnelle de votre page rembourse l'outil pour les 5 prochaines années."]
+                  ['q' => "Est-ce vraiment rentable ?", 'short' => "Remboursé pour 5 ans dès le 1er devis.", 'a' => "Oui. Un seul devis haut de gamme signé au prix fort grâce à l'image professionnelle de votre page rembourse l'outil pour les 5 prochaines années."],
+                  ['q' => "Y a-t-il un engagement sur la durée ?", 'short' => "Strictement aucun. Annulez en 1 clic.", 'a' => "Absolument pas. Tous nos abonnements sont sans engagement. Vous pouvez annuler en un clic depuis votre espace client à tout moment. Pas de courrier recommandé, pas de préavis caché."]
                 ];
               @endphp
               @foreach($faqs as $idx => $faq)

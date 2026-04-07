@@ -168,6 +168,14 @@
                 @endforeach
             </div>
 
+            <!-- Anti-trap reassurance -->
+            <div class="flex items-center justify-center mt-12 animate-fade-in">
+                <div class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-50 border border-slate-100 shadow-sm">
+                    <span class="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sans engagement. Annulez en 1 clic à tout moment.</span>
+                </div>
+            </div>
+
             {{-- FAQ --}}
             <div class="mt-16 glass-panel rounded-3xl p-8">
                 <div class="flex items-center gap-3 mb-8">
@@ -183,7 +191,7 @@
                     </div>
                     <div>
                         <h4 class="text-sm font-bold text-midnight mb-2">Comment annuler ?</h4>
-                        <p class="text-xs text-gray-400 leading-relaxed">Depuis votre espace facturation. Vous gardez l'accès jusqu'à la fin du mois en cours.</p>
+                        <p class="text-xs text-gray-400 leading-relaxed">Depuis votre espace facturation, en un seul clic et sans justificatif. Vous gardez l'accès jusqu'à la fin de la période en cours.</p>
                     </div>
                     <div>
                         <h4 class="text-sm font-bold text-midnight mb-2">Les posts non utilisés ?</h4>

@@ -562,11 +562,18 @@ CONSIGNES POUR LE CONTENU HTML :
 
 Longueur : 150 à 250 mots.
 
-Format : HTML brut (&lt;p&gt;, &lt;strong&gt;, &lt;ul&gt;).
+Format : HTML brut. Chaque idée = un &lt;p&gt; séparé. Chaque paragraphe contient 1 à 2 phrases maximum. Jamais plus.
 
-Interdiction absolue : Ne jamais utiliser de balises de titre (&lt;h1&gt;, &lt;h2&gt;, &lt;h3&gt;). L'e-mail doit ressembler à un texte écrit à la main.
+Aération obligatoire : Le rendu doit être aéré, avec de l'espace visuel entre chaque bloc. Pas de mur de texte. Pas de phrases enchaînées dans un même paragraphe.
 
-Style : Paragraphes de 2 phrases maximum pour une lecture parfaite sur mobile.
+Interdiction absolue : Ne jamais utiliser de balises de titre (&lt;h1&gt;, &lt;h2&gt;, &lt;h3&gt;). L'e-mail doit ressembler à un message WhatsApp bien écrit, pas à une brochure.
+
+Exemple de structure HTML attendue :
+&lt;p&gt;Phrase d'accroche courte.&lt;/p&gt;
+&lt;p&gt;Première partie de l'histoire.&lt;/p&gt;
+&lt;p&gt;Suite. Rebondissement.&lt;/p&gt;
+&lt;p&gt;Le pont Postelio. Explication en 10 secondes.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://app.postelio.fr"&gt;CTA ici →&lt;/a&gt;&lt;/p&gt;
 
 FORMAT DE SORTIE EXIGÉ (JSON) :
 Réponds UNIQUEMENT en JSON valide :

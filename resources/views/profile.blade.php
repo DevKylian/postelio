@@ -19,6 +19,10 @@
             </div>
 
             <div class="glass-panel rounded-2xl p-6 lg:p-8">
+                <livewire:profile.newsletter-preferences />
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 lg:p-8">
                 <livewire:profile.delete-user-form />
             </div>
         </div>

@@ -93,6 +93,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
         Route::get('/admin/instagram', \App\Livewire\Admin\InstagramPostGenerator::class)->name('admin.instagram');
         Route::get('/admin/prospects', \App\Livewire\Admin\Prospect\ProspectManager::class)->name('admin.prospects.index');
         Route::get('/admin/announcements', \App\Livewire\Admin\Settings\AnnouncementManager::class)->name('admin.announcements.index');
+        Route::get('/admin/newsletter', \App\Livewire\Admin\Newsletter\NewsletterManager::class)->name('admin.newsletter.index');
     });
 
     // Social & Sync routes (Premium only)
@@ -115,6 +116,10 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
+
+// Newsletter unsubscribe (signed URL, no auth required)
+Route::get('/newsletter/unsubscribe/{user}', [\App\Http\Controllers\NewsletterController::class, 'unsubscribe'])
+    ->name('newsletter.unsubscribe');
 
 Route::get('/render/post/{post}', [\App\Http\Controllers\RenderPostController::class, 'show'])->name('render.post');
 

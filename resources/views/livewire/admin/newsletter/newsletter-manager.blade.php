@@ -556,7 +556,7 @@ L'Histoire/Le Hack : 2 à 3 paragraphes très courts pour raconter l'anecdote ou
 
 Le Pont Postelio : Montre comment l'outil simplifie la vie en 10 secondes par rapport à ce qui vient d'être dit.
 
-CTA : Une phrase d'appel à l'action avec le lien https://app.postelio.fr.
+CTA : Une phrase d'appel à l'action avec le lien https://postelio.fr.
 
 CONSIGNES POUR LE CONTENU HTML :
 
@@ -577,7 +577,7 @@ Exemple de structure HTML attendue :
 &lt;p&gt;Première partie de l'histoire.&lt;/p&gt;
 &lt;p&gt;Suite. Rebondissement.&lt;/p&gt;
 &lt;p&gt;Le pont Postelio. Explication en 10 secondes.&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://app.postelio.fr"&gt;CTA ici →&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://postelio.fr"&gt;CTA ici →&lt;/a&gt;&lt;/p&gt;
 
 FORMAT DE SORTIE EXIGÉ (JSON) :
 Réponds UNIQUEMENT en JSON valide :

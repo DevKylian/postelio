@@ -396,10 +396,8 @@
     </div>
     @endif
 
-</div>
-
-{{-- CKEditor styling (same as blog editor) --}}
-<style>
+    {{-- CKEditor styling --}}
+    <style>
     .ck-editor-container .ck-editor__editable {
         min-height: 380px;
         border-radius: 0 0 1.5rem 1.5rem !important;
@@ -429,4 +427,5 @@
         box-shadow: 0 0 0 2px rgba(245,158,11,0.15) !important;
         border-color: #F59E0B !important;
     }
-</style>
+    </style>
+</div>

@@ -568,6 +568,10 @@ Aération obligatoire : Le rendu doit être aéré, avec de l'espace visuel entr
 
 Interdiction absolue : Ne jamais utiliser de balises de titre (&lt;h1&gt;, &lt;h2&gt;, &lt;h3&gt;). L'e-mail doit ressembler à un message WhatsApp bien écrit, pas à une brochure.
 
+Interdictions sur le fond :
+— Ne jamais mentionner l'IA, les algorithmes, ou la génération automatique de contenu.
+— Ne jamais dire "premier post offert", "essai gratuit" ou toute formule promotionnelle similaire. Si tu parles de l'offre, dis simplement qu'on peut commencer gratuitement.
+
 Exemple de structure HTML attendue :
 &lt;p&gt;Phrase d'accroche courte.&lt;/p&gt;
 &lt;p&gt;Première partie de l'histoire.&lt;/p&gt;

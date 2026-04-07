@@ -1444,8 +1444,6 @@
               <h4 class="font-display font-semibold text-midnight mb-6">Plus</h4>
               <ul class="space-y-4 text-sm">
                 <li><a href="#" class="hover:text-copper transition-colors font-light">Blog</a></li>
-                <li><a href="#" class="hover:text-copper transition-colors font-light">Guides artisans</a></li>
-                <li><a href="#" class="hover:text-copper transition-colors font-light">Aides au digital</a></li>
                 <li><a href="{{ route('login') }}" class="text-copper font-medium">Connexion Pro</a></li>
               </ul>
             </div>

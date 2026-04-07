@@ -5,7 +5,7 @@ use App\Services\TemplateGeneratorService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-use function Livewire\Volt\{state, uses};
+use function Livewire\Volt\{state, uses, computed};
 uses(\Livewire\WithFileUploads::class);
 
 state([
@@ -14,11 +14,35 @@ state([
     'generatedTemplate' => null,
     'errorMessage'      => null,
     'editingTemplateId' => null,
+    'userRequest'       => '',
+    'photoMode'         => 'none',
     'adjustmentRequest' => '',
     'isRefining'        => false,
     'hasImageText'      => true,
-    'activeTab'         => 'standard', // 'standard', 'glass', 'blueprint', 'kraft' or 'beton'
+    'activeTab'         => 'standard', 
+    'brandColor'      => fn() => auth()->user()->company?->brand_color ?? '#F59E0B',
+    'companyLabel'    => fn() => auth()->user()->company?->name ?? 'Votre Société',
+    'companyCity'     => fn() => auth()->user()->company?->city ?? '',
+    'brandTextColor'  => function() {
+        $color = auth()->user()->company?->brand_color ?? '#F59E0B';
+        $hex = str_replace('#', '', $color);
+        if (strlen($hex) == 3) {
+            $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+        }
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+        $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+        return ($yiq >= 186) ? '#1E293B' : '#FFFFFF';
+    },
+    'logoUrl' => function() {
+        $company = auth()->user()->company;
+        $hasLogo = $company?->logo_path && Storage::disk('public')->exists($company->logo_path);
+        return $hasLogo ? Storage::disk('public')->url($company->logo_path) : null;
+    }
 ]);
+
+$company = computed(fn() => auth()->user()->company);
 
 $openModal = function () {
     $this->showModal         = true;
@@ -146,81 +170,81 @@ $deleteTemplate = function (int $id) {
     }
 };
 
+$switchTab = function ($tab) {
+    $this->activeTab = $tab;
+};
+
 ?>
 
 <div>
 
-    @php
-        $company         = auth()->user()->company;
-        $brandColor      = $company?->brand_color ?? '#F59E0B';
-        $companyName     = $company?->name ?? 'Votre Société';
-        $companyCity     = $company?->city ?? '';
-        $companyLabel    = $companyName;
-        $hasLogo         = $company?->logo_path && Storage::disk('public')->exists($company->logo_path);
-        
-        $getContrastColor = function($hex) {
-            $hex = str_replace('#', '', $hex);
-            if (strlen($hex) == 3) {
-                $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
-            }
-            $r = hexdec(substr($hex, 0, 2));
-            $g = hexdec(substr($hex, 2, 2));
-            $b = hexdec(substr($hex, 4, 2));
-            $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
-            return ($yiq >= 186) ? '#1E293B' : '#FFFFFF';
-        };
-        $brandTextColor = $getContrastColor($brandColor);
-
-        // Custom templates: only active ones for regular users
-        // (Wait, if it's THEIR template, should it be hidden if admin deactivated it? Yes, per user request)
-        $customTemplates = \App\Models\CustomTemplate::where('user_id', auth()->id())
-                            ->where('is_active', true)
-                            ->orderByDesc('created_at')
-                            ->get()
-                            ->toArray();
-
-        // Native templates: fetch all settings
-        $nativeSettings = \App\Models\NativeTemplateSetting::all()->pluck('is_active', 'slug');
-        $isNativeActive = fn($slug) => $nativeSettings[$slug] ?? true;
-
-        $allNativeTemplates = [
-            'project', 'review', 'faq', 'lifestyle', 'quality_focus', 
-            'chantier_detail', 'step_by_step', 'conseil_saisonnier', 
-            'erreur_a_eviter', 'guide_pedagogique'
-        ];
-        $activeNativeCount = collect($allNativeTemplates)->filter(fn($s) => $isNativeActive($s))->count();
-    @endphp
-
-    <div class="py-8 px-4 sm:px-6 lg:px-8">
+    <div class="py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
 
             {{-- Style Tabs --}}
             <div class="flex items-center justify-between mb-8">
-                <div class="flex p-1.5 bg-gray-100 rounded-2xl w-full sm:w-auto shadow-inner ring-1 ring-gray-100">
-                    <button wire:click="$set('activeTab', 'standard')"
-                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300
+                <div class="flex p-1.5 bg-gray-100 rounded-2xl w-full sm:w-auto shadow-inner ring-1 ring-gray-100 relative overflow-hidden">
+                    {{-- Progress bar overlay --}}
+                    <div wire:loading class="absolute top-0 left-0 right-0 h-0.5 bg-copper/30 animate-pulse pointer-events-none"></div>
+
+                    <button wire:click="switchTab('standard')"
+                            wire:loading.attr="disabled"
+                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 relative
                                 {{ $activeTab === 'standard' ? 'bg-white text-midnight shadow-lg shadow-gray-200 ring-1 ring-gray-100' : 'text-gray-400 hover:text-gray-600' }}">
-                        Style Classique
+                        <span wire:loading.remove wire:target="switchTab('standard')">Style Classique</span>
+                        <div wire:loading wire:target="switchTab('standard')" class="flex items-center gap-1">
+                             <span class="w-1.5 h-1.5 rounded-full bg-midnight animate-bounce [animation-delay:-0.3s]"></span>
+                             <span class="w-1.5 h-1.5 rounded-full bg-midnight animate-bounce [animation-delay:-0.15s]"></span>
+                             <span class="w-1.5 h-1.5 rounded-full bg-midnight animate-bounce"></span>
+                        </div>
                     </button>
-                    <button wire:click="$set('activeTab', 'glass')"
-                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2
+
+                    <button wire:click="switchTab('glass')"
+                            wire:loading.attr="disabled"
+                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
                                 {{ $activeTab === 'glass' ? 'bg-midnight text-white shadow-lg shadow-midnight/20' : 'text-gray-400 hover:text-gray-600' }}">
-                        <span>Style Glassmorphism</span>
+                        <span wire:loading.remove wire:target="switchTab('glass')">Style Glassmorphism</span>
+                        <div wire:loading wire:target="switchTab('glass')" class="flex items-center gap-1">
+                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-0.3s]"></span>
+                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-0.15s]"></span>
+                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></span>
+                        </div>
                     </button>
-                    <button wire:click="$set('activeTab', 'blueprint')"
-                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2
+
+                    <button wire:click="switchTab('blueprint')"
+                            wire:loading.attr="disabled"
+                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
                                 {{ $activeTab === 'blueprint' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-400 hover:text-gray-600' }}">
-                        <span>Style Blueprint</span>
+                        <span wire:loading.remove wire:target="switchTab('blueprint')">Style Blueprint</span>
+                        <div wire:loading wire:target="switchTab('blueprint')" class="flex items-center gap-1">
+                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-0.3s]"></span>
+                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-0.15s]"></span>
+                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></span>
+                        </div>
                     </button>
-                    <button wire:click="$set('activeTab', 'kraft')"
-                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2
+
+                    <button wire:click="switchTab('kraft')"
+                            wire:loading.attr="disabled"
+                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
                                 {{ $activeTab === 'kraft' ? 'bg-[#BC9A7E] text-slate-900 shadow-lg shadow-[#BC9A7E]/20' : 'text-gray-400 hover:text-gray-600' }}">
-                        <span>Style Kraft</span>
+                        <span wire:loading.remove wire:target="switchTab('kraft')">Style Kraft</span>
+                        <div wire:loading wire:target="switchTab('kraft')" class="flex items-center gap-1">
+                             <span class="w-1.5 h-1.5 rounded-full bg-slate-900 animate-bounce [animation-delay:-0.3s]"></span>
+                             <span class="w-1.5 h-1.5 rounded-full bg-slate-900 animate-bounce [animation-delay:-0.15s]"></span>
+                             <span class="w-1.5 h-1.5 rounded-full bg-slate-900 animate-bounce"></span>
+                        </div>
                     </button>
-                    <button wire:click="$set('activeTab', 'beton')"
-                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2
+
+                    <button wire:click="switchTab('beton')"
+                            wire:loading.attr="disabled"
+                            class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
                                 {{ $activeTab === 'beton' ? 'bg-slate-600 text-white shadow-lg shadow-slate-600/20' : 'text-gray-400 hover:text-gray-600' }}">
-                        <span>Style Béton</span>
+                        <span wire:loading.remove wire:target="switchTab('beton')">Style Béton</span>
+                        <div wire:loading wire:target="switchTab('beton')" class="flex items-center gap-1">
+                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-0.3s]"></span>
+                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-0.15s]"></span>
+                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></span>
+                        </div>
                     </button>
                 </div>
 
@@ -229,7 +253,7 @@ $deleteTemplate = function (int $id) {
             {{-- Topbar avec bouton créer --}}
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    @if (!$company || !$company->name)
+                    @if (!$this->company || !$this->company->name)
                     <div class="flex items-center gap-3 bg-amber-50 border border-amber-100 text-amber-800 rounded-xl px-4 py-3.5 text-sm">
                         <svg class="w-4 h-4 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -245,511 +269,74 @@ $deleteTemplate = function (int $id) {
                 </div>
             </div>
 
-            @if($activeTab === 'standard')
+            {{-- Contenu Dynamique avec Lazy Loading --}}
+            <div class="min-h-[400px] relative">
+                {{-- Skeleton Loader Global --}}
+                <div wire:loading class="absolute inset-0 z-10 bg-white/50 backdrop-blur-[2px] flex items-center justify-center rounded-3xl animate-fade-in">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+                        @for($i=0; $i<6; $i++)
+                            <div class="space-y-4 animate-pulse">
+                                <div class="aspect-[4/5] bg-gray-100 rounded-2xl"></div>
+                                <div class="h-4 bg-gray-100 rounded w-1/2"></div>
+                                <div class="h-3 bg-gray-100 rounded w-3/4"></div>
+                            </div>
+                        @endfor
+                    </div>
+                </div>
 
-            {{-- ── Gabarits natifs ── --}}
-            <div class="flex items-center gap-3 mb-6">
-                <h2 class="font-bold text-midnight text-base">Gabarits inclus</h2>
-                <div class="flex-1 h-px bg-gray-100"></div>
-                <span class="text-xs text-gray-400 font-medium">{{ $activeNativeCount }} style{{ $activeNativeCount > 1 ? 's' : '' }}</span>
+                {{-- Composant StyleGrid avec Lazy Loading - Séparé par onglet pour une réactivité maximale --}}
+                @if($activeTab === 'standard')
+                    <livewire:components.style-grid 
+                        wire:key="grid-standard"
+                        :activeTab="'standard'" 
+                        :brandColor="$brandColor"
+                        :companyLabel="$companyLabel"
+                        :companyCity="$companyCity"
+                        :brandTextColor="$brandTextColor"
+                        :logoUrl="$logoUrl"
+                    />
+                @elseif($activeTab === 'glass')
+                    <livewire:components.style-grid 
+                        wire:key="grid-glass"
+                        :activeTab="'glass'" 
+                        :brandColor="$brandColor"
+                        :companyLabel="$companyLabel"
+                        :companyCity="$companyCity"
+                        :brandTextColor="$brandTextColor"
+                        :logoUrl="$logoUrl"
+                    />
+                @elseif($activeTab === 'blueprint')
+                    <livewire:components.style-grid 
+                        wire:key="grid-blueprint"
+                        :activeTab="'blueprint'" 
+                        :brandColor="$brandColor"
+                        :companyLabel="$companyLabel"
+                        :companyCity="$companyCity"
+                        :brandTextColor="$brandTextColor"
+                        :logoUrl="$logoUrl"
+                    />
+                @elseif($activeTab === 'kraft')
+                    <livewire:components.style-grid 
+                        wire:key="grid-kraft"
+                        :activeTab="'kraft'" 
+                        :brandColor="$brandColor"
+                        :companyLabel="$companyLabel"
+                        :companyCity="$companyCity"
+                        :brandTextColor="$brandTextColor"
+                        :logoUrl="$logoUrl"
+                    />
+                @elseif($activeTab === 'beton')
+                    <livewire:components.style-grid 
+                        wire:key="grid-beton"
+                        :activeTab="'beton'" 
+                        :brandColor="$brandColor"
+                        :companyLabel="$companyLabel"
+                        :companyCity="$companyCity"
+                        :brandTextColor="$brandTextColor"
+                        :logoUrl="$logoUrl"
+                    />
+                @endif
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                {{-- ── Avant/Après ── --}}
-                @if($isNativeActive('project'))
-                <div class="space-y-4 group">
-                    <x-post-templates.project :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                    <div><h4 class="font-bold text-midnight text-lg">Avant / Après</h4><p class="text-gray-500 text-sm">Parfait pour valoriser vos rénovations et finitions.</p></div>
-                </div>
-                @endif
-
-                {{-- ── Avis Client ── --}}
-                @if($isNativeActive('review'))
-                <div class="space-y-4 group">
-                    <x-post-templates.review :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" :brand-text-color="$brandTextColor" />
-                    <div><h4 class="font-bold text-midnight text-lg">Avis Client</h4><p class="text-gray-500 text-sm">Transformez vos témoignages en preuves sociales fortes.</p></div>
-                </div>
-                @endif
-
-                {{-- ── FAQ Artisan ── --}}
-                @if($isNativeActive('faq'))
-                <div class="space-y-4 group">
-                    <x-post-templates.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" :brand-text-color="$brandTextColor" />
-                    <div><h4 class="font-bold text-midnight text-lg">FAQ Artisan</h4><p class="text-gray-500 text-sm">Éduquez vos clients et affirmez votre professionnalisme.</p></div>
-                </div>
-                @endif
-
-                {{-- ── Lifestyle ── --}}
-                @if($isNativeActive('lifestyle'))
-                <div class="space-y-4 group">
-                    <x-post-templates.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" :brand-text-color="$brandTextColor" />
-                    <div><h4 class="font-bold text-midnight text-lg">Lifestyle</h4><p class="text-gray-500 text-sm">Une immersion brute dans votre métier, sans artifices.</p></div>
-                </div>
-                @endif
-
-                {{-- ── Focus Qualité ── --}}
-                @if($isNativeActive('quality_focus'))
-                <div class="space-y-4 group">
-                    <x-post-templates.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" :brand-text-color="$brandTextColor" />
-                    <div><h4 class="font-bold text-midnight text-lg">Focus Qualité</h4><p class="text-gray-500 text-sm">Valorisez la qualité de vos matériaux et équipements.</p></div>
-                </div>
-                @endif
-
-                {{-- ── Chantier en Détail ── --}}
-                @if($isNativeActive('chantier_detail'))
-                <div class="space-y-4 group">
-                    <x-post-templates.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" :brand-text-color="$brandTextColor" />
-                    <div><h4 class="font-bold text-midnight text-lg">Chantier en Détail</h4><p class="text-gray-500 text-sm">Une immersion complète avec plusieurs photos d'un même projet.</p></div>
-                </div>
-                @endif
-
-                {{-- ── Step-by-Step ── --}}
-                @if($isNativeActive('step_by_step'))
-                <div class="space-y-4 group">
-                    <x-post-templates.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                    <div><h4 class="font-bold text-midnight text-lg">Step-by-Step</h4><p class="text-gray-500 text-sm">Expliquez votre expertise étape par étape, didactique et rassurant.</p></div>
-                </div>
-                @endif
-
-                {{-- ── Conseil Saisonnier ── --}}
-                @if($isNativeActive('conseil_saisonnier'))
-                <div class="space-y-4 group">
-                    <x-post-templates.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" :brand-text-color="$brandTextColor" />
-                    <div><h4 class="font-bold text-midnight text-lg">Conseil Saisonnier</h4><p class="text-gray-500 text-sm">Anticipez les besoins de vos clients selon la saison.</p></div>
-                </div>
-                @endif
-
-                {{-- ── Erreur à Éviter ── --}}
-                @if($isNativeActive('erreur_a_eviter'))
-                <div class="space-y-4 group">
-                    <x-post-templates.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$hasLogo ? Storage::url($company->logo_path) : null" :preview="true" :brand-text-color="$brandTextColor" />
-                    <div><h4 class="font-bold text-midnight text-lg">Erreur à Éviter</h4><p class="text-gray-500 text-sm">Un format alerte très engageant pour éduquer vos clients.</p></div>
-                </div>
-                @endif
-
-                {{-- ── Guide Pédagogique ── --}}
-                @if($isNativeActive('guide_pedagogique'))
-                <div class="space-y-4 group">
-                    <x-post-templates.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                    <div><h4 class="font-bold text-midnight text-lg">Guide Pédagogique</h4><p class="text-gray-500 text-sm">Apportez de la valeur et positionnez-vous en expert conseil.</p></div>
-                </div>
-                @endif
-
-            </div>
-            @endif
-
-            @if($activeTab === 'glass')
-            <div class="mb-10 animate-fade-in">
-            <div class="flex items-center gap-3 mb-6">
-                <h2 class="font-bold text-midnight text-base">Gabarits inclus</h2>
-                <div class="flex-1 h-px bg-gray-100"></div>
-                <span class="text-xs text-gray-400 font-medium">{{ $activeNativeCount }} style{{ $activeNativeCount > 1 ? 's' : '' }}</span>
-            </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{-- Glass Avant/Après --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.glass.project :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Glass Avant / Après</h4>
-                            <p class="text-gray-500 text-sm italic">Un style futuriste et épuré pour vos réalisations.</p>
-                        </div>
-                    </div>
-
-                    {{-- Glass Review --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.glass.review :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Glass Avis Client</h4>
-                            <p class="text-gray-500 text-sm italic">Mettez en valeur vos retours clients avec élégance.</p>
-                        </div>
-                    </div>
-
-                    {{-- Glass FAQ --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.glass.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Glass FAQ</h4>
-                            <p class="text-gray-500 text-sm italic">Répondez aux questions avec un design premium.</p>
-                        </div>
-                    </div>
-
-                    {{-- Glass Lifestyle --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.glass.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Glass Lifestyle</h4>
-                            <p class="text-gray-500 text-sm italic">Une immersion brute et moderne dans votre métier.</p>
-                        </div>
-                    </div>
-
-                    {{-- Glass Quality Focus --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.glass.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Glass Focus Qualité</h4>
-                            <p class="text-gray-500 text-sm italic">Valorisez vos matériaux avec précision.</p>
-                        </div>
-                    </div>
-
-                    {{-- Glass Chantier Détail --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.glass.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Glass Chantier Détail</h4>
-                            <p class="text-gray-500 text-sm italic">Explorez chaque recoin de vos projets.</p>
-                        </div>
-                    </div>
-
-                    {{-- Glass Step-by-Step --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.glass.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Glass Step-by-Step</h4>
-                            <p class="text-gray-500 text-sm italic">Partagez votre expertise étape par étape.</p>
-                        </div>
-                    </div>
-
-                    {{-- Glass Conseil Saisonnier --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.glass.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Glass Conseil Saisonnier</h4>
-                            <p class="text-gray-500 text-sm italic">Le bon conseil, pour le bon moment.</p>
-                        </div>
-                    </div>
-
-                    {{-- Glass Erreur à Éviter --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.glass.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Glass Erreur à Éviter</h4>
-                            <p class="text-gray-500 text-sm italic">Éduquez avec un design d'alerte premium.</p>
-                        </div>
-                    </div>
-
-                    {{-- Glass Guide Pédagogique --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.glass.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Glass Guide Pédagogique</h4>
-                            <p class="text-gray-500 text-sm italic">Devenez la référence conseil de votre secteur.</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            @endif
-            
-            @if($activeTab === 'blueprint')
-            <div class="mb-10 animate-fade-in space-y-12">
-            <div class="flex items-center gap-3 mb-6">
-                <h2 class="font-bold text-midnight text-base">Gabarits inclus</h2>
-                <div class="flex-1 h-px bg-gray-100"></div>
-                <span class="text-xs text-gray-400 font-medium">{{ $activeNativeCount }} style{{ $activeNativeCount > 1 ? 's' : '' }}</span>
-            </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{-- Blueprint Project --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.blueprint.project :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Blueprint Avant / Après</h4>
-                            <p class="text-gray-500 text-sm italic">Le chantier vu comme un projet d'architecte.</p>
-                        </div>
-                    </div>
-
-                    {{-- Blueprint Review --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.blueprint.review :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Blueprint Avis</h4>
-                            <p class="text-gray-500 text-sm italic">La validation technique de vos clients.</p>
-                        </div>
-                    </div>
-
-                    {{-- Blueprint FAQ --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.blueprint.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Blueprint FAQ</h4>
-                            <p class="text-gray-500 text-sm italic">Des réponses claires et documentées.</p>
-                        </div>
-                    </div>
-
-                    {{-- Blueprint Lifestyle --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.blueprint.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Blueprint Lifestyle</h4>
-                            <p class="text-gray-500 text-sm italic">L'immersion brute dans vos réalisations.</p>
-                        </div>
-                    </div>
-
-                    {{-- Blueprint Quality --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.blueprint.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Blueprint Focus Qualité</h4>
-                            <p class="text-gray-500 text-sm italic">L'analyse détaillée de vos matériaux.</p>
-                        </div>
-                    </div>
-
-                    {{-- Blueprint Chantier --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.blueprint.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Blueprint Zoom Chantier</h4>
-                            <p class="text-gray-500 text-sm italic">Le dossier technique de vos chantiers.</p>
-                        </div>
-                    </div>
-
-                    {{-- Blueprint Steps --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.blueprint.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Blueprint Étapes</h4>
-                            <p class="text-gray-500 text-sm italic">Votre méthodologie, étape par étape.</p>
-                        </div>
-                    </div>
-
-                    {{-- Blueprint Seasonal --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.blueprint.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Blueprint Saison</h4>
-                            <p class="text-gray-500 text-sm italic">Le conseil expert, archivé et précis.</p>
-                        </div>
-                    </div>
-
-                    {{-- Blueprint Alert --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.blueprint.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Blueprint Alerte</h4>
-                            <p class="text-gray-500 text-sm italic">Éduquez avec la rigueur d'un expert.</p>
-                        </div>
-                    </div>
-
-                    {{-- Blueprint Guide --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.blueprint.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Blueprint Guide</h4>
-                            <p class="text-gray-500 text-sm italic">Votre base de connaissance technique.</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            @endif
-
-            @if($activeTab === 'kraft')
-            <div class="mb-10 animate-fade-in space-y-12">
-            <div class="flex items-center gap-3 mb-6">
-                <h2 class="font-bold text-midnight text-base">Gabarits inclus</h2>
-                <div class="flex-1 h-px bg-gray-100"></div>
-                <span class="text-xs text-gray-400 font-medium">{{ $activeNativeCount }} style{{ $activeNativeCount > 1 ? 's' : '' }}</span>
-            </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{-- Kraft Project --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.kraft.project :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Kraft Avant / Après</h4>
-                            <p class="text-gray-500 text-sm italic">L'authenticité du chantier, étape par étape.</p>
-                        </div>
-                    </div>
-
-                    {{-- Kraft Review --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.kraft.review :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Kraft Avis Client</h4>
-                            <p class="text-gray-500 text-sm italic">La validation brute de vos clients satisfaits.</p>
-                        </div>
-                    </div>
-
-                    {{-- Kraft FAQ --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.kraft.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Kraft FAQ</h4>
-                            <p class="text-gray-500 text-sm italic">Des réponses franches à vos clients.</p>
-                        </div>
-                    </div>
-
-                    {{-- Kraft Lifestyle --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.kraft.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Kraft Lifestyle</h4>
-                            <p class="text-gray-500 text-sm italic">Votre métier au naturel, sans filtre.</p>
-                        </div>
-                    </div>
-
-                    {{-- Kraft Quality --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.kraft.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Kraft Focus Qualité</h4>
-                            <p class="text-gray-500 text-sm italic">La précision technique mise en avant.</p>
-                        </div>
-                    </div>
-
-                    {{-- Kraft Chantier --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.kraft.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Kraft Zoom Chantier</h4>
-                            <p class="text-gray-500 text-sm italic">Le rapport de chantier visuel et efficace.</p>
-                        </div>
-                    </div>
-
-                    {{-- Kraft Steps --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.kraft.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Kraft Étapes</h4>
-                            <p class="text-gray-500 text-sm italic">Une méthodologie claire et industrielle.</p>
-                        </div>
-                    </div>
-
-                    {{-- Kraft Seasonal --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.kraft.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Kraft Saison</h4>
-                            <p class="text-gray-500 text-sm italic">Le mémo technique pour chaque saison.</p>
-                        </div>
-                    </div>
-
-                    {{-- Kraft Alert --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.kraft.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Kraft Alerte</h4>
-                            <p class="text-gray-500 text-sm italic">Évitez les erreurs avec un design impactant.</p>
-                        </div>
-                    </div>
-
-                    {{-- Kraft Guide --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.kraft.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Kraft Guide</h4>
-                            <p class="text-gray-500 text-sm italic">Le guide pratique de votre savoir-faire.</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            @endif
-
-            @if($activeTab === 'beton')
-            <div class="mb-10 animate-fade-in space-y-12">
-                <div class="flex items-center gap-3 mb-6">
-                    <h2 class="font-bold text-midnight text-base">Gabarits inclus</h2>
-                    <div class="flex-1 h-px bg-gray-100"></div>
-                    <span class="text-xs text-gray-400 font-medium">{{ $activeNativeCount }} style{{ $activeNativeCount > 1 ? 's' : '' }}</span>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{-- Béton Project --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.beton.project :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Béton Avant / Après</h4>
-                            <p class="text-gray-500 text-sm italic">Modernité et solidité visuelle.</p>
-                        </div>
-                    </div>
-
-                    {{-- Béton Review --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.beton.review :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Béton Avis Client</h4>
-                            <p class="text-gray-500 text-sm italic">Le témoignage de confiance ancré dans le réel.</p>
-                        </div>
-                    </div>
-
-                    {{-- Béton FAQ --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.beton.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Béton FAQ</h4>
-                            <p class="text-gray-500 text-sm italic">Réponses précises et professionnelles.</p>
-                        </div>
-                    </div>
-
-                    {{-- Béton Lifestyle --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.beton.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Béton Lifestyle</h4>
-                            <p class="text-gray-500 text-sm italic">L'immersion moderne sur vos chantiers.</p>
-                        </div>
-                    </div>
-
-                    {{-- Béton Quality --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.beton.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Béton Focus Qualité</h4>
-                            <p class="text-gray-500 text-sm italic">Le détail qui fait la différence.</p>
-                        </div>
-                    </div>
-
-                    {{-- Béton Chantier --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.beton.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Béton Zoom Chantier</h4>
-                            <p class="text-gray-500 text-sm italic">Vue technique et multi-angle.</p>
-                        </div>
-                    </div>
-
-                    {{-- Béton Steps --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.beton.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Béton Étapes Pro</h4>
-                            <p class="text-gray-500 text-sm italic">Votre méthodologie en 3 étapes claires.</p>
-                        </div>
-                    </div>
-
-                    {{-- Béton Seasonal --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.beton.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Béton Dossier</h4>
-                            <p class="text-gray-500 text-sm italic">Le mémo technique indispensable.</p>
-                        </div>
-                    </div>
-
-                    {{-- Béton Alert --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.beton.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Béton Alerte Erreur</h4>
-                            <p class="text-gray-500 text-sm italic">Prévention et conseils d'expert.</p>
-                        </div>
-                    </div>
-
-                    {{-- Béton Guide --}}
-                    <div class="space-y-4 group">
-                        <x-post-templates.beton.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
-                        <div>
-                            <h4 class="font-bold text-midnight text-lg">Béton Guide Pratique</h4>
-                            <p class="text-gray-500 text-sm italic">L'accompagnement client par l'artisan.</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            @endif
 
             {{-- CTA branding --}}
             <div class="mt-12 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white shadow ring-1 ring-gray-100">
@@ -847,7 +434,7 @@ $deleteTemplate = function (int $id) {
                                 :template="$generatedTemplate" 
                                 :brandColor="$brandColor" 
                                 :companyLabel="$companyLabel" 
-                                :logoUrl="$hasLogo ? Storage::disk('public')->url($company->logo_path) : null" 
+                                :logoUrl="$logoUrl" 
                                 :preview="true"
                                 :hasImageText="$hasImageText"
                                 imageBeforeUrl="https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=400"

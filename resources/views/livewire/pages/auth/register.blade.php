@@ -17,13 +17,17 @@ state([
     'name' => '',
     'email' => '',
     'password' => '',
-    'password_confirmation' => ''
+    'password_confirmation' => '',
+    'newsletter_opt_in' => false,
+    'terms' => false,
 ]);
 
 rules([
     'name' => ['required', 'string', 'max:255'],
     'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
     'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+    'newsletter_opt_in' => ['boolean'],
+    'terms' => ['accepted', 'required'],
 ]);
 
 $register = function () {
@@ -39,8 +43,15 @@ $register = function () {
     ]);
 
     Auth::login($user);
-
     $this->redirect(route('onboarding', absolute: false), navigate: true);
+};
+
+$redirectToGoogle = function () {
+    $this->validate(['terms' => 'accepted']);
+    
+    session(['register_newsletter_opt_in' => $this->newsletter_opt_in]);
+    
+    return redirect()->route('auth.google');
 };
 
 ?>
@@ -53,7 +64,7 @@ $register = function () {
 
     <!-- Social Register -->
     <div class="mb-8 space-y-4">
-        <a href="{{ route('auth.google') }}" class="w-full flex items-center justify-center gap-3 py-4 px-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:bg-gray-50 transition-all duration-200 group transform active:scale-[0.98]">
+        <button wire:click="redirectToGoogle" type="button" class="w-full flex items-center justify-center gap-3 py-4 px-4 bg-white border border-gray-200 rounded-2xl shadow-sm hover:bg-gray-50 transition-all duration-200 group transform active:scale-[0.98]">
             <svg class="w-5 h-5" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -61,7 +72,7 @@ $register = function () {
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
             <span class="text-slate-700 font-bold tracking-tight">Continuer avec Google</span>
-        </a>
+        </button>
 
         <div class="relative flex items-center py-2">
             <div class="flex-grow border-t border-gray-100"></div>
@@ -103,6 +114,34 @@ $register = function () {
                                 type="password"
                                 name="password_confirmation" required autocomplete="new-password" />
                 <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+            </div>
+        </div>
+
+        <!-- Legal & Newsletter -->
+        <div class="mt-8 space-y-4 pt-4 border-t border-gray-50">
+            <!-- Terms & Conditions (Required) -->
+            <div>
+                <label for="terms" class="inline-flex items-start group cursor-pointer">
+                    <div class="relative flex items-center mt-0.5">
+                        <input id="terms" type="checkbox" wire:model="terms" name="terms" class="w-5 h-5 rounded border-gray-300 text-copper shadow-sm focus:ring-copper transition-all duration-200">
+                    </div>
+                    <span class="ms-3 text-sm font-medium text-slate-600 group-hover:text-midnight transition-colors leading-tight">
+                        {{ __('J\'accepte les') }} <a href="{{ route('legal.cgv') }}" target="_blank" class="text-copper border-b border-copper/30 hover:border-copper transition-all">{{ __('Conditions Générales de Vente') }}</a> {{ __('et la') }} <a href="{{ route('legal.confidentialite') }}" target="_blank" class="text-copper border-b border-copper/30 hover:border-copper transition-all">{{ __('Politique de Confidentialité') }}</a>
+                    </span>
+                </label>
+                <x-input-error :messages="$errors->get('terms')" class="mt-2" />
+            </div>
+
+            <!-- Newsletter Opt-in (Optional) -->
+            <div>
+                <label for="newsletter_opt_in" class="inline-flex items-start group cursor-pointer">
+                    <div class="relative flex items-center mt-0.5">
+                        <input id="newsletter_opt_in" type="checkbox" wire:model ="newsletter_opt_in" name="newsletter_opt_in" class="w-5 h-5 rounded border-gray-300 text-copper shadow-sm focus:ring-copper transition-all duration-200">
+                    </div>
+                    <span class="ms-3 text-sm font-medium text-slate-500 group-hover:text-midnight transition-colors leading-tight">
+                        {{ __('Je souhaite recevoir les actualités de Postelio par e-mail') }}
+                    </span>
+                </label>
             </div>
         </div>
 

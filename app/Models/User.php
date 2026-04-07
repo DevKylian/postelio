@@ -39,6 +39,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'total_credits',
         'used_credits',
         'last_quota_reset_at',
+        'newsletter_opt_in',
     ];
 
     /**
@@ -69,6 +70,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'last_quota_reset_at' => 'datetime',
             'total_credits' => 'integer',
             'used_credits' => 'integer',
+            'newsletter_opt_in' => 'boolean',
         ];
     }
 

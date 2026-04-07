@@ -29,6 +29,9 @@
     $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
     $total = 1 + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
+    
+    $showFooter = $hasContactInfo ? ((int)$slideIndex === 0) : true;
+    $footerAlpine = $slideIndex === null ? ($hasContactInfo ? 'x-show="current === 0"' : '') : '';
 @endphp
 
 <div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
@@ -54,7 +57,7 @@
             </div>
         </div>
 
-        <div class="h-16 px-10 bg-white border-t-2 border-[#0047AB] flex items-center justify-between z-20">
+        <div {!! $footerAlpine !!} class="h-16 px-10 bg-white border-t-2 border-[#0047AB] flex items-center justify-between z-20">
               @php
                     $len = mb_strlen($text);
                     $fontSize = 'text-sm';

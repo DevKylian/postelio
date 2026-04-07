@@ -27,6 +27,9 @@
     $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
     $total = 1 + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
+    
+    $showFooter = $hasContactInfo ? ((int)$slideIndex === 0) : true;
+    $footerAlpine = $slideIndex === null ? ($hasContactInfo ? 'x-show="current === 0"' : '') : '';
 @endphp
 
 <div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
@@ -63,7 +66,7 @@
             </div>
         </div>
 
-        <div class="py-2.5 px-10 bg-white border-t-2 border-[#011430] flex flex-col gap-1 relative z-20 min-h-14">
+        <div {!! $footerAlpine !!} class="py-2.5 px-10 bg-white border-t-2 border-[#011430] flex flex-col gap-1 relative z-20 min-h-14">
             <span class="text-[#0047AB] text-[9px] font-black font-mono-technical uppercase tracking-widest truncate w-full">{{ $companyLabel }}</span>
             <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)

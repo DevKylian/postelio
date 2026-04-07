@@ -67,7 +67,10 @@ class SocialAuthController extends Controller
                     'google_refresh_token' => $googleUser->refreshToken,
                     'avatar' => $googleUser->avatar,
                     'password' => Hash::make(Str::random(24)), // Random password for security
+                    'newsletter_opt_in' => session('register_newsletter_opt_in', false),
                 ]);
+
+                session()->forget('register_newsletter_opt_in');
 
                 $user->markEmailAsVerified();
 

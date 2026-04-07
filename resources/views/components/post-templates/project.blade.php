@@ -81,7 +81,7 @@
         @endphp
         <div class="absolute inset-0 bg-slate-950 flex items-center justify-center" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if ($imageBeforeUrl)
-                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-contain p-4">
+                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 <div class="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-4 py-2 rounded-lg border border-white/20 z-20 shadow-xl">
                     <p class="text-white text-xs font-black uppercase tracking-[0.2em] leading-none">Avant</p>
                 </div>
@@ -96,7 +96,7 @@
         @endphp
         <div class="absolute inset-0 bg-slate-900 flex items-center justify-center" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if ($imageAfterUrl)
-                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-contain p-4">
+                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg border border-black/10 z-20 shadow-xl">
                     <p class="text-gray-900 text-xs font-black uppercase tracking-[0.2em] leading-none">Après</p>
                 </div>

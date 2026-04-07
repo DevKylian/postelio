@@ -99,8 +99,6 @@
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: linear-gradient(135deg, #111827 0%, #1E293B 100%); border-radius: 20px; overflow: hidden;">
                                 <tr>
                                     <td style="padding: 32px 32px 28px; text-align: center;">
-                                        <!-- Icon -->
-                                        <div style="display: inline-block; width: 44px; height: 44px; background: linear-gradient(135deg, #F59E0B, #D97706); border-radius: 12px; line-height: 44px; font-size: 20px; margin-bottom: 16px;">⚡</div>
                                         <!-- Headline -->
                                         <p style="margin: 0 0 6px; font-size: 18px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.3px;">
                                             Prêt à passer à la vitesse supérieure ?
@@ -112,7 +110,7 @@
                                         <!-- Button -->
                                         <a href="https://postelio.fr"
                                            target="_blank"
-                                           style="display: inline-block; padding: 14px 36px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: #111827; font-size: 15px; font-weight: 800; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 24px -4px rgba(245,158,11,0.5); letter-spacing: -0.2px;">
+                                           style="display: inline-block; padding: 14px 36px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: #FFFFFF; font-size: 15px; font-weight: 800; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 24px -4px rgba(245,158,11,0.5); letter-spacing: -0.2px;">
                                             Commencer gratuitement &rarr;
                                         </a>
                                     </td>

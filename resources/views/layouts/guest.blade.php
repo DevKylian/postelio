@@ -28,6 +28,16 @@
             <!-- Left Side: Auth Forms -->
             <div class="flex-1 flex flex-col justify-center items-center p-8 sm:p-12 lg:p-20 bg-white relative z-10 overflow-y-auto">
                 <div class="w-full max-w-[480px]">
+                    <!-- Back to Site -->
+                    <div class="mb-8">
+                        <a href="/" wire:navigate class="text-xs font-semibold text-gray-400 hover:text-midnight transition-colors flex items-center gap-2 group">
+                            <svg class="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                            Retour au site
+                        </a>
+                    </div>
+
                     <!-- Logo -->
                     <div class="mb-12">
                         <a href="/" wire:navigate class="inline-block transition-transform hover:scale-105 duration-300">

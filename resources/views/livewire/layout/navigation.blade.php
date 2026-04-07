@@ -54,6 +54,16 @@ $logout = function (Logout $logout) {
                 <span>Tableau de bord</span>
             </x-sidebar-link>
 
+            <!-- Retour au site -->
+            <x-sidebar-link href="/" target="_blank">
+                <svg class="w-[18px] h-[18px] shrink-0 text-slate-500 group-hover:text-amber-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                <span class="text-slate-400 group-hover:text-white transition-colors">Retour au site</span>
+            </x-sidebar-link>
+
+            <div class="h-px bg-white/[0.04] mx-3 my-3"></div>
+
             <!-- Section: Outils -->
             <div class="pt-5 pb-2 px-3">
                 <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-[0.12em]">Créations</p>

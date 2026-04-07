@@ -121,6 +121,7 @@ class NewsletterManager extends Component
                 newsletterSubject: '[TEST] ' . $this->subject,
                 newsletterContent: $this->content,
                 recipientName:     Auth::user()->name,
+                recipient:         Auth::user(),
             )
         );
 
@@ -140,7 +141,7 @@ class NewsletterManager extends Component
         $this->isSending       = true;
         $this->showConfirmModal = false;
 
-        $recipients = $this->getRecipientsQuery()->get(['name', 'email']);
+        $recipients = $this->getRecipientsQuery()->get(['id', 'name', 'email']);
         $count      = $recipients->count();
 
         foreach ($recipients as $user) {
@@ -149,6 +150,7 @@ class NewsletterManager extends Component
                     newsletterSubject: $this->subject,
                     newsletterContent: $this->content,
                     recipientName:     $user->name,
+                    recipient:         $user,
                 )
             );
         }

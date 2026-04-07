@@ -117,6 +117,10 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+// Newsletter unsubscribe (signed URL, no auth required)
+Route::get('/newsletter/unsubscribe/{user}', [\App\Http\Controllers\NewsletterController::class, 'unsubscribe'])
+    ->name('newsletter.unsubscribe');
+
 Route::get('/render/post/{post}', [\App\Http\Controllers\RenderPostController::class, 'show'])->name('render.post');
 
 // Dynamic Sitemap

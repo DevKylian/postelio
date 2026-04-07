@@ -128,7 +128,7 @@
                             </p>
                             <p style="margin: 0; font-size: 12px; color: #CBD5E1; font-weight: 400;">
                                 Vous recevez cet email car vous avez accepté de recevoir nos actualités.<br>
-                                <a href="{{ config('app.url') }}/profile" style="color: #CBD5E1; text-decoration: underline;">Se désabonner</a>
+                                <a href="{{ $unsubscribeUrl }}" style="color: #CBD5E1; text-decoration: underline;">Se désabonner</a>
                             </p>
                         </td>
                     </tr>

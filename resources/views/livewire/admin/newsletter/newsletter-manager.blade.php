@@ -68,14 +68,23 @@
                 {{-- Decoration blob --}}
                 <div class="absolute top-0 right-0 w-64 h-64 bg-copper/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
 
-                <div class="flex items-center gap-3 mb-8 relative z-10">
-                    <div class="w-9 h-9 rounded-xl bg-copper/10 flex items-center justify-center text-copper shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <div class="flex items-center justify-between mb-8 relative z-10">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-copper/10 flex items-center justify-center text-copper shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div>
+                            <h2 class="font-display font-bold text-xl text-midnight">Nouvelle newsletter</h2>
+                            <p class="text-xs text-slate-400 font-medium">Rédigez votre email et choisissez votre audience</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="font-display font-bold text-xl text-midnight">Nouvelle newsletter</h2>
-                        <p class="text-xs text-slate-400 font-medium">Rédigez votre email et choisissez votre audience</p>
-                    </div>
+                    <button
+                        wire:click="openAIModal"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold text-white bg-gradient-to-r from-copper to-amber-500 shadow-lg shadow-copper/20 hover:shadow-copper/30 hover:-translate-y-0.5 transition-all active:translate-y-0"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        Générer avec l'IA
+                    </button>
                 </div>
 
                 <div class="space-y-8 relative z-10">
@@ -465,6 +474,155 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- ─── AI Generator Modal ─── --}}
+    @if($showAIModal)
+    <div class="fixed inset-0 z-[9999] flex items-center justify-center"
+         x-data="{
+             copied: false,
+             sujet: '',
+             ton: '',
+         }">
+        <div class="fixed inset-0 bg-slate-900/45 backdrop-blur-md" wire:click="closeAIModal"></div>
+
+        <div class="relative w-full max-w-5xl mx-4 sm:mx-6 bg-white/95 backdrop-blur-md border border-white/40 shadow-2xl rounded-[2.5rem] overflow-hidden flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh]">
+
+            {{-- Header --}}
+            <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-white/50 shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-copper to-amber-500 flex items-center justify-center text-white shadow-lg shadow-copper/20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-xl text-midnight">Générateur de Newsletter IA</h3>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">Prompt et Importation JSON</p>
+                    </div>
+                </div>
+                <button wire:click="closeAIModal" class="p-2 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            {{-- Body --}}
+            <div class="flex-1 overflow-y-auto p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                {{-- Left: Prompt --}}
+                <div class="space-y-5 flex flex-col h-full">
+                    <div class="flex items-center justify-between shrink-0">
+                        <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-full bg-copper/20 text-copper flex items-center justify-center text-xs">1</span>
+                            Le Prompt à copier
+                        </h4>
+                        <button @click="
+                            let text = $refs.promptText.innerText;
+                            navigator.clipboard.writeText(text);
+                            copied = true;
+                            setTimeout(() => copied = false, 2000);
+                        " class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-sm"
+                        :class="copied ? 'bg-green-100 text-green-600 border border-green-200' : 'bg-white text-slate-600 border border-slate-200 hover:border-copper/50 hover:text-copper'">
+                            <svg x-show="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                            <svg x-cloak x-show="copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+                            <span x-text="copied ? 'Copié !' : 'Copier'"></span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 shrink-0">
+                        <input type="text" x-model="sujet" placeholder="Sujet / thème principal"
+                               class="w-full bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-midnight focus:border-copper focus:ring-2 focus:ring-copper/20 outline-none transition-all shadow-sm">
+                        <input type="text" x-model="ton" placeholder="Anecdote / Angle (ex. L'histoire de Marc)"
+                               class="w-full bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-midnight focus:border-copper focus:ring-2 focus:ring-copper/20 outline-none transition-all shadow-sm">
+                    </div>
+
+                    <div class="relative flex-1 min-h-[300px]">
+                        <div class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none rounded-b-2xl"></div>
+                        <pre x-ref="promptText" class="absolute inset-0 text-[11px] sm:text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-2xl p-5 overflow-y-auto font-mono whitespace-pre-wrap leading-[1.8] shadow-inner selection:bg-copper/20">SUJET DE LA NEWSLETTER : <span x-text="sujet || '[INSÉRER LE SUJET]'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
+ANECDOTE / ANGLE : <span x-text="ton || '[INSÉRER L\'ANGLE : ex. L\'histoire de Marc ou l\'astuce de la grille]'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
+
+TON RÔLE :
+Tu es un expert en email marketing B2B pour les artisans du bâtiment. Ton style est unique : tu rédiges des newsletters au format "Pause Café". C'est un message qui se lit en 1 minute maximum, avec un ton "vrai", cash et chaleureux. Tu tutoies l'artisan. Pas de jargon marketing, pas de grandes théories. Tu parles comme un collègue de confiance.
+
+TON OBJECTIF :
+Rédiger une newsletter très courte qui raconte une anecdote concrète ou donne une astuce "secrète" liée à l'ANGLE fourni, pour prouver la valeur de Postelio sans faire de "vente agressive".
+
+STRUCTURE DE LA NEWSLETTER (Format Pause Café) :
+
+L'Accroche : Une phrase courte qui plonge directement dans l'anecdote ou le problème.
+
+L'Histoire/Le Hack : 2 à 3 paragraphes très courts pour raconter l'anecdote ou donner l'astuce.
+
+Le Pont Postelio : Montre comment l'outil simplifie la vie en 10 secondes par rapport à ce qui vient d'être dit.
+
+CTA : Une phrase d'appel à l'action avec le lien https://postelio.fr.
+
+CONSIGNES POUR LE CONTENU HTML :
+
+Longueur : 150 à 250 mots.
+
+Format : HTML brut. Chaque idée = un &lt;p&gt; séparé. Chaque paragraphe contient 1 à 2 phrases maximum. Jamais plus.
+
+Aération obligatoire : Le rendu doit être aéré, avec de l'espace visuel entre chaque bloc. Pas de mur de texte. Pas de phrases enchaînées dans un même paragraphe.
+
+Interdiction absolue : Ne jamais utiliser de balises de titre (&lt;h1&gt;, &lt;h2&gt;, &lt;h3&gt;). L'e-mail doit ressembler à un message WhatsApp bien écrit, pas à une brochure.
+
+Interdictions sur le fond :
+— Ne jamais mentionner l'IA, les algorithmes, ou la génération automatique de contenu.
+— Ne jamais dire "premier post offert", "essai gratuit" ou toute formule promotionnelle similaire. Si tu parles de l'offre, dis simplement qu'on peut commencer gratuitement.
+
+Exemple de structure HTML attendue :
+&lt;p&gt;Phrase d'accroche courte.&lt;/p&gt;
+&lt;p&gt;Première partie de l'histoire.&lt;/p&gt;
+&lt;p&gt;Suite. Rebondissement.&lt;/p&gt;
+&lt;p&gt;Le pont Postelio. Explication en 10 secondes.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://postelio.fr"&gt;CTA ici →&lt;/a&gt;&lt;/p&gt;
+
+FORMAT DE SORTIE EXIGÉ (JSON) :
+Réponds UNIQUEMENT en JSON valide :
+
+{
+"objet_email": "Objet intrigant avec 1 emoji, max 50 caractères",
+"preheader": "Phrase d'aperçu qui complète l'objet, max 80 caractères",
+"contenu_html": "Le texte HTML complet avec le lien"
+}</pre>
+                    </div>
+                </div>
+
+                {{-- Right: JSON paste --}}
+                <div class="space-y-5 flex flex-col pt-6 lg:pt-0 lg:border-l lg:border-slate-100 lg:pl-8 h-full">
+                    <div class="flex items-center justify-between shrink-0">
+                        <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-full bg-copper/20 text-copper flex items-center justify-center text-xs">2</span>
+                            Coller la réponse JSON
+                        </h4>
+                    </div>
+
+                    <div class="relative flex-1 min-h-[250px] lg:min-h-0">
+                        <textarea wire:model="json_pasted"
+                                  placeholder='Collez le code JSON ici...
+{
+  "objet_email": "...",
+  "preheader": "...",
+  "contenu_html": "..."
+}'
+                                  class="absolute inset-0 w-full h-full bg-slate-900 text-green-400/90 border-0 rounded-2xl p-6 text-xs sm:text-sm font-mono focus:ring-4 focus:ring-copper/30 transition-shadow outline-none resize-none shadow-inner shadow-slate-950/50 selection:bg-copper/30"></textarea>
+
+                        <div wire:loading wire:target="processPastedJson" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                            <svg class="animate-spin h-8 w-8 text-copper" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        </div>
+                    </div>
+
+                    @error('json_pasted') <span class="text-rose-500 text-[11px] font-bold tracking-tight bg-rose-50 px-3 py-1 rounded-lg shrink-0">{{ $message }}</span> @enderror
+
+                    <button wire:click="processPastedJson"
+                            class="w-full shrink-0 py-4 rounded-2xl bg-midnight text-white font-black text-sm uppercase tracking-[0.1em] hover:bg-slate-800 transition-all shadow-xl shadow-midnight/10 flex items-center justify-center gap-2 group">
+                        <svg class="w-5 h-5 text-copper group-hover:-rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        Importer dans l'éditeur
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>

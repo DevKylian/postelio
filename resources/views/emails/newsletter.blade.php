@@ -95,17 +95,23 @@
 
                     <!-- CTA Section -->
                     <tr>
-                        <td style="padding: 16px 40px 32px;">
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border-radius: 16px; border: 1px solid #FDE68A;">
+                        <td style="padding: 16px 40px 36px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: linear-gradient(135deg, #111827 0%, #1E293B 100%); border-radius: 20px; overflow: hidden;">
                                 <tr>
-                                    <td style="padding: 22px 28px; text-align: center;">
-                                        <p style="margin: 0 0 14px; font-size: 15px; font-weight: 600; color: #92400E;">
-                                            Accédez à votre espace Postelio
+                                    <td style="padding: 32px 32px 28px; text-align: center;">
+                                        <!-- Headline -->
+                                        <p style="margin: 0 0 6px; font-size: 18px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.3px;">
+                                            Prêt à passer à la vitesse supérieure ?
                                         </p>
-                                        <a href="{{ config('app.url') }}/dashboard"
+                                        <!-- Sub -->
+                                        <p style="margin: 0 0 22px; font-size: 13px; font-weight: 400; color: #94A3B8;">
+                                            Rejoins les artisans qui remplissent leur agenda avec Postelio.
+                                        </p>
+                                        <!-- Button -->
+                                        <a href="https://postelio.fr"
                                            target="_blank"
-                                           style="display: inline-block; padding: 13px 32px; background-color: #111827; color: #FFFFFF; font-size: 15px; font-weight: 700; text-decoration: none; border-radius: 50px; box-shadow: 0 6px 16px -4px rgba(15,23,42,0.3); letter-spacing: -0.2px;">
-                                            Ouvrir mon tableau de bord &rarr;
+                                           style="display: inline-block; padding: 14px 36px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: #FFFFFF; font-size: 15px; font-weight: 800; text-decoration: none; border-radius: 50px; box-shadow: 0 8px 24px -4px rgba(245,158,11,0.5); letter-spacing: -0.2px;">
+                                            Commencer gratuitement &rarr;
                                         </a>
                                     </td>
                                 </tr>

@@ -533,49 +533,48 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 shrink-0">
                         <input type="text" x-model="sujet" placeholder="Sujet / thème principal"
                                class="w-full bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-midnight focus:border-copper focus:ring-2 focus:ring-copper/20 outline-none transition-all shadow-sm">
-                        <input type="text" x-model="ton" placeholder="Type : Étude de cas, Hack, Coulisses, Contraste…"
+                        <input type="text" x-model="ton" placeholder="Anecdote / Angle (ex. L'histoire de Marc)"
                                class="w-full bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-midnight focus:border-copper focus:ring-2 focus:ring-copper/20 outline-none transition-all shadow-sm">
                     </div>
 
                     <div class="relative flex-1 min-h-[300px]">
                         <div class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none rounded-b-2xl"></div>
                         <pre x-ref="promptText" class="absolute inset-0 text-[11px] sm:text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-2xl p-5 overflow-y-auto font-mono whitespace-pre-wrap leading-[1.8] shadow-inner selection:bg-copper/20">SUJET DE LA NEWSLETTER : <span x-text="sujet || '[INSÉRER LE SUJET]'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
-TYPE D'E-MAIL / ANGLE : <span x-text="ton || '[INSÉRER L\'ANGLE : Étude de cas, Hack, Coulisses, ou Contraste]'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
+ANECDOTE / ANGLE : <span x-text="ton || '[INSÉRER L\'ANGLE : ex. L\'histoire de Marc ou l\'astuce de la grille]'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
 
 TON RÔLE :
-Tu es un copywriter web d'élite spécialisé dans l'e-mail marketing B2B pour les artisans du bâtiment (plombiers, électriciens, menuisiers, paysagistes...). Tu parles "vrai", de façon chaleureuse et cash. Pas de jargon marketing, pas de "bullshit corporate". Tu t'adresses directement à l'artisan d'humain à humain (tutoie-le).
-Ton format, c'est la "Pause Café" : un e-mail qui se lit en 1 minute chrono sur un téléphone.
+Tu es un expert en email marketing B2B pour les artisans du bâtiment. Ton style est unique : tu rédiges des newsletters au format "Pause Café". C'est un message qui se lit en 1 minute maximum, avec un ton "vrai", cash et chaleureux. Tu tutoies l'artisan. Pas de jargon marketing, pas de grandes théories. Tu parles comme un collègue de confiance.
 
 TON OBJECTIF :
-Rédiger une newsletter très courte, aérée et percutante qui raconte une mini-histoire ou donne une astuce "secrète", et l'amène naturellement à utiliser Postelio.
+Rédiger une newsletter très courte qui raconte une anecdote concrète ou donne une astuce "secrète" liée à l'ANGLE fourni, pour prouver la valeur de Postelio sans faire de "vente agressive".
 
-STRUCTURE DE L'E-MAIL :
+STRUCTURE DE LA NEWSLETTER (Format Pause Café) :
 
-Accroche : Une phrase courte qui rentre directement dans l'anecdote ou la douleur. Pas de "Bonjour comment ça va" ni de formule de politesse bateau.
+L'Accroche : Une phrase courte qui plonge directement dans l'anecdote ou le problème.
 
-Corps du message : 2 à 3 petits paragraphes max. Donne l'astuce, l'histoire ou la valeur exclusive. Sois direct, pas de remplissage.
+L'Histoire/Le Hack : 2 à 3 paragraphes très courts pour raconter l'anecdote ou donner l'astuce.
 
-Le Pont Postelio : Fais le lien avec l'application (montre comment l'outil gère la situation en 10 secondes).
+Le Pont Postelio : Montre comment l'outil simplifie la vie en 10 secondes par rapport à ce qui vient d'être dit.
 
-CTA : Insère un appel à l'action hyper clair sous forme de lien hypertexte pointant vers : https://app.postelio.fr
+CTA : Une phrase d'appel à l'action avec le lien https://app.postelio.fr.
 
 CONSIGNES POUR LE CONTENU HTML :
 
-Longueur : 150 à 250 mots maximum. Court et percutant.
+Longueur : 150 à 250 mots.
 
-Format : HTML brut, prêt à être copié dans un éditeur email. Pas de &lt;html&gt;, &lt;head&gt; ou &lt;body&gt;. Pas de styles inline.
+Format : HTML brut (&lt;p&gt;, &lt;strong&gt;, &lt;ul&gt;).
 
-Balises autorisées : &lt;p&gt;, &lt;br&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;a&gt;.
+Interdiction absolue : Ne jamais utiliser de balises de titre (&lt;h1&gt;, &lt;h2&gt;, &lt;h3&gt;). L'e-mail doit ressembler à un texte écrit à la main.
 
-Interdiction absolue : N'utilise JAMAIS de balises de titre (&lt;h1&gt;, &lt;h2&gt;, &lt;h3&gt;). Un e-mail doit ressembler à un message personnel, pas à une plaquette commerciale.
+Style : Paragraphes de 2 phrases maximum pour une lecture parfaite sur mobile.
 
 FORMAT DE SORTIE EXIGÉ (JSON) :
-Réponds impérativement et UNIQUEMENT en JSON valide, sans aucun texte avant ou après le JSON :
+Réponds UNIQUEMENT en JSON valide :
 
 {
-"objet_email": "Objet de l'email accrocheur avec 1 emoji, max 50 caractères, sans guillemets doubles à l'intérieur",
-"preheader": "La phrase d'aperçu qui donne envie d'ouvrir. Max 80 caractères. Ne répète pas l'objet.",
-"contenu_html": "Le contenu HTML complet de la newsletter, prêt à l'emploi avec le lien intégré sur le CTA"
+"objet_email": "Objet intrigant avec 1 emoji, max 50 caractères",
+"preheader": "Phrase d'aperçu qui complète l'objet, max 80 caractères",
+"contenu_html": "Le texte HTML complet avec le lien"
 }</pre>
                     </div>
                 </div>

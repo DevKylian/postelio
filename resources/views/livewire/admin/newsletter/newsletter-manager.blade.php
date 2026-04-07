@@ -10,13 +10,6 @@
                 </p>
             </div>
             <div class="flex items-center gap-3">
-                <button
-                    wire:click="openAIModal"
-                    class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-copper to-amber-500 shadow-lg shadow-copper/20 hover:shadow-copper/30 hover:-translate-y-0.5 transition-all active:translate-y-0"
-                >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    Générer avec l'IA
-                </button>
                 <a href="{{ route('admin.dashboard') }}" wire:navigate class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                     Dashboard
@@ -75,14 +68,23 @@
                 {{-- Decoration blob --}}
                 <div class="absolute top-0 right-0 w-64 h-64 bg-copper/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
 
-                <div class="flex items-center gap-3 mb-8 relative z-10">
-                    <div class="w-9 h-9 rounded-xl bg-copper/10 flex items-center justify-center text-copper shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <div class="flex items-center justify-between mb-8 relative z-10">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-copper/10 flex items-center justify-center text-copper shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div>
+                            <h2 class="font-display font-bold text-xl text-midnight">Nouvelle newsletter</h2>
+                            <p class="text-xs text-slate-400 font-medium">Rédigez votre email et choisissez votre audience</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="font-display font-bold text-xl text-midnight">Nouvelle newsletter</h2>
-                        <p class="text-xs text-slate-400 font-medium">Rédigez votre email et choisissez votre audience</p>
-                    </div>
+                    <button
+                        wire:click="openAIModal"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold text-white bg-gradient-to-r from-copper to-amber-500 shadow-lg shadow-copper/20 hover:shadow-copper/30 hover:-translate-y-0.5 transition-all active:translate-y-0"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        Générer avec l'IA
+                    </button>
                 </div>
 
                 <div class="space-y-8 relative z-10">

@@ -10,6 +10,13 @@
                 </p>
             </div>
             <div class="flex items-center gap-3">
+                <button
+                    wire:click="openAIModal"
+                    class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-copper to-amber-500 shadow-lg shadow-copper/20 hover:shadow-copper/30 hover:-translate-y-0.5 transition-all active:translate-y-0"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    Générer avec l'IA
+                </button>
                 <a href="{{ route('admin.dashboard') }}" wire:navigate class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                     Dashboard
@@ -465,6 +472,134 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- ─── AI Generator Modal ─── --}}
+    @if($showAIModal)
+    <div class="fixed inset-0 z-[9999] flex items-center justify-center"
+         x-data="{
+             copied: false,
+             sujet: '',
+             ton: '',
+         }">
+        <div class="fixed inset-0 bg-slate-900/45 backdrop-blur-md" wire:click="closeAIModal"></div>
+
+        <div class="relative w-full max-w-5xl mx-4 sm:mx-6 bg-white/95 backdrop-blur-md border border-white/40 shadow-2xl rounded-[2.5rem] overflow-hidden flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh]">
+
+            {{-- Header --}}
+            <div class="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-white/50 shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-copper to-amber-500 flex items-center justify-center text-white shadow-lg shadow-copper/20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-display font-bold text-xl text-midnight">Générateur de Newsletter IA</h3>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">Prompt et Importation JSON</p>
+                    </div>
+                </div>
+                <button wire:click="closeAIModal" class="p-2 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+
+            {{-- Body --}}
+            <div class="flex-1 overflow-y-auto p-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                {{-- Left: Prompt --}}
+                <div class="space-y-5 flex flex-col h-full">
+                    <div class="flex items-center justify-between shrink-0">
+                        <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-full bg-copper/20 text-copper flex items-center justify-center text-xs">1</span>
+                            Le Prompt à copier
+                        </h4>
+                        <button @click="
+                            let text = $refs.promptText.innerText;
+                            navigator.clipboard.writeText(text);
+                            copied = true;
+                            setTimeout(() => copied = false, 2000);
+                        " class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-sm"
+                        :class="copied ? 'bg-green-100 text-green-600 border border-green-200' : 'bg-white text-slate-600 border border-slate-200 hover:border-copper/50 hover:text-copper'">
+                            <svg x-show="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                            <svg x-cloak x-show="copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+                            <span x-text="copied ? 'Copié !' : 'Copier'"></span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 shrink-0">
+                        <input type="text" x-model="sujet" placeholder="Sujet / thème principal"
+                               class="w-full bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-midnight focus:border-copper focus:ring-2 focus:ring-copper/20 outline-none transition-all shadow-sm">
+                        <input type="text" x-model="ton" placeholder="Angle / message clé (optionnel)"
+                               class="w-full bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm font-medium text-midnight focus:border-copper focus:ring-2 focus:ring-copper/20 outline-none transition-all shadow-sm">
+                    </div>
+
+                    <div class="relative flex-1 min-h-[300px]">
+                        <div class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none rounded-b-2xl"></div>
+                        <pre x-ref="promptText" class="absolute inset-0 text-[11px] sm:text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-2xl p-5 overflow-y-auto font-mono whitespace-pre-wrap leading-[1.8] shadow-inner selection:bg-copper/20">SUJET DE LA NEWSLETTER : <span x-text="sujet || '[INSÉRER LE SUJET]'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
+ANGLE / MESSAGE CLÉ : <span x-text="ton || '[INSÉRER L\'ANGLE OU LAISSER VIDE]'" class="text-copper font-bold bg-copper/10 px-1 rounded"></span>
+
+TON RÔLE :
+Tu es un expert en email marketing B2B pour les artisans du bâtiment (plombiers, électriciens, menuisiers, paysagistes...). Tu écris des newsletters courtes, directes et à forte valeur ajoutée. Ton ton est humain, chaleureux, cash — pas de jargon corporate. Tu tutoies le lecteur.
+
+TON OBJECTIF :
+Rédiger une newsletter complète qui apporte de la valeur immédiatement et incite l'artisan à revenir sur Postelio.
+
+STRUCTURE DE LA NEWSLETTER :
+1. Accroche (1 phrase) — Attaque directement sur la problématique ou la valeur à délivrer.
+2. Corps du message — 2 à 4 courts paragraphes. Donne un conseil concret, une info utile ou une nouveauté Postelio. Sois direct, pas de rembourrage.
+3. CTA — 1 phrase d'appel à l'action claire et simple (ex : "Connecte-toi et teste maintenant →").
+
+CONSIGNES POUR LE CONTENU HTML :
+Format : HTML brut, prêt à être copié dans un éditeur email.
+Balises autorisées : &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;a&gt;.
+Interdiction : Pas de &lt;h1&gt;, pas de &lt;html&gt;/&lt;body&gt;/&lt;head&gt;, pas de styles inline complexes.
+Longueur : 150 à 300 mots. Court et percutant.
+Le lien du CTA doit pointer vers : https://app.postelio.fr
+
+FORMAT DE SORTIE EXIGÉ (JSON) :
+Réponds UNIQUEMENT en JSON valide, sans texte autour :
+
+{
+"sujet": "Objet de l'email accrocheur, max 60 caractères, sans guillemets",
+"contenu_html": "Le contenu HTML complet de la newsletter, prêt à l'emploi"
+}</pre>
+                    </div>
+                </div>
+
+                {{-- Right: JSON paste --}}
+                <div class="space-y-5 flex flex-col pt-6 lg:pt-0 lg:border-l lg:border-slate-100 lg:pl-8 h-full">
+                    <div class="flex items-center justify-between shrink-0">
+                        <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
+                            <span class="w-5 h-5 rounded-full bg-copper/20 text-copper flex items-center justify-center text-xs">2</span>
+                            Coller la réponse JSON
+                        </h4>
+                    </div>
+
+                    <div class="relative flex-1 min-h-[250px] lg:min-h-0">
+                        <textarea wire:model="json_pasted"
+                                  placeholder='Collez le code JSON ici...
+{
+  "sujet": "...",
+  "contenu_html": "..."
+}'
+                                  class="absolute inset-0 w-full h-full bg-slate-900 text-green-400/90 border-0 rounded-2xl p-6 text-xs sm:text-sm font-mono focus:ring-4 focus:ring-copper/30 transition-shadow outline-none resize-none shadow-inner shadow-slate-950/50 selection:bg-copper/30"></textarea>
+
+                        <div wire:loading wire:target="processPastedJson" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                            <svg class="animate-spin h-8 w-8 text-copper" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        </div>
+                    </div>
+
+                    @error('json_pasted') <span class="text-rose-500 text-[11px] font-bold tracking-tight bg-rose-50 px-3 py-1 rounded-lg shrink-0">{{ $message }}</span> @enderror
+
+                    <button wire:click="processPastedJson"
+                            class="w-full shrink-0 py-4 rounded-2xl bg-midnight text-white font-black text-sm uppercase tracking-[0.1em] hover:bg-slate-800 transition-all shadow-xl shadow-midnight/10 flex items-center justify-center gap-2 group">
+                        <svg class="w-5 h-5 text-copper group-hover:-rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        Importer dans l'éditeur
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>

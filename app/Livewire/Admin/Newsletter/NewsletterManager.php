@@ -27,6 +27,9 @@ class NewsletterManager extends Component
     public string $testEmail        = '';
     public bool   $testSent         = false;
 
+    public bool   $showAIModal  = false;
+    public string $json_pasted  = '';
+
     /** Computed counts cached per request */
     protected array $audienceCounts = [];
 
@@ -95,6 +98,37 @@ class NewsletterManager extends Component
     // ─────────────────────────────────────────────
     //  Actions
     // ─────────────────────────────────────────────
+
+    public function openAIModal(): void
+    {
+        $this->showAIModal  = true;
+        $this->json_pasted  = '';
+    }
+
+    public function closeAIModal(): void
+    {
+        $this->showAIModal  = false;
+        $this->json_pasted  = '';
+    }
+
+    public function processPastedJson(): void
+    {
+        $this->validate(['json_pasted' => 'required|string']);
+
+        $data = json_decode($this->json_pasted, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($data)) {
+            $this->subject = $data['sujet'] ?? ($data['subject'] ?? '');
+            $this->content = $data['contenu_html'] ?? ($data['content'] ?? '');
+
+            $this->showAIModal = false;
+            $this->json_pasted = '';
+
+            $this->dispatch('notify', 'Newsletter importée avec succès.');
+        } else {
+            $this->dispatch('notify', 'Erreur : Le texte collé n\'est pas un JSON valide.');
+        }
+    }
 
     public function openPreview(): void
     {
@@ -171,9 +205,10 @@ class NewsletterManager extends Component
 
     public function resetForm(): void
     {
-        $this->subject  = '';
-        $this->content  = '';
-        $this->audience = 'all';
+        $this->subject     = '';
+        $this->content     = '';
+        $this->audience    = 'all';
+        $this->json_pasted = '';
     }
 
     // ─────────────────────────────────────────────

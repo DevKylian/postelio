@@ -180,16 +180,22 @@ class NewsletterManager extends Component
 
     public function render()
     {
-        $logs = NewsletterLog::with('sender')
-            ->latest()
-            ->paginate(10);
+        try {
+            $logs = NewsletterLog::with('sender')
+                ->latest()
+                ->paginate(10);
 
-        $counts = [
-            'all'   => $this->getCountFor('all'),
-            'free'  => $this->getCountFor('free'),
-            'basic' => $this->getCountFor('basic'),
-            'pro'   => $this->getCountFor('pro'),
-        ];
+            $counts = [
+                'all'   => $this->getCountFor('all'),
+                'free'  => $this->getCountFor('free'),
+                'basic' => $this->getCountFor('basic'),
+                'pro'   => $this->getCountFor('pro'),
+            ];
+        } catch (\Exception $e) {
+            // Table may not exist yet (migration pending)
+            $logs   = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
+            $counts = ['all' => 0, 'free' => 0, 'basic' => 0, 'pro' => 0];
+        }
 
         return view('livewire.admin.newsletter.newsletter-manager', compact('logs', 'counts'));
     }

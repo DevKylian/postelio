@@ -118,7 +118,7 @@ class NewsletterManager extends Component
         $data = json_decode($this->json_pasted, true);
 
         if (json_last_error() === JSON_ERROR_NONE && is_array($data)) {
-            $this->subject = $data['sujet'] ?? ($data['subject'] ?? '');
+            $this->subject = $data['objet_email'] ?? ($data['sujet'] ?? ($data['subject'] ?? ''));
             $this->content = $data['contenu_html'] ?? ($data['content'] ?? '');
 
             $this->showAIModal = false;

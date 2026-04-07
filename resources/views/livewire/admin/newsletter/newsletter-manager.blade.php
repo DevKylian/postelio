@@ -182,6 +182,15 @@
 
                             <button
                                 type="button"
+                                wire:click="openTestModal"
+                                class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold transition-all bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                Envoyer un test
+                            </button>
+
+                            <button
+                                type="button"
                                 wire:click="openConfirmModal"
                                 @disabled($isSending || $this->selectedCount === 0)
                                 class="inline-flex items-center gap-2 px-8 py-3 rounded-2xl text-sm font-black uppercase tracking-widest transition-all shadow-xl shadow-copper/20 bg-gradient-to-r from-copper to-amber-500 text-white hover:shadow-copper/30 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
@@ -270,6 +279,71 @@
         </section>
 
     </div>
+
+    {{-- ─── Test Send Modal ─── --}}
+    @if($showTestModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4"
+         x-data x-init="$el.querySelector('[data-dialog]').classList.add('animate-scale-in')">
+        <div class="absolute inset-0 bg-midnight/40 backdrop-blur-sm" wire:click="$set('showTestModal', false)"></div>
+        <div data-dialog class="relative bg-white rounded-[2rem] shadow-2xl shadow-midnight/20 p-8 max-w-md w-full z-10">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-2xl shrink-0">🧪</div>
+                <div>
+                    <h3 class="font-display font-bold text-lg text-midnight">Envoyer un test</h3>
+                    <p class="text-sm text-slate-400 font-medium mt-0.5">Le sujet sera préfixé par <span class="font-bold text-blue-600">[TEST]</span></p>
+                </div>
+            </div>
+
+            @if($testSent)
+                <div class="flex items-center gap-3 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 mb-6">
+                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <p class="text-sm font-bold text-emerald-700">Test envoyé à <span class="underline">{{ $testEmail }}</span> !</p>
+                </div>
+                <div class="flex gap-3">
+                    <button wire:click="$set('showTestModal', false)"
+                            class="flex-1 px-6 py-3.5 rounded-2xl font-bold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all">
+                        Fermer
+                    </button>
+                    <button wire:click="openConfirmModal"
+                            class="flex-1 px-6 py-3.5 rounded-2xl font-black text-sm text-white bg-gradient-to-r from-copper to-amber-500 hover:shadow-lg hover:shadow-copper/20 transition-all active:scale-95">
+                        Envoyer pour de vrai →
+                    </button>
+                </div>
+            @else
+                <div class="space-y-2 mb-6">
+                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">Email de test</label>
+                    <input
+                        type="email"
+                        wire:model="testEmail"
+                        placeholder="toi@exemple.fr"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm font-bold text-midnight focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all outline-none"
+                    >
+                    @error('testEmail') <span class="text-rose-500 text-xs font-bold px-1">{{ $message }}</span> @enderror
+                </div>
+                <div class="p-3 bg-blue-50 rounded-xl border border-blue-100 mb-6">
+                    <p class="text-xs font-medium text-blue-700">
+                        <span class="font-black">Objet qui sera envoyé :</span><br>
+                        [TEST] {{ $subject ?: '(objet vide)' }}
+                    </p>
+                </div>
+                <div class="flex gap-3">
+                    <button wire:click="$set('showTestModal', false)"
+                            class="flex-1 px-6 py-3.5 rounded-2xl font-bold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all">
+                        Annuler
+                    </button>
+                    <button wire:click="sendTest" wire:loading.attr="disabled"
+                            class="flex-1 px-6 py-3.5 rounded-2xl font-black text-sm text-white bg-blue-600 hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-60">
+                        <span wire:loading.remove wire:target="sendTest">Envoyer le test</span>
+                        <span wire:loading wire:target="sendTest" class="inline-flex items-center gap-2">
+                            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            Envoi…
+                        </span>
+                    </button>
+                </div>
+            @endif
+        </div>
+    </div>
+    @endif
 
     {{-- ─── Confirm Send Modal ─── --}}
     @if($showConfirmModal)

@@ -20,9 +20,12 @@ class NewsletterManager extends Component
     public string $content  = '';
     public string $audience = 'all';
 
-    public bool $showConfirmModal  = false;
-    public bool $showPreviewModal  = false;
-    public bool $isSending         = false;
+    public bool   $showConfirmModal = false;
+    public bool   $showPreviewModal = false;
+    public bool   $showTestModal    = false;
+    public bool   $isSending        = false;
+    public string $testEmail        = '';
+    public bool   $testSent         = false;
 
     /** Computed counts cached per request */
     protected array $audienceCounts = [];
@@ -97,6 +100,31 @@ class NewsletterManager extends Component
     {
         $this->validate();
         $this->showPreviewModal = true;
+    }
+
+    public function openTestModal(): void
+    {
+        $this->validate();
+        $this->testEmail = Auth::user()->email;
+        $this->testSent  = false;
+        $this->showTestModal = true;
+    }
+
+    public function sendTest(): void
+    {
+        $this->validateOnly('testEmail', [
+            'testEmail' => 'required|email',
+        ]);
+
+        Mail::to($this->testEmail)->send(
+            new NewsletterMail(
+                newsletterSubject: '[TEST] ' . $this->subject,
+                newsletterContent: $this->content,
+                recipientName:     Auth::user()->name,
+            )
+        );
+
+        $this->testSent = true;
     }
 
     public function openConfirmModal(): void

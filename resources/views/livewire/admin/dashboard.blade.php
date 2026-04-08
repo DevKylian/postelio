@@ -65,115 +65,91 @@
             <!-- Zernio API Quota -->
             @if($zernioStats)
             @php
-                $uploadsUsed    = $zernioStats['usage']['uploads']   ?? 0;
-                $uploadsLimit   = $zernioStats['limits']['uploads']  ?? 1;
+                $uploadsUsed    = $zernioStats['usage']['uploads']  ?? 0;
+                $uploadsLimit   = $zernioStats['limits']['uploads'] ?? 1;
                 $uploadsPercent = min(100, round(($uploadsUsed / max(1, $uploadsLimit)) * 100));
-                $uploadsColor   = $uploadsPercent >= 90 ? 'from-red-500 to-rose-600'
-                                : ($uploadsPercent >= 70 ? 'from-orange-400 to-amber-500'
-                                : 'from-amber-400 to-copper');
+                $uploadsBar     = $uploadsPercent >= 90 ? 'bg-rose-500' : ($uploadsPercent >= 70 ? 'bg-amber-400' : 'bg-emerald-500');
+                $uploadsBadge   = $uploadsPercent >= 90 ? 'text-rose-600 bg-rose-50 border-rose-100' : ($uploadsPercent >= 70 ? 'text-amber-600 bg-amber-50 border-amber-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100');
 
                 $profilesUsed    = $zernioStats['usage']['profiles']  ?? 0;
                 $profilesLimit   = $zernioStats['limits']['profiles'] ?? 1;
                 $profilesPercent = min(100, round(($profilesUsed / max(1, $profilesLimit)) * 100));
-                $profilesColor   = $profilesPercent >= 90 ? 'from-red-500 to-rose-600'
-                                 : ($profilesPercent >= 70 ? 'from-orange-400 to-amber-500'
-                                 : 'from-emerald-400 to-teal-500');
+                $profilesBar     = $profilesPercent >= 90 ? 'bg-rose-500' : ($profilesPercent >= 70 ? 'bg-amber-400' : 'bg-emerald-500');
+                $profilesBadge   = $profilesPercent >= 90 ? 'text-rose-600 bg-rose-50 border-rose-100' : ($profilesPercent >= 70 ? 'text-amber-600 bg-amber-50 border-amber-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100');
 
                 $lastReset = isset($zernioStats['usage']['lastReset'])
-                    ? \Carbon\Carbon::parse($zernioStats['usage']['lastReset'])->translatedFormat('d MMMM Y')
+                    ? \Carbon\Carbon::parse($zernioStats['usage']['lastReset'])->isoFormat('D MMMM YYYY')
                     : null;
             @endphp
-            <div class="bg-slate-900 rounded-2xl p-6 shadow-sm relative overflow-hidden">
-                <!-- Déco glows -->
-                <div class="absolute -top-8 -right-8 w-32 h-32 bg-copper/15 rounded-full blur-2xl pointer-events-none"></div>
-                <div class="absolute -bottom-8 -left-8 w-28 h-28 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-copper/10 text-copper flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-midnight text-sm leading-tight">Zernio API</p>
+                            <p class="text-xs text-gray-400 mt-0.5">
+                                Plan <span class="font-semibold text-midnight">{{ $zernioStats['planName'] ?? '—' }}</span>
+                                · {{ $zernioStats['billingPeriod'] === 'monthly' ? 'mensuel' : 'annuel' }}
+                            </p>
+                        </div>
+                    </div>
+                    @if($zernioDaysUntilRenewal !== null)
+                    <div class="text-right">
+                        <p class="text-xs font-semibold text-midnight">{{ $zernioRenewalDate }}</p>
+                        <p class="text-[11px] mt-0.5 font-medium {{ $zernioDaysUntilRenewal <= 5 ? 'text-rose-500' : 'text-gray-400' }}">
+                            renouvellement dans {{ $zernioDaysUntilRenewal }}j
+                        </p>
+                    </div>
+                    @endif
+                </div>
 
-                <div class="relative z-10">
-                    <!-- Header -->
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-                                <svg class="w-4.5 h-4.5 w-[18px] h-[18px] text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Quota Zernio API</p>
-                                <p class="text-white font-bold text-sm leading-tight">
-                                    Plan {{ $zernioStats['planName'] ?? '—' }}
-                                    <span class="text-slate-400 font-normal text-xs ml-1">· {{ $zernioStats['billingPeriod'] === 'monthly' ? 'mensuel' : 'annuel' }}</span>
-                                </p>
+                <div class="space-y-4">
+                    {{-- Publications --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-xs font-medium text-gray-500">Publications</span>
+                            <div class="flex items-center gap-2">
+                                @if($lastReset)
+                                    <span class="text-[10px] text-gray-300">reset {{ $lastReset }}</span>
+                                @endif
+                                <span class="text-[11px] font-bold border px-2 py-0.5 rounded-full {{ $uploadsBadge }}">
+                                    {{ $uploadsUsed }} / {{ $uploadsLimit }}
+                                </span>
                             </div>
                         </div>
-                        @if($zernioDaysUntilRenewal !== null)
-                            <div class="text-right">
-                                <p class="text-[10px] text-slate-500 uppercase tracking-wide font-semibold">Renouvellement</p>
-                                <p class="text-white text-xs font-bold">{{ $zernioRenewalDate }}</p>
-                                <p class="text-[10px] font-medium mt-0.5 {{ $zernioDaysUntilRenewal <= 5 ? 'text-rose-400' : 'text-copper' }}">
-                                    dans {{ $zernioDaysUntilRenewal }} jour{{ $zernioDaysUntilRenewal > 1 ? 's' : '' }}
-                                </p>
-                            </div>
-                        @endif
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full {{ $uploadsBar }} rounded-full transition-all duration-700" style="width: {{ $uploadsPercent }}%"></div>
+                        </div>
                     </div>
 
-                    <!-- Metrics grid -->
-                    <div class="grid grid-cols-2 gap-4">
-
-                        <!-- Publications -->
-                        <div class="bg-white/[0.05] border border-white/[0.08] rounded-xl p-4">
-                            <div class="flex items-center justify-between mb-3">
-                                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Publications</p>
-                                <span class="text-[11px] font-bold text-white tabular-nums">
-                                    {{ number_format($uploadsUsed) }} / {{ number_format($uploadsLimit) }}
-                                </span>
-                            </div>
-                            <div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                                <div class="h-full bg-gradient-to-r {{ $uploadsColor }} rounded-full transition-all duration-700"
-                                     style="width: {{ $uploadsPercent }}%"></div>
-                            </div>
-                            <div class="flex items-center justify-between mt-2">
-                                <p class="text-[10px] text-slate-500">
-                                    @if($lastReset) Remis à zéro le {{ $lastReset }} @endif
-                                </p>
-                                <p class="text-[10px] font-bold {{ $uploadsPercent >= 90 ? 'text-rose-400' : 'text-slate-400' }}">
-                                    {{ $uploadsPercent }}%
-                                </p>
-                            </div>
+                    {{-- Profils --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-xs font-medium text-gray-500">Profils sociaux</span>
+                            <span class="text-[11px] font-bold border px-2 py-0.5 rounded-full {{ $profilesBadge }}">
+                                {{ $profilesUsed }} / {{ $profilesLimit }}
+                            </span>
                         </div>
-
-                        <!-- Profils -->
-                        <div class="bg-white/[0.05] border border-white/[0.08] rounded-xl p-4">
-                            <div class="flex items-center justify-between mb-3">
-                                <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Profils</p>
-                                <span class="text-[11px] font-bold text-white tabular-nums">
-                                    {{ $profilesUsed }} / {{ $profilesLimit }}
-                                </span>
-                            </div>
-                            <div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                                <div class="h-full bg-gradient-to-r {{ $profilesColor }} rounded-full transition-all duration-700"
-                                     style="width: {{ $profilesPercent }}%"></div>
-                            </div>
-                            <div class="flex items-center justify-between mt-2">
-                                <p class="text-[10px] text-slate-500">Comptes sociaux liés</p>
-                                <p class="text-[10px] font-bold {{ $profilesPercent >= 90 ? 'text-rose-400' : 'text-slate-400' }}">
-                                    {{ $profilesPercent }}%
-                                </p>
-                            </div>
+                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full {{ $profilesBar }} rounded-full transition-all duration-700" style="width: {{ $profilesPercent }}%"></div>
                         </div>
-
                     </div>
                 </div>
             </div>
             @elseif(config('services.zernio.api_key'))
-            <div class="bg-slate-900 rounded-2xl p-6 shadow-sm flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-rose-500/20 flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white rounded-2xl border border-rose-100 shadow-sm p-5 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
                 <div>
-                    <p class="text-white text-sm font-semibold">Zernio API — données indisponibles</p>
-                    <p class="text-slate-400 text-xs">Impossible de joindre l'API. Vérifiez la clé et la connectivité.</p>
+                    <p class="text-sm font-semibold text-midnight">Zernio API indisponible</p>
+                    <p class="text-xs text-gray-400">Impossible de joindre l'API. Vérifiez la clé et la connectivité.</p>
                 </div>
             </div>
             @endif

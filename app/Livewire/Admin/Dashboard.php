@@ -62,7 +62,7 @@ class Dashboard extends Component
                 if ($renewal->isPast() || $renewal->isToday()) {
                     $renewal->addMonth();
                 }
-                $zernioRenewalDate = $renewal->translatedFormat('d MMMM Y');
+                $zernioRenewalDate = $renewal->isoFormat('D MMMM YYYY');
                 $zernioDaysUntilRenewal = (int) now()->diffInDays($renewal);
             }
         } catch (\Exception $e) {

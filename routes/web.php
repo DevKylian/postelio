@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\FacebookController;
+use App\Http\Controllers\FreeGuideController;
 use App\Http\Controllers\InstagramController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PostController;
@@ -15,6 +16,11 @@ Route::view('/', 'welcome');
 // Blog (public)
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+// Guides (public)
+Route::get('/guides', [FreeGuideController::class, 'index'])->name('guides.index');
+Route::get('/guides/{slug}', [FreeGuideController::class, 'show'])->name('guides.show');
+Route::post('/guides/{slug}/subscribe', [FreeGuideController::class, 'subscribe'])->name('guides.subscribe');
 
 // Legal pages (public)
 Route::view('/mentions-legales', 'legal.mentions')->name('legal.mentions');
@@ -94,6 +100,9 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
         Route::get('/admin/prospects', \App\Livewire\Admin\Prospect\ProspectManager::class)->name('admin.prospects.index');
         Route::get('/admin/announcements', \App\Livewire\Admin\Settings\AnnouncementManager::class)->name('admin.announcements.index');
         Route::get('/admin/newsletter', \App\Livewire\Admin\Newsletter\NewsletterManager::class)->name('admin.newsletter.index');
+        Route::get('/admin/guides', \App\Livewire\Admin\Guide\GuideManager::class)->name('admin.guides.index');
+        Route::get('/admin/guides/all-leads', \App\Livewire\Admin\Guide\GuideAllLeads::class)->name('admin.guides.all-leads');
+        Route::get('/admin/guides/{guide}/leads', \App\Livewire\Admin\Guide\GuideLeads::class)->name('admin.guides.leads');
     });
 
     // Social & Sync routes (Premium only)

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Guide;
 
 use App\Models\FreeGuide;
+use App\Models\FreeGuideLead;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -207,7 +208,7 @@ class GuideManager extends Component
             'messages' => [
                 [
                     'role'    => 'system',
-                    'content' => "Tu es expert en communication. Génère un titre court et percutant pour la couverture d'un guide gratuit (3 à 6 mots maximum, pas de ponctuation lourde, pas de deux-points, pas de point d'interrogation). Tu peux utiliser *mot* pour mettre un mot en italique coloré si c'est pertinent. Réponds uniquement en JSON : {\"title\": \"...\"}",
+                    'content' => "Tu es expert en communication. Génère un titre court et percutant pour la couverture d'un guide gratuit (3 à 6 mots maximum, pas de ponctuation lourde, pas de deux-points, pas de point d'interrogation). Utilise une casse naturelle (Sentence case), PAS DE TOUT-MAJUSCULES. Tu peux utiliser *mot* pour mettre un mot en italique coloré si c'est pertinent. Réponds uniquement en JSON : {\"title\": \"...\"}",
                 ],
                 [
                     'role'    => 'user',
@@ -227,10 +228,22 @@ class GuideManager extends Component
     public function render()
     {
         $guides = FreeGuide::query()
+            ->withCount('leads')
             ->when($this->search, fn ($q) => $q->where('title', 'like', "%{$this->search}%"))
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate(15);
 
-        return view('livewire.admin.guide.guide-manager', compact('guides'));
+        $stats = [
+            'total_leads' => FreeGuideLead::count(),
+            'leads_today' => FreeGuideLead::whereDate('created_at', Carbon::today())->count(),
+            'total_views' => FreeGuide::sum('downloads_count'),
+            'avg_conversion' => 0
+        ];
+
+        if ($stats['total_views'] > 0) {
+            $stats['avg_conversion'] = round(($stats['total_leads'] / $stats['total_views']) * 100, 1);
+        }
+
+        return view('livewire.admin.guide.guide-manager', compact('guides', 'stats'));
     }
 }

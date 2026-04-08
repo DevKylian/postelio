@@ -30,6 +30,11 @@ class FreeGuide extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function leads()
+    {
+        return $this->hasMany(FreeGuideLead::class, 'free_guide_id');
+    }
+
     public function scopePublished($query)
     {
         return $query->where('status', 'published')

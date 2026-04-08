@@ -176,7 +176,7 @@
             <div class="flex items-center justify-center mt-12 animate-fade-in px-4">
                 <div class="flex sm:inline-flex items-center justify-center gap-2 text-center px-4 py-3 sm:py-2 rounded-2xl sm:rounded-full bg-slate-50 border border-slate-100 shadow-sm mx-auto">
                     <span class="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] shrink-0"></span>
-                    <span class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider leading-tight">Sans engagement. Annulez en 1 clic à tout moment.</span>
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-500 leading-tight">Sans engagement. Annulez en 1 clic à tout moment.</span>
                 </div>
             </div>
 

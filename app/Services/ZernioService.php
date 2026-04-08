@@ -152,6 +152,22 @@ class ZernioService
     }
 
     /**
+     * Get current plan and usage stats (uploads, profiles, billing period).
+     */
+    public function getUsageStats(): array
+    {
+        $response = Http::withToken($this->apiKey)
+            ->get("{$this->baseUrl}/usage-stats");
+
+        if (!$response->successful()) {
+            Log::error('Zernio getUsageStats failed', ['body' => $response->body()]);
+            return [];
+        }
+
+        return $response->json();
+    }
+
+    /**
      * Get posts list (published through Zernio).
      */
     public function getPosts(array $params = []): array

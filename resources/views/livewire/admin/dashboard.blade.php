@@ -81,61 +81,46 @@
                     ? \Carbon\Carbon::parse($zernioStats['usage']['lastReset'])->isoFormat('D MMMM YYYY')
                     : null;
             @endphp
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                <div class="flex items-center justify-between mb-5">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-copper/10 text-copper flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="font-bold text-midnight text-sm leading-tight">Zernio API</p>
-                            <p class="text-xs text-gray-400 mt-0.5">
-                                Plan <span class="font-semibold text-midnight">{{ $zernioStats['planName'] ?? '—' }}</span>
-                                · {{ $zernioStats['billingPeriod'] === 'monthly' ? 'mensuel' : 'annuel' }}
-                            </p>
-                        </div>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+                {{-- Identity --}}
+                <div class="flex items-center gap-2.5 shrink-0">
+                    <div class="w-8 h-8 rounded-lg bg-copper/10 text-copper flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     </div>
-                    @if($zernioDaysUntilRenewal !== null)
-                    <div class="text-right">
-                        <p class="text-xs font-semibold text-midnight">{{ $zernioRenewalDate }}</p>
-                        <p class="text-[11px] mt-0.5 font-medium {{ $zernioDaysUntilRenewal <= 5 ? 'text-rose-500' : 'text-gray-400' }}">
-                            renouvellement dans {{ $zernioDaysUntilRenewal }}j
+                    <div>
+                        <p class="text-xs font-bold text-midnight leading-tight">Zernio · Plan {{ $zernioStats['planName'] ?? '—' }}</p>
+                        @if($zernioDaysUntilRenewal !== null)
+                        <p class="text-[10px] {{ $zernioDaysUntilRenewal <= 5 ? 'text-rose-500' : 'text-gray-400' }}">
+                            renouvellement {{ $zernioRenewalDate }} <span class="font-semibold">({{ $zernioDaysUntilRenewal }}j)</span>
                         </p>
+                        @endif
                     </div>
-                    @endif
                 </div>
 
-                <div class="space-y-4">
-                    {{-- Publications --}}
-                    <div>
-                        <div class="flex items-center justify-between mb-1.5">
-                            <span class="text-xs font-medium text-gray-500">Publications</span>
-                            <div class="flex items-center gap-2">
-                                @if($lastReset)
-                                    <span class="text-[10px] text-gray-300">reset {{ $lastReset }}</span>
-                                @endif
-                                <span class="text-[11px] font-bold border px-2 py-0.5 rounded-full {{ $uploadsBadge }}">
-                                    {{ $uploadsUsed }} / {{ $uploadsLimit }}
-                                </span>
-                            </div>
+                <div class="w-px h-8 bg-gray-100 hidden sm:block shrink-0"></div>
+
+                {{-- Publications --}}
+                <div class="flex items-center gap-3 min-w-[180px] flex-1">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Publications</span>
+                            <span class="text-[11px] font-bold border px-1.5 py-px rounded-full {{ $uploadsBadge }}">{{ $uploadsUsed }} / {{ $uploadsLimit }}</span>
                         </div>
-                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div class="h-full {{ $uploadsBar }} rounded-full transition-all duration-700" style="width: {{ $uploadsPercent }}%"></div>
+                        <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full {{ $uploadsBar }} rounded-full" style="width: {{ $uploadsPercent }}%"></div>
                         </div>
                     </div>
+                </div>
 
-                    {{-- Profils --}}
-                    <div>
-                        <div class="flex items-center justify-between mb-1.5">
-                            <span class="text-xs font-medium text-gray-500">Profils sociaux</span>
-                            <span class="text-[11px] font-bold border px-2 py-0.5 rounded-full {{ $profilesBadge }}">
-                                {{ $profilesUsed }} / {{ $profilesLimit }}
-                            </span>
+                {{-- Profils --}}
+                <div class="flex items-center gap-3 min-w-[160px] flex-1">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Profils</span>
+                            <span class="text-[11px] font-bold border px-1.5 py-px rounded-full {{ $profilesBadge }}">{{ $profilesUsed }} / {{ $profilesLimit }}</span>
                         </div>
-                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div class="h-full {{ $profilesBar }} rounded-full transition-all duration-700" style="width: {{ $profilesPercent }}%"></div>
+                        <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full {{ $profilesBar }} rounded-full" style="width: {{ $profilesPercent }}%"></div>
                         </div>
                     </div>
                 </div>

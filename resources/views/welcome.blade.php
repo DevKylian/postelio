@@ -14,8 +14,8 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Postelio — Votre chantier travaille pour vous</title>
-        <meta name="description" content="Postelio — La solution IA pour les artisans. Transformez vos chantiers en posts Instagram parfaits en 30 secondes grâce au vocal. Automatisez votre marketing local dès aujourd'hui.">
+        <title>Postelio — Posts Instagram pro pour artisans en 30 secondes</title>
+        <meta name="description" content="Postelio — Transformez vos chantiers en posts Instagram professionnels en 30 secondes. Dictez une note vocale, l'IA rédige et publie. Sans compétence digitale. Essai gratuit.">
         <link rel="canonical" href="{{ url()->current() }}">
 
         <script type="application/ld+json">
@@ -53,9 +53,7 @@
         <link rel="icon" type="image/svg+xml" href="{{ asset('images/postelio-logo-gradient.svg') }}">
         <link rel="apple-touch-icon" href="{{ asset('images/postelio-logo-gradient.svg') }}">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
+        <!-- Fonts (Outfit + Inter chargés via app.css depuis Google Fonts) -->
 
         <!-- Umami Analytics -->
     @if(config('services.umami.id'))
@@ -64,10 +62,10 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
         
-        <!-- Alpine.js Plugins + Alpine.js -->
-        <script defer src="https://unpkg.com/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
-        <script defer src="https://unpkg.com/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
-        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <!-- Alpine.js Plugins + Alpine.js (versions épinglées) -->
+        <script defer src="https://unpkg.com/@alpinejs/collapse@3.14.8/dist/cdn.min.js"></script>
+        <script defer src="https://unpkg.com/@alpinejs/intersect@3.14.8/dist/cdn.min.js"></script>
+        <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
 
         <!-- Lucide Icons -->
         <script src="https://unpkg.com/lucide@latest"></script>
@@ -93,9 +91,9 @@
            x-transition:leave="transition ease-in duration-300"
            x-transition:leave-start="opacity-100 translate-y-0"
            x-transition:leave-end="opacity-0 translate-y-4 md:translate-y-10"
-           class="md:fixed md:bottom-8 fixed md:top-auto top-0 left-0 md:left-1/2 md:-translate-x-1/2 z-[100] w-full md:w-auto"
+           class="fixed bottom-0 md:bottom-8 left-0 md:left-1/2 md:-translate-x-1/2 z-[100] w-full md:w-auto"
            style="display: none;">
-        <div class="bg-amber-600 rounded-none md:rounded-full py-2.5 px-4 md:px-10 flex items-center justify-between md:justify-center gap-6 shadow-2xl shadow-amber-900/20">
+        <div class="bg-amber-600 rounded-t-2xl md:rounded-full py-2.5 px-4 md:px-10 flex items-center justify-between md:justify-center gap-6 shadow-2xl shadow-amber-900/20">
           <div class="flex items-center gap-3 text-white text-center md:text-left w-full md:w-auto">
             <span class="hidden md:flex h-2.5 w-2.5 relative flex-shrink-0">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -119,8 +117,7 @@
     </div>
 
       <!-- Navigation -->
-      <nav class="fixed inset-x-0 z-50 transition-all duration-500 flex justify-center px-4"
-           :class="showAnnouncement ? 'top-[56px] md:top-4' : 'top-4'">
+      <nav class="fixed inset-x-0 top-4 z-50 transition-all duration-500 flex justify-center px-4">
         <div class="w-full max-w-5xl transition-all duration-500 rounded-full px-4 sm:px-6 py-3 flex justify-between items-center border glass-card bg-white/70"
              :class="scrolled ? 'bg-white/95 shadow-lg' : 'bg-white/70 shadow-sm'">
           <a href="/" class="transition-opacity hover:opacity-80">
@@ -130,7 +127,7 @@
           <!-- Desktop Nav -->
           <div class="hidden md:flex items-center gap-8">
             <a href="#methode" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">La méthode</a>
-            <a href="#galerie" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Galerie</a>
+            <a href="#galerie" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Réalisations</a>
             <a href="#benefices" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Avantages</a>
             <a href="#tarifs" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Tarifs</a>
             <a href="{{ route('blog.index') }}" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Blog</a>
@@ -168,7 +165,7 @@
              style="display: none;">
           <div class="px-4 py-6 space-y-2">
             <a href="#methode" @click="isMenuOpen = false" class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">La méthode</a>
-            <a href="#galerie" @click="isMenuOpen = false" class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Galerie</a>
+            <a href="#galerie" @click="isMenuOpen = false" class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Réalisations</a>
             <a href="#benefices" @click="isMenuOpen = false" class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Avantages</a>
             <a href="#tarifs" @click="isMenuOpen = false" class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Tarifs</a>
             <a href="{{ route('blog.index') }}" @click="isMenuOpen = false" class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Blog</a>
@@ -995,9 +992,9 @@
                 <div class="text-sm text-slate-500 mt-2 font-light">De la note vocale à la publication</div>
               </div>
               <div class="pt-8 sm:pt-0 reveal-d2" x-intersect.once="$el.classList.add('reveal-up')">
-                <div class="text-6xl sm:text-7xl font-display font-light text-midnight mb-4 tracking-tighter">8<span class="text-copper">h</span></div>
-                <div class="font-medium text-slate-700 text-lg">Gagnées par semaine</div>
-                <div class="text-sm text-slate-500 mt-2 font-light">Fini les soirées sur les réseaux</div>
+                <div class="text-6xl sm:text-7xl font-display font-light text-midnight mb-4 tracking-tighter">0<span class="text-copper">h</span></div>
+                <div class="font-medium text-slate-700 text-lg">De gestion des réseaux</div>
+                <div class="text-sm text-slate-500 mt-2 font-light">Fini les soirées sur Instagram</div>
               </div>
             </div>
           </div>
@@ -1016,9 +1013,9 @@
             <div class="grid md:grid-cols-3 gap-6">
               @php
                 $testimonials = [
-                  ['name' => 'Marc D.', 'job' => 'Plombier', 'text' => "Aujourd'hui, je montre des finitions propres en 10s. Bizarrement, les clients négocient beaucoup moins mes prix.", 'img' => 'plumber'],
-                  ['name' => 'Sophie L.', 'job' => 'Peintre', 'text' => "Je fais ma photo, je parle dans le téléphone, et ça me ramène de belles rénovations sans y passer mes soirées.", 'img' => 'painter'],
-                  ['name' => 'Thomas B.', 'job' => 'Menuisier', 'text' => "Je montre mon exigence, je signe avec des clients sérieux, fini la guerre des prix.", 'img' => 'carpenter']
+                  ['name' => 'Marc Deschamps', 'job' => 'Plombier · Lyon', 'text' => "Aujourd'hui, je montre des finitions propres en quelques secondes. Bizarrement, les clients négocient beaucoup moins mes prix."],
+                  ['name' => 'Sophie Laurent', 'job' => 'Peintre · Nantes', 'text' => "Je fais ma photo, je parle dans le téléphone, et ça me ramène de belles rénovations sans y passer mes soirées."],
+                  ['name' => 'Thomas Bernard', 'job' => 'Menuisier · Bordeaux', 'text' => "Je montre mon exigence, je signe avec des clients sérieux, fini la guerre des prix."]
                 ];
               @endphp
               @foreach($testimonials as $t)
@@ -1030,14 +1027,20 @@
                     @endfor
                   </div>
                   <p class="text-lg text-slate-700 mb-10 font-light leading-relaxed flex-1">"{{ $t['text'] }}"</p>
-                  <div class="flex items-center gap-4 mt-auto">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-100 to-orange-50 text-copper border border-copper/20 flex items-center justify-center shadow-sm font-display font-bold text-xl">
-                      {{ mb_substr($t['name'], 0, 1) }}
+                  <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-4">
+                      <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-100 to-orange-50 text-copper border border-copper/20 flex items-center justify-center shadow-sm font-display font-bold text-xl">
+                        {{ mb_substr($t['name'], 0, 1) }}
+                      </div>
+                      <div>
+                        <div class="font-semibold text-midnight">{{ $t['name'] }}</div>
+                        <div class="text-sm text-slate-500">{{ $t['job'] }}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div class="font-medium text-midnight">{{ $t['name'] }}</div>
-                      <div class="text-sm text-copper">{{ $t['job'] }}</div>
-                    </div>
+                    <span class="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full shrink-0">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                      Vérifié
+                    </span>
                   </div>
                 </div>
               @endforeach
@@ -1128,8 +1131,8 @@
                         Accéder à mon compte
                       </a>
                     @else
-                      <a href="{{ route('register') }}" wire:navigate class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-widest block hover:bg-slate-100 transition-colors">
-                        Commencer gratuitement
+                      <a href="{{ route('register', ['plan' => 'starter']) }}" wire:navigate class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-widest block hover:bg-slate-100 transition-colors">
+                        Démarrer gratuitement
                       </a>
                     @endauth
                   </div>
@@ -1180,8 +1183,8 @@
                         Accéder à mon compte
                       </a>
                     @else
-                      <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl">
-                        Commencer gratuitement
+                      <a href="{{ route('register', ['plan' => 'basic']) }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl">
+                        Essayer Basic gratuitement
                       </a>
                     @endauth
                   </div>
@@ -1189,7 +1192,7 @@
               </div>
 
               {{-- Offre Professionnel --}}
-              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ring-2 ring-copper/20 reveal-d2" x-intersect.once="$el.classList.add('reveal-up')">
+              <div class="group flex flex-col h-full relative bg-amber-50/60 border-2 border-copper/40 shadow-2xl shadow-copper/10 rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 reveal-d2 md:-translate-y-2" x-intersect.once="$el.classList.add('reveal-up')">
                 <div class="absolute top-0 right-0 bg-copper text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm">
                   Meilleure offre
                 </div>
@@ -1228,8 +1231,8 @@
                         Accéder à mon compte
                       </a>
                     @else
-                      <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
-                        Commencer gratuitement
+                      <a href="{{ route('register', ['plan' => 'pro']) }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
+                        Choisir le plan Pro
                       </a>
                     @endauth
                   </div>
@@ -1391,11 +1394,18 @@
         </section>
       </main>
 
-      <div class="md:hidden fixed bottom-0 inset-x-0 p-4 pb-6 bg-white/90 backdrop-blur-2xl border-t border-slate-200 z-50">
-        <a href="#tarifs" class="btn-primary flex justify-center items-center w-full py-3.5 text-base shadow-lg shadow-amber-500/20">
-          Découvrir les offres
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </a>
+      <div class="md:hidden fixed bottom-0 inset-x-0 p-4 pb-safe-area-inset-bottom bg-white/90 backdrop-blur-2xl border-t border-slate-200 z-40" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
+        @auth
+          <a href="{{ route('generate-post') }}" wire:navigate class="btn-primary flex justify-center items-center w-full py-3.5 text-base shadow-lg shadow-amber-500/20">
+            Créer un post maintenant
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        @else
+          <a href="{{ route('register') }}" wire:navigate class="btn-primary flex justify-center items-center w-full py-3.5 text-base shadow-lg shadow-amber-500/20">
+            Essayer gratuitement
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        @endauth
       </div>
 
       <!-- Footer -->
@@ -1438,12 +1448,13 @@
               </ul>
             </div>
 
-            <!-- Col 4: Plus -->
+            <!-- Col 4: Accès -->
             <div>
-              <h4 class="font-display font-semibold text-midnight mb-6">Plus</h4>
+              <h4 class="font-display font-semibold text-midnight mb-6">Accès</h4>
               <ul class="space-y-4 text-sm">
-                <li><a href="#" class="hover:text-copper transition-colors font-light">Blog</a></li>
-                <li><a href="{{ route('login') }}" class="text-copper font-medium">Connexion Pro</a></li>
+                <li><a href="{{ route('login') }}" wire:navigate class="hover:text-copper transition-colors font-light">Connexion</a></li>
+                <li><a href="{{ route('register') }}" wire:navigate class="hover:text-copper transition-colors font-light">Créer un compte</a></li>
+                <li><a href="{{ route('blog.index') }}" class="hover:text-copper transition-colors font-light">Derniers articles</a></li>
               </ul>
             </div>
           </div>

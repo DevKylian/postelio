@@ -10,7 +10,7 @@
                 </p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
-                @if(config('services.umami.id'))
+                @if(config('services.umami.id') && auth()->user()->is_admin)
                 <a href="{{ config('services.umami.url') }}/websites/{{ config('services.umami.id') }}?url=%2Fblog%2F" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-slate-50 transition-all shadow-sm">
                     <svg class="w-4 h-4 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -78,13 +78,27 @@
 
             {{-- ── Onboarding Banner ── --}}
             @if (!$onboardingComplete)
-            <div class="glass-panel rounded-2xl overflow-hidden">
+            <div class="glass-panel rounded-2xl overflow-hidden"
+                 x-data="{ dismissed: localStorage.getItem('onboarding_dismissed_{{ $user->id }}') === '1' }"
+                 x-show="!dismissed"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 -translate-y-2">
                 <div class="px-6 py-5 flex items-center justify-between border-b border-gray-50">
                     <div>
                         <h3 class="font-semibold text-midnight text-sm">Démarrez avec Postelio</h3>
                         <p class="text-xs text-gray-400 mt-0.5">Complétez votre configuration pour générer des posts professionnels</p>
                     </div>
-                    <span class="badge badge-copper !text-xs !px-2.5">{{ $done }}/4</span>
+                    <div class="flex items-center gap-3">
+                        <span class="badge badge-copper !text-xs !px-2.5">{{ $done }}/4</span>
+                        <button @click="dismissed = true; localStorage.setItem('onboarding_dismissed_{{ $user->id }}', '1')"
+                                class="text-gray-300 hover:text-gray-500 transition-colors p-1 rounded-lg hover:bg-gray-50"
+                                title="Masquer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="px-6 py-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
                     @php
@@ -115,7 +129,7 @@
             @endif
 
             {{-- ── Stats Row ── --}}
-            <div id="tour-stats" class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            <div id="tour-stats" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
 
                 {{-- Total Posts --}}
                 <div class="glass-panel rounded-2xl p-5 group card-hover">
@@ -288,56 +302,48 @@
 
                 {{-- Quick Actions (1/3) --}}
                 <div class="space-y-4">
-                    {{-- Welcome --}}
+                    {{-- Welcome contextuel --}}
                     <div class="glass-panel-dark rounded-2xl p-5 relative overflow-hidden">
                         <div class="absolute -top-6 -right-6 w-24 h-24 bg-copper/10 rounded-full blur-2xl"></div>
                         <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-white/5 rounded-full blur-xl"></div>
                         <div class="relative">
                             <p class="text-white/50 text-xs font-medium mb-1">Bonjour,</p>
-                            <h3 class="text-white font-bold text-lg leading-tight">{{ explode(' ', $user->name)[0] }} 👋</h3>
-                            <p class="text-white/40 text-xs mt-2 leading-relaxed">
-                                Prêt à créer du contenu qui attire de nouveaux clients ?
-                            </p>
-                        </div>
-                    </div>
-
-                    {{-- Quota Card --}}
-                    <div id="tour-quota" class="glass-panel rounded-2xl p-5 group relative overflow-hidden">
-                        <div class="absolute -right-6 -top-6 w-16 h-16 bg-copper/5 rounded-full blur-xl"></div>
-                        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-copper animate-pulse"></div>
-                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-none">Usage Quota</p>
-                            </div>
-                            <span class="text-[13px] font-bold text-midnight tabular-nums leading-none flex items-center">
-                                @if(auth()->user()->is_admin || auth()->user()->is_premium)
-                                    <span class="text-lg leading-none">∞</span>
-                                @else
-                                    {{ auth()->user()->remaining_credits }} <span class="text-gray-400 font-medium ml-1">/ {{ auth()->user()->total_credits }}</span>
-                                @endif
-                            </span>
-                        </div>
-                        
-                        <div class="h-2 w-full bg-slate-100/50 rounded-full shadow-inner flex relative">
+                            <h3 class="text-white font-bold text-lg leading-tight mb-3">{{ explode(' ', $user->name)[0] }} 👋</h3>
                             @php
-                                $remaining = auth()->user()->remaining_credits;
-                                $total = max(1, auth()->user()->total_credits);
-                                $isUnlimited = auth()->user()->is_admin || auth()->user()->is_premium;
-                                $percentage = $isUnlimited ? 100 : min(100, ($remaining / $total) * 100);
-                                $colorClass = $isUnlimited ? 'from-amber-400 to-copper' : ($percentage < 15 ? 'from-red-500 to-rose-600' : ($percentage < 40 ? 'from-orange-400 to-amber-500' : 'from-amber-400 to-copper'));
-                                $shadowColor = $percentage < 15 ? 'rgba(239,68,68,0.4)' : 'rgba(245,158,11,0.4)';
+                                $weeklyGoalCtx = $company?->weekly_posts_goal ?? 3;
+                                $remaining_this_week = max(0, $weeklyGoalCtx - $thisWeek);
                             @endphp
-                            <div class="absolute h-full bg-gradient-to-r {{ $colorClass }} transition-all duration-1000 rounded-full"
-                                 style="width: {{ $percentage }}%; box-shadow: 0 0 10px {{ $shadowColor }};">
-                            </div>
-                        </div>
-                        
-                        <div class="mt-3 flex items-center justify-between">
-                            <p class="text-[10px] text-gray-400 font-medium">Usage mensuel</p>
-                            <span class="text-[10px] font-bold text-copper">{{ isset($isUnlimited) && $isUnlimited ? 'Génération illimitée' : round($percentage) . '% restant' }}</span>
+                            @if($totalPosts === 0)
+                                <p class="text-white/60 text-xs leading-relaxed">
+                                    Ton premier post est à 30 secondes. Lance-toi, c'est gratuit.
+                                </p>
+                                <a href="{{ route('generate-post') }}" wire:navigate class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-copper hover:text-amber-400 transition-colors">
+                                    Créer maintenant
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            @elseif($thisWeek >= $weeklyGoalCtx)
+                                <p class="text-white/60 text-xs leading-relaxed">
+                                    🎉 Objectif hebdo atteint ! Tu es à <span class="text-white font-semibold">{{ $thisMonth }} posts</span> ce mois-ci.
+                                </p>
+                            @elseif($remaining_this_week === 1)
+                                <p class="text-white/60 text-xs leading-relaxed">
+                                    Plus qu'<span class="text-copper font-semibold">1 post</span> pour atteindre ton objectif de la semaine.
+                                </p>
+                                <a href="{{ route('generate-post') }}" wire:navigate class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-copper hover:text-amber-400 transition-colors">
+                                    Générer maintenant
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            @else
+                                <p class="text-white/60 text-xs leading-relaxed">
+                                    <span class="text-copper font-semibold">{{ $remaining_this_week }} posts</span> restants pour atteindre ton objectif de la semaine.
+                                </p>
+                                <a href="{{ route('generate-post') }}" wire:navigate class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-copper hover:text-amber-400 transition-colors">
+                                    Générer un post
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            @endif
                         </div>
                     </div>
-
 
                 </div>
 

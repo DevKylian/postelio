@@ -839,7 +839,7 @@
                   </div>
                 </div>
 
-                <div class="absolute left-0 sm:left-4 top-[25%] sm:top-[45%] -translate-y-1/2 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-30 animate-bounce" style="animation-duration: 4s;">
+                <div class="absolute left-0 sm:left-4 top-[35%] sm:top-[65%] -translate-y-1/2 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-30 animate-bounce" style="animation-duration: 4s;">
                   <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
                       <i data-lucide="file-text" class="w-4 h-4"></i>

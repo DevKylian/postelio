@@ -198,7 +198,7 @@
                       <rect x="2" width="1" height="2" fill="#E62117"/>
                     </svg>
                     <div class="w-px h-3.5 bg-slate-200 mx-1 shrink-0"></div>
-                    <span class="text-[10.5px] sm:text-[11px] lg:text-xs font-bold text-slate-600 tracking-tight sm:tracking-widest uppercase whitespace-nowrap">
+                    <span class="text-[10.5px] sm:text-[11px] lg:text-xs font-bold text-slate-600 tracking-tight sm:tracking-wide whitespace-nowrap">
                       Application <span class="text-midnight">100% Française</span> <span class="mx-1 text-slate-300">·</span> Conçue en <span class="text-midnight">Bretagne</span>
                     </span>
                   </div>

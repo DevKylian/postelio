@@ -190,15 +190,15 @@
         <section class="relative pt-40 pb-20 lg:pt-52 lg:pb-32">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-4xl mx-auto">
-                <div class="inline-flex items-center gap-2.5 sm:gap-3 px-4 py-2 sm:px-4 sm:py-2 rounded-full bg-white/80 border border-slate-200/60 shadow-sm backdrop-blur-md mb-8 animate-blur-in group hover:bg-white transition-all duration-300 max-w-[95vw] sm:max-w-none mx-auto">
-                  <div class="flex items-center gap-2 sm:gap-2.5 overflow-hidden">
+                <div class="inline-flex items-center gap-2.5 sm:gap-3 px-4 py-2 rounded-full bg-white/80 border border-slate-200/60 shadow-sm backdrop-blur-md mb-8 animate-blur-in group hover:bg-white transition-all duration-300">
+                  <div class="flex items-center gap-2 sm:gap-2.5">
                     <svg class="w-4.5 h-3 sm:w-5 sm:h-3.5 rounded-[1px] sm:rounded-[2px] shadow-sm overflow-hidden shrink-0" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg">
                       <rect width="1" height="2" fill="#052B6F"/>
                       <rect x="1" width="1" height="2" fill="#FFFFFF"/>
                       <rect x="2" width="1" height="2" fill="#E62117"/>
                     </svg>
                     <div class="w-px h-3.5 bg-slate-200 mx-1 shrink-0"></div>
-                    <span class="text-[10.5px] sm:text-[11px] lg:text-xs font-bold text-slate-600 tracking-tight sm:tracking-widest uppercase whitespace-nowrap">
+                    <span class="text-[10.5px] sm:text-[11px] lg:text-xs font-bold text-slate-600 tracking-tight uppercase whitespace-nowrap">
                       Application <span class="text-midnight">100% Française</span> <span class="mx-1 text-slate-300">·</span> Conçue en <span class="text-midnight">Bretagne</span>
                     </span>
                   </div>

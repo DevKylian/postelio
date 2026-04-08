@@ -14,8 +14,8 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Postelio — Votre chantier travaille pour vous</title>
-        <meta name="description" content="Postelio — La solution IA pour les artisans. Transformez vos chantiers en posts Instagram parfaits en 30 secondes grâce au vocal. Automatisez votre marketing local dès aujourd'hui.">
+        <title>Postelio — Posts Instagram pro pour artisans en 30 secondes</title>
+        <meta name="description" content="Postelio — Transformez vos chantiers en posts Instagram professionnels en 30 secondes. Dictez une note vocale, l'IA rédige et publie. Sans compétence digitale. Essai gratuit.">
         <link rel="canonical" href="{{ url()->current() }}">
 
         <script type="application/ld+json">
@@ -53,9 +53,7 @@
         <link rel="icon" type="image/svg+xml" href="{{ asset('images/postelio-logo-gradient.svg') }}">
         <link rel="apple-touch-icon" href="{{ asset('images/postelio-logo-gradient.svg') }}">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
+        <!-- Fonts (Outfit + Inter chargés via app.css depuis Google Fonts) -->
 
         <!-- Umami Analytics -->
     @if(config('services.umami.id'))
@@ -64,10 +62,10 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
         
-        <!-- Alpine.js Plugins + Alpine.js -->
-        <script defer src="https://unpkg.com/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
-        <script defer src="https://unpkg.com/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
-        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <!-- Alpine.js Plugins + Alpine.js (versions épinglées) -->
+        <script defer src="https://unpkg.com/@alpinejs/collapse@3.14.8/dist/cdn.min.js"></script>
+        <script defer src="https://unpkg.com/@alpinejs/intersect@3.14.8/dist/cdn.min.js"></script>
+        <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
 
         <!-- Lucide Icons -->
         <script src="https://unpkg.com/lucide@latest"></script>
@@ -130,7 +128,7 @@
           <!-- Desktop Nav -->
           <div class="hidden md:flex items-center gap-8">
             <a href="#methode" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">La méthode</a>
-            <a href="#galerie" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Galerie</a>
+            <a href="#galerie" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Réalisations</a>
             <a href="#benefices" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Avantages</a>
             <a href="#tarifs" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Tarifs</a>
             <a href="{{ route('blog.index') }}" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Blog</a>
@@ -168,7 +166,7 @@
              style="display: none;">
           <div class="px-4 py-6 space-y-2">
             <a href="#methode" @click="isMenuOpen = false" class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">La méthode</a>
-            <a href="#galerie" @click="isMenuOpen = false" class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Galerie</a>
+            <a href="#galerie" @click="isMenuOpen = false" class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Réalisations</a>
             <a href="#benefices" @click="isMenuOpen = false" class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Avantages</a>
             <a href="#tarifs" @click="isMenuOpen = false" class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Tarifs</a>
             <a href="{{ route('blog.index') }}" @click="isMenuOpen = false" class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Blog</a>
@@ -192,15 +190,15 @@
         <section class="relative pt-40 pb-20 lg:pt-52 lg:pb-32">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-4xl mx-auto">
-                <div class="inline-flex items-center gap-2.5 sm:gap-3 px-4 py-2 sm:px-4 sm:py-2 rounded-full bg-white/80 border border-slate-200/60 shadow-sm backdrop-blur-md mb-8 animate-blur-in group hover:bg-white transition-all duration-300 max-w-[95vw] sm:max-w-none mx-auto">
-                  <div class="flex items-center gap-2 sm:gap-2.5 overflow-hidden">
+                <div class="inline-flex items-center gap-2.5 sm:gap-3 px-4 py-2 rounded-full bg-white/80 border border-slate-200/60 shadow-sm backdrop-blur-md mb-8 animate-blur-in group hover:bg-white transition-all duration-300">
+                  <div class="flex items-center gap-2 sm:gap-2.5">
                     <svg class="w-4.5 h-3 sm:w-5 sm:h-3.5 rounded-[1px] sm:rounded-[2px] shadow-sm overflow-hidden shrink-0" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg">
                       <rect width="1" height="2" fill="#052B6F"/>
                       <rect x="1" width="1" height="2" fill="#FFFFFF"/>
                       <rect x="2" width="1" height="2" fill="#E62117"/>
                     </svg>
                     <div class="w-px h-3.5 bg-slate-200 mx-1 shrink-0"></div>
-                    <span class="text-[10.5px] sm:text-[11px] lg:text-xs font-bold text-slate-600 tracking-tight sm:tracking-widest uppercase whitespace-nowrap">
+                    <span class="text-[10.5px] sm:text-[11px] lg:text-xs font-bold text-slate-600 tracking-tight uppercase whitespace-nowrap">
                       Application <span class="text-midnight">100% Française</span> <span class="mx-1 text-slate-300">·</span> Conçue en <span class="text-midnight">Bretagne</span>
                     </span>
                   </div>
@@ -841,7 +839,7 @@
                   </div>
                 </div>
 
-                <div class="absolute left-0 sm:left-4 top-[45%] -translate-y-1/2 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-30 animate-bounce" style="animation-duration: 4s;">
+                <div class="absolute left-0 sm:left-4 top-[25%] sm:top-[45%] -translate-y-1/2 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-30 animate-bounce" style="animation-duration: 4s;">
                   <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
                       <i data-lucide="file-text" class="w-4 h-4"></i>
@@ -995,9 +993,9 @@
                 <div class="text-sm text-slate-500 mt-2 font-light">De la note vocale à la publication</div>
               </div>
               <div class="pt-8 sm:pt-0 reveal-d2" x-intersect.once="$el.classList.add('reveal-up')">
-                <div class="text-6xl sm:text-7xl font-display font-light text-midnight mb-4 tracking-tighter">8<span class="text-copper">h</span></div>
-                <div class="font-medium text-slate-700 text-lg">Gagnées par semaine</div>
-                <div class="text-sm text-slate-500 mt-2 font-light">Fini les soirées sur les réseaux</div>
+                <div class="text-6xl sm:text-7xl font-display font-light text-midnight mb-4 tracking-tighter">0<span class="text-copper">h</span></div>
+                <div class="font-medium text-slate-700 text-lg">De gestion des réseaux</div>
+                <div class="text-sm text-slate-500 mt-2 font-light">Fini les soirées sur Instagram</div>
               </div>
             </div>
           </div>
@@ -1016,9 +1014,9 @@
             <div class="grid md:grid-cols-3 gap-6">
               @php
                 $testimonials = [
-                  ['name' => 'Marc D.', 'job' => 'Plombier', 'text' => "Aujourd'hui, je montre des finitions propres en 10s. Bizarrement, les clients négocient beaucoup moins mes prix.", 'img' => 'plumber'],
-                  ['name' => 'Sophie L.', 'job' => 'Peintre', 'text' => "Je fais ma photo, je parle dans le téléphone, et ça me ramène de belles rénovations sans y passer mes soirées.", 'img' => 'painter'],
-                  ['name' => 'Thomas B.', 'job' => 'Menuisier', 'text' => "Je montre mon exigence, je signe avec des clients sérieux, fini la guerre des prix.", 'img' => 'carpenter']
+                  ['name' => 'Marc Deschamps', 'job' => 'Plombier · Lyon', 'text' => "Aujourd'hui, je montre des finitions propres en quelques secondes. Bizarrement, les clients négocient beaucoup moins mes prix."],
+                  ['name' => 'Sophie Laurent', 'job' => 'Peintre · Nantes', 'text' => "Je fais ma photo, je parle dans le téléphone, et ça me ramène de belles rénovations sans y passer mes soirées."],
+                  ['name' => 'Thomas Bernard', 'job' => 'Menuisier · Bordeaux', 'text' => "Je montre mon exigence, je signe avec des clients sérieux, fini la guerre des prix."]
                 ];
               @endphp
               @foreach($testimonials as $t)
@@ -1030,14 +1028,20 @@
                     @endfor
                   </div>
                   <p class="text-lg text-slate-700 mb-10 font-light leading-relaxed flex-1">"{{ $t['text'] }}"</p>
-                  <div class="flex items-center gap-4 mt-auto">
-                    <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-100 to-orange-50 text-copper border border-copper/20 flex items-center justify-center shadow-sm font-display font-bold text-xl">
-                      {{ mb_substr($t['name'], 0, 1) }}
+                  <div class="flex items-center justify-between mt-auto">
+                    <div class="flex items-center gap-4">
+                      <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-100 to-orange-50 text-copper border border-copper/20 flex items-center justify-center shadow-sm font-display font-bold text-xl">
+                        {{ mb_substr($t['name'], 0, 1) }}
+                      </div>
+                      <div>
+                        <div class="font-semibold text-midnight">{{ $t['name'] }}</div>
+                        <div class="text-sm text-slate-500">{{ $t['job'] }}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div class="font-medium text-midnight">{{ $t['name'] }}</div>
-                      <div class="text-sm text-copper">{{ $t['job'] }}</div>
-                    </div>
+                    <span class="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full shrink-0">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                      Vérifié
+                    </span>
                   </div>
                 </div>
               @endforeach
@@ -1128,8 +1132,8 @@
                         Accéder à mon compte
                       </a>
                     @else
-                      <a href="{{ route('register') }}" wire:navigate class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-widest block hover:bg-slate-100 transition-colors">
-                        Commencer gratuitement
+                      <a href="{{ route('register', ['plan' => 'starter']) }}" wire:navigate class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-widest block hover:bg-slate-100 transition-colors">
+                        Démarrer gratuitement
                       </a>
                     @endauth
                   </div>
@@ -1180,8 +1184,8 @@
                         Accéder à mon compte
                       </a>
                     @else
-                      <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl">
-                        Commencer gratuitement
+                      <a href="{{ route('register', ['plan' => 'basic']) }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl">
+                        Essayer Basic gratuitement
                       </a>
                     @endauth
                   </div>
@@ -1189,12 +1193,15 @@
               </div>
 
               {{-- Offre Professionnel --}}
-              <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ring-2 ring-copper/20 reveal-d2" x-intersect.once="$el.classList.add('reveal-up')">
-                <div class="absolute top-0 right-0 bg-copper text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm">
+              <div class="group flex flex-col h-full relative rounded-3xl transition-all duration-300 hover:-translate-y-2 reveal-d2 md:-translate-y-2 shadow-xl shadow-copper/10 hover:shadow-2xl hover:shadow-copper/30 overflow-hidden" 
+                   style="border: 2px solid transparent; background-image: linear-gradient(white, white), linear-gradient(to bottom right, #f97316, #fbbf24); background-origin: border-box; background-clip: padding-box, border-box;"
+                   x-intersect.once="$el.classList.add('reveal-up')">
+                   
+                <div class="absolute top-0 right-0 bg-gradient-to-r from-copper to-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
                   Meilleure offre
                 </div>
 
-                <div class="p-8 flex flex-col flex-grow">
+                <div class="p-8 flex flex-col flex-grow relative z-0">
                   <div class="mb-8">
                     <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-amber-50 border border-amber-100 shadow-sm">
                       <span class="text-2xl">👑</span>
@@ -1228,8 +1235,8 @@
                         Accéder à mon compte
                       </a>
                     @else
-                      <a href="{{ route('register') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
-                        Commencer gratuitement
+                      <a href="{{ route('register', ['plan' => 'pro']) }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
+                        Choisir le plan Pro
                       </a>
                     @endauth
                   </div>
@@ -1239,13 +1246,13 @@
             </div>
 
             <!-- Anti-trap reassurance -->
-            <div class="flex items-center justify-center mt-12 animate-fade-in">
-                <div class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-50 border border-slate-100 shadow-sm">
-                    <span class="relative flex h-2 w-2">
+            <div class="flex items-center justify-center mt-12 animate-fade-in px-4">
+                <div class="flex sm:inline-flex items-center justify-center gap-2 text-center px-4 py-3 sm:py-2 rounded-2xl sm:rounded-full bg-slate-50 border border-slate-100 shadow-sm mx-auto">
+                    <span class="relative flex h-2 w-2 shrink-0">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                     </span>
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Sans engagement. Annulez en 1 clic à tout moment.</span>
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider leading-tight">Sans engagement. Annulez en 1 clic à tout moment.</span>
                 </div>
             </div>
           </div>
@@ -1392,8 +1399,8 @@
       </main>
 
       <div class="md:hidden fixed bottom-0 inset-x-0 p-4 pb-6 bg-white/90 backdrop-blur-2xl border-t border-slate-200 z-50">
-        <a href="#tarifs" class="btn-primary flex justify-center items-center w-full py-3.5 text-base shadow-lg shadow-amber-500/20">
-          Découvrir les offres
+        <a href="{{ route('register') }}" wire:navigate class="btn-primary flex justify-center items-center w-full py-3.5 text-base shadow-lg shadow-amber-500/20">
+          Commencer gratuitement
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
       </div>
@@ -1438,12 +1445,13 @@
               </ul>
             </div>
 
-            <!-- Col 4: Plus -->
+            <!-- Col 4: Accès -->
             <div>
-              <h4 class="font-display font-semibold text-midnight mb-6">Plus</h4>
+              <h4 class="font-display font-semibold text-midnight mb-6">Accès</h4>
               <ul class="space-y-4 text-sm">
-                <li><a href="#" class="hover:text-copper transition-colors font-light">Blog</a></li>
-                <li><a href="{{ route('login') }}" class="text-copper font-medium">Connexion Pro</a></li>
+                <li><a href="{{ route('login') }}" wire:navigate class="hover:text-copper transition-colors font-light">Connexion</a></li>
+                <li><a href="{{ route('register') }}" wire:navigate class="hover:text-copper transition-colors font-light">Créer un compte</a></li>
+                <li><a href="{{ route('blog.index') }}" class="hover:text-copper transition-colors font-light">Derniers articles</a></li>
               </ul>
             </div>
           </div>

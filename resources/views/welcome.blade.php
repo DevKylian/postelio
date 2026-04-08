@@ -91,9 +91,9 @@
            x-transition:leave="transition ease-in duration-300"
            x-transition:leave-start="opacity-100 translate-y-0"
            x-transition:leave-end="opacity-0 translate-y-4 md:translate-y-10"
-           class="fixed bottom-0 md:bottom-8 left-0 md:left-1/2 md:-translate-x-1/2 z-[100] w-full md:w-auto"
+           class="md:fixed md:bottom-8 fixed md:top-auto top-0 left-0 md:left-1/2 md:-translate-x-1/2 z-[100] w-full md:w-auto"
            style="display: none;">
-        <div class="bg-amber-600 rounded-t-2xl md:rounded-full py-2.5 px-4 md:px-10 flex items-center justify-between md:justify-center gap-6 shadow-2xl shadow-amber-900/20">
+        <div class="bg-amber-600 rounded-none md:rounded-full py-2.5 px-4 md:px-10 flex items-center justify-between md:justify-center gap-6 shadow-2xl shadow-amber-900/20">
           <div class="flex items-center gap-3 text-white text-center md:text-left w-full md:w-auto">
             <span class="hidden md:flex h-2.5 w-2.5 relative flex-shrink-0">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -117,7 +117,8 @@
     </div>
 
       <!-- Navigation -->
-      <nav class="fixed inset-x-0 top-4 z-50 transition-all duration-500 flex justify-center px-4">
+      <nav class="fixed inset-x-0 z-50 transition-all duration-500 flex justify-center px-4"
+           :class="showAnnouncement ? 'top-[56px] md:top-4' : 'top-4'">
         <div class="w-full max-w-5xl transition-all duration-500 rounded-full px-4 sm:px-6 py-3 flex justify-between items-center border glass-card bg-white/70"
              :class="scrolled ? 'bg-white/95 shadow-lg' : 'bg-white/70 shadow-sm'">
           <a href="/" class="transition-opacity hover:opacity-80">

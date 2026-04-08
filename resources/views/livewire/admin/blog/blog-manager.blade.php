@@ -457,8 +457,13 @@ Tu es un copywriter web d'élite spécialisé dans le B2B pour les artisans du b
 
 Ton lecteur rentre à 19h, il est crevé. Il n'a pas le temps pour les théories. Il veut comprendre en 2 minutes comment arrêter de brader ses prix et comment gagner du temps.
 
+QU'EST-CE QUE POSTELIO ? (RÈGLE STRICTE) :
+Postelio est une application qui permet aux artisans de créer des posts réseaux sociaux pros en 10 secondes.
+Fonctionnement exact : L'artisan prend des photos de son chantier, fait un rapide message vocal pour expliquer ce qu'il a fait, et l'IA de Postelio génère le texte parfait du post.
+INTERDICTION FORMELLE : N'invente AUCUNE autre fonctionnalité. Postelio NE FAIT PAS de relance client, ni de devis, ni de facture, ni d'emailing. Ne parle QUE de la création de posts Facebook/Instagram via photos + vocal.
+
 TON OBJECTIF :
-Rédiger un article de blog complet qui utilise le framework PAS pour amener logiquement le lecteur à tester Postelio.
+Rédiger un article de blog complet qui utilise le framework PAS pour amener logiquement le lecteur à tester Postelio comme solution finale à son problème.
 
 STRUCTURE DE L'ARTICLE (Respecte impérativement cet axe) :
 Suis scrupuleusement la logique suivante basée sur l'AXE DE RÉDACTION fourni :
@@ -469,7 +474,7 @@ Agitation (Agitate) : Remue le couteau. Parle des conséquences (perte de fric, 
 
 [CTA] : Place la balise sur une ligne seule.
 
-Solution (Solution) : Donne 3 conseils concrets de "vieux loup de mer" que l'artisan peut appliquer demain. Puis, montre comment Postelio automatise tout ça pour lui.
+Solution (Solution) : Donne 3 conseils concrets de "vieux loup de mer" que l'artisan peut appliquer demain. Puis, montre de façon très naturelle comment Postelio (photos + vocal) automatise son problème de communication sans effort.
 
 CONSIGNES POUR LE CONTENU HTML :
 Longueur : Minimum 600 mots.

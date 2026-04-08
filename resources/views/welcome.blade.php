@@ -50,8 +50,8 @@
         </script>
 
         <!-- Favicon -->
-        <link rel="icon" type="image/svg+xml" href="{{ asset('images/postelio-logo-gradient.svg') }}">
-        <link rel="apple-touch-icon" href="{{ asset('images/postelio-logo-gradient.svg') }}">
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+        <link rel="apple-touch-icon" href="{{ asset('favicon.ico') }}">
 
         <!-- Fonts (Outfit + Inter chargés via app.css depuis Google Fonts) -->
 
@@ -198,8 +198,8 @@
                       <rect x="2" width="1" height="2" fill="#E62117"/>
                     </svg>
                     <div class="w-px h-3.5 bg-slate-200 mx-1 shrink-0"></div>
-                    <span class="text-[10.5px] sm:text-[11px] lg:text-xs font-bold text-slate-600 tracking-tight uppercase whitespace-nowrap">
-                      Application <span class="text-midnight">100% Française</span> <span class="mx-1 text-slate-300">·</span> Conçue en <span class="text-midnight">Bretagne</span>
+                    <span class="text-xs sm:text-[13px] font-medium text-slate-600">
+                      Application <span class="font-bold text-midnight">100% Française</span> <span class="mx-1.5 text-copper/50">•</span> Conçue en <span class="font-bold text-midnight">Bretagne</span>
                     </span>
                   </div>
                 </div>

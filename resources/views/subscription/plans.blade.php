@@ -75,15 +75,19 @@
                         $isFree = $key === 'free';
                     @endphp
 
-                    <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 {{ $isPopular ? 'ring-2 ring-copper/20' : '' }}">
+                    <div class="group flex flex-col h-full relative bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1 {{ $isPopular ? 'shadow-xl shadow-copper/10 hover:shadow-2xl hover:shadow-copper/30 z-0' : 'border border-slate-200/60 shadow-md hover:shadow-xl' }}"
+                         @if($isPopular)
+                         style="border: 2px solid transparent; background-image: linear-gradient(white, white), linear-gradient(to bottom right, #f97316, #fbbf24); background-origin: border-box; background-clip: padding-box, border-box;"
+                         @endif
+                    >
 
                         {{-- Labels --}}
                         @if($isPopular)
-                            <div class="absolute top-0 right-0 bg-copper text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm">
+                            <div class="absolute top-0 right-0 bg-gradient-to-r from-copper to-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
                                 Meilleure Offre
                             </div>
                         @elseif($isCurrent)
-                            <div class="absolute top-0 right-0 bg-midnight text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm">
+                            <div class="absolute top-0 right-0 bg-midnight text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
                                 Plan actuel
                             </div>
                         @endif
@@ -169,10 +173,10 @@
             </div>
 
             <!-- Anti-trap reassurance -->
-            <div class="flex items-center justify-center mt-12 animate-fade-in">
-                <div class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-50 border border-slate-100 shadow-sm">
-                    <span class="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Sans engagement. Annulez en 1 clic à tout moment.</span>
+            <div class="flex items-center justify-center mt-12 animate-fade-in px-4">
+                <div class="flex sm:inline-flex items-center justify-center gap-2 text-center px-4 py-3 sm:py-2 rounded-2xl sm:rounded-full bg-slate-50 border border-slate-100 shadow-sm mx-auto">
+                    <span class="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] shrink-0"></span>
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider leading-tight">Sans engagement. Annulez en 1 clic à tout moment.</span>
                 </div>
             </div>
 

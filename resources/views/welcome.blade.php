@@ -839,7 +839,7 @@
                   </div>
                 </div>
 
-                <div class="absolute left-0 sm:left-4 top-[45%] -translate-y-1/2 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-30 animate-bounce" style="animation-duration: 4s;">
+                <div class="absolute left-0 sm:left-4 top-[25%] sm:top-[45%] -translate-y-1/2 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-30 animate-bounce" style="animation-duration: 4s;">
                   <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
                       <i data-lucide="file-text" class="w-4 h-4"></i>
@@ -1193,12 +1193,15 @@
               </div>
 
               {{-- Offre Professionnel --}}
-              <div class="group flex flex-col h-full relative bg-amber-50/60 border-2 border-copper/40 shadow-2xl shadow-copper/10 rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 reveal-d2 md:-translate-y-2" x-intersect.once="$el.classList.add('reveal-up')">
-                <div class="absolute top-0 right-0 bg-copper text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm">
+              <div class="group flex flex-col h-full relative rounded-3xl transition-all duration-300 hover:-translate-y-2 reveal-d2 md:-translate-y-2 shadow-xl shadow-copper/10 hover:shadow-2xl hover:shadow-copper/30 overflow-hidden" 
+                   style="border: 2px solid transparent; background-image: linear-gradient(white, white), linear-gradient(to bottom right, #f97316, #fbbf24); background-origin: border-box; background-clip: padding-box, border-box;"
+                   x-intersect.once="$el.classList.add('reveal-up')">
+                   
+                <div class="absolute top-0 right-0 bg-gradient-to-r from-copper to-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
                   Meilleure offre
                 </div>
 
-                <div class="p-8 flex flex-col flex-grow">
+                <div class="p-8 flex flex-col flex-grow relative z-0">
                   <div class="mb-8">
                     <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-amber-50 border border-amber-100 shadow-sm">
                       <span class="text-2xl">👑</span>
@@ -1243,13 +1246,13 @@
             </div>
 
             <!-- Anti-trap reassurance -->
-            <div class="flex items-center justify-center mt-12 animate-fade-in">
-                <div class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-50 border border-slate-100 shadow-sm">
-                    <span class="relative flex h-2 w-2">
+            <div class="flex items-center justify-center mt-12 animate-fade-in px-4">
+                <div class="flex sm:inline-flex items-center justify-center gap-2 text-center px-4 py-3 sm:py-2 rounded-2xl sm:rounded-full bg-slate-50 border border-slate-100 shadow-sm mx-auto">
+                    <span class="relative flex h-2 w-2 shrink-0">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                     </span>
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Sans engagement. Annulez en 1 clic à tout moment.</span>
+                    <span class="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-wider leading-tight">Sans engagement. Annulez en 1 clic à tout moment.</span>
                 </div>
             </div>
           </div>

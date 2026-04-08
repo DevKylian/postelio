@@ -1,3 +1,17 @@
 User-agent: *
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /onboarding
+Disallow: /profile
+Disallow: /subscription
+Disallow: /auth
+Disallow: /render
+Disallow: /newsletter/unsubscribe
+Disallow: /livewire
+
+User-agent: *
 Allow: /
+Allow: /blog
+
+# Sitemaps
 Sitemap: https://postelio.fr/sitemap.xml

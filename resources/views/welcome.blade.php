@@ -76,7 +76,16 @@
             scrolled: false, 
             openFaq: null,
             showAnnouncement: {{ $announcementActive ? 'true' : 'false' }},
+            visibleCtas: [],
+            updateCta(id, visible) {
+                if (visible) {
+                    if (!this.visibleCtas.includes(id)) this.visibleCtas.push(id);
+                } else {
+                    this.visibleCtas = this.visibleCtas.filter(i => i !== id);
+                }
+            },
             init() {
+                this.scrolled = window.scrollY > 50;
                 window.addEventListener('scroll', () => {
                     this.scrolled = window.scrollY > 50;
                 });
@@ -210,7 +219,9 @@
               <p class="text-xl sm:text-2xl font-light text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed animate-blur-in delay-200">
                 10 secondes pour transformer vos fins de chantier en vitrine premium. Attirez de vrais clients, sans y passer vos soirées.
               </p>
-              <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-blur-in delay-300">
+              <div id="cta-hero" class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-blur-in delay-300"
+                   x-intersect:enter.margin.-10%="updateCta('hero', true)" 
+                   x-intersect:leave.margin.-10%="updateCta('hero', false)">
                 @auth
                     <a href="{{ route('generate-post') }}" wire:navigate class="btn-primary w-full sm:w-auto flex justify-center items-center gap-2 text-base">
                         Créer mon 1er post (Gratuit)
@@ -1055,6 +1066,9 @@
           <div class="max-w-4xl mx-auto relative z-10" x-intersect.once="$el.classList.add('reveal-up')">
             <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Rentrez chez vous, et laissez vos chantiers continuer à vous trouver des clients.</h2>
             <p class="text-xl font-light text-slate-600 mb-10">Prêt à transformer vos réalisations en aimants à clients premium ?</p>
+            <div id="cta-mid" class="inline-block"
+                 x-intersect:enter.margin.-10%="updateCta('mid', true)" 
+                 x-intersect:leave.margin.-10%="updateCta('mid', false)">
             @auth
                 <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
                   Créer mon 1er post (Gratuit) <i data-lucide="arrow-right" class="w-5 h-5"></i>
@@ -1093,6 +1107,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto items-stretch">
 
               {{-- Offre Starter --}}
+              {{-- Offre Starter --}}
               <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1" x-intersect.once="$el.classList.add('reveal-up')">
                 <div class="p-8 flex flex-col flex-grow">
                   <div class="mb-8">
@@ -1126,7 +1141,9 @@
                     @endforeach
                   </ul>
 
-                  <div class="mt-auto">
+                  <div id="cta-plan-starter" class="mt-auto"
+                       x-intersect:enter.margin.-10%="updateCta('starter', true)" 
+                       x-intersect:leave.margin.-10%="updateCta('starter', false)">
                     @auth
                       <a href="{{ route('dashboard') }}" wire:navigate class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-widest block hover:bg-slate-100 transition-colors">
                         Accéder à mon compte
@@ -1140,6 +1157,7 @@
                 </div>
               </div>
 
+              {{-- Offre Basic --}}
               {{-- Offre Basic --}}
               <div class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 reveal-d1" x-intersect.once="$el.classList.add('reveal-up')">
                 <div class="p-8 flex flex-col flex-grow">
@@ -1178,7 +1196,9 @@
                     @endforeach
                   </ul>
 
-                  <div class="mt-auto">
+                  <div id="cta-plan-basic" class="mt-auto"
+                       x-intersect:enter.margin.-10%="updateCta('basic', true)" 
+                       x-intersect:leave.margin.-10%="updateCta('basic', false)">
                     @auth
                       <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl">
                         Accéder à mon compte
@@ -1229,7 +1249,9 @@
                     @endforeach
                   </ul>
 
-                  <div class="mt-auto">
+                  <div id="cta-plan-pro" class="mt-auto"
+                       x-intersect:enter.margin.-10%="updateCta('pro', true)" 
+                       x-intersect:leave.margin.-10%="updateCta('pro', false)">
                     @auth
                       <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
                         Accéder à mon compte
@@ -1398,7 +1420,17 @@
         </section>
       </main>
 
-      <div class="md:hidden fixed bottom-0 inset-x-0 p-4 pb-6 bg-white/90 backdrop-blur-2xl border-t border-slate-200 z-50">
+
+
+      <div class="md:hidden fixed bottom-0 inset-x-0 p-4 pb-4 z-50 transition-all duration-500"
+           x-show="scrolled && visibleCtas.length === 0"
+           style="display: none;"
+           x-transition:enter="transition ease-out duration-300"
+           x-transition:enter-start="opacity-0 translate-y-full"
+           x-transition:enter-end="opacity-100 translate-y-0"
+           x-transition:leave="transition ease-in duration-300"
+           x-transition:leave-start="opacity-100 translate-y-0"
+           x-transition:leave-end="opacity-0 translate-y-full">
         <a href="{{ route('register') }}" wire:navigate class="btn-primary flex justify-center items-center w-full py-3.5 text-base shadow-lg shadow-amber-500/20">
           Commencer gratuitement
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>

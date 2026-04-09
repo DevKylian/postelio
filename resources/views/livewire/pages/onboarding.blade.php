@@ -200,8 +200,10 @@ $complete = function () {
                                        {{ $trade
                                           ? 'bg-copper text-white hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-copper/20 hover:shadow-lg hover:shadow-copper/30 cursor-pointer'
                                           : 'bg-gray-100 text-gray-400 cursor-not-allowed' }}">
-                            Continuer
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg wire:loading wire:target="nextStep" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            <span wire:loading.remove wire:target="nextStep">Continuer</span>
+                            <span wire:loading wire:target="nextStep">Chargement...</span>
+                            <svg wire:loading.remove wire:target="nextStep" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </button>
@@ -314,8 +316,10 @@ $complete = function () {
                         </button>
                         <button wire:click="nextStep" type="button"
                                 class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm bg-copper text-white hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-copper/20 hover:shadow-lg hover:shadow-copper/30 transition-all duration-200">
-                            Continuer
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg wire:loading wire:target="nextStep" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            <span wire:loading.remove wire:target="nextStep">Continuer</span>
+                            <span wire:loading wire:target="nextStep">Suivant...</span>
+                            <svg wire:loading.remove wire:target="nextStep" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </button>
@@ -396,8 +400,10 @@ $complete = function () {
                         </button>
                         <button wire:click="nextStep" type="button"
                                 class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm bg-copper text-white hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-copper/20 hover:shadow-lg hover:shadow-copper/30 transition-all duration-200">
-                            Continuer
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg wire:loading wire:target="nextStep" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            <span wire:loading.remove wire:target="nextStep">Continuer</span>
+                            <span wire:loading wire:target="nextStep">Suivant...</span>
+                            <svg wire:loading.remove wire:target="nextStep" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </button>
@@ -478,8 +484,10 @@ $complete = function () {
                         </button>
                         <button wire:click="nextStep" type="button"
                                 class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm bg-copper text-white hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-copper/20 hover:shadow-lg hover:shadow-copper/30 transition-all duration-200">
-                            Continuer
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg wire:loading wire:target="nextStep" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            <span wire:loading.remove wire:target="nextStep">Continuer</span>
+                            <span wire:loading wire:target="nextStep">Suivant...</span>
+                            <svg wire:loading.remove wire:target="nextStep" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </button>
@@ -716,8 +724,10 @@ $complete = function () {
                         </button>
                         <button wire:click="nextStep" type="button"
                                 class="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm bg-copper text-white hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-copper/20 hover:shadow-lg hover:shadow-copper/30 transition-all duration-200">
-                            Continuer
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg wire:loading wire:target="nextStep" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            <span wire:loading.remove wire:target="nextStep">Continuer</span>
+                            <span wire:loading wire:target="nextStep">Suivant...</span>
+                            <svg wire:loading.remove wire:target="nextStep" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </button>
@@ -843,10 +853,11 @@ $complete = function () {
                                 wire:loading.attr="disabled"
                                 type="button"
                                 class="flex items-center justify-center gap-2 w-full sm:w-auto px-7 py-3 rounded-xl font-bold text-sm bg-copper text-white hover:bg-amber-600 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-copper/20 hover:shadow-lg hover:shadow-copper/30 transition-all duration-300 disabled:opacity-60">
+                            <svg wire:loading wire:target="complete" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                             <span wire:loading.remove wire:target="complete">Accéder à mon espace</span>
-                            <span wire:loading wire:target="complete">Enregistrement…</span>
+                            <span wire:loading wire:target="complete">Finalisation...</span>
                             <svg wire:loading.remove wire:target="complete" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
                         </button>
                     </div>

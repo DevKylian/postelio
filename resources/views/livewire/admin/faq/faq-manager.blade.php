@@ -144,7 +144,10 @@
             </div>
             <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0 rounded-b-2xl">
                 <button wire:click="$set('showCategoryModal', false)" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Annuler</button>
-                <button wire:click="saveCategory" class="px-4 py-2 text-sm font-medium text-white bg-copper rounded-lg hover:bg-amber-600 shadow-sm">Enregistrer</button>
+                <button wire:click="saveCategory" wire:loading.attr="disabled" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-copper rounded-lg hover:bg-amber-600 shadow-sm">
+                    <svg wire:loading wire:target="saveCategory" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Enregistrer
+                </button>
             </div>
         </div>
     </div>
@@ -223,7 +226,10 @@
             
             <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0 rounded-b-2xl">
                 <button wire:click="$set('showQuestionModal', false)" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Annuler</button>
-                <button wire:click="saveQuestion" class="px-4 py-2 text-sm font-medium text-white bg-copper rounded-lg hover:bg-amber-600 shadow-sm">Enregistrer le sujet</button>
+                <button wire:click="saveQuestion" wire:loading.attr="disabled" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-copper rounded-lg hover:bg-amber-600 shadow-sm">
+                    <svg wire:loading wire:target="saveQuestion" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Enregistrer le sujet
+                </button>
             </div>
         </div>
     </div>

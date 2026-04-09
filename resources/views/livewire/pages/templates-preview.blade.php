@@ -191,60 +191,35 @@ $switchTab = function ($tab) {
                             wire:loading.attr="disabled"
                             class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 relative
                                 {{ $activeTab === 'standard' ? 'bg-white text-midnight shadow-lg shadow-gray-200 ring-1 ring-gray-100' : 'text-gray-400 hover:text-gray-600' }}">
-                        <span wire:loading.remove wire:target="switchTab('standard')">Style Classique</span>
-                        <div wire:loading wire:target="switchTab('standard')" class="flex items-center gap-1">
-                             <span class="w-1.5 h-1.5 rounded-full bg-midnight animate-bounce [animation-delay:-0.3s]"></span>
-                             <span class="w-1.5 h-1.5 rounded-full bg-midnight animate-bounce [animation-delay:-0.15s]"></span>
-                             <span class="w-1.5 h-1.5 rounded-full bg-midnight animate-bounce"></span>
-                        </div>
+                        Style Classique
                     </button>
 
                     <button wire:click="switchTab('glass')"
                             wire:loading.attr="disabled"
                             class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
                                 {{ $activeTab === 'glass' ? 'bg-midnight text-white shadow-lg shadow-midnight/20' : 'text-gray-400 hover:text-gray-600' }}">
-                        <span wire:loading.remove wire:target="switchTab('glass')">Style Glassmorphism</span>
-                        <div wire:loading wire:target="switchTab('glass')" class="flex items-center gap-1">
-                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-0.3s]"></span>
-                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-0.15s]"></span>
-                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></span>
-                        </div>
+                        Style Glassmorphism
                     </button>
 
                     <button wire:click="switchTab('blueprint')"
                             wire:loading.attr="disabled"
                             class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
                                 {{ $activeTab === 'blueprint' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-400 hover:text-gray-600' }}">
-                        <span wire:loading.remove wire:target="switchTab('blueprint')">Style Blueprint</span>
-                        <div wire:loading wire:target="switchTab('blueprint')" class="flex items-center gap-1">
-                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-0.3s]"></span>
-                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-0.15s]"></span>
-                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></span>
-                        </div>
+                        Style Blueprint
                     </button>
 
                     <button wire:click="switchTab('kraft')"
                             wire:loading.attr="disabled"
                             class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
                                 {{ $activeTab === 'kraft' ? 'bg-[#BC9A7E] text-slate-900 shadow-lg shadow-[#BC9A7E]/20' : 'text-gray-400 hover:text-gray-600' }}">
-                        <span wire:loading.remove wire:target="switchTab('kraft')">Style Kraft</span>
-                        <div wire:loading wire:target="switchTab('kraft')" class="flex items-center gap-1">
-                             <span class="w-1.5 h-1.5 rounded-full bg-slate-900 animate-bounce [animation-delay:-0.3s]"></span>
-                             <span class="w-1.5 h-1.5 rounded-full bg-slate-900 animate-bounce [animation-delay:-0.15s]"></span>
-                             <span class="w-1.5 h-1.5 rounded-full bg-slate-900 animate-bounce"></span>
-                        </div>
+                        Style Kraft
                     </button>
 
                     <button wire:click="switchTab('beton')"
                             wire:loading.attr="disabled"
                             class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
                                 {{ $activeTab === 'beton' ? 'bg-slate-600 text-white shadow-lg shadow-slate-600/20' : 'text-gray-400 hover:text-gray-600' }}">
-                        <span wire:loading.remove wire:target="switchTab('beton')">Style Béton</span>
-                        <div wire:loading wire:target="switchTab('beton')" class="flex items-center gap-1">
-                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-0.3s]"></span>
-                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:-0.15s]"></span>
-                             <span class="w-1.5 h-1.5 rounded-full bg-white animate-bounce"></span>
-                        </div>
+                        Style Béton
                     </button>
                 </div>
 
@@ -271,18 +246,12 @@ $switchTab = function ($tab) {
 
             {{-- Contenu Dynamique avec Lazy Loading --}}
             <div class="min-h-[400px] relative">
-                {{-- Skeleton Loader Global --}}
-                <div wire:loading class="absolute inset-0 z-10 bg-white/50 backdrop-blur-[2px] flex items-center justify-center rounded-3xl animate-fade-in">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-                        @for($i=0; $i<6; $i++)
-                            <div class="space-y-4 animate-pulse">
-                                <div class="aspect-[4/5] bg-gray-100 rounded-2xl"></div>
-                                <div class="h-4 bg-gray-100 rounded w-1/2"></div>
-                                <div class="h-3 bg-gray-100 rounded w-3/4"></div>
-                            </div>
-                        @endfor
-                    </div>
+                {{-- Loader discret au dessus de la grille --}}
+                <div wire:loading class="absolute top-0 left-0 right-0 h-1 z-20 overflow-hidden rounded-full">
+                    <div class="h-full bg-copper/40 animate-[loading_1.5s_infinite_linear] w-[40%] rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
                 </div>
+
+                <div wire:loading.class="opacity-50 blur-[1px] transition-all duration-300" class="w-full">
 
                 {{-- Composant StyleGrid avec Lazy Loading - Séparé par onglet pour une réactivité maximale --}}
                 @if($activeTab === 'standard')
@@ -337,6 +306,7 @@ $switchTab = function ($tab) {
                     />
                 @endif
             </div>
+        </div>
 
             {{-- CTA branding --}}
             <div class="mt-12 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white shadow ring-1 ring-gray-100">
@@ -410,9 +380,10 @@ $switchTab = function ($tab) {
                                    :class="focus ? 'shadow-md' : ''"></textarea>
                             <button wire:click="refineTemplate"
                                     wire:loading.attr="disabled"
-                                    class="px-5 bg-copper text-white text-xs font-bold rounded-xl hover:bg-amber-500 transition-all flex items-center justify-center shrink-0 shadow-sm">
-                                <span wire:loading.remove wire:target="refineTemplate">Ajuster</span>
+                                    class="px-5 bg-copper text-white text-xs font-bold rounded-xl hover:bg-amber-500 transition-all flex items-center justify-center shrink-0 shadow-sm gap-2">
                                 <svg wire:loading wire:target="refineTemplate" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                <span wire:loading.remove wire:target="refineTemplate">Ajuster</span>
+                                <span wire:loading wire:target="refineTemplate">Ajustement...</span>
                             </button>
                         </div>
                         <p class="text-[10px] text-amber-600/70 mt-2 italic">L'IA détectera automatiquement si vous voulez changer le style, la mise en page ou le mode photo.</p>
@@ -483,6 +454,11 @@ $switchTab = function ($tab) {
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
         }
     </style>
     @endpush

@@ -82,8 +82,10 @@
                         wire:click="openAIModal"
                         class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold text-white bg-gradient-to-r from-copper to-amber-500 shadow-lg shadow-copper/20 hover:shadow-copper/30 hover:-translate-y-0.5 transition-all active:translate-y-0"
                     >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        Générer avec l'IA
+                        <svg wire:loading.remove wire:target="openAIModal" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <svg wire:loading wire:target="openAIModal" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span wire:loading.remove wire:target="openAIModal">Générer avec l'IA</span>
+                        <span wire:loading wire:target="openAIModal">Préparation...</span>
                     </button>
                 </div>
 
@@ -183,19 +185,23 @@
                             <button
                                 type="button"
                                 wire:click="openPreview"
-                                class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold transition-all bg-slate-100 text-slate-600 hover:bg-slate-200"
                             >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                Aperçu
+                                <svg wire:loading wire:target="openPreview" class="animate-spin h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                <svg wire:loading.remove wire:target="openPreview" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <span wire:loading.remove wire:target="openPreview">Aperçu</span>
+                                <span wire:loading wire:target="openPreview">Ouverture...</span>
                             </button>
 
                             <button
                                 type="button"
                                 wire:click="openTestModal"
-                                class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold transition-all bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100"
+                                class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold transition-all bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100"
                             >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                                Envoyer un test
+                                <svg wire:loading wire:target="openTestModal" class="animate-spin h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                <svg wire:loading.remove wire:target="openTestModal" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                <span wire:loading.remove wire:target="openTestModal">Envoyer un test</span>
+                                <span wire:loading wire:target="openTestModal">Chargement...</span>
                             </button>
 
                             <button
@@ -341,7 +347,7 @@
                         Annuler
                     </button>
                     <button wire:click="sendTest" wire:loading.attr="disabled"
-                            class="flex-1 px-6 py-3.5 rounded-2xl font-black text-sm text-white bg-blue-600 hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-60">
+                            class="flex-1 px-6 py-3.5 rounded-2xl font-black text-sm text-white bg-blue-600 hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-60 flex items-center justify-center gap-2">
                         <span wire:loading.remove wire:target="sendTest">Envoyer le test</span>
                         <span wire:loading wire:target="sendTest" class="inline-flex items-center gap-2">
                             <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>

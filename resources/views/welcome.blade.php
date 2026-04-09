@@ -80,6 +80,7 @@
   x-data="{ 
             isMenuOpen: false, 
             scrolled: false, 
+            navReady: false,
             openFaq: null,
             visibleCtas: [],
             showAnnouncement: {{ $announcementActive ? 'true' : 'false' }},
@@ -87,6 +88,8 @@
                 window.addEventListener('scroll', () => {
                     this.scrolled = window.scrollY > 50;
                 });
+                // Déclencher l'animation d'entrée
+                setTimeout(() => { this.navReady = true; }, 300);
             }
           }">
 
@@ -131,42 +134,75 @@
   </div>
 
   <!-- Navigation -->
-  <nav class="fixed inset-x-0 z-50 transition-all duration-500 flex justify-center px-4"
+  <nav class="fixed inset-x-0 z-50 transition-all duration-300 flex justify-center px-4"
     :class="showAnnouncement ? 'top-[56px] md:top-4' : 'top-4'">
     <div
-      class="w-full max-w-5xl transition-all duration-500 rounded-full px-4 sm:px-6 py-3 flex justify-between items-center border glass-card bg-white/70"
-      :class="scrolled ? 'bg-white/95 shadow-lg' : 'bg-white/70 shadow-sm'">
-      <a href="/" class="transition-opacity hover:opacity-80">
-        <x-logo size="md" />
-      </a>
+      class="transition-[max-width,width,background-color,box-shadow] duration-[500ms] ease-[cubic-bezier(0.23,1,0.32,1)] rounded-full h-[64px] flex items-center glass-card border-none overflow-hidden max-w-[200px] w-[200px] justify-center px-2 animate-nav-pill-entry"
+      :class="[
+        scrolled ? 'bg-white/95 shadow-lg' : 'bg-white/70 shadow-sm',
+        navReady ? '!max-w-5xl !w-full !justify-between !px-4 sm:!px-6' : ''
+      ]">
+      
+      <div class="transition-all duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] flex items-center shrink-0 flex-1 justify-center"
+           :class="navReady ? '!flex-initial' : ''">
+          <a href="/" class="transition-opacity hover:opacity-80">
+            <x-logo size="md" />
+          </a>
+      </div>
 
       <!-- Desktop Nav -->
-      <div class="hidden md:flex items-center gap-8">
-        <a href="#methode" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">La
-          méthode</a>
+      <div class="hidden md:flex items-center gap-8" :class="navReady ? 'opacity-100' : 'opacity-0 pointer-events-none'">
+        <a href="#methode" 
+           class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
+           :class="navReady ? 'nav-entry-stagger' : ''"
+           style="animation-delay: 200ms">La méthode</a>
         <a href="#galerie"
-          class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Réalisations</a>
+          class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
+          :class="navReady ? 'nav-entry-stagger' : ''"
+          style="animation-delay: 250ms">Réalisations</a>
         <a href="#benefices"
-          class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Avantages</a>
-        <a href="#tarifs" class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Tarifs</a>
+          class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
+          :class="navReady ? 'nav-entry-stagger' : ''"
+          style="animation-delay: 300ms">Avantages</a>
+        <a href="#tarifs" 
+           class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
+           :class="navReady ? 'nav-entry-stagger' : ''"
+           style="animation-delay: 350ms">Tarifs</a>
         <a href="{{ route('blog.index') }}"
-          class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Blog</a>
+          class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
+          :class="navReady ? 'nav-entry-stagger' : 'opacity-0'"
+          style="animation-delay: 400ms">Blog</a>
+        
+        <div class="w-px h-4 bg-slate-200 mx-1"
+             :class="navReady ? 'nav-entry-stagger' : 'opacity-0'"
+             style="animation-delay: 450ms"></div>
 
         @auth
-          <a href="{{ route('dashboard') }}" wire:navigate class="btn-primary ml-4 text-sm px-6 py-2.5">
+          <a href="{{ route('dashboard') }}" wire:navigate 
+             class="btn-primary text-sm px-6 py-2"
+             :class="navReady ? 'nav-btn-pop' : 'opacity-0'"
+             style="animation-delay: 550ms">
             Tableau de Bord
           </a>
         @else
           <a href="{{ route('login') }}" wire:navigate
-            class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors">Connexion</a>
-          <a href="{{ route('register') }}" wire:navigate class="btn-primary ml-4 text-sm px-6 py-2.5">
+            class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
+            :class="navReady ? 'nav-entry-stagger' : 'opacity-0'"
+            style="animation-delay: 500ms">Connexion</a>
+          <a href="{{ route('register') }}" wire:navigate 
+             class="btn-primary text-sm px-6 py-2"
+             :class="navReady ? 'nav-btn-pop' : 'opacity-0'"
+             style="animation-delay: 600ms">
             Essayer gratuitement
           </a>
         @endauth
       </div>
 
       <div class="md:hidden flex items-center">
-        <button @click="isMenuOpen = !isMenuOpen" class="text-midnight p-2 outline-none focus:outline-none">
+        <button @click="isMenuOpen = !isMenuOpen" 
+                class="text-midnight p-2 outline-none focus:outline-none"
+                :class="navReady ? 'nav-btn-pop' : 'opacity-0'"
+                style="animation-delay: 200ms">
           <i data-lucide="menu" class="w-6 h-6" x-show="!isMenuOpen"></i>
           <i data-lucide="x" class="w-6 h-6" x-show="isMenuOpen" style="display: none;"></i>
         </button>
@@ -305,6 +341,37 @@
         background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
         border: 1px solid rgba(226, 232, 240, 0.6);
         box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02)
+      }
+
+      /* Navbar Opening Animation */
+      .animate-nav-pill-entry {
+        animation: navPillEntry 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      @keyframes navPillEntry {
+        0% { opacity: 0; transform: scale(0.85); filter: blur(10px); }
+        100% { opacity: 1; transform: scale(1); filter: blur(0); }
+      }
+
+      .nav-entry-stagger {
+        opacity: 0;
+        transform: scale(0.95);
+        filter: blur(4px);
+        animation: navItemDepthIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      @keyframes navItemDepthIn {
+        to { opacity: 1; transform: scale(1); filter: blur(0); }
+      }
+
+      .nav-btn-pop {
+        opacity: 0;
+        transform: scale(0.9);
+        animation: navBtnPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+
+      @keyframes navBtnPop {
+        to { opacity: 1; transform: scale(1); }
       }
 
       .md-scene {

@@ -419,7 +419,7 @@
                                 <span class="text-red-600 font-bold text-2xl tabular-nums" x-text="formatTime(elapsed)">00:00</span>
                             </div>
                             <button type="button" @click="stopRecording()"
-                                    class="bg-red-500 text-white font-semibold px-6 py-2 rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20 text-sm">
+                                    class="bg-red-500 text-white font-semibold px-6 py-2 rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20 text-sm flex items-center justify-center gap-2">
                                 Arrêter
                             </button>
                         </div>
@@ -429,11 +429,12 @@
                             <audio :src="audioUrl" controls class="w-full rounded-xl h-10"></audio>
                             <div class="flex gap-2">
                                 <button type="button" @click="confirmRecording()"
-                                        class="flex-1 bg-copper text-white font-semibold py-2.5 rounded-xl hover:bg-amber-500 transition-colors text-xs shadow-md shadow-copper/20">
+                                        class="flex-1 bg-copper text-white font-semibold py-2.5 rounded-xl hover:bg-amber-500 transition-colors text-xs shadow-md shadow-copper/20 flex items-center justify-center gap-2">
+                                    <svg wire:loading wire:target="confirmRecording" class="animate-spin h-3 w-3 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                                     Analyser ce mémo
                                 </button>
                                 <button type="button" @click="resetRecording()"
-                                        class="px-4 py-2.5 border-2 border-gray-200 text-gray-500 font-semibold rounded-xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all text-xs bg-white">
+                                        class="px-4 py-2.5 border-2 border-gray-200 text-gray-500 font-semibold rounded-xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all text-xs bg-white flex items-center justify-center gap-2">
                                     Recommencer
                                 </button>
                             </div>
@@ -515,12 +516,12 @@
                                         <p class="text-xs text-midnight font-bold">Analyse en cours...</p>
                                     </div>
                                 @else
-                                    <div wire:loading.flex wire:target="audio" class="flex-col items-center justify-center animate-pulse w-full">
-                                        <svg class="animate-spin h-8 w-8 text-copper mb-3" fill="none" viewBox="0 0 24 24">
+                                    <div wire:loading.flex wire:target="audio" class="flex-row items-center justify-center gap-3 animate-pulse w-full">
+                                        <svg class="animate-spin h-6 w-6 text-copper" fill="none" viewBox="0 0 24 24">
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        <p class="text-xs text-midnight font-semibold text-center w-full">Envoi du fichier...</p>
+                                        <p class="text-xs text-midnight font-semibold">Envoi du fichier...</p>
                                     </div>
                                     <div wire:loading.remove wire:target="audio" class="flex flex-col items-center">
                                         <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-copper shadow-md mb-3">
@@ -1462,7 +1463,7 @@
                 @if($currentStep > 1)
                     <button type="button" 
                             wire:click="previousStep"
-                            class="flex-1 bg-white border-2 border-gray-100 text-midnight font-bold py-4 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98]">
+                            class="flex-1 bg-white border-2 border-gray-100 text-midnight font-bold py-4 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
                         Précédent
                     </button>
                 @endif
@@ -1473,12 +1474,10 @@
                             wire:click="nextStep"
                             wire:loading.attr="disabled"
                             @if(auth()->user()->remaining_credits <= 0) disabled @endif
-                            class="flex-[2] bg-copper text-white font-bold py-4 rounded-2xl shadow-lg shadow-copper/20 hover:bg-amber-500 hover:shadow-xl hover:shadow-copper/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="flex-[2] bg-copper text-white font-bold py-4 rounded-2xl shadow-lg shadow-copper/20 hover:bg-amber-500 hover:shadow-xl hover:shadow-copper/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        <svg wire:loading wire:target="nextStep" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
                         <span wire:loading.remove wire:target="nextStep">Continuer</span>
-                        <span wire:loading wire:target="nextStep" class="flex items-center justify-center gap-2">
-                            <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
-                            Validation...
-                        </span>
+                        <span wire:loading wire:target="nextStep">Validation...</span>
                     </button>
                 @else
                     {{-- ── Submit ── --}}
@@ -1489,19 +1488,20 @@
                                 wire:loading.attr="disabled"
                                 wire:target="generate"
                                 @if(auth()->user()->remaining_credits <= 0) disabled @endif
-                                class="w-full relative group overflow-hidden bg-copper text-white font-bold text-sm py-4 rounded-2xl shadow-lg shadow-copper/25 hover:shadow-xl hover:shadow-copper/30 hover:bg-amber-500 transition-all active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed">
-                            <div class="flex items-center justify-center gap-3">
-                                <template x-if="!isQueuing">
-                                    <svg wire:loading.remove wire:target="generate" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                                </template>
+                                class="w-full relative group overflow-hidden bg-copper text-white font-bold text-sm py-4 rounded-2xl shadow-lg shadow-copper/25 hover:shadow-xl hover:shadow-copper/30 hover:bg-amber-500 transition-all active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-3">
+                                <svg wire:loading wire:target="generate" class="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                
                                 <template x-if="isQueuing">
                                     <svg class="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
                                 </template>
-                                <svg wire:loading wire:target="generate" class="animate-spin w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+
+                                <template x-if="!isQueuing">
+                                    <svg wire:loading.remove wire:target="generate" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                </template>
+
                                 <span wire:loading.remove wire:target="generate"
                                       x-text="isQueuing ? 'Mise en file d\'attente...' : (navigator.onLine ? 'Lancer la génération' : 'Sauvegarder hors-ligne')"></span>
                                 <span wire:loading wire:target="generate">Analyse en cours...</span>
-                            </div>
                         </button>
 
                         {{-- Offline helper text --}}

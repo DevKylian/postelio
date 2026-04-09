@@ -87,9 +87,11 @@
                     Voir tous les leads
                 </a>
                 @if(!$showForm)
-                <button wire:click="openAIModal" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition-all shadow-lg bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:shadow-orange-500/30 hover:-translate-y-0.5 border border-orange-500/20 active:translate-y-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    Générateur de Lead Magnet
+                <button wire:click="openAIModal" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition-all shadow-lg bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:shadow-orange-500/30 hover:-translate-y-0.5 border border-orange-500/20 active:translate-y-0">
+                    <svg wire:loading wire:target="openAIModal" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                    <svg wire:loading.remove wire:target="openAIModal" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <span wire:loading.remove wire:target="openAIModal">Générateur de Lead Magnet</span>
+                    <span wire:loading wire:target="openAIModal">Préparation...</span>
                 </button>
                 @endif
                 <button wire:click="toggleForm"
@@ -217,7 +219,8 @@
                             Annuler
                         </button>
                         <button type="submit"
-                                class="bg-orange-500 text-white px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20 active:scale-95 disabled:opacity-50">
+                                class="bg-orange-500 text-white px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20 active:scale-95 disabled:opacity-50 inline-flex items-center justify-center gap-2">
+                            <svg wire:loading wire:target="save" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                             {{ $isEditing ? 'Mettre à jour' : ($status === 'published' ? 'Publier' : 'Enregistrer le brouillon') }}
                         </button>
                     </div>
@@ -421,10 +424,12 @@ Réponds impérativement et UNIQUEMENT en JSON valide :
                         @error('json_pasted') <span class="text-rose-500 text-[11px] font-bold tracking-tight bg-rose-50 px-3 py-1 rounded-lg shrink-0">{{ $message }}</span> @enderror
                         
                         <button wire:click="processPastedJson"
-                                class="w-full shrink-0 py-4 rounded-2xl bg-midnight text-white font-black text-sm uppercase tracking-[0.1em] hover:bg-slate-800 transition-all shadow-xl shadow-midnight/10 flex flex-col items-center justify-center gap-1 group">
+                                class="w-full shrink-0 py-4 rounded-2xl bg-midnight text-white font-black text-sm uppercase tracking-[0.1em] hover:bg-slate-800 transition-all shadow-xl shadow-midnight/10 flex flex-row items-center justify-center gap-2 group">
                              <div class="flex items-center gap-2">
-                                 <svg class="w-5 h-5 text-orange-500 group-hover:-rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                                 Importer le Guide
+                                 <svg wire:loading wire:target="processPastedJson" class="animate-spin h-5 w-5 text-orange-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                 <svg wire:loading.remove wire:target="processPastedJson" class="w-5 h-5 text-orange-500 group-hover:-rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                 <span wire:loading.remove wire:target="processPastedJson">Importer le Guide</span>
+                                 <span wire:loading wire:target="processPastedJson">Analyse en cours...</span>
                              </div>
                         </button>
                     </div>

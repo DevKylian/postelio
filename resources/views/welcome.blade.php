@@ -245,34 +245,6 @@
   </nav>
 
   <main class="relative z-10">
-    <script>
-      function heroTypewriter() {
-        return {
-          p1: '', p2: '', done: false,
-          init() {
-            const s1 = 'Votre post Instagram pr\u00eat en 10 secondes,\u00a0';
-            const s2 = '\u00e0 partir d\u2019une simple note vocale.';
-            const totalChars = s1.length + s2.length;
-            const startDelay = 150;   // ms — laisse l'animation de blur démarrer
-            const totalTyping = 1250; // ms — finit quasi en même temps que le blur (1.5s)
-            const speed = Math.round(totalTyping / totalChars);
-            let i = 0, j = 0;
-            setTimeout(() => {
-              const t1 = setInterval(() => {
-                if (i < s1.length) { this.p1 += s1[i++]; }
-                else {
-                  clearInterval(t1);
-                  const t2 = setInterval(() => {
-                    if (j < s2.length) { this.p2 += s2[j++]; }
-                    else { clearInterval(t2); setTimeout(() => this.done = true, 600); }
-                  }, speed);
-                }
-              }, speed);
-            }, startDelay);
-          }
-        }
-      }
-    </script>
 
     <!-- Hero Section -->
     <section class="relative pt-40 pb-20 lg:pt-52 lg:pb-32">
@@ -292,10 +264,9 @@
             </div>
           </div>
           <h1
-            class="text-4xl sm:text-5xl lg:text-6xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.1] animate-blur-in"
-            style="animation-duration:1.5s"
-            x-data="heroTypewriter()">
-            <span x-text="p1"></span><span class="text-gradient-copper italic" x-text="p2"></span><span class="tw-cursor" x-show="!done">|</span>
+            class="text-4xl sm:text-5xl lg:text-6xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.1] animate-blur-in delay-100 text-balance">
+            Votre post Instagram prêt en 10 secondes, <br class="hidden sm:block" />
+            <span class="text-gradient-copper italic">à partir d’une simple note vocale.</span>
           </h1>
           <p
             class="text-lg sm:text-xl lg:text-2xl font-light text-slate-600 mb-10 max-w-4xl mx-auto leading-relaxed animate-blur-in delay-200 text-balance">
@@ -362,7 +333,7 @@
       .md-showcase {
         position: relative;
         width: 100%;
-        min-height: 560px;
+        height: 560px;
         border-radius: 1.5rem;
         overflow: hidden;
         background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
@@ -1696,7 +1667,7 @@
                 </template>
               </div>
 
-              <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left min-h-[80px] flex align-center">
+              <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left min-h-[110px] flex items-center">
                 <p class="text-midnight font-medium leading-relaxed text-sm"
                   x-text="isPlaying ? displayedText : 'Salut ! On vient de finir cette superbe rénovation de cuisine à Lyon. Le résultat est top, regardez l\'avant-après !'">
                 </p>
@@ -1793,7 +1764,7 @@
             </div>
 
             <div
-              class="absolute left-0 sm:left-4 top-[35%] sm:top-[65%] -translate-y-1/2 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-30 animate-bounce"
+              class="absolute left-0 sm:left-4 top-[35%] sm:top-[40%] -translate-y-1/2 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-30 animate-bounce"
               style="animation-duration: 4s;">
               <div class="flex items-center gap-2">
                 <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">

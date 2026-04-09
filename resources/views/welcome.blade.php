@@ -1818,6 +1818,310 @@
       </div>
     </section>
 
+    <!-- Templates Showcase -->
+    <section id="gabarits" class="py-28 bg-white relative overflow-hidden">
+      <div class="absolute top-0 left-1/3 w-[500px] h-[500px] bg-copper/5 blur-[120px] rounded-full pointer-events-none"></div>
+      <div class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-blue-400/5 blur-[100px] rounded-full pointer-events-none"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center max-w-3xl mx-auto mb-16" x-intersect.once="$el.classList.add('reveal-up')">
+          <p class="section-label text-center mb-4">6 gabarits prêts à l'emploi</p>
+          <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">
+            Un format pour <span class="text-gradient-copper italic">chaque post</span>
+          </h2>
+          <p class="text-xl font-light text-slate-600">Chaque publication suit une structure éprouvée qui capte l'attention. Vous parlez, l'IA applique le bon gabarit.</p>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-4xl mx-auto">
+
+          <!-- 1. Avant / Après -->
+          <div class="group bg-white rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+            x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="p-3 sm:p-4">
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-100">
+                <div class="flex items-center gap-2 px-3 py-2 bg-white border-b border-slate-100">
+                  <div class="w-5 h-5 rounded-full bg-slate-200"></div>
+                  <div class="h-1.5 w-16 bg-slate-200 rounded-full"></div>
+                  <div class="ml-auto flex gap-0.5">
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                  </div>
+                </div>
+                <div class="h-28 flex relative">
+                  <div class="flex-1 bg-gradient-to-br from-orange-100 to-amber-100 flex flex-col items-center justify-center gap-1.5">
+                    <div class="w-9 h-9 rounded-lg bg-orange-200/70 flex items-center justify-center">
+                      <div class="w-5 h-5 rounded bg-orange-300/60"></div>
+                    </div>
+                    <span class="text-[7px] sm:text-[8px] font-bold text-orange-400 uppercase tracking-widest">Avant</span>
+                  </div>
+                  <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                    <div class="w-7 h-7 bg-white rounded-full shadow-md flex items-center justify-center border border-slate-100">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </div>
+                  </div>
+                  <div class="flex-1 bg-gradient-to-br from-emerald-100 to-teal-100 flex flex-col items-center justify-center gap-1.5">
+                    <div class="w-9 h-9 rounded-lg bg-emerald-200/70 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span class="text-[7px] sm:text-[8px] font-bold text-emerald-500 uppercase tracking-widest">Après</span>
+                  </div>
+                </div>
+                <div class="px-3 py-2 bg-white">
+                  <div class="flex gap-2 mb-1.5 mt-0.5">
+                    <div class="w-3.5 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-3.5 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-3.5 h-3 bg-slate-200 rounded ml-auto"></div>
+                  </div>
+                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1"></div>
+                  <div class="h-1.5 w-3/4 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Transformation</div>
+              <div class="text-sm font-display font-semibold text-midnight">Avant / Après</div>
+            </div>
+          </div>
+
+          <!-- 2. Avis client -->
+          <div class="group bg-white rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden reveal-d1"
+            x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="p-3 sm:p-4">
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-100">
+                <div class="flex items-center gap-2 px-3 py-2 bg-white border-b border-slate-100">
+                  <div class="w-5 h-5 rounded-full bg-slate-200"></div>
+                  <div class="h-1.5 w-16 bg-slate-200 rounded-full"></div>
+                  <div class="ml-auto flex gap-0.5">
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                  </div>
+                </div>
+                <div class="h-28 bg-gradient-to-br from-amber-50 to-yellow-50 p-3 flex flex-col justify-between">
+                  <div>
+                    <div class="flex gap-0.5 mb-2">
+                      <span class="text-amber-400 text-xs leading-none">★★★★★</span>
+                    </div>
+                    <div class="space-y-1.5">
+                      <div class="h-1.5 bg-amber-200/70 rounded w-full"></div>
+                      <div class="h-1.5 bg-amber-200/70 rounded w-5/6"></div>
+                      <div class="h-1.5 bg-amber-200/70 rounded w-3/5"></div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <div class="w-6 h-6 rounded-full bg-amber-300/70 flex-shrink-0"></div>
+                    <div class="space-y-1">
+                      <div class="h-1.5 w-14 bg-amber-200/70 rounded"></div>
+                      <div class="h-1 w-10 bg-amber-100 rounded"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="px-3 py-2 bg-white">
+                  <div class="flex gap-2 mb-1.5 mt-0.5">
+                    <div class="w-3.5 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-3.5 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-3.5 h-3 bg-slate-200 rounded ml-auto"></div>
+                  </div>
+                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1"></div>
+                  <div class="h-1.5 w-2/3 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Social proof</div>
+              <div class="text-sm font-display font-semibold text-midnight">Avis client</div>
+            </div>
+          </div>
+
+          <!-- 3. FAQ -->
+          <div class="group bg-white rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden reveal-d2"
+            x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="p-3 sm:p-4">
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-100">
+                <div class="flex items-center gap-2 px-3 py-2 bg-white border-b border-slate-100">
+                  <div class="w-5 h-5 rounded-full bg-slate-200"></div>
+                  <div class="h-1.5 w-16 bg-slate-200 rounded-full"></div>
+                  <div class="ml-auto flex gap-0.5">
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                  </div>
+                </div>
+                <div class="h-28 bg-gradient-to-br from-blue-50 to-indigo-50 p-3 flex flex-col justify-between">
+                  <div class="flex items-start gap-2">
+                    <div class="w-5 h-5 rounded-full bg-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span class="text-white text-[9px] font-bold leading-none">?</span>
+                    </div>
+                    <div class="space-y-1.5 flex-1 pt-0.5">
+                      <div class="h-1.5 bg-blue-200 rounded w-full"></div>
+                      <div class="h-1.5 bg-blue-200 rounded w-4/5"></div>
+                    </div>
+                  </div>
+                  <div class="pl-1 space-y-1.5 border-l-2 border-indigo-200 ml-1">
+                    <div class="h-1.5 bg-indigo-100 rounded w-full ml-2"></div>
+                    <div class="h-1.5 bg-indigo-100 rounded w-full ml-2"></div>
+                    <div class="h-1.5 bg-indigo-100 rounded w-3/5 ml-2"></div>
+                  </div>
+                </div>
+                <div class="px-3 py-2 bg-white">
+                  <div class="flex gap-2 mb-1.5 mt-0.5">
+                    <div class="w-3.5 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-3.5 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-3.5 h-3 bg-slate-200 rounded ml-auto"></div>
+                  </div>
+                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1"></div>
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Éducation</div>
+              <div class="text-sm font-display font-semibold text-midnight">FAQ</div>
+            </div>
+          </div>
+
+          <!-- 4. Lifestyle -->
+          <div class="group bg-white rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+            x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="p-3 sm:p-4">
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-100">
+                <div class="flex items-center gap-2 px-3 py-2 bg-white border-b border-slate-100">
+                  <div class="w-5 h-5 rounded-full bg-slate-200"></div>
+                  <div class="h-1.5 w-16 bg-slate-200 rounded-full"></div>
+                  <div class="ml-auto flex gap-0.5">
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                  </div>
+                </div>
+                <div class="h-28 relative bg-gradient-to-br from-rose-300 via-pink-400 to-purple-400 flex items-end overflow-hidden">
+                  <div class="absolute inset-0 opacity-30">
+                    <div class="absolute top-2 left-3 w-12 h-8 bg-white/20 rounded-lg"></div>
+                    <div class="absolute top-6 right-4 w-8 h-8 bg-white/20 rounded-full"></div>
+                    <div class="absolute bottom-8 left-5 w-10 h-6 bg-white/20 rounded"></div>
+                  </div>
+                  <div class="relative w-full bg-gradient-to-t from-black/50 to-transparent px-3 py-2">
+                    <div class="h-2 w-20 bg-white/80 rounded mb-1"></div>
+                    <div class="h-1.5 w-14 bg-white/50 rounded"></div>
+                  </div>
+                </div>
+                <div class="px-3 py-2 bg-white">
+                  <div class="flex gap-2 mb-1.5 mt-0.5">
+                    <div class="w-3.5 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-3.5 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-3.5 h-3 bg-slate-200 rounded ml-auto"></div>
+                  </div>
+                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1"></div>
+                  <div class="h-1.5 w-1/2 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Image de marque</div>
+              <div class="text-sm font-display font-semibold text-midnight">Lifestyle</div>
+            </div>
+          </div>
+
+          <!-- 5. Chantier en détail -->
+          <div class="group bg-white rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden reveal-d1"
+            x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="p-3 sm:p-4">
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-100">
+                <div class="flex items-center gap-2 px-3 py-2 bg-white border-b border-slate-100">
+                  <div class="w-5 h-5 rounded-full bg-slate-200"></div>
+                  <div class="h-1.5 w-16 bg-slate-200 rounded-full"></div>
+                  <div class="ml-auto flex gap-0.5">
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                  </div>
+                </div>
+                <div class="h-28 bg-slate-50 p-3 flex flex-col gap-2.5">
+                  <div class="h-10 bg-gradient-to-r from-slate-200 to-slate-300 rounded-lg flex-shrink-0 overflow-hidden relative">
+                    <div class="absolute inset-0 opacity-20" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(0,0,0,0.15) 4px, rgba(0,0,0,0.15) 5px);"></div>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <div class="flex flex-col items-center gap-1 flex-1">
+                      <div class="w-5 h-5 rounded-full bg-midnight text-white text-[8px] font-bold flex items-center justify-center">1</div>
+                      <div class="h-1 w-full bg-slate-300 rounded"></div>
+                    </div>
+                    <div class="w-3 h-px bg-slate-300 flex-shrink-0"></div>
+                    <div class="flex flex-col items-center gap-1 flex-1">
+                      <div class="w-5 h-5 rounded-full bg-midnight text-white text-[8px] font-bold flex items-center justify-center">2</div>
+                      <div class="h-1 w-full bg-slate-300 rounded"></div>
+                    </div>
+                    <div class="w-3 h-px bg-slate-300 flex-shrink-0"></div>
+                    <div class="flex flex-col items-center gap-1 flex-1">
+                      <div class="w-5 h-5 rounded-full bg-copper text-white text-[8px] font-bold flex items-center justify-center">3</div>
+                      <div class="h-1 w-full bg-copper/40 rounded"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="px-3 py-2 bg-white">
+                  <div class="flex gap-2 mb-1.5 mt-0.5">
+                    <div class="w-3.5 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-3.5 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-3.5 h-3 bg-slate-200 rounded ml-auto"></div>
+                  </div>
+                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1"></div>
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Expertise</div>
+              <div class="text-sm font-display font-semibold text-midnight">Chantier en détail</div>
+            </div>
+          </div>
+
+          <!-- 6. Erreur à éviter -->
+          <div class="group bg-white rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden reveal-d2"
+            x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="p-3 sm:p-4">
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-100">
+                <div class="flex items-center gap-2 px-3 py-2 bg-white border-b border-slate-100">
+                  <div class="w-5 h-5 rounded-full bg-slate-200"></div>
+                  <div class="h-1.5 w-16 bg-slate-200 rounded-full"></div>
+                  <div class="ml-auto flex gap-0.5">
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                  </div>
+                </div>
+                <div class="h-28 bg-gradient-to-br from-red-50 to-rose-50 p-3 flex flex-col justify-between">
+                  <div class="flex items-center gap-1.5">
+                    <div class="w-5 h-5 rounded-full bg-red-400 flex items-center justify-center flex-shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </div>
+                    <div class="h-2 bg-red-200 rounded flex-1"></div>
+                  </div>
+                  <div class="bg-red-100 rounded-lg px-2 py-1.5 flex items-center gap-1.5">
+                    <div class="w-3.5 h-3.5 rounded bg-red-200 flex-shrink-0 opacity-60"></div>
+                    <div class="flex-1 space-y-1">
+                      <div class="h-1 bg-red-200/80 rounded w-full" style="text-decoration:line-through"></div>
+                      <div class="h-1 bg-red-200/60 rounded w-3/4"></div>
+                    </div>
+                  </div>
+                  <div class="bg-emerald-50 border border-emerald-200 rounded-lg px-2 py-1.5 flex items-center gap-1.5">
+                    <div class="w-3.5 h-3.5 rounded-full bg-emerald-300 flex items-center justify-center flex-shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="flex-1 space-y-1">
+                      <div class="h-1 bg-emerald-200 rounded w-full"></div>
+                      <div class="h-1 bg-emerald-200 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="px-3 py-2 bg-white">
+                  <div class="flex gap-2 mb-1.5 mt-0.5">
+                    <div class="w-3.5 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-3.5 h-3 bg-slate-200 rounded"></div>
+                    <div class="w-3.5 h-3 bg-slate-200 rounded ml-auto"></div>
+                  </div>
+                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1"></div>
+                  <div class="h-1.5 w-3/5 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Pédagogie</div>
+              <div class="text-sm font-display font-semibold text-midnight">Erreur à éviter</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
     <!-- Bento Grid: How it works -->
     <section id="methode" class="py-32">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

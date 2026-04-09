@@ -271,9 +271,10 @@
                                 @php
                                     $slides = $post->slides ?? [];
                                     $thumb = count($slides) > 0 ? Storage::url($slides[0]) : ($post->image_path ? Storage::url($post->image_path) : null);
+                                    $ratioClass = ($post->template_options['aspect_ratio'] ?? '1:1') === '4:5' ? 'aspect-[4/5]' : 'aspect-square';
                                 @endphp
                                 <a href="{{ route('posts.index') }}" wire:navigate
-                                   class="group relative aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-100 hover:border-copper/30 transition-all duration-200">
+                                   class="group relative {{ $ratioClass }} rounded-xl overflow-hidden bg-gray-100 border border-gray-100 hover:border-copper/30 transition-all duration-200">
                                     @if($thumb)
                                         <img src="{{ $thumb }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                                     @else

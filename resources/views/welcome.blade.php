@@ -1780,44 +1780,6 @@
       </div>
     </section>
 
-    <!-- Professions Carousel -->
-    <section id="galerie" class="py-16 border-y border-slate-200/40 bg-white/40 backdrop-blur-sm overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p class="section-label text-center mb-12">Les métiers qui réussissent avec Postelio</p>
-        <div
-          class="flex overflow-x-auto pb-8 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-4 gap-6 max-w-6xl mx-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          @php
-            $jobs = [
-              ['icon' => 'paintbrush', 'name' => 'Peintres', 'img' => 'peintre.png'],
-              ['icon' => 'scissors', 'name' => 'Paysagistes', 'img' => 'jardinier.png'],
-              ['icon' => 'zap', 'name' => 'Électriciens', 'img' => 'electricien.png'],
-              ['icon' => 'hammer', 'name' => 'Menuisiers', 'img' => 'menuiserie.png']
-            ];
-          @endphp
-          @foreach($jobs as $job)
-            <div
-              class="relative rounded-3xl overflow-hidden group aspect-[4/5] min-w-[260px] sm:min-w-0 snap-center cursor-pointer border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-all duration-500">
-              <img src="{{ asset('images/demo/' . $job['img']) }}" alt="{{ $job['name'] }}"
-                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-
-              <div
-                class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent flex flex-col justify-end p-6 pointer-events-none">
-                <h3 class="text-xl font-bold text-white transition-transform duration-500 group-hover:translate-x-1">
-                  {{ $job['name'] }}</h3>
-              </div>
-            </div>
-          @endforeach
-        </div>
-
-        <div class="mt-12 text-center animate-fade-in" x-intersect="$el.classList.add('animate-fade-up')">
-          <p class="text-sm text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed px-4">
-            <span class="text-copper mr-1">●</span> Aussi disponible pour : Maçons, Plombiers, Couvreurs, Carreleurs,
-            Chauffagistes, Serruriers, Multi-services, et bien d'autres corps de métier.
-          </p>
-        </div>
-      </div>
-    </section>
-
     <!-- Templates Showcase -->
     <section id="gabarits" class="py-28 bg-slate-50 relative overflow-hidden">
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-copper/5 blur-[140px] rounded-full pointer-events-none"></div>
@@ -1828,7 +1790,7 @@
           <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">
             Un format pour <span class="text-gradient-copper italic">chaque post</span>
           </h2>
-          <p class="text-xl font-light text-slate-600">Chaque publication suit une structure éprouvée qui capte l'attention. Parlez de votre chantier, le bon format s'applique tout seul.</p>
+          <p class="text-xl font-light text-slate-600">Chaque publication suit une structure éprouvée qui capte l'attention.</p>
         </div>
 
         <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-4xl mx-auto">
@@ -2087,6 +2049,44 @@
               </div>
             @endforeach
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Professions Carousel -->
+    <section id="galerie" class="py-16 border-y border-slate-200/40 bg-white/40 backdrop-blur-sm overflow-hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <p class="section-label text-center mb-12">Les métiers qui réussissent avec Postelio</p>
+        <div
+          class="flex overflow-x-auto pb-8 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-4 gap-6 max-w-6xl mx-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          @php
+            $jobs = [
+              ['icon' => 'paintbrush', 'name' => 'Peintres', 'img' => 'peintre.png'],
+              ['icon' => 'scissors', 'name' => 'Paysagistes', 'img' => 'jardinier.png'],
+              ['icon' => 'zap', 'name' => 'Électriciens', 'img' => 'electricien.png'],
+              ['icon' => 'hammer', 'name' => 'Menuisiers', 'img' => 'menuiserie.png']
+            ];
+          @endphp
+          @foreach($jobs as $job)
+            <div
+              class="relative rounded-3xl overflow-hidden group aspect-[4/5] min-w-[260px] sm:min-w-0 snap-center cursor-pointer border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-all duration-500">
+              <img src="{{ asset('images/demo/' . $job['img']) }}" alt="{{ $job['name'] }}"
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent flex flex-col justify-end p-6 pointer-events-none">
+                <h3 class="text-xl font-bold text-white transition-transform duration-500 group-hover:translate-x-1">
+                  {{ $job['name'] }}</h3>
+              </div>
+            </div>
+          @endforeach
+        </div>
+
+        <div class="mt-12 text-center animate-fade-in" x-intersect="$el.classList.add('animate-fade-up')">
+          <p class="text-sm text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed px-4">
+            <span class="text-copper mr-1">●</span> Aussi disponible pour : Maçons, Plombiers, Couvreurs, Carreleurs,
+            Chauffagistes, Serruriers, Multi-services, et bien d'autres corps de métier.
+          </p>
         </div>
       </div>
     </section>

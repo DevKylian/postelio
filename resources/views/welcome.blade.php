@@ -1781,13 +1781,10 @@
     </section>
 
     <!-- Templates Showcase -->
-    <section id="gabarits" class="py-28 bg-slate-50 relative overflow-hidden">
-      <!-- Fades top/bottom pour transition fluide avec les sections blanches adjacentes -->
-      <div class="absolute top-0 inset-x-0 h-20 bg-gradient-to-b from-white to-transparent pointer-events-none z-10"></div>
-      <div class="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
+    <section id="gabarits" class="py-28 bg-white relative overflow-hidden">
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-copper/5 blur-[140px] rounded-full pointer-events-none"></div>
 
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center max-w-3xl mx-auto mb-16" x-intersect.once="$el.classList.add('reveal-up')">
           <p class="section-label text-center mb-4">6 gabarits prêts à l'emploi</p>
           <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">

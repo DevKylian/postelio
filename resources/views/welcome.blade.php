@@ -1842,43 +1842,25 @@
             x-intersect.once="$el.classList.add('reveal-up')">
             <div class="p-3 sm:p-4">
               <div class="rounded-xl overflow-hidden mb-3 border border-slate-100 bg-white">
-                <!-- Post header -->
                 <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
-                  <div class="w-5 h-5 rounded-full bg-slate-200 flex-shrink-0"></div>
-                  <div class="h-1.5 w-14 bg-slate-200 rounded-full"></div>
-                  <div class="ml-auto flex gap-0.5">
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                  </div>
+                  <div class="w-4 h-4 rounded-full bg-slate-200 flex-shrink-0"></div>
+                  <div class="h-1.5 w-12 bg-slate-200 rounded-full"></div>
                 </div>
-                <!-- content area -->
-                <div class="h-36 relative flex">
-                  <div class="flex-1 bg-slate-100 flex flex-col items-center justify-center gap-2 border-r border-slate-200">
-                    <div class="w-10 h-8 rounded-lg bg-slate-200"></div>
-                    <span class="text-[7px] sm:text-[8px] font-bold text-slate-400 uppercase tracking-widest">Avant</span>
+                <div class="h-32 relative flex">
+                  <div class="flex-1 bg-slate-100 border-r border-slate-200">
+                    <div class="absolute bottom-2 left-2 text-[7px] font-semibold text-slate-400 uppercase tracking-wider">Avant</div>
                   </div>
-                  <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                    <div class="w-7 h-7 bg-white rounded-full shadow-sm flex items-center justify-center border border-slate-200">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div class="w-6 h-6 bg-white rounded-full border border-slate-200 flex items-center justify-center shadow-sm">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </div>
                   </div>
-                  <div class="flex-1 bg-white flex flex-col items-center justify-center gap-2">
-                    <div class="w-10 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    </div>
-                    <span class="text-[7px] sm:text-[8px] font-bold text-slate-500 uppercase tracking-widest">Après</span>
+                  <div class="flex-1 bg-white">
+                    <div class="absolute bottom-2 right-2 text-[7px] font-semibold text-slate-400 uppercase tracking-wider">Après</div>
                   </div>
                 </div>
-                <!-- Post footer -->
                 <div class="px-3 py-2 border-t border-slate-100">
-                  <div class="flex gap-2 mb-2 mt-0.5">
-                    <div class="w-4 h-3.5 bg-slate-100 rounded"></div>
-                    <div class="w-4 h-3.5 bg-slate-100 rounded"></div>
-                    <div class="w-4 h-3.5 bg-slate-100 rounded ml-auto"></div>
-                  </div>
-                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1.5"></div>
-                  <div class="h-1.5 w-3/4 bg-slate-100 rounded"></div>
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
                 </div>
               </div>
               <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Transformation</div>
@@ -1892,45 +1874,25 @@
             <div class="p-3 sm:p-4">
               <div class="rounded-xl overflow-hidden mb-3 border border-slate-100 bg-white">
                 <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
-                  <div class="w-5 h-5 rounded-full bg-slate-200 flex-shrink-0"></div>
-                  <div class="h-1.5 w-14 bg-slate-200 rounded-full"></div>
-                  <div class="ml-auto flex gap-0.5">
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                  </div>
+                  <div class="w-4 h-4 rounded-full bg-slate-200 flex-shrink-0"></div>
+                  <div class="h-1.5 w-12 bg-slate-200 rounded-full"></div>
                 </div>
-                <div class="h-36 bg-white p-3 flex flex-col justify-between">
-                  <div>
-                    <div class="flex gap-0.5 mb-2">
-                      <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                      <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                      <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                      <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                      <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    </div>
-                    <div class="space-y-1.5">
-                      <div class="h-1.5 bg-slate-200 rounded w-full"></div>
-                      <div class="h-1.5 bg-slate-200 rounded w-5/6"></div>
-                      <div class="h-1.5 bg-slate-200 rounded w-3/5"></div>
-                    </div>
+                <div class="h-32 bg-white px-3 py-3 flex flex-col justify-center gap-2.5">
+                  <div class="flex gap-0.5">
+                    <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                   </div>
-                  <div class="flex items-center gap-2">
-                    <div class="w-6 h-6 rounded-full bg-slate-200 flex-shrink-0"></div>
-                    <div class="space-y-1">
-                      <div class="h-1.5 w-14 bg-slate-300 rounded"></div>
-                      <div class="h-1 w-10 bg-slate-200 rounded"></div>
-                    </div>
+                  <div class="space-y-1.5">
+                    <div class="h-1.5 bg-slate-200 rounded w-full"></div>
+                    <div class="h-1.5 bg-slate-200 rounded w-4/5"></div>
+                    <div class="h-1.5 bg-slate-200 rounded w-3/5"></div>
                   </div>
                 </div>
                 <div class="px-3 py-2 border-t border-slate-100">
-                  <div class="flex gap-2 mb-2 mt-0.5">
-                    <div class="w-4 h-3.5 bg-slate-100 rounded"></div>
-                    <div class="w-4 h-3.5 bg-slate-100 rounded"></div>
-                    <div class="w-4 h-3.5 bg-slate-100 rounded ml-auto"></div>
-                  </div>
-                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1.5"></div>
-                  <div class="h-1.5 w-2/3 bg-slate-100 rounded"></div>
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
                 </div>
               </div>
               <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Social proof</div>
@@ -1944,37 +1906,22 @@
             <div class="p-3 sm:p-4">
               <div class="rounded-xl overflow-hidden mb-3 border border-slate-100 bg-white">
                 <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
-                  <div class="w-5 h-5 rounded-full bg-slate-200 flex-shrink-0"></div>
-                  <div class="h-1.5 w-14 bg-slate-200 rounded-full"></div>
-                  <div class="ml-auto flex gap-0.5">
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                  </div>
+                  <div class="w-4 h-4 rounded-full bg-slate-200 flex-shrink-0"></div>
+                  <div class="h-1.5 w-12 bg-slate-200 rounded-full"></div>
                 </div>
-                <div class="h-36 bg-white p-3 flex flex-col gap-3 justify-center">
-                  <div class="flex items-start gap-2">
-                    <div class="w-6 h-6 rounded-full bg-midnight flex items-center justify-center flex-shrink-0">
-                      <span class="text-white text-[10px] font-bold leading-none">?</span>
+                <div class="h-32 bg-white px-3 py-3 flex flex-col justify-center gap-3">
+                  <div class="flex items-center gap-2">
+                    <div class="w-5 h-5 rounded-full bg-midnight flex items-center justify-center flex-shrink-0">
+                      <span class="text-white text-[9px] font-bold leading-none">?</span>
                     </div>
-                    <div class="space-y-1.5 flex-1">
-                      <div class="h-1.5 bg-slate-300 rounded w-full"></div>
-                      <div class="h-1.5 bg-slate-300 rounded w-4/5"></div>
-                    </div>
+                    <div class="h-1.5 bg-slate-300 rounded flex-1"></div>
                   </div>
-                  <div class="pl-3 border-l-2 border-slate-200 space-y-1.5">
+                  <div class="space-y-1.5 pl-1">
                     <div class="h-1.5 bg-slate-200 rounded w-full"></div>
-                    <div class="h-1.5 bg-slate-200 rounded w-5/6"></div>
-                    <div class="h-1.5 bg-slate-200 rounded w-3/5"></div>
+                    <div class="h-1.5 bg-slate-200 rounded w-4/5"></div>
                   </div>
                 </div>
                 <div class="px-3 py-2 border-t border-slate-100">
-                  <div class="flex gap-2 mb-2 mt-0.5">
-                    <div class="w-4 h-3.5 bg-slate-100 rounded"></div>
-                    <div class="w-4 h-3.5 bg-slate-100 rounded"></div>
-                    <div class="w-4 h-3.5 bg-slate-100 rounded ml-auto"></div>
-                  </div>
-                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1.5"></div>
                   <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
                 </div>
               </div>
@@ -1989,29 +1936,16 @@
             <div class="p-3 sm:p-4">
               <div class="rounded-xl overflow-hidden mb-3 border border-slate-100 bg-white">
                 <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
-                  <div class="w-5 h-5 rounded-full bg-slate-200 flex-shrink-0"></div>
-                  <div class="h-1.5 w-14 bg-slate-200 rounded-full"></div>
-                  <div class="ml-auto flex gap-0.5">
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                  </div>
+                  <div class="w-4 h-4 rounded-full bg-slate-200 flex-shrink-0"></div>
+                  <div class="h-1.5 w-12 bg-slate-200 rounded-full"></div>
                 </div>
-                <!-- Lifestyle: full gray image area + plain text bar at bottom -->
-                <div class="h-36 relative bg-slate-200 flex items-end">
-                  <div class="w-full bg-midnight px-3 py-2.5 flex flex-col gap-1.5">
-                    <div class="h-2 w-20 bg-white/70 rounded"></div>
-                    <div class="h-1.5 w-14 bg-white/40 rounded"></div>
+                <div class="h-32 bg-slate-200 flex items-end">
+                  <div class="w-full bg-midnight px-3 py-2">
+                    <div class="h-1.5 w-20 bg-white/60 rounded"></div>
                   </div>
                 </div>
                 <div class="px-3 py-2 border-t border-slate-100">
-                  <div class="flex gap-2 mb-2 mt-0.5">
-                    <div class="w-4 h-3.5 bg-slate-100 rounded"></div>
-                    <div class="w-4 h-3.5 bg-slate-100 rounded"></div>
-                    <div class="w-4 h-3.5 bg-slate-100 rounded ml-auto"></div>
-                  </div>
-                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1.5"></div>
-                  <div class="h-1.5 w-1/2 bg-slate-100 rounded"></div>
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
                 </div>
               </div>
               <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Image de marque</div>
@@ -2025,49 +1959,20 @@
             <div class="p-3 sm:p-4">
               <div class="rounded-xl overflow-hidden mb-3 border border-slate-100 bg-white">
                 <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
-                  <div class="w-5 h-5 rounded-full bg-slate-200 flex-shrink-0"></div>
-                  <div class="h-1.5 w-14 bg-slate-200 rounded-full"></div>
-                  <div class="ml-auto flex gap-0.5">
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                  </div>
+                  <div class="w-4 h-4 rounded-full bg-slate-200 flex-shrink-0"></div>
+                  <div class="h-1.5 w-12 bg-slate-200 rounded-full"></div>
                 </div>
-                <div class="h-36 flex flex-col">
-                  <!-- Top: plain gray photo -->
-                  <div class="h-2/5 flex-shrink-0 bg-slate-200"></div>
-                  <!-- Bottom: numbered steps -->
-                  <div class="flex-1 bg-white px-3 py-2 flex flex-col justify-center gap-2">
-                    <div class="flex items-center gap-2">
-                      <div class="w-6 h-6 rounded-full bg-midnight text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">1</div>
-                      <div class="flex-1 space-y-1">
-                        <div class="h-1.5 bg-slate-200 rounded w-full"></div>
-                        <div class="h-1 bg-slate-100 rounded w-3/4"></div>
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <div class="w-6 h-6 rounded-full bg-midnight text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">2</div>
-                      <div class="flex-1 space-y-1">
-                        <div class="h-1.5 bg-slate-200 rounded w-full"></div>
-                        <div class="h-1 bg-slate-100 rounded w-2/3"></div>
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <div class="w-6 h-6 rounded-full bg-copper text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">3</div>
-                      <div class="flex-1 space-y-1">
-                        <div class="h-1.5 bg-slate-200 rounded w-full"></div>
-                        <div class="h-1 bg-slate-100 rounded w-4/5"></div>
-                      </div>
-                    </div>
+                <div class="h-32 flex flex-col">
+                  <div class="flex-1 bg-slate-200"></div>
+                  <div class="flex items-center justify-around px-3 py-3 bg-white border-t border-slate-100">
+                    <div class="w-6 h-6 rounded-full bg-midnight text-white text-[9px] font-bold flex items-center justify-center">1</div>
+                    <div class="flex-1 h-px bg-slate-200 mx-2"></div>
+                    <div class="w-6 h-6 rounded-full bg-midnight text-white text-[9px] font-bold flex items-center justify-center">2</div>
+                    <div class="flex-1 h-px bg-slate-200 mx-2"></div>
+                    <div class="w-6 h-6 rounded-full bg-copper text-white text-[9px] font-bold flex items-center justify-center">3</div>
                   </div>
                 </div>
                 <div class="px-3 py-2 border-t border-slate-100">
-                  <div class="flex gap-2 mb-2 mt-0.5">
-                    <div class="w-4 h-3.5 bg-slate-100 rounded"></div>
-                    <div class="w-4 h-3.5 bg-slate-100 rounded"></div>
-                    <div class="w-4 h-3.5 bg-slate-100 rounded ml-auto"></div>
-                  </div>
-                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1.5"></div>
                   <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
                 </div>
               </div>
@@ -2082,50 +1987,39 @@
             <div class="p-3 sm:p-4">
               <div class="rounded-xl overflow-hidden mb-3 border border-slate-100 bg-white">
                 <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
-                  <div class="w-5 h-5 rounded-full bg-slate-200 flex-shrink-0"></div>
-                  <div class="h-1.5 w-14 bg-slate-200 rounded-full"></div>
-                  <div class="ml-auto flex gap-0.5">
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                    <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                  </div>
+                  <div class="w-4 h-4 rounded-full bg-slate-200 flex-shrink-0"></div>
+                  <div class="h-1.5 w-12 bg-slate-200 rounded-full"></div>
                 </div>
-                <div class="h-36 bg-white px-3 py-3 flex flex-col justify-center gap-3">
-                  <!-- Error block -->
-                  <div class="border border-slate-200 rounded-xl p-3 flex items-start gap-2 opacity-60">
-                    <div class="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                    </div>
-                    <div class="flex-1 space-y-1.5">
-                      <div class="h-1.5 bg-slate-200 rounded w-full"></div>
-                      <div class="h-1.5 bg-slate-200 rounded w-4/5"></div>
-                      <div class="h-1.5 bg-slate-200 rounded w-3/5"></div>
+                <div class="h-32 bg-white px-3 py-3 flex flex-col justify-center gap-2">
+                  <div class="bg-slate-100 rounded-lg px-2.5 py-2 flex items-center gap-2 opacity-50">
+                    <div class="w-4 h-4 rounded bg-slate-300 flex-shrink-0"></div>
+                    <div class="space-y-1 flex-1">
+                      <div class="h-1.5 bg-slate-300 rounded w-full"></div>
+                      <div class="h-1 bg-slate-300 rounded w-3/4"></div>
                     </div>
                   </div>
-                  <!-- Correct block -->
-                  <div class="bg-midnight rounded-xl p-3 flex items-start gap-2">
-                    <div class="w-5 h-5 rounded-full bg-copper flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    </div>
-                    <div class="flex-1 space-y-1.5">
+                  <div class="bg-midnight rounded-lg px-2.5 py-2 flex items-center gap-2">
+                    <div class="w-4 h-4 rounded-full bg-copper flex-shrink-0"></div>
+                    <div class="space-y-1 flex-1">
                       <div class="h-1.5 bg-white/30 rounded w-full"></div>
-                      <div class="h-1.5 bg-white/30 rounded w-4/5"></div>
-                      <div class="h-1.5 bg-white/20 rounded w-2/3"></div>
+                      <div class="h-1 bg-white/20 rounded w-3/4"></div>
                     </div>
                   </div>
                 </div>
                 <div class="px-3 py-2 border-t border-slate-100">
-                  <div class="flex gap-2 mb-2 mt-0.5">
-                    <div class="w-4 h-3.5 bg-slate-100 rounded"></div>
-                    <div class="w-4 h-3.5 bg-slate-100 rounded"></div>
-                    <div class="w-4 h-3.5 bg-slate-100 rounded ml-auto"></div>
-                  </div>
-                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1.5"></div>
-                  <div class="h-1.5 w-3/5 bg-slate-100 rounded"></div>
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
                 </div>
               </div>
               <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Pédagogie</div>
               <div class="text-sm font-display font-semibold text-midnight">Erreur à éviter</div>
+            </div>
+          </div>
+                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1.5"></div>
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Expertise</div>
+              <div class="text-sm font-display font-semibold text-midnight">Chantier en détail</div>
             </div>
           </div>
 

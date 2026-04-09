@@ -250,8 +250,12 @@
         return {
           p1: '', p2: '', done: false,
           init() {
-            const s1 = 'Votre post Instagram prêt en 10 secondes,\u00a0';
+            const s1 = 'Votre post Instagram pr\u00eat en 10 secondes,\u00a0';
             const s2 = '\u00e0 partir d\u2019une simple note vocale.';
+            const totalChars = s1.length + s2.length;
+            const startDelay = 150;   // ms — laisse l'animation de blur démarrer
+            const totalTyping = 1250; // ms — finit quasi en même temps que le blur (1.5s)
+            const speed = Math.round(totalTyping / totalChars);
             let i = 0, j = 0;
             setTimeout(() => {
               const t1 = setInterval(() => {
@@ -260,11 +264,11 @@
                   clearInterval(t1);
                   const t2 = setInterval(() => {
                     if (j < s2.length) { this.p2 += s2[j++]; }
-                    else { clearInterval(t2); setTimeout(() => this.done = true, 900); }
-                  }, 30);
+                    else { clearInterval(t2); setTimeout(() => this.done = true, 600); }
+                  }, speed);
                 }
-              }, 30);
-            }, 250);
+              }, speed);
+            }, startDelay);
           }
         }
       }
@@ -288,7 +292,8 @@
             </div>
           </div>
           <h1
-            class="text-4xl sm:text-5xl lg:text-6xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.1] animate-blur-in delay-100"
+            class="text-4xl sm:text-5xl lg:text-6xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.1] animate-blur-in"
+            style="animation-duration:1.5s"
             x-data="heroTypewriter()">
             <span x-text="p1"></span><span class="text-gradient-copper italic" x-text="p2"></span><span class="tw-cursor" x-show="!done">|</span>
           </h1>

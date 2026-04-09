@@ -263,9 +263,29 @@
             </div>
           </div>
           <h1
-            class="text-4xl sm:text-5xl lg:text-6xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.1] animate-blur-in delay-100 text-balance">
-            Votre post Instagram prêt en 10 secondes, <br class="hidden sm:block" />
-            <span class="text-gradient-copper italic">à partir d’une simple note vocale.</span>
+            class="text-4xl sm:text-5xl lg:text-6xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.1] animate-blur-in delay-100"
+            x-data="{
+              p1:’’,p2:’’,done:false,
+              start(){
+                const s1=’Votre post Instagram prêt en 10 secondes,\u00A0’;
+                const s2=’à partir d\’une simple note vocale.’;
+                let i=0,j=0;
+                setTimeout(()=>{
+                  const t1=setInterval(()=>{
+                    if(i<s1.length){ this.p1+=s1[i++] }
+                    else{
+                      clearInterval(t1);
+                      const t2=setInterval(()=>{
+                        if(j<s2.length){ this.p2+=s2[j++] }
+                        else{ clearInterval(t2); setTimeout(()=>this.done=true,900) }
+                      },30)
+                    }
+                  },30)
+                },250)
+              }
+            }"
+            x-init="start()">
+            <span x-text="p1"></span><br class="hidden sm:block" x-show="p1.length > 0"><span class="text-gradient-copper italic" x-text="p2"></span><span class="tw-cursor" x-show="!done">|</span>
           </h1>
           <p
             class="text-lg sm:text-xl lg:text-2xl font-light text-slate-600 mb-10 max-w-4xl mx-auto leading-relaxed animate-blur-in delay-200 text-balance">

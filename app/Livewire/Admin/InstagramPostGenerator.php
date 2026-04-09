@@ -756,9 +756,9 @@ class InstagramPostGenerator extends Component
 
     private function fillHero(array $data): void
     {
-        $this->hero_tag      = $data['tag'] ?? 'OFFICIEL';
-        $this->hero_headline = $data['headline'] ?? '';
-        $this->hero_body     = $data['body'] ?? '';
+        $this->hero_tag      = $data['tag']      ?? 'OFFICIEL';
+        $this->hero_headline = $data['title']    ?? $data['headline'] ?? '';
+        $this->hero_body     = $data['body']     ?? '';
     }
 
     private function fillArticleBlog(array $d): void
@@ -949,8 +949,9 @@ class InstagramPostGenerator extends Component
                 PROMPT,
             'hero' => <<<PROMPT
                 Post "Branding / Lancement". IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
-                Design minimaliste, centré, avec LOGO au top (Pas de tag texte). 
-                JSON : { "title": "Headline (5-8 mots)", "body": "Message brandé (12-18 mots)", "instagram_caption": "..." }
+                Design minimaliste, centré, avec LOGO au top.
+                JSON : { "tag": "Badge court (2-3 mots)", "title": "Headline impactante (5-8 mots)", "body": "Message brandé (12-18 mots)", "instagram_caption": "..." }
+                RÈGLE : Le "tag" doit être un badge court et cohérent avec le titre (ex: "NOUVEAU", "EXCELLENCE", "VOTRE ALLIÉ").
                 PROMPT,
             'avantapres' => <<<PROMPT
                 Post "Avant/Après". IMAGE UNIQUE (Interdit : Pas de carrousel).

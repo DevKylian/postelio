@@ -259,10 +259,7 @@
                 <rect x="2" width="1" height="2" fill="#E62117" />
               </svg>
               <div class="w-px h-3.5 bg-slate-200 mx-1 shrink-0"></div>
-              <span class="text-xs sm:text-[13px] font-medium text-slate-600">
-                Application <span class="font-bold text-midnight">100% Française</span> <span
-                  class="mx-1.5 text-copper/50">•</span> Conçue en <span class="font-bold text-midnight">Bretagne</span>
-              </span>
+              <span class="text-xs sm:text-[13px] font-medium text-slate-600 whitespace-nowrap">Application <span class="font-bold text-midnight">100% Française</span> <span class="mx-1 text-copper/50">•</span> Conçue en <span class="font-bold text-midnight">Bretagne</span></span>
             </div>
           </div>
           <h1

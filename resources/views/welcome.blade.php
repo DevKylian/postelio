@@ -1852,9 +1852,9 @@
                     <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
                   </div>
                 </div>
-                <!-- 4:5 content area -->
-                <div class="aspect-[4/5] relative flex">
-                  <div class="flex-1 bg-slate-100 flex flex-col items-center justify-center gap-2 border-r border-slate-200/60">
+                <!-- content area -->
+                <div class="h-36 relative flex">
+                  <div class="flex-1 bg-slate-100 flex flex-col items-center justify-center gap-2 border-r border-slate-200">
                     <div class="w-10 h-8 rounded-lg bg-slate-200"></div>
                     <span class="text-[7px] sm:text-[8px] font-bold text-slate-400 uppercase tracking-widest">Avant</span>
                   </div>
@@ -1900,26 +1900,25 @@
                     <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
                   </div>
                 </div>
-                <div class="aspect-[4/5] bg-white p-4 flex flex-col justify-between">
+                <div class="h-36 bg-white p-3 flex flex-col justify-between">
                   <div>
-                    <div class="flex gap-0.5 mb-3">
-                      <svg class="w-3 h-3 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                      <svg class="w-3 h-3 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                      <svg class="w-3 h-3 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                      <svg class="w-3 h-3 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                      <svg class="w-3 h-3 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <div class="flex gap-0.5 mb-2">
+                      <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                      <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                      <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                      <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                      <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                     </div>
-                    <div class="space-y-2">
+                    <div class="space-y-1.5">
                       <div class="h-1.5 bg-slate-200 rounded w-full"></div>
                       <div class="h-1.5 bg-slate-200 rounded w-5/6"></div>
-                      <div class="h-1.5 bg-slate-200 rounded w-4/5"></div>
                       <div class="h-1.5 bg-slate-200 rounded w-3/5"></div>
                     </div>
                   </div>
                   <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-full bg-slate-200 flex-shrink-0"></div>
-                    <div class="space-y-1.5">
-                      <div class="h-1.5 w-16 bg-slate-300 rounded"></div>
+                    <div class="w-6 h-6 rounded-full bg-slate-200 flex-shrink-0"></div>
+                    <div class="space-y-1">
+                      <div class="h-1.5 w-14 bg-slate-300 rounded"></div>
                       <div class="h-1 w-10 bg-slate-200 rounded"></div>
                     </div>
                   </div>
@@ -1953,7 +1952,7 @@
                     <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
                   </div>
                 </div>
-                <div class="aspect-[4/5] bg-white p-4 flex flex-col gap-4 justify-center">
+                <div class="h-36 bg-white p-3 flex flex-col gap-3 justify-center">
                   <div class="flex items-start gap-2">
                     <div class="w-6 h-6 rounded-full bg-midnight flex items-center justify-center flex-shrink-0">
                       <span class="text-white text-[10px] font-bold leading-none">?</span>
@@ -1964,7 +1963,6 @@
                     </div>
                   </div>
                   <div class="pl-3 border-l-2 border-slate-200 space-y-1.5">
-                    <div class="h-1.5 bg-slate-200 rounded w-full"></div>
                     <div class="h-1.5 bg-slate-200 rounded w-full"></div>
                     <div class="h-1.5 bg-slate-200 rounded w-5/6"></div>
                     <div class="h-1.5 bg-slate-200 rounded w-3/5"></div>
@@ -1999,11 +1997,11 @@
                     <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
                   </div>
                 </div>
-                <!-- Full image area 4:5 with hatch pattern + dark overlay -->
-                <div class="aspect-[4/5] relative overflow-hidden" style="background-color:#e2e8f0;background-image:repeating-linear-gradient(135deg,#cbd5e1 0px,#cbd5e1 1px,transparent 1px,transparent 12px)">
-                  <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-midnight via-midnight/60 to-transparent px-4 py-5">
-                    <div class="h-2 w-24 bg-white/80 rounded mb-2"></div>
-                    <div class="h-1.5 w-16 bg-white/50 rounded"></div>
+                <!-- Lifestyle: full gray image area + plain text bar at bottom -->
+                <div class="h-36 relative bg-slate-200 flex items-end">
+                  <div class="w-full bg-midnight px-3 py-2.5 flex flex-col gap-1.5">
+                    <div class="h-2 w-20 bg-white/70 rounded"></div>
+                    <div class="h-1.5 w-14 bg-white/40 rounded"></div>
                   </div>
                 </div>
                 <div class="px-3 py-2 border-t border-slate-100">
@@ -2035,11 +2033,11 @@
                     <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
                   </div>
                 </div>
-                <div class="aspect-[4/5] flex flex-col">
-                  <!-- Top: hatch photo -->
-                  <div class="h-2/5 flex-shrink-0" style="background-color:#e2e8f0;background-image:repeating-linear-gradient(135deg,#cbd5e1 0px,#cbd5e1 1px,transparent 1px,transparent 12px)"></div>
+                <div class="h-36 flex flex-col">
+                  <!-- Top: plain gray photo -->
+                  <div class="h-2/5 flex-shrink-0 bg-slate-200"></div>
                   <!-- Bottom: numbered steps -->
-                  <div class="flex-1 bg-white px-3 py-3 flex flex-col justify-center gap-3">
+                  <div class="flex-1 bg-white px-3 py-2 flex flex-col justify-center gap-2">
                     <div class="flex items-center gap-2">
                       <div class="w-6 h-6 rounded-full bg-midnight text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">1</div>
                       <div class="flex-1 space-y-1">
@@ -2092,7 +2090,7 @@
                     <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
                   </div>
                 </div>
-                <div class="aspect-[4/5] bg-white px-3 py-4 flex flex-col justify-center gap-3">
+                <div class="h-36 bg-white px-3 py-3 flex flex-col justify-center gap-3">
                   <!-- Error block -->
                   <div class="border border-slate-200 rounded-xl p-3 flex items-start gap-2 opacity-60">
                     <div class="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5">

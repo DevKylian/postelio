@@ -1781,7 +1781,7 @@
     </section>
 
     <!-- Templates Showcase -->
-    <section id="gabarits" class="py-28 bg-white relative overflow-hidden">
+    <section id="gabarits" class="py-28 bg-slate-50 relative overflow-hidden">
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-copper/5 blur-[140px] rounded-full pointer-events-none"></div>
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

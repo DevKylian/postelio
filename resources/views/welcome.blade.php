@@ -250,7 +250,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-5xl mx-auto">
           <div
-            class="inline-flex items-center gap-2.5 sm:gap-3 px-4 py-2 rounded-full bg-white/80 border border-slate-200/60 shadow-sm backdrop-blur-md mb-8 animate-blur-in group hover:bg-white transition-all duration-300">
+            class="inline-flex items-center gap-1.5 sm:gap-3 px-3 sm:px-4 py-2 rounded-full bg-white/80 border border-slate-200/60 shadow-sm backdrop-blur-md mb-8 animate-blur-in group hover:bg-white transition-all duration-300">
             <div class="flex items-center gap-2 sm:gap-2.5">
               <svg class="w-4.5 h-3 sm:w-5 sm:h-3.5 rounded-[1px] sm:rounded-[2px] shadow-sm overflow-hidden shrink-0"
                 viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg">
@@ -259,7 +259,7 @@
                 <rect x="2" width="1" height="2" fill="#E62117" />
               </svg>
               <div class="w-px h-3.5 bg-slate-200 mx-1 shrink-0"></div>
-              <span class="text-xs sm:text-[13px] font-medium text-slate-600 whitespace-nowrap">Application <span class="font-bold text-midnight">100% Française</span> <span class="mx-1 text-copper/50">•</span> Conçue en <span class="font-bold text-midnight">Bretagne</span></span>
+              <span class="text-[9px] sm:text-[13px] font-medium text-slate-600 whitespace-nowrap">Application <span class="font-bold text-midnight">100% Française</span> <span class="mx-0.5 sm:mx-1 text-copper/50">•</span> Conçue en <span class="font-bold text-midnight">Bretagne</span></span>
             </div>
           </div>
           <h1

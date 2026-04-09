@@ -1828,7 +1828,7 @@
           <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">
             Un format pour <span class="text-gradient-copper italic">chaque post</span>
           </h2>
-          <p class="text-xl font-light text-slate-600">Chaque publication suit une structure éprouvée qui capte l'attention. Vous parlez, l'IA applique le bon gabarit.</p>
+          <p class="text-xl font-light text-slate-600">Chaque publication suit une structure éprouvée qui capte l'attention. Parlez de votre chantier, le bon format s'applique tout seul.</p>
         </div>
 
         <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-4xl mx-auto">
@@ -2014,16 +2014,17 @@
               <div class="text-sm font-display font-semibold text-midnight">Erreur à éviter</div>
             </div>
           </div>
-                  <div class="h-1.5 w-full bg-slate-100 rounded mb-1.5"></div>
-                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
-                </div>
-              </div>
-              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Expertise</div>
-              <div class="text-sm font-display font-semibold text-midnight">Chantier en détail</div>
-            </div>
-          </div>
 
         </div>
+
+        <!-- Coming soon -->
+        <div class="mt-10 text-center" x-intersect.once="$el.classList.add('reveal-up')">
+          <p class="text-sm text-slate-400 font-medium">
+            <span class="inline-block w-1 h-1 rounded-full bg-copper/60 mb-0.5 mr-1"></span>
+            D'autres gabarits arrivent prochainement
+          </p>
+        </div>
+
       </div>
     </section>
 

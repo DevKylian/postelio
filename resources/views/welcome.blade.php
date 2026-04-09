@@ -245,12 +245,13 @@
   </nav>
 
   <main class="relative z-10">
+
     <!-- Hero Section -->
     <section class="relative pt-40 pb-20 lg:pt-52 lg:pb-32">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-5xl mx-auto">
           <div
-            class="inline-flex items-center gap-2.5 sm:gap-3 px-4 py-2 rounded-full bg-white/80 border border-slate-200/60 shadow-sm backdrop-blur-md mb-8 animate-blur-in group hover:bg-white transition-all duration-300">
+            class="inline-flex items-center gap-1.5 sm:gap-3 px-3 sm:px-4 py-2 rounded-full bg-white/80 border border-slate-200/60 shadow-sm backdrop-blur-md mb-8 animate-blur-in group hover:bg-white transition-all duration-300">
             <div class="flex items-center gap-2 sm:gap-2.5">
               <svg class="w-4.5 h-3 sm:w-5 sm:h-3.5 rounded-[1px] sm:rounded-[2px] shadow-sm overflow-hidden shrink-0"
                 viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg">
@@ -259,10 +260,7 @@
                 <rect x="2" width="1" height="2" fill="#E62117" />
               </svg>
               <div class="w-px h-3.5 bg-slate-200 mx-1 shrink-0"></div>
-              <span class="text-xs sm:text-[13px] font-medium text-slate-600">
-                Application <span class="font-bold text-midnight">100% Française</span> <span
-                  class="mx-1.5 text-copper/50">•</span> Conçue en <span class="font-bold text-midnight">Bretagne</span>
-              </span>
+              <span class="text-[9px] sm:text-[13px] font-medium text-slate-600 whitespace-nowrap">Application <span class="font-bold text-midnight">100% Française</span> <span class="mx-0.5 sm:mx-1 text-copper/50">•</span> Conçue en <span class="font-bold text-midnight">Bretagne</span></span>
             </div>
           </div>
           <h1
@@ -335,7 +333,7 @@
       .md-showcase {
         position: relative;
         width: 100%;
-        min-height: 560px;
+        height: 560px;
         border-radius: 1.5rem;
         overflow: hidden;
         background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
@@ -1669,7 +1667,7 @@
                 </template>
               </div>
 
-              <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left min-h-[80px] flex align-center">
+              <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left min-h-[110px] flex items-center">
                 <p class="text-midnight font-medium leading-relaxed text-sm"
                   x-text="isPlaying ? displayedText : 'Salut ! On vient de finir cette superbe rénovation de cuisine à Lyon. Le résultat est top, regardez l\'avant-après !'">
                 </p>
@@ -1766,7 +1764,7 @@
             </div>
 
             <div
-              class="absolute left-0 sm:left-4 top-[35%] sm:top-[65%] -translate-y-1/2 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-30 animate-bounce"
+              class="absolute left-0 sm:left-4 top-[35%] sm:top-[40%] -translate-y-1/2 bg-white p-3 rounded-2xl shadow-xl border border-slate-100 z-30 animate-bounce"
               style="animation-duration: 4s;">
               <div class="flex items-center gap-2">
                 <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
@@ -1780,41 +1778,213 @@
       </div>
     </section>
 
-    <!-- Professions Carousel -->
-    <section id="galerie" class="py-16 border-y border-slate-200/40 bg-white/40 backdrop-blur-sm overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p class="section-label text-center mb-12">Les métiers qui réussissent avec Postelio</p>
-        <div
-          class="flex overflow-x-auto pb-8 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-4 gap-6 max-w-6xl mx-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          @php
-            $jobs = [
-              ['icon' => 'paintbrush', 'name' => 'Peintres', 'img' => 'peintre.png'],
-              ['icon' => 'scissors', 'name' => 'Paysagistes', 'img' => 'jardinier.png'],
-              ['icon' => 'zap', 'name' => 'Électriciens', 'img' => 'electricien.png'],
-              ['icon' => 'hammer', 'name' => 'Menuisiers', 'img' => 'menuiserie.png']
-            ];
-          @endphp
-          @foreach($jobs as $job)
-            <div
-              class="relative rounded-3xl overflow-hidden group aspect-[4/5] min-w-[260px] sm:min-w-0 snap-center cursor-pointer border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-all duration-500">
-              <img src="{{ asset('images/demo/' . $job['img']) }}" alt="{{ $job['name'] }}"
-                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+    <!-- Templates Showcase -->
+    <section id="gabarits" class="py-28 bg-slate-50 relative overflow-hidden">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-copper/5 blur-[140px] rounded-full pointer-events-none"></div>
 
-              <div
-                class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent flex flex-col justify-end p-6 pointer-events-none">
-                <h3 class="text-xl font-bold text-white transition-transform duration-500 group-hover:translate-x-1">
-                  {{ $job['name'] }}</h3>
-              </div>
-            </div>
-          @endforeach
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center max-w-3xl mx-auto mb-16" x-intersect.once="$el.classList.add('reveal-up')">
+          <p class="section-label text-center mb-4">6 gabarits prêts à l'emploi</p>
+          <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">
+            Un format pour <span class="text-gradient-copper italic">chaque post</span>
+          </h2>
+          <p class="text-xl font-light text-slate-600">Chaque publication suit une structure éprouvée qui capte l'attention.</p>
         </div>
 
-        <div class="mt-12 text-center animate-fade-in" x-intersect="$el.classList.add('animate-fade-up')">
-          <p class="text-sm text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed px-4">
-            <span class="text-copper mr-1">●</span> Aussi disponible pour : Maçons, Plombiers, Couvreurs, Carreleurs,
-            Chauffagistes, Serruriers, Multi-services, et bien d'autres corps de métier.
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 max-w-4xl mx-auto">
+
+          @php
+            /* Shared post header / footer snippets rendered inline per card */
+          @endphp
+
+          <!-- 1. Avant / Après -->
+          <div class="group bg-white rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+            x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="p-3 sm:p-4">
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-100 bg-white">
+                <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
+                  <div class="w-4 h-4 rounded-full bg-slate-200 flex-shrink-0"></div>
+                  <div class="h-1.5 w-12 bg-slate-200 rounded-full"></div>
+                </div>
+                <div class="h-32 relative flex">
+                  <div class="flex-1 bg-slate-100 border-r border-slate-200">
+                    <div class="absolute bottom-2 left-2 text-[7px] font-semibold text-slate-400 uppercase tracking-wider">Avant</div>
+                  </div>
+                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div class="w-6 h-6 bg-white rounded-full border border-slate-200 flex items-center justify-center shadow-sm">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </div>
+                  </div>
+                  <div class="flex-1 bg-white">
+                    <div class="absolute bottom-2 right-2 text-[7px] font-semibold text-slate-400 uppercase tracking-wider">Après</div>
+                  </div>
+                </div>
+                <div class="px-3 py-2 border-t border-slate-100">
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Transformation</div>
+              <div class="text-sm font-display font-semibold text-midnight">Avant / Après</div>
+            </div>
+          </div>
+
+          <!-- 2. Avis client -->
+          <div class="group bg-white rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden reveal-d1"
+            x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="p-3 sm:p-4">
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-100 bg-white">
+                <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
+                  <div class="w-4 h-4 rounded-full bg-slate-200 flex-shrink-0"></div>
+                  <div class="h-1.5 w-12 bg-slate-200 rounded-full"></div>
+                </div>
+                <div class="h-32 bg-white px-3 py-3 flex flex-col justify-center gap-2.5">
+                  <div class="flex gap-0.5">
+                    <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-2.5 h-2.5 fill-copper" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </div>
+                  <div class="space-y-1.5">
+                    <div class="h-1.5 bg-slate-200 rounded w-full"></div>
+                    <div class="h-1.5 bg-slate-200 rounded w-4/5"></div>
+                    <div class="h-1.5 bg-slate-200 rounded w-3/5"></div>
+                  </div>
+                </div>
+                <div class="px-3 py-2 border-t border-slate-100">
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Social proof</div>
+              <div class="text-sm font-display font-semibold text-midnight">Avis client</div>
+            </div>
+          </div>
+
+          <!-- 3. FAQ -->
+          <div class="group bg-white rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden reveal-d2"
+            x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="p-3 sm:p-4">
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-100 bg-white">
+                <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
+                  <div class="w-4 h-4 rounded-full bg-slate-200 flex-shrink-0"></div>
+                  <div class="h-1.5 w-12 bg-slate-200 rounded-full"></div>
+                </div>
+                <div class="h-32 bg-white px-3 py-3 flex flex-col justify-center gap-3">
+                  <div class="flex items-center gap-2">
+                    <div class="w-5 h-5 rounded-full bg-midnight flex items-center justify-center flex-shrink-0">
+                      <span class="text-white text-[9px] font-bold leading-none">?</span>
+                    </div>
+                    <div class="h-1.5 bg-slate-300 rounded flex-1"></div>
+                  </div>
+                  <div class="space-y-1.5 pl-1">
+                    <div class="h-1.5 bg-slate-200 rounded w-full"></div>
+                    <div class="h-1.5 bg-slate-200 rounded w-4/5"></div>
+                  </div>
+                </div>
+                <div class="px-3 py-2 border-t border-slate-100">
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Éducation</div>
+              <div class="text-sm font-display font-semibold text-midnight">FAQ</div>
+            </div>
+          </div>
+
+          <!-- 4. Lifestyle -->
+          <div class="group bg-white rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+            x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="p-3 sm:p-4">
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-100 bg-white">
+                <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
+                  <div class="w-4 h-4 rounded-full bg-slate-200 flex-shrink-0"></div>
+                  <div class="h-1.5 w-12 bg-slate-200 rounded-full"></div>
+                </div>
+                <div class="h-32 bg-slate-200 flex items-end">
+                  <div class="w-full bg-midnight px-3 py-2">
+                    <div class="h-1.5 w-20 bg-white/60 rounded"></div>
+                  </div>
+                </div>
+                <div class="px-3 py-2 border-t border-slate-100">
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Image de marque</div>
+              <div class="text-sm font-display font-semibold text-midnight">Lifestyle</div>
+            </div>
+          </div>
+
+          <!-- 5. Chantier en détail -->
+          <div class="group bg-white rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden reveal-d1"
+            x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="p-3 sm:p-4">
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-100 bg-white">
+                <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
+                  <div class="w-4 h-4 rounded-full bg-slate-200 flex-shrink-0"></div>
+                  <div class="h-1.5 w-12 bg-slate-200 rounded-full"></div>
+                </div>
+                <div class="h-32 flex flex-col">
+                  <div class="flex-1 bg-slate-200"></div>
+                  <div class="flex items-center justify-around px-3 py-3 bg-white border-t border-slate-100">
+                    <div class="w-6 h-6 rounded-full bg-midnight text-white text-[9px] font-bold flex items-center justify-center">1</div>
+                    <div class="flex-1 h-px bg-slate-200 mx-2"></div>
+                    <div class="w-6 h-6 rounded-full bg-midnight text-white text-[9px] font-bold flex items-center justify-center">2</div>
+                    <div class="flex-1 h-px bg-slate-200 mx-2"></div>
+                    <div class="w-6 h-6 rounded-full bg-copper text-white text-[9px] font-bold flex items-center justify-center">3</div>
+                  </div>
+                </div>
+                <div class="px-3 py-2 border-t border-slate-100">
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Expertise</div>
+              <div class="text-sm font-display font-semibold text-midnight">Chantier en détail</div>
+            </div>
+          </div>
+
+          <!-- 6. Erreur à éviter -->
+          <div class="group bg-white rounded-2xl border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 overflow-hidden reveal-d2"
+            x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="p-3 sm:p-4">
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-100 bg-white">
+                <div class="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
+                  <div class="w-4 h-4 rounded-full bg-slate-200 flex-shrink-0"></div>
+                  <div class="h-1.5 w-12 bg-slate-200 rounded-full"></div>
+                </div>
+                <div class="h-32 bg-white px-3 py-3 flex flex-col justify-center gap-2">
+                  <div class="bg-slate-100 rounded-lg px-2.5 py-2 flex items-center gap-2 opacity-50">
+                    <div class="w-4 h-4 rounded bg-slate-300 flex-shrink-0"></div>
+                    <div class="space-y-1 flex-1">
+                      <div class="h-1.5 bg-slate-300 rounded w-full"></div>
+                      <div class="h-1 bg-slate-300 rounded w-3/4"></div>
+                    </div>
+                  </div>
+                  <div class="bg-midnight rounded-lg px-2.5 py-2 flex items-center gap-2">
+                    <div class="w-4 h-4 rounded-full bg-copper flex-shrink-0"></div>
+                    <div class="space-y-1 flex-1">
+                      <div class="h-1.5 bg-white/30 rounded w-full"></div>
+                      <div class="h-1 bg-white/20 rounded w-3/4"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="px-3 py-2 border-t border-slate-100">
+                  <div class="h-1.5 w-4/5 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+              <div class="text-[10px] font-semibold text-copper uppercase tracking-widest mb-0.5">Pédagogie</div>
+              <div class="text-sm font-display font-semibold text-midnight">Erreur à éviter</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Coming soon -->
+        <div class="mt-10 text-center" x-intersect.once="$el.classList.add('reveal-up')">
+          <p class="text-sm text-slate-400 font-medium">
+            <span class="inline-block w-1 h-1 rounded-full bg-copper/60 mb-0.5 mr-1"></span>
+            D'autres gabarits arrivent prochainement
           </p>
         </div>
+
       </div>
     </section>
 
@@ -1877,6 +2047,44 @@
               </div>
             @endforeach
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Professions Carousel -->
+    <section id="galerie" class="py-16 border-y border-slate-200/40 bg-white/40 backdrop-blur-sm overflow-hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <p class="section-label text-center mb-12">Les métiers qui réussissent avec Postelio</p>
+        <div
+          class="flex overflow-x-auto pb-8 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-4 gap-6 max-w-6xl mx-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          @php
+            $jobs = [
+              ['icon' => 'paintbrush', 'name' => 'Peintres', 'img' => 'peintre.png'],
+              ['icon' => 'scissors', 'name' => 'Paysagistes', 'img' => 'jardinier.png'],
+              ['icon' => 'zap', 'name' => 'Électriciens', 'img' => 'electricien.png'],
+              ['icon' => 'hammer', 'name' => 'Menuisiers', 'img' => 'menuiserie.png']
+            ];
+          @endphp
+          @foreach($jobs as $job)
+            <div
+              class="relative rounded-3xl overflow-hidden group aspect-[4/5] min-w-[260px] sm:min-w-0 snap-center cursor-pointer border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-all duration-500">
+              <img src="{{ asset('images/demo/' . $job['img']) }}" alt="{{ $job['name'] }}"
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent flex flex-col justify-end p-6 pointer-events-none">
+                <h3 class="text-xl font-bold text-white transition-transform duration-500 group-hover:translate-x-1">
+                  {{ $job['name'] }}</h3>
+              </div>
+            </div>
+          @endforeach
+        </div>
+
+        <div class="mt-12 text-center animate-fade-in" x-intersect="$el.classList.add('animate-fade-up')">
+          <p class="text-sm text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed px-4">
+            <span class="text-copper mr-1">●</span> Aussi disponible pour : Maçons, Plombiers, Couvreurs, Carreleurs,
+            Chauffagistes, Serruriers, Multi-services, et bien d'autres corps de métier.
+          </p>
         </div>
       </div>
     </section>

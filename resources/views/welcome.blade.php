@@ -18,6 +18,7 @@
   <title>Postelio — Votre post Instagram prêt en 10 secondes, à partir d’une simple note vocale.</title>
   <meta name="description"
     content="Postelio — Votre post Instagram prêt en 10 secondes, à partir d'une simple note vocale. L'IA rédige et publie pour vous. Sans compétence digitale. Essai gratuit.">
+  <style>[x-cloak] { display: none !important; }</style>
   <link rel="canonical" href="{{ url()->current() }}">
 
   <script type="application/ld+json">
@@ -80,6 +81,7 @@
             isMenuOpen: false, 
             scrolled: false, 
             openFaq: null,
+            visibleCtas: [],
             showAnnouncement: {{ $announcementActive ? 'true' : 'false' }},
             init() {
                 window.addEventListener('scroll', () => {
@@ -228,23 +230,27 @@
             </div>
           </div>
           <h1
-            class="text-3xl sm:text-5xl lg:text-6xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.1] animate-blur-in delay-100 text-balance">
+            class="text-4xl sm:text-5xl lg:text-6xl font-display font-semibold tracking-tighter text-midnight mb-8 leading-[1.1] animate-blur-in delay-100 text-balance">
             Votre post Instagram prêt en 10 secondes, <br class="hidden sm:block" />
             <span class="text-gradient-copper italic">à partir d’une simple note vocale.</span>
           </h1>
           <p
-            class="text-xl sm:text-2xl font-light text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed animate-blur-in delay-200">
+            class="text-lg sm:text-xl lg:text-2xl font-light text-slate-600 mb-10 max-w-4xl mx-auto leading-relaxed animate-blur-in delay-200 text-balance">
             Plus besoin d'être un pro d'Insta. Depuis votre camion, 1 photo + 1 vocal suffisent pour générer le post parfait et attirer de vrais clients, sans sacrifier vos soirées.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-blur-in delay-300">
             @auth
               <a href="{{ route('generate-post') }}" wire:navigate
+                x-intersect:enter="if(!visibleCtas.includes('hero')) visibleCtas.push('hero')" 
+                x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'hero')"
                 class="btn-primary w-full sm:w-auto flex justify-center items-center gap-2 text-base">
                 Créer mon 1er post (Gratuit)
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
               </a>
             @else
               <a href="{{ route('register') }}" wire:navigate
+                x-intersect:enter="if(!visibleCtas.includes('hero')) visibleCtas.push('hero')" 
+                x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'hero')"
                 class="btn-primary w-full sm:w-auto flex justify-center items-center gap-2 text-base">
                 Créer mon 1er post (Gratuit)
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -1949,11 +1955,15 @@
           premium ?</p>
         @auth
           <a href="{{ route('dashboard') }}" wire:navigate
+            x-intersect:enter="if(!visibleCtas.includes('final')) visibleCtas.push('final')" 
+            x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'final')"
             class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
             Créer mon 1er post (Gratuit) <i data-lucide="arrow-right" class="w-5 h-5"></i>
           </a>
         @else
           <a href="{{ route('register') }}" wire:navigate
+            x-intersect:enter="if(!visibleCtas.includes('final')) visibleCtas.push('final')" 
+            x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'final')"
             class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
             Créer mon compte gratuitement <i data-lucide="arrow-right" class="w-5 h-5"></i>
           </a>
@@ -2034,11 +2044,15 @@
               <div class="mt-auto">
                 @auth
                   <a href="{{ route('dashboard') }}" wire:navigate
+                    x-intersect:enter="if(!visibleCtas.includes('plan-starter')) visibleCtas.push('plan-starter')" 
+                    x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-starter')"
                     class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-widest block hover:bg-slate-100 transition-colors">
                     Accéder à mon compte
                   </a>
                 @else
                   <a href="{{ route('register', ['plan' => 'starter']) }}" wire:navigate
+                    x-intersect:enter="if(!visibleCtas.includes('plan-starter')) visibleCtas.push('plan-starter')" 
+                    x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-starter')"
                     class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-widest block hover:bg-slate-100 transition-colors">
                     Démarrer gratuitement
                   </a>
@@ -2096,11 +2110,15 @@
               <div class="mt-auto">
                 @auth
                   <a href="{{ route('dashboard') }}" wire:navigate
+                    x-intersect:enter="if(!visibleCtas.includes('plan-basic')) visibleCtas.push('plan-basic')" 
+                    x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-basic')"
                     class="btn-primary w-full py-4 text-center block !rounded-2xl">
                     Accéder à mon compte
                   </a>
                 @else
                   <a href="{{ route('register', ['plan' => 'basic']) }}" wire:navigate
+                    x-intersect:enter="if(!visibleCtas.includes('plan-basic')) visibleCtas.push('plan-basic')" 
+                    x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-basic')"
                     class="btn-primary w-full py-4 text-center block !rounded-2xl">
                     Essayer Basic gratuitement
                   </a>
@@ -2155,11 +2173,15 @@
               <div class="mt-auto">
                 @auth
                   <a href="{{ route('dashboard') }}" wire:navigate
+                    x-intersect:enter="if(!visibleCtas.includes('plan-pro')) visibleCtas.push('plan-pro')" 
+                    x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-pro')"
                     class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
                     Accéder à mon compte
                   </a>
                 @else
                   <a href="{{ route('register', ['plan' => 'pro']) }}" wire:navigate
+                    x-intersect:enter="if(!visibleCtas.includes('plan-pro')) visibleCtas.push('plan-pro')" 
+                    x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-pro')"
                     class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
                     Choisir le plan Pro
                   </a>
@@ -2359,9 +2381,16 @@
     </section>
   </main>
 
-  <div class="md:hidden fixed bottom-0 inset-x-0 p-4 pb-6 bg-white/90 backdrop-blur-2xl border-t border-slate-200 z-50">
+  <div class="md:hidden fixed bottom-0 inset-x-0 p-4 pb-4 z-50 pointer-events-none"
+    x-show="scrolled && visibleCtas.length === 0" x-cloak
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 translate-y-10"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 translate-y-0"
+    x-transition:leave-end="opacity-0 translate-y-10">
     <a href="{{ route('register') }}" wire:navigate
-      class="btn-primary flex justify-center items-center w-full py-3.5 text-base shadow-lg shadow-amber-500/20">
+      class="btn-primary flex justify-center items-center w-full py-3.5 text-base shadow-lg shadow-amber-500/20 pointer-events-auto">
       Commencer gratuitement
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2">

@@ -253,31 +253,6 @@ class ZernioService
 
     private function getPublicUrl(string $path): string
     {
-        // Reuse imgbb logic from existing services if needed, 
-        // or just use local URL if Zernio can access it.
-        // But since Meta couldn't, Zernio probably needs it public too.
-        
-        $imgbbKey = config('services.imgbb.api_key');
-        $localUrl = url(\Illuminate\Support\Facades\Storage::url($path));
-
-        if (!$imgbbKey) {
-            return $localUrl;
-        }
-
-        try {
-            $imageData = \Illuminate\Support\Facades\Storage::disk('public')->get($path);
-            $response  = Http::timeout(120)->asForm()->post('https://api.imgbb.com/1/upload?key=' . urlencode($imgbbKey), [
-                'image'      => base64_encode($imageData),
-                'expiration' => 600,
-            ])->json();
-
-            if (!empty($response['data']['url'])) {
-                return $response['data']['url'];
-            }
-        } catch (\Throwable $e) {
-            Log::warning('imgbb upload failed for Zernio, falling back to local URL', ['error' => $e->getMessage()]);
-        }
-
-        return $localUrl;
+        return url(\Illuminate\Support\Facades\Storage::url($path));
     }
 }

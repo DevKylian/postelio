@@ -83,7 +83,7 @@
     }
 
     .text-gradient-copper {
-        @apply bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 inline-block;
+        @apply bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 inline-block pr-1 pb-1;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;

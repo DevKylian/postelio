@@ -47,9 +47,6 @@ return [
         'redirect'      => env('FACEBOOK_CALLBACK_URL'),
     ],
 
-    'imgbb' => [
-        'api_key' => env('IMGBB_API_KEY'),
-    ],
 
     'zernio' => [
         'api_key' => env('ZERNIO_API_KEY'),

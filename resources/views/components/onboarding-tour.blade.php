@@ -11,6 +11,7 @@
         perms: @js($perms),
         autoStart: @js($autoStart)
      })"
+     @if(isset($attributes['wire:key'])) wire:key="{{ $attributes['wire:key'] }}" @endif
      x-show="active"
      x-cloak
      class="relative z-[9999]">
@@ -182,6 +183,9 @@ document.addEventListener('alpine:init', () => {
         },
 
         start() {
+            if (this.steps.length === 0) return;
+            if (localStorage.getItem('postelio_tour_' + this.name)) return;
+            
             this.active = true;
             this.stepIndex = 0;
             this._positionStep();

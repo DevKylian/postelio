@@ -370,7 +370,7 @@
         ['target' => null, 'icon' => '🎉', 'title' => 'Tu es prêt !', 'desc' => 'Tu connais l\'essentiel. Maintenant, génère ton premier post et fais briller ton activité !'],
     ];
     @endphp
-    <x-onboarding-tour name="dashboard_v2" :steps="$tourSteps" :perms="$tourPerms" />
+    <x-onboarding-tour wire:key="tour-dashboard" name="dashboard_v2" :steps="$tourSteps" :perms="$tourPerms" />
 
 
 </x-app-layout>

@@ -222,8 +222,16 @@ $switchTab = function ($tab) {
                         Style Béton
                     </button>
                 </div>
-
             </div>
+            
+            {{-- Info alert: plus de modèles arrivent --}}
+            <div class="mb-8 animate-fade-in">
+                <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-slate-50 border border-slate-100 text-slate-500 shadow-sm">
+                    <div class="w-1.5 h-1.5 rounded-full bg-copper animate-pulse"></div>
+                    <span class="text-xs font-medium">De nouveaux gabarits arrivent très prochainement pour encore plus de choix.</span>
+                </div>
+            </div>
+
 
             {{-- Topbar avec bouton créer --}}
             <div class="flex items-center justify-between mb-6">

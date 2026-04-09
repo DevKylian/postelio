@@ -17,7 +17,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Postelio — Votre post Instagram prêt en 10 secondes, à partir d’une simple note vocale.</title>
   <meta name="description"
-    content="Postelio — Votre post Instagram prêt en 10 secondes, à partir d'une simple note vocale. L'IA rédige et publie pour vous. Sans compétence digitale. Essai gratuit.">
+    content="Attirez de vrais clients sans sacrifier vos soirées ! Depuis votre camion, 1 photo + 1 vocal génèrent votre post Instagram parfait en 10 secondes.">
   <style>[x-cloak] { display: none !important; }</style>
   <link rel="canonical" href="{{ url()->current() }}">
 

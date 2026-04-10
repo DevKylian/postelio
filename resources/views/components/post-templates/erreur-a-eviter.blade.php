@@ -65,26 +65,15 @@
 
 <div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] relative overflow-hidden flex flex-col {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: #F8FAFC;">
 
-    {{-- ── TOP BRAND STRIP ── --}}
-    <div class="shrink-0 flex items-center justify-between px-6 py-4" style="background-color: {{ $accentColor }}">
-        <div class="flex items-center gap-2.5">
-            @if($logoUrl)
-                <img src="{{ $logoUrl }}" alt="Logo" class="h-5 w-5 object-contain rounded {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
-            @endif
-            <span class="font-black tracking-[0.18em] text-[10px] uppercase truncate" style="color: {{ $accentTextColor }}">{{ $companyLabel }}</span>
-        </div>
-        <div class="flex items-center gap-1.5">
-            @if($trade)
-                <span class="px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-wider border" style="background: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $accentTextColor }}">{{ $trade }}</span>
-            @endif
-            @if($city)
-                <span class="px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-wider border" style="background: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $accentTextColor }}">{{ $city }}</span>
-            @endif
-        </div>
-    </div>
+
 
     {{-- ── MAIN CONTENT AREA ── --}}
     <div class="flex-1 flex flex-col justify-center px-7 relative overflow-hidden">
+
+        {{-- Decorative warning watermark --}}
+        <svg class="absolute -bottom-10 -right-10 select-none pointer-events-none" style="width: 240px; height: 240px; color: {{ $brandColor }}; opacity: 0.05;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
 
 
         {{-- ── SLIDE 0 : WARNING CONTENT ── --}}

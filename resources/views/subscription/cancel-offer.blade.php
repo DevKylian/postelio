@@ -29,7 +29,7 @@
                 </div>
 
                 {{-- Bordered card --}}
-                <div class="rounded-3xl shadow-xl shadow-copper/10 pt-10 pb-8 px-8 sm:px-12"
+                <div class="rounded-3xl shadow-xl shadow-copper/10 pt-10 pb-8 px-5 sm:px-12 overflow-hidden"
                      style="border: 2px solid transparent;
                             background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #f97316, #F59E0B);
                             background-origin: border-box;
@@ -50,26 +50,28 @@
 
                     {{-- Current plan summary --}}
                     @if($currentPlanData)
-                    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-2xl p-5 mb-8">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Votre plan {{ $currentPlanData['name'] }}</p>
-                                <div class="flex items-baseline gap-2">
-                                    <span class="text-3xl font-black text-midnight">{{ number_format($currentPlanData['price'] / 2, 2, ',', '') }}€</span>
-                                    <span class="text-sm text-gray-400 line-through">{{ number_format($currentPlanData['price'], 2, ',', '') }}€</span>
-                                    <span class="text-xs font-bold text-gray-400">/ prochain mois</span>
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-100 rounded-3xl p-6 sm:p-8 mb-8 relative overflow-hidden shadow-sm text-center">
+                        {{-- Centered Text Layout --}}
+                        <div class="relative z-10">
+                            <p class="text-[10px] font-bold text-amber-700/60 uppercase tracking-[0.2em] mb-3">Offre spéciale • Plan {{ $currentPlanData['name'] }}</p>
+                            <div class="flex flex-col items-center">
+                                <div class="flex items-baseline gap-2 mb-2">
+                                    <span class="text-4xl sm:text-6xl font-black text-midnight tracking-tighter">{{ number_format($currentPlanData['price'] / 2, 2, ',', '') }}€</span>
+                                    <span class="text-xs sm:text-base text-gray-400 line-through opacity-60">{{ number_format($currentPlanData['price'], 2, ',', '') }}€</span>
                                 </div>
-                            </div>
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-copper flex items-center justify-center shadow-lg shadow-copper/30 flex-shrink-0">
-                                <span class="text-white font-black text-sm leading-tight text-center">-50%</span>
+                                <div class="flex items-center gap-2 px-3 py-1.5 bg-white/80 border border-amber-200/50 rounded-xl shadow-sm">
+                                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span class="text-[10px] sm:text-[11px] font-black text-amber-800 uppercase tracking-widest">Réduction automatique</span>
+                                </div>
+                                <p class="mt-4 text-xs text-gray-400 font-bold uppercase tracking-wide">Valable sur votre prochain mois</p>
                             </div>
                         </div>
-                        <div class="mt-3 flex items-center gap-2 text-xs text-amber-700 font-medium">
-                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            Réduction automatique, sans code promo. Valable une seule fois.
-                        </div>
+                        
+                        {{-- Subtle background decoration --}}
+                        <div class="absolute -right-6 -top-6 w-32 h-32 bg-orange-200/10 rounded-full blur-3xl"></div>
+                        <div class="absolute -left-6 -bottom-6 w-32 h-32 bg-amber-200/10 rounded-full blur-3xl"></div>
                     </div>
                     @endif
 
@@ -77,15 +79,15 @@
                     @if($currentPlanData && !empty($currentPlanData['features']))
                     <div class="mb-8">
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 text-center">Ce que vous gardez</p>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             @foreach(array_slice($currentPlanData['features'], 0, 4) as $feature)
-                            <div class="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2.5">
-                                <div class="w-4 h-4 rounded-full bg-copper/10 flex items-center justify-center flex-shrink-0">
-                                    <svg class="w-2.5 h-2.5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">
+                                <div class="w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <span class="text-xs font-medium text-slate-600 leading-tight">{{ $feature }}</span>
+                                <span class="text-[11px] font-semibold text-slate-600 leading-tight">{{ $feature }}</span>
                             </div>
                             @endforeach
                         </div>

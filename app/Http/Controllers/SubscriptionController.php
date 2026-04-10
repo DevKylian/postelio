@@ -120,7 +120,20 @@ class SubscriptionController extends Controller
         $subscription = $user->subscription('default');
 
         if ($subscription && $subscription->onGracePeriod()) {
-            $subscription->resume();
+            try {
+                if (app()->environment('local') && (!$user->hasStripeId() || !$subscription->stripe_id)) {
+                    // Simule le resume en local
+                    $subscription->update(['ends_at' => null]);
+                } else {
+                    $subscription->resume();
+                }
+            } catch (\Exception $e) {
+                if (app()->environment('local')) {
+                    $subscription->update(['ends_at' => null]);
+                } else {
+                    return redirect()->route('subscription.billing')->with('error', 'Erreur lors de la réactivation.');
+                }
+            }
             return redirect()->route('subscription.billing')->with('success', 'Abonnement réactivé !');
         }
 
@@ -142,12 +155,26 @@ class SubscriptionController extends Controller
 
         // Only show the retention offer on monthly subscriptions and if not already shown
         $isMonthly = $this->isMonthlySubscription($subscription);
-        if ($isMonthly && !$user->hasSeenRetentionOffer()) {
+        if ($isMonthly && (!$user->hasSeenRetentionOffer() || app()->environment('local'))) {
             return redirect()->route('subscription.cancel-offer');
         }
 
         // Offer already shown or yearly plan: cancel directly
-        $subscription->cancel();
+        try {
+            if (app()->environment('local') && (!$user->hasStripeId() || !$subscription->stripe_id)) {
+                $subscription->update(['ends_at' => now()->addDays(30)]); // Simule une fin dans 30 jours pour le testing
+            } else {
+                $subscription->cancel();
+            }
+        } catch (\Exception $e) {
+            if (app()->environment('local')) {
+                logger()->error("Erreur Stripe lors de l'annulation: " . $e->getMessage());
+                $subscription->update(['ends_at' => now()->addDays(30)]);
+            } else {
+                return redirect()->route('subscription.billing')->with('error', 'Une erreur est survenue lors de la résiliation.');
+            }
+        }
+
         return redirect()->route('subscription.billing')
             ->with('success', 'Abonnement annulé. Vous conservez l\'accès jusqu\'à la fin de la période en cours.');
     }
@@ -180,24 +207,47 @@ class SubscriptionController extends Controller
         $user = Auth::user();
         $subscription = $user->subscription('default');
 
-        if (!$subscription || !$subscription->valid() || $subscription->onGracePeriod()) {
+        if (!$subscription || !$subscription->valid()) {
             return redirect()->route('subscription.billing')->with('error', 'Aucun abonnement actif.');
+        }
+
+        // If the user was already in grace period (clicked cancel just before), we resume first
+        if ($subscription->onGracePeriod()) {
+            try {
+                if (app()->environment('local') && (!$user->hasStripeId() || !$subscription->stripe_id)) {
+                    $subscription->update(['ends_at' => null]);
+                } else {
+                    $subscription->resume();
+                }
+            } catch (\Exception $e) {
+                // Ignore resume errors in favor of trying the coupon, or fallback to manual update in local
+                if (app()->environment('local')) $subscription->update(['ends_at' => null]);
+            }
         }
 
         // Create a one-time 50% coupon via Stripe and apply it to the subscription
         try {
-            $stripe = Cashier::stripe();
+            // In local development, if the user doesn't have a real Stripe ID or uses a 'fake' one, we simulate the success
+            if (app()->environment('local') && (!$user->hasStripeId() || !$subscription->stripe_id || str_contains($subscription->stripe_id, 'fake'))) {
+                logger()->info("Simulation de l'offre de rétention en local pour l'utilisateur {$user->id}");
+            } else {
+                $stripe = \Laravel\Cashier\Cashier::stripe();
 
-            $coupon = $stripe->coupons->create([
-                'percent_off' => 50,
-                'duration'    => 'once',
-                'name'        => 'Offre fidélité -50%',
-            ]);
+                $coupon = $stripe->coupons->create([
+                    'percent_off' => 50,
+                    'duration'    => 'once',
+                    'name'        => 'Offre fidélité -50%',
+                ]);
 
-            $stripe->subscriptions->update($subscription->stripe_id, [
-                'coupon' => $coupon->id,
-            ]);
+                $stripe->subscriptions->update($subscription->stripe_id, [
+                    'coupon' => $coupon->id,
+                ]);
+            }
         } catch (\Exception $e) {
+            if (app()->environment('local')) {
+                logger()->error("Erreur Stripe offre rétention: " . $e->getMessage());
+            }
+
             return redirect()->route('subscription.billing')
                 ->with('error', 'Une erreur est survenue lors de l\'application de la réduction. Veuillez réessayer.');
         }
@@ -224,7 +274,20 @@ class SubscriptionController extends Controller
         // Mark offer as seen so it won't be shown again
         $user->update(['retention_offer_used_at' => now()]);
 
-        $subscription->cancel();
+        try {
+            if (app()->environment('local') && (!$user->hasStripeId() || !$subscription->stripe_id)) {
+                $subscription->update(['ends_at' => now()->addDays(30)]);
+            } else {
+                $subscription->cancel();
+            }
+        } catch (\Exception $e) {
+            if (app()->environment('local')) {
+                logger()->error("Erreur Stripe lors de la résiliation assistée: " . $e->getMessage());
+                $subscription->update(['ends_at' => now()->addDays(30)]);
+            } else {
+                return redirect()->route('subscription.billing')->with('error', 'Une erreur est survenue lors de la résiliation.');
+            }
+        }
 
         return redirect()->route('subscription.billing')
             ->with('success', 'Abonnement annulé. Vous conservez l\'accès jusqu\'à la fin de la période en cours.');

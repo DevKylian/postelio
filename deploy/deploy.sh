@@ -110,8 +110,13 @@ if [ "$FRONTEND_CHANGED" -gt 0 ]; then
     log "Changements frontend détectés (${FRONTEND_CHANGED} fichiers) — lancement build npm..."
     log "Fichiers concernés : $(echo "$FRONTEND_FILES" | tr '\n' ' ')"
     
-    # Nettoyage manuel — sudo nécessaire si les fichiers appartiennent à www-data
+    # Nettoyage manuel avec gestion des droits
+    if [ -d "public/build" ]; then
+        log "Récupération des droits sur public/build..."
+        sudo chown -R $(whoami):$(whoami) public/build || true
+    fi
     sudo rm -rf public/build
+    mkdir -p public/build
     
     log "npm install..."
     # On tente npm ci (plus sûr), sinon npm install (plus flexible)

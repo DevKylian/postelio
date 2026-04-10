@@ -1129,7 +1129,16 @@
     <section class="relative z-20 pb-20 -mt-8 sm:-mt-16" x-data="demoShowcase()"
       x-init="$nextTick(() => { setTimeout(() => startAnimation(), 800) })" x-intersect:enter.half="startAnimation()"
       x-intersect:leave="stopAnimation()">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Glow + micro-particles behind the showcase -->
+      <div class="absolute inset-0 pointer-events-none overflow-hidden" style="z-index:0">
+        <!-- Soft radial amber glow -->
+        <div class="absolute inset-0" style="background: radial-gradient(ellipse 90% 75% at 50% 52%, rgba(245,158,11,0.13) 0%, rgba(249,115,22,0.07) 35%, rgba(245,158,11,0.03) 65%, transparent 80%);"></div>
+        <!-- Canvas: micro-dust particles -->
+        <canvas id="hero-dust" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
+      </div>
+
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8" style="position:relative;z-index:1">
         <div class="md-showcase flex flex-col" x-ref="showcase">
 
           <!-- Persistent Safari UI -->
@@ -1776,6 +1785,124 @@
           </div>
         </div>
       </div>
+
+      <!-- Micro-dust particle animation -->
+      <script>
+        (function () {
+          const canvas = document.getElementById('hero-dust');
+          if (!canvas) return;
+          const ctx = canvas.getContext('2d');
+
+          // Amber / orange / yellow palette
+          const COLORS = ['#F59E0B', '#f97316', '#fbbf24', '#fde68a', '#fb923c', '#fcd34d'];
+
+          let W = 0, H = 0;
+          let particles = [];
+          let raf = null;
+          const COUNT = 160;
+
+          function resize() {
+            W = canvas.width  = canvas.offsetWidth;
+            H = canvas.height = canvas.offsetHeight;
+          }
+
+          // Gaussian-ish: concentrate particles toward the horizontal center
+          function randX() {
+            // bias toward center with a bit of spread
+            const u = Math.random(), v = Math.random();
+            const gauss = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+            return W * 0.5 + gauss * (W * 0.3);
+          }
+
+          function spawn(fromBottom) {
+            const lifespan = 120 + Math.random() * 180;
+            return {
+              x:          randX(),
+              y:          fromBottom ? H + Math.random() * 40 : Math.random() * H,
+              r:          0.4 + Math.random() * 1.4,       // 0.4 – 1.8 px
+              color:      COLORS[Math.floor(Math.random() * COLORS.length)],
+              alpha:      0,
+              peakAlpha:  0.25 + Math.random() * 0.55,
+              vx:         (Math.random() - 0.5) * 0.25,
+              vy:         -(0.12 + Math.random() * 0.35),  // drift upward
+              // twinkle: oscillate alpha slightly
+              twinkle:    Math.random() * Math.PI * 2,
+              twinkleSpd: 0.03 + Math.random() * 0.04,
+              life:       fromBottom ? 0 : Math.random() * lifespan,
+              lifespan:   lifespan,
+            };
+          }
+
+          // Seed initial particles at random life stages
+          for (let i = 0; i < COUNT; i++) particles.push(spawn(false));
+
+          function draw() {
+            ctx.clearRect(0, 0, W, H);
+
+            for (let i = 0; i < particles.length; i++) {
+              const p = particles[i];
+              p.life++;
+              p.x += p.vx;
+              p.y += p.vy;
+              p.twinkle += p.twinkleSpd;
+
+              // Fade-in / sustain / fade-out envelope
+              const t = p.life / p.lifespan;
+              let env;
+              if      (t < 0.15) env = t / 0.15;
+              else if (t > 0.80) env = (1 - t) / 0.20;
+              else               env = 1;
+
+              // Subtle twinkle layered on top
+              const twinkleMod = 0.75 + 0.25 * Math.sin(p.twinkle);
+              p.alpha = p.peakAlpha * env * twinkleMod;
+
+              // Respawn when life ends or floats off-screen
+              if (p.life >= p.lifespan || p.y < -6) {
+                particles[i] = spawn(true);
+                continue;
+              }
+
+              // Draw glowing dot
+              ctx.save();
+              ctx.globalAlpha = p.alpha;
+              ctx.shadowBlur  = p.r * 5 + 4;
+              ctx.shadowColor = p.color;
+              ctx.fillStyle   = p.color;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+              ctx.fill();
+              // Second pass for extra glow core
+              ctx.globalAlpha = p.alpha * 0.6;
+              ctx.shadowBlur  = p.r * 12;
+              ctx.arc(p.x, p.y, p.r * 0.5, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            }
+
+            raf = requestAnimationFrame(draw);
+          }
+
+          // Pause when section leaves the viewport
+          const section = canvas.closest('section');
+          const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+              if (e.isIntersecting) {
+                if (!raf) draw();
+              } else {
+                cancelAnimationFrame(raf);
+                raf = null;
+              }
+            });
+          }, { threshold: 0.05 });
+          if (section) observer.observe(section);
+
+          resize();
+          window.addEventListener('resize', () => { resize(); });
+          draw();
+        })();
+      </script>
+
     </section>
 
     <!-- Templates Showcase -->

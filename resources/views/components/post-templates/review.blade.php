@@ -79,10 +79,10 @@
         <div class="absolute -bottom-12 -left-12 w-48 h-48 rounded-full blur-3xl pointer-events-none" style="background: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.15)' }}"></div>
 
         {{-- Verified Badge --}}
-        <div class="mb-4 relative z-10 h-6 inline-flex items-center gap-1.5 px-3 pt-[2px] rounded-full border shadow-sm backdrop-blur-sm transition-all text-center justify-center" 
+        <div class="mb-4 relative z-10 h-6 inline-flex items-center gap-1.5 px-3 rounded-full border shadow-sm backdrop-blur-sm transition-all text-center justify-center" 
              style="background: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)' }}; border-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}">
             <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="{{ $brandTextColor }}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-            <span class="text-[8px] font-black uppercase tracking-[0.2em] leading-tight" style="color: {{ $brandTextColor }}">Témoignage Vérifié</span>
+            <span class="text-[8px] font-black uppercase tracking-[0.2em] leading-none" style="color: {{ $brandTextColor }}">Témoignage Vérifié</span>
         </div>
 
         {{-- Stars --}}
@@ -124,7 +124,7 @@
                      style="background: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.05)' }}; border-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)' }}">
                     
                     {{-- Initials Avatar --}}
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-inner pt-[2px]" 
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-inner" 
                          style="background: {{ $brandTextColor }}; color: {{ $brandColor }}">
                         <span class="text-xs font-black tracking-tighter leading-none">{{ $initials }}</span>
                     </div>
@@ -146,39 +146,12 @@
                 </div>
                 @endif
 
-                @php
-                    $hex = str_replace('#', '', $brandColor);
-                    if(strlen($hex) == 3) {
-                        $r = hexdec(substr($hex,0,1).substr($hex,0,1));
-                        $g = hexdec(substr($hex,1,1).substr($hex,1,1));
-                        $b = hexdec(substr($hex,2,1).substr($hex,2,1));
-                    } else {
-                        $r = hexdec(substr($hex,0,2));
-                        $g = hexdec(substr($hex,2,2));
-                        $b = hexdec(substr($hex,4,2));
-                    }
-                    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
-                    $isDarkBrand = $yiq < 120;
-
-                    if ($isDarkBrand) {
-                        $tagBg = 'rgba(255,255,255,0.1)';
-                        $tagBorder = 'rgba(255,255,255,0.2)';
-                        $tagText = 'rgba(255,255,255,0.9)';
-                    } else {
-                        $tagBg = 'rgba(0,0,0,0.05)';
-                        $tagBorder = 'rgba(0,0,0,0.1)';
-                        // Use a dark color for contrast on light backgrounds
-                        $tagText = 'rgba(30, 41, 59, 0.8)';
-                    }
-                    $tagStyle = "background-color: $tagBg; border-color: $tagBorder; color: $tagText;";
-                @endphp
-
                 <div class="flex items-center justify-center gap-2 mt-4">
                     @if($trade)
-                        <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-tight" style="{{ $tagStyle }}">{{ $trade }}</span>
+                        <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[7px] font-black uppercase tracking-wider border leading-none" style="background: rgba({{ $brandTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $brandTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $brandTextColor }}">{{ $trade }}</span>
                     @endif
                     @if($city)
-                        <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-tight" style="{{ $tagStyle }}">{{ $city }}</span>
+                        <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[7px] font-black uppercase tracking-wider border leading-none" style="background: rgba({{ $brandTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $brandTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $brandTextColor }}">{{ $city }}</span>
                     @endif
                 </div>
         </div>

@@ -67,9 +67,9 @@
                     <div class="absolute -bottom-20 -left-20 w-80 h-80 rounded-full blur-[100px] pointer-events-none opacity-30" style="background: radial-gradient(circle, {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.2)' }}, transparent 70%)"></div>
 
                     {{-- Cover label --}}
-                    <div class="inline-flex items-center gap-2 mb-6 relative z-10 pt-[1.5px]">
+                    <div class="inline-flex items-center gap-2 mb-6 relative z-10">
                         <span class="w-2 h-2 rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.5)' }}"></span>
-                        <p class="font-black text-[10px] uppercase tracking-[0.3em] font-montserrat leading-tight" style="color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.4)' }}">GUIDE ARTISAN</p>
+                        <p class="font-black text-[10px] uppercase tracking-[0.3em] font-montserrat leading-none" style="color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.4)' }}">GUIDE ARTISAN</p>
                     </div>
 
                     @php
@@ -105,9 +105,9 @@
                     @endif
 
                     {{-- Step number glass badge --}}
-                    <div class="absolute top-6 left-6 w-12 h-12 rounded-2xl flex flex-col items-center justify-center pt-[2px] shadow-2xl z-20 backdrop-blur-xl bg-white/90 border border-white/20">
+                    <div class="absolute top-6 left-6 w-12 h-12 rounded-2xl flex flex-col items-center justify-center shadow-2xl z-20 backdrop-blur-xl bg-white/90 border border-white/20">
                         <span class="text-[8px] font-black font-montserrat text-slate-400 leading-none mb-1.5 uppercase tracking-wider">Step</span>
-                        <span class="font-black text-xl font-montserrat text-slate-950 leading-none mb-[2px]">{{ sprintf('%02d', $index) }}</span>
+                        <span class="font-black text-xl font-montserrat text-slate-950 leading-none">{{ sprintf('%02d', $index) }}</span>
                     </div>
 
                     {{-- Subtle top indicator --}}
@@ -200,10 +200,10 @@
                         $tagStyle = "background-color: $tagBg; border-color: $tagBorder; color: $tagText;";
                     @endphp
                     @if($trade)
-                        <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-tight" style="{{ $tagStyle }}">{{ $trade }}</span>
+                        <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-none" style="{{ $tagStyle }}">{{ $trade }}</span>
                     @endif
                     @if($city)
-                        <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-tight" style="{{ $tagStyle }}">{{ $city }}</span>
+                        <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-none" style="{{ $tagStyle }}">{{ $city }}</span>
                     @endif
                 </div>
             </div>

@@ -75,16 +75,16 @@
                     $slideText = $slideContents[$index] ?? (($index === 0) ? $title : '');
                 @endphp
 
-                @if(!empty($slideText) && !$imageUrl)
+                @if(!empty($slideText))
                     @php
                         $sLen = mb_strlen($slideText);
                         $sFontSize = 'text-[11px]';
                         if ($sLen > 120) $sFontSize = 'text-[7px]';
                         elseif ($sLen > 60) $sFontSize = 'text-[9px]';
                     @endphp
-                     <div class="absolute inset-x-4 bottom-20 backdrop-blur-sm p-4 rounded-xl border shadow-xl" style="background: rgba(0,0,0,0.65); border-color: rgba(255,255,255,0.08)">
+                    <div class="absolute inset-x-4 bottom-20 backdrop-blur-sm p-4 rounded-xl border shadow-xl" style="background: rgba(0,0,0,0.65); border-color: rgba(255,255,255,0.08)">
                         <div class="max-h-[60px] overflow-hidden">
-                             <p class="text-white font-black {{ $sFontSize }} leading-snug font-montserrat text-center">{{ $slideText }}</p>
+                            <p class="text-white font-black {{ $sFontSize }} leading-snug font-montserrat text-center">{{ $slideText }}</p>
                         </div>
                     </div>
                 @endif
@@ -157,10 +157,10 @@
                     {{-- Right: tags --}}
                     <div class="flex items-center gap-1.5 shrink-0">
                         @if($trade)
-                            <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-tight" style="{{ $tagStyle }}">{{ $trade }}</span>
+                            <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-none" style="{{ $tagStyle }}">{{ $trade }}</span>
                         @endif
                         @if($city)
-                            <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-tight" style="{{ $tagStyle }}">{{ $city }}</span>
+                            <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-none" style="{{ $tagStyle }}">{{ $city }}</span>
                         @endif
                     </div>
                 </div>

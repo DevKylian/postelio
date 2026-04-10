@@ -25,7 +25,11 @@ rollback() {
         cd "$APP_DIR" && git reset --hard "$PREV_COMMIT" --quiet || true
         log "Nettoyage des caches..."
         cd "$APP_DIR" && $PHP artisan optimize:clear 2>/dev/null || true
+        cd "$APP_DIR" && $PHP artisan view:clear 2>/dev/null || true
     fi
+    # Toujours redémarrer les workers pour éviter les workers 'stale' après un échec
+    log "Redémarrage préventif des workers..."
+    sudo systemctl restart postelio-queue || true
     cd "$APP_DIR" && $PHP artisan up 2>/dev/null || true
 }
 

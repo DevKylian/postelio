@@ -8,81 +8,77 @@
         $canvasHeight = ($aspectRatio === '4:5') ? 450 : 360;
     @endphp
     <meta name="viewport" content="width={{ $canvasWidth }}, initial-scale=1">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
         @php
             $fontRegular = base64_encode(file_get_contents(storage_path('fonts/Montserrat-Regular.ttf')));
-            $fontBold = base64_encode(file_get_contents(storage_path('fonts/Montserrat-Bold.ttf')));
-            $fontBlack = base64_encode(file_get_contents(storage_path('fonts/Montserrat-Black.ttf')));
+            $fontBold    = base64_encode(file_get_contents(storage_path('fonts/Montserrat-Bold.ttf')));
+            $fontBlack   = base64_encode(file_get_contents(storage_path('fonts/Montserrat-Black.ttf')));
         @endphp
+        /*
+         * Montserrat embedded as base64 – completely offline, no CDN dependency.
+         * Weight ranges ensure every Tailwind font-weight utility (100–900) maps to
+         * the nearest physical file without triggering browser font synthesis.
+         *   300–500  → Regular (400)
+         *   600–700  → Bold    (700)
+         *   800–900  → Black   (900)
+         */
         @font-face {
             font-family: 'Montserrat';
             src: url('data:font/ttf;base64,{{ $fontRegular }}') format('truetype');
-            font-weight: 400;
+            font-weight: 100 500;
             font-style: normal;
-        }
-        /* weight 300 → Regular (no Montserrat-Light available) */
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('data:font/ttf;base64,{{ $fontRegular }}') format('truetype');
-            font-weight: 300;
-            font-style: normal;
-        }
-        /* weight 500 → Regular (closest available) */
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('data:font/ttf;base64,{{ $fontRegular }}') format('truetype');
-            font-weight: 500;
-            font-style: normal;
+            font-display: block;
         }
         @font-face {
             font-family: 'Montserrat';
             src: url('data:font/ttf;base64,{{ $fontBold }}') format('truetype');
-            font-weight: 700;
+            font-weight: 600 700;
             font-style: normal;
-        }
-        /* weight 600 → Bold (closest available) */
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('data:font/ttf;base64,{{ $fontBold }}') format('truetype');
-            font-weight: 600;
-            font-style: normal;
+            font-display: block;
         }
         @font-face {
             font-family: 'Montserrat';
             src: url('data:font/ttf;base64,{{ $fontBlack }}') format('truetype');
-            font-weight: 900;
+            font-weight: 800 900;
             font-style: normal;
-        }
-        /* weight 800 → Black (closest available) */
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('data:font/ttf;base64,{{ $fontBlack }}') format('truetype');
-            font-weight: 800;
-            font-style: normal;
+            font-display: block;
         }
     </style>
     @php
         /*
-         * In production, inline the compiled Tailwind CSS directly so Browsershot
-         * doesn't need to fetch any external URLs (which can fail due to SSL/network
-         * restrictions on the server, silently breaking all font-* and text-* classes).
-         * External @import statements (Google Fonts CDN) are stripped since fonts are
-         * already embedded as base64 above.
-         * In development (no manifest), fall back to the normal @vite directive.
+         * ── Inline the compiled Tailwind CSS ─────────────────────────────────────
+         * Browsershot renders HTML via ->html() (raw string → temp file). In that
+         * context Chromium must fetch any <link> stylesheet over the network. On
+         * many production servers (SSL termination at proxy, loopback blocked…)
+         * this silently fails, wiping out all Tailwind classes: font-montserrat,
+         * font-black, text-sm, etc. Text then falls back to the Ubuntu system font
+         * at normal weight → "moins grasse" + wrong line metrics.
+         *
+         * Fix: read the compiled CSS from the Vite manifest and inline it so there
+         * are zero external requests. CDN @import lines are stripped because fonts
+         * are already embedded as base64 above.
+         *
+         * Manifest location:
+         *   Vite 5+ (laravel-vite-plugin ≥1)  →  public/build/.vite/manifest.json
+         *   Vite 4 / legacy                   →  public/build/manifest.json
+         *
+         * Fallback: @vite directive (works in dev, where no manifest exists yet).
          */
-        $rendererCss = null;
-        $viteManifest = public_path('build/manifest.json');
-        if (file_exists($viteManifest)) {
+        $rendererCss   = null;
+        $manifestPaths = [
+            public_path('build/.vite/manifest.json'),  // Vite 5+ / laravel-vite-plugin v1+
+            public_path('build/manifest.json'),         // Vite 4 / legacy
+        ];
+        foreach ($manifestPaths as $manifestPath) {
+            if (!file_exists($manifestPath)) continue;
             try {
-                $manifest = json_decode(file_get_contents($viteManifest), true);
-                $cssEntry  = $manifest['resources/css/app.css'] ?? null;
+                $manifest = json_decode(file_get_contents($manifestPath), true);
+                $cssEntry = $manifest['resources/css/app.css'] ?? null;
                 if ($cssEntry && !empty($cssEntry['file'])) {
                     $cssPath = public_path('build/' . $cssEntry['file']);
                     if (file_exists($cssPath)) {
                         $raw = file_get_contents($cssPath);
-                        // Strip CDN @import lines (Google Fonts etc.) – fonts are embedded
+                        // Strip all CDN @import lines – no network calls during rendering
                         $rendererCss = preg_replace(
                             '/@import\s+url\([\'"]?https?:\/\/[^)]+[\'"]?\)\s*(?:layer\([^)]*\))?\s*;/i',
                             '',
@@ -91,6 +87,7 @@
                     }
                 }
             } catch (\Throwable $e) {}
+            if ($rendererCss !== null) break;
         }
     @endphp
     @if($rendererCss !== null)
@@ -106,10 +103,12 @@
             height: {{ $canvasHeight }}px;
             background: #ffffff;
             overflow: hidden;
-            -webkit-font-smoothing: subpixel-antialiased !important;
-            -moz-osx-font-smoothing: auto !important;
-            text-rendering: optimizeLegibility;
-            padding-top: 1.2px; /* Correctif global de baseline pour Linux/Chromium */
+            /* antialiased is consistent on both macOS and Linux headless Chrome;
+               subpixel-antialiased is silently ignored in headless mode on Linux
+               and can cause weight/sharpness inconsistencies. */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: geometricPrecision;
         }
         ::-webkit-scrollbar { display: none; }
     </style>

@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // Force French locale for dates
+        config(['app.locale' => 'fr']);
         \Carbon\Carbon::setLocale('fr');
-        setlocale(LC_TIME, 'fr_FR.utf8', 'fra', 'fr_FR');
     }
 }

@@ -119,11 +119,6 @@ if [ "$FRONTEND_CHANGED" -gt 0 ]; then
     mkdir -p public/build
     
     log "npm install..."
-    if [ -d "node_modules" ]; then
-        log "Récupération des droits sur node_modules..."
-        sudo chown -R $(whoami):$(whoami) node_modules || true
-    fi
-    
     # On tente npm ci (plus sûr), sinon npm install (plus flexible)
     if ! npm ci --quiet 2>/dev/null; then
         npm install --quiet
@@ -144,11 +139,6 @@ fi
 log "Mode maintenance ON..."
 $PHP artisan down --retry=60
 
-# Arrêter le worker AVANT de toucher aux caches pour éviter que les jobs en
-# cours ne cherchent des vues compilées supprimées par view:clear / optimize.
-log "Arrêt du queue worker (avant rebuild caches)..."
-sudo systemctl stop postelio-queue || true
-
 # --- Sauvegarde BDD ---------------------------------------------------------
 log "Sauvegarde base de données..."
 mkdir -p "$BACKUP_DIR"
@@ -162,9 +152,8 @@ $PHP artisan migrate --force || fail "Migration échouée"
 
 # --- Caches -----------------------------------------------------------------
 log "Rebuild caches (optimize)..."
-# view:clear explicite avant optimize pour garantir un état propre
-$PHP artisan view:clear
 $PHP artisan optimize
+$PHP artisan view:cache
 $PHP artisan event:cache
 
 # --- Storage link ------------------------------------------------------------

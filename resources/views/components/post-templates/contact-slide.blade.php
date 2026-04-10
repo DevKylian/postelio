@@ -94,16 +94,12 @@
         <h2 class="text-xl font-black tracking-tighter mb-1 leading-tight uppercase">{{ $companyLabel }}</h2>
         
         @if($trade || $city)
-            <div class="mb-6 flex flex-wrap justify-center gap-1.5 h-5">
+            <div class="mb-6 flex flex-wrap justify-center gap-1.5">
                 @if($trade)
-                    <span class="px-3 h-5 grid-center rounded-lg text-[7px] font-black uppercase tracking-[0.15em] border whitespace-nowrap leading-none" style="{{ $brandTagStyle }}">
-                        <span class="v-align-fix">{{ $trade }}</span>
-                    </span>
+                    <span class="px-3 h-5 inline-flex items-center justify-center rounded-lg text-[7px] font-black uppercase tracking-[0.15em] border whitespace-nowrap leading-none" style="{{ $brandTagStyle }}">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-3 h-5 grid-center rounded-lg text-[7px] font-black uppercase tracking-[0.15em] border whitespace-nowrap leading-none" style="{{ $brandTagStyle }}">
-                        <span class="v-align-fix">{{ $city }}</span>
-                    </span>
+                    <span class="px-3 h-5 inline-flex items-center justify-center rounded-lg text-[7px] font-black uppercase tracking-[0.15em] border whitespace-nowrap leading-none" style="{{ $brandTagStyle }}">{{ $city }}</span>
                 @endif
             </div>
         @else
@@ -119,8 +115,8 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" style="{{ $accentStyle }}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                     </div>
                     <div class="min-w-0">
-                        <p class="text-[7px] font-black uppercase tracking-[0.2em] opacity-30 mb-1 leading-none v-align-fix">Téléphone</p>
-                        <p class="text-[12px] font-black tracking-tight truncate leading-none v-align-fix">{{ $phone }}</p>
+                        <p class="text-[7px] font-black uppercase tracking-[0.2em] opacity-30 mb-0.5 leading-none">Téléphone</p>
+                        <p class="text-[12px] font-black tracking-tight truncate leading-tight">{{ $phone }}</p>
                     </div>
                 </div>
             @endif

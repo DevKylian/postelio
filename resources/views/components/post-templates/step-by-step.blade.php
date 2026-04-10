@@ -164,13 +164,13 @@
         @endphp
         @if($showFooter && !$exporting)
         <div class="absolute bottom-6 inset-x-0 mx-auto w-[90%] z-20" {!! $footerAlpine !!}>
-            <div class="backdrop-blur-xl rounded-2xl px-4 py-3.5 shadow-2xl border border-white/10 flex flex-col items-center h-16 justify-center"
+            <div class="backdrop-blur-xl rounded-2xl px-4 py-3.5 shadow-2xl border border-white/10 flex flex-col items-center"
                  style="background-color: {{ $accentColor }}d9;">
-                <div class="flex items-center justify-center gap-2 mb-2.5 h-3">
+                <div class="flex items-center gap-2 mb-2.5">
                     @if ($logoUrl)
                         <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
                     @endif
-                    <p class="font-black tracking-[0.2em] text-[7px] uppercase truncate leading-none v-align-fix" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                    <p class="font-black tracking-[0.2em] text-[7px] uppercase truncate leading-none" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
                 </div>
                 
                 <div class="flex items-center gap-1.5 overflow-hidden">

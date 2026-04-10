@@ -8,127 +8,16 @@
         $canvasHeight = ($aspectRatio === '4:5') ? 450 : 360;
     @endphp
     <meta name="viewport" content="width={{ $canvasWidth }}, initial-scale=1">
+    @vite(['resources/css/app.css'])
     <style>
-        @php
-            $fontRegular = base64_encode(file_get_contents(storage_path('fonts/Montserrat-Regular.ttf')));
-            $fontBold    = base64_encode(file_get_contents(storage_path('fonts/Montserrat-Bold.ttf')));
-            $fontBlack   = base64_encode(file_get_contents(storage_path('fonts/Montserrat-Black.ttf')));
-        @endphp
-        /*
-         * Montserrat embedded as base64 – completely offline, no CDN dependency.
-         * Weight ranges ensure every Tailwind font-weight utility (100–900) maps to
-         * the nearest physical file without triggering browser font synthesis.
-         *   300–500  → Regular (400)
-         *   600–700  → Bold    (700)
-         *   800–900  → Black   (900)
-         */
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('data:font/ttf;base64,{{ $fontRegular }}') format('truetype');
-            font-weight: 100 500;
-            font-style: normal;
-            font-display: block;
-        }
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('data:font/ttf;base64,{{ $fontBold }}') format('truetype');
-            font-weight: 600 700;
-            font-style: normal;
-            font-display: block;
-        }
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('data:font/ttf;base64,{{ $fontBlack }}') format('truetype');
-            font-weight: 800 900;
-            font-style: normal;
-            font-display: block;
-        }
-    </style>
-    @php
-        /*
-         * ── Inline the compiled Tailwind CSS ─────────────────────────────────────
-         * Browsershot renders HTML via ->html() (raw string → temp file). In that
-         * context Chromium must fetch any <link> stylesheet over the network. On
-         * many production servers (SSL termination at proxy, loopback blocked…)
-         * this silently fails, wiping out all Tailwind classes: font-montserrat,
-         * font-black, text-sm, etc. Text then falls back to the Ubuntu system font
-         * at normal weight → "moins grasse" + wrong line metrics.
-         *
-         * Fix: read the compiled CSS from the Vite manifest and inline it so there
-         * are zero external requests. CDN @import lines are stripped because fonts
-         * are already embedded as base64 above.
-         *
-         * Manifest location:
-         *   Vite 5+ (laravel-vite-plugin ≥1)  →  public/build/.vite/manifest.json
-         *   Vite 4 / legacy                   →  public/build/manifest.json
-         *
-         * Fallback: @vite directive (works in dev, where no manifest exists yet).
-         */
-        $rendererCss   = null;
-        $manifestPaths = [
-            public_path('build/.vite/manifest.json'),  // Vite 5+ / laravel-vite-plugin v1+
-            public_path('build/manifest.json'),         // Vite 4 / legacy
-        ];
-        foreach ($manifestPaths as $manifestPath) {
-            if (!file_exists($manifestPath)) continue;
-            try {
-                $manifest = json_decode(file_get_contents($manifestPath), true);
-                $cssEntry = $manifest['resources/css/app.css'] ?? null;
-                if ($cssEntry && !empty($cssEntry['file'])) {
-                    $cssPath = public_path('build/' . $cssEntry['file']);
-                    if (file_exists($cssPath)) {
-                        $raw = file_get_contents($cssPath);
-                        // Strip all CDN @import lines – no network calls during rendering
-                        $rendererCss = preg_replace(
-                            '/@import\s+url\([\'"]?https?:\/\/[^)]+[\'"]?\)\s*(?:layer\([^)]*\))?\s*;/i',
-                            '',
-                            $raw
-                        );
-                    }
-                }
-            } catch (\Throwable $e) {}
-            if ($rendererCss !== null) break;
-        }
-    @endphp
-    @if($rendererCss !== null)
-        <style>{!! $rendererCss !!}</style>
-    @else
-        @vite(['resources/css/app.css'])
-    @endif
-    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: {{ $canvasWidth }}px;
+            height: {{ $canvasHeight }}px;
             background: #ffffff;
             overflow: hidden;
-            /* Remove global padding-top as it doesn't fix internal flex alignment. 
-               We will use targeted compensation instead. */
-            padding-top: 0; 
-            
-            /* Antialiased is the most predictable for headless capture. */
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            text-rendering: geometricPrecision;
-            
-            /* Ensure Montserrat is used everywhere by default in this layout */
-            font-family: 'Montserrat', sans-serif !important;
         }
-        
-        /* THE ULTIMATE FIX: Targeted vertical offset for Linux baseline issues 
-           We apply a slight push down to centered text elements. 
-           Increased to 2.2px as 1.5px was still a bit high. */
-        .v-align-fix {
-            transform: translateY(2.2px) !important;
-        }
-
-        /* Force Grid centering for badges which is more stable than Flex on some OS. */
-        .grid-center {
-            display: inline-grid !important;
-            place-content: center !important;
-            align-items: center !important;
-        }
-
-        /* Force boldness consistency across platforms - ensuring no system font fallback */
-        .font-black { font-weight: 900 !important; font-family: 'Montserrat', sans-serif !important; }
-        .font-bold { font-weight: 700 !important; font-family: 'Montserrat', sans-serif !important; }
-        
         ::-webkit-scrollbar { display: none; }
     </style>
 </head>

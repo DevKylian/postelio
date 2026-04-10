@@ -41,11 +41,6 @@ class ImageGeneratorService
             ->clip(0, 0, $width, $height)
             ->format('png')
             ->noSandbox()
-            ->ignoreHttpsErrors()
-            // Allow the temp HTML file to load local file:// resources (fonts etc.)
-            ->addChromiumArguments(['--allow-file-access-from-files'])
-            ->waitUntilNetworkIdle()
-            ->waitForFunction('document.fonts.status === "loaded"')
             ->timeout(60);
     }
 

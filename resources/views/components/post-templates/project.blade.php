@@ -65,26 +65,26 @@
             <div class="w-1/2 relative overflow-hidden border-r border-white/20 bg-gray-300 flex items-center justify-center">
                 @if ($imageBeforeUrl)
                     <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
-                    <div class="absolute top-6 left-6 px-4 h-7 grid-center rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none v-align-fix">Avant</p>
+                    <div class="absolute top-6 left-6 px-4 h-7 inline-flex items-center justify-center rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none">Avant</p>
                     </div>
                 @else
-                    <div class="h-full flex flex-col items-center justify-center text-center text-gray-500">
+                    <div class="text-center text-gray-500">
                         <svg class="w-10 h-10 mx-auto mb-2 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        <p class="text-[9px] font-bold uppercase tracking-widest leading-none v-align-fix" style="color: {{ $brandColor }}">Avant</p>
+                        <p class="text-[9px] font-bold uppercase tracking-widest" style="color: {{ $brandColor }}">Avant</p>
                     </div>
                 @endif
             </div>
             <div class="w-1/2 relative overflow-hidden bg-gray-400 flex items-center justify-center">
                 @if ($imageAfterUrl)
                     <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
-                    <div class="absolute top-6 right-6 px-4 h-7 grid-center rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none v-align-fix">Après</p>
+                    <div class="absolute top-6 right-6 px-4 h-7 inline-flex items-center justify-center rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none">Après</p>
                     </div>
                 @else
-                    <div class="h-full flex flex-col items-center justify-center text-center text-gray-100">
+                    <div class="text-center text-gray-100">
                         <svg class="w-10 h-10 mx-auto mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        <p class="text-[9px] font-bold uppercase tracking-widest leading-none v-align-fix" style="color: {{ $brandColor }}">Après</p>
+                        <p class="text-[9px] font-bold uppercase tracking-widest" style="color: {{ $brandColor }}">Après</p>
                     </div>
                 @endif
             </div>
@@ -99,8 +99,8 @@
         <div class="absolute inset-0 bg-slate-900 flex items-center justify-center" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if ($imageBeforeUrl)
                 <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute top-6 left-6 px-4 h-7 grid-center rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none v-align-fix">Avant</p>
+                <div class="absolute top-6 left-6 px-4 h-7 inline-flex items-center justify-center rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none">Avant</p>
                 </div>
             @endif
         </div>
@@ -114,8 +114,8 @@
         <div class="absolute inset-0 bg-slate-900 flex items-center justify-center" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if ($imageAfterUrl)
                 <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute top-6 right-6 px-4 h-7 grid-center rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none v-align-fix">Après</p>
+                <div class="absolute top-6 right-6 px-4 h-7 inline-flex items-center justify-center rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none">Après</p>
                 </div>
             @endif
         </div>

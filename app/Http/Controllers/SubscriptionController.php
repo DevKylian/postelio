@@ -32,13 +32,17 @@ class SubscriptionController extends Controller
         $subscription = $user->subscription('default');
 
         $renewalDate = null;
-        if ($subscription && $subscription->valid() && !$subscription->onGracePeriod()) {
+        if ($subscription && $subscription->stripe_id && !$subscription->onGracePeriod()) {
             try {
-                $periodEnd = $subscription->asStripeSubscription()->current_period_end;
+                $stripeSubscription = $subscription->asStripeSubscription();
+                $periodEnd = $stripeSubscription->current_period_end;
                 if ($periodEnd) {
                     $renewalDate = \Carbon\Carbon::createFromTimestamp($periodEnd);
                 }
             } catch (\Exception $e) {
+                if (app()->environment('local')) {
+                    logger()->error("Erreur récupération date Stripe: " . $e->getMessage());
+                }
                 // Fallback for test subscriptions (Tinker) or when Stripe is unreachable
                 $renewalDate = $subscription->created_at->addMonth();
             }

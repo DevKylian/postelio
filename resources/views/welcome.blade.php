@@ -1130,16 +1130,17 @@
       x-init="$nextTick(() => { setTimeout(() => startAnimation(), 800) })" x-intersect:enter.half="startAnimation()"
       x-intersect:leave="stopAnimation()">
 
-      <!-- Glow + micro-particles behind the showcase -->
-      <div class="absolute inset-0 pointer-events-none overflow-hidden" style="z-index:0">
-        <!-- Soft radial amber glow -->
-        <div class="absolute inset-0" style="background: radial-gradient(ellipse 90% 75% at 50% 52%, rgba(245,158,11,0.13) 0%, rgba(249,115,22,0.07) 35%, rgba(245,158,11,0.03) 65%, transparent 80%);"></div>
-        <!-- Canvas: micro-dust particles -->
-        <canvas id="hero-dust" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
-      </div>
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- isolation: isolate crée un stacking context local pour que z-index:-1 reste derrière la card -->
+        <div class="relative" style="isolation: isolate;">
 
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8" style="position:relative;z-index:1">
-        <div class="md-showcase flex flex-col" x-ref="showcase">
+          <!-- Glow + particules : ancré sur la card, déborde autour via inset négatif -->
+          <div class="absolute pointer-events-none" style="inset: -80px -60px; z-index: -1;">
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse 85% 75% at 50% 50%, rgba(245,158,11,0.28) 0%, rgba(249,115,22,0.15) 32%, rgba(245,158,11,0.05) 62%, transparent 82%);"></div>
+            <canvas id="hero-dust" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
+          </div>
+
+          <div class="md-showcase flex flex-col" x-ref="showcase">
 
           <!-- Persistent Safari UI -->
           <div class="md-topbar relative z-20">
@@ -1783,7 +1784,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div><!-- /isolation wrapper -->
       </div>
 
       <!-- Micro-dust particle animation -->
@@ -1793,47 +1794,66 @@
           if (!canvas) return;
           const ctx = canvas.getContext('2d');
 
-          // Amber / orange / yellow palette
-          const COLORS = ['#F59E0B', '#f97316', '#fbbf24', '#fde68a', '#fb923c', '#fcd34d'];
+          const COLORS = ['#F59E0B', '#f97316', '#fbbf24', '#fde68a', '#fb923c', '#fcd34d', '#fff7ed'];
+          // Must match CSS inset values on the glow wrapper (inset: -80px -60px)
+          const MX = 60, MY = 80;
 
-          let W = 0, H = 0;
-          let particles = [];
-          let raf = null;
-          const COUNT = 160;
+          let W = 0, H = 0, particles = [], raf = null;
+          const COUNT = 200;
 
           function resize() {
             W = canvas.width  = canvas.offsetWidth;
             H = canvas.height = canvas.offsetHeight;
           }
 
-          // Gaussian-ish: concentrate particles toward the horizontal center
-          function randX() {
-            // bias toward center with a bit of spread
-            const u = Math.random(), v = Math.random();
-            const gauss = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
-            return W * 0.5 + gauss * (W * 0.3);
+          // Returns a position biased toward the visible border strips around the card.
+          // The canvas is card + MX left/right + MY top/bottom.
+          // The card itself is behind md-showcase (z-index: -1), so only the margins are visible.
+          function borderPos() {
+            // Weight: top & bottom strips are widest → more particles there
+            const zone = Math.random();
+            if (zone < 0.30) {               // top strip
+              return { x: Math.random() * W, y: Math.random() * MY };
+            } else if (zone < 0.60) {        // bottom strip
+              return { x: Math.random() * W, y: H - Math.random() * MY };
+            } else if (zone < 0.80) {        // left strip
+              return { x: Math.random() * MX, y: Math.random() * H };
+            } else {                          // right strip
+              return { x: W - Math.random() * MX, y: Math.random() * H };
+            }
           }
 
           function spawn(fromBottom) {
-            const lifespan = 120 + Math.random() * 180;
+            const lifespan = 90 + Math.random() * 160;
+            let x, y;
+            if (fromBottom) {
+              // Respawns drift up from the bottom edge, visible in bottom strip first
+              x = MX + Math.random() * (W - MX * 2);
+              y = H + Math.random() * 20;
+            } else if (Math.random() < 0.70) {
+              // 70% start in visible border zones
+              const p = borderPos();
+              x = p.x; y = p.y;
+            } else {
+              // 30% anywhere — some start hidden, create "emerging from behind" look
+              x = Math.random() * W;
+              y = Math.random() * H;
+            }
             return {
-              x:          randX(),
-              y:          fromBottom ? H + Math.random() * 40 : Math.random() * H,
-              r:          0.4 + Math.random() * 1.4,       // 0.4 – 1.8 px
+              x, y,
+              r:          0.35 + Math.random() * 1.5,
               color:      COLORS[Math.floor(Math.random() * COLORS.length)],
               alpha:      0,
-              peakAlpha:  0.25 + Math.random() * 0.55,
-              vx:         (Math.random() - 0.5) * 0.25,
-              vy:         -(0.12 + Math.random() * 0.35),  // drift upward
-              // twinkle: oscillate alpha slightly
+              peakAlpha:  0.28 + Math.random() * 0.52,
+              vx:         (Math.random() - 0.5) * 0.22,
+              vy:         -(0.10 + Math.random() * 0.32),
               twinkle:    Math.random() * Math.PI * 2,
-              twinkleSpd: 0.03 + Math.random() * 0.04,
+              twinkleSpd: 0.02 + Math.random() * 0.05,
               life:       fromBottom ? 0 : Math.random() * lifespan,
-              lifespan:   lifespan,
+              lifespan,
             };
           }
 
-          // Seed initial particles at random life stages
           for (let i = 0; i < COUNT; i++) particles.push(spawn(false));
 
           function draw() {
@@ -1846,36 +1866,32 @@
               p.y += p.vy;
               p.twinkle += p.twinkleSpd;
 
-              // Fade-in / sustain / fade-out envelope
               const t = p.life / p.lifespan;
               let env;
               if      (t < 0.15) env = t / 0.15;
-              else if (t > 0.80) env = (1 - t) / 0.20;
+              else if (t > 0.82) env = (1 - t) / 0.18;
               else               env = 1;
 
-              // Subtle twinkle layered on top
-              const twinkleMod = 0.75 + 0.25 * Math.sin(p.twinkle);
-              p.alpha = p.peakAlpha * env * twinkleMod;
+              p.alpha = p.peakAlpha * env * (0.75 + 0.25 * Math.sin(p.twinkle));
 
-              // Respawn when life ends or floats off-screen
-              if (p.life >= p.lifespan || p.y < -6) {
+              if (p.life >= p.lifespan || p.y < -8) {
                 particles[i] = spawn(true);
                 continue;
               }
 
-              // Draw glowing dot
               ctx.save();
               ctx.globalAlpha = p.alpha;
-              ctx.shadowBlur  = p.r * 5 + 4;
+              ctx.shadowBlur  = p.r * 6 + 4;
               ctx.shadowColor = p.color;
               ctx.fillStyle   = p.color;
               ctx.beginPath();
               ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
               ctx.fill();
-              // Second pass for extra glow core
-              ctx.globalAlpha = p.alpha * 0.6;
-              ctx.shadowBlur  = p.r * 12;
-              ctx.arc(p.x, p.y, p.r * 0.5, 0, Math.PI * 2);
+              // Bright core
+              ctx.globalAlpha = p.alpha * 0.7;
+              ctx.shadowBlur  = p.r * 14;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.r * 0.45, 0, Math.PI * 2);
               ctx.fill();
               ctx.restore();
             }
@@ -1883,22 +1899,17 @@
             raf = requestAnimationFrame(draw);
           }
 
-          // Pause when section leaves the viewport
           const section = canvas.closest('section');
           const observer = new IntersectionObserver(entries => {
             entries.forEach(e => {
-              if (e.isIntersecting) {
-                if (!raf) draw();
-              } else {
-                cancelAnimationFrame(raf);
-                raf = null;
-              }
+              if (e.isIntersecting) { if (!raf) draw(); }
+              else { cancelAnimationFrame(raf); raf = null; }
             });
           }, { threshold: 0.05 });
           if (section) observer.observe(section);
 
           resize();
-          window.addEventListener('resize', () => { resize(); });
+          window.addEventListener('resize', resize);
           draw();
         })();
       </script>

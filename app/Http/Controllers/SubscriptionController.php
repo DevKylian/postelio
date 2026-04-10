@@ -30,29 +30,39 @@ class SubscriptionController extends Controller
         $plans = config('subscription.plans');
         $currentPlan = $user->currentPlanKey();
         
-        // Get 'default' subscription or fallback to the first one found
-        $subscription = $user->subscription('default') ?: $user->subscriptions()->first();
+        // Find ANY subscription record to be safe
+        $subscription = $this->getSubscription($user);
 
-        $renewalDate = null;
-        if ($subscription) {
+        // DEFAULT FALLBACK: If we have a sub, we MUST have a date.
+        // We initialize with created_at + 1 month.
+        $renewalDate = $subscription ? ($subscription->created_at ? $subscription->created_at->addMonth() : now()->addMonth()) : null;
+
+        if ($subscription && $subscription->stripe_id) {
             try {
                 // Try to get real end date from Stripe
                 $stripeSubscription = $subscription->asStripeSubscription();
-                if (isset($stripeSubscription->current_period_end)) {
+                if ($stripeSubscription && isset($stripeSubscription->current_period_end)) {
                     $renewalDate = \Carbon\Carbon::createFromTimestamp($stripeSubscription->current_period_end);
                 }
             } catch (\Exception $e) {
-                // Log only in local for debugging
+                // Keep our fallback renewalDate
                 if (app()->environment('local')) {
-                    logger()->error("Billing: Fallback to created_at + 1 month. Error: " . $e->getMessage());
+                    logger()->error("Billing Exception: " . $e->getMessage());
                 }
-                
-                // Fallback: created_at + 1 month
-                $renewalDate = $subscription->created_at->addMonth();
             }
         }
 
         return view('subscription.billing', compact('user', 'plans', 'currentPlan', 'subscription', 'renewalDate'));
+    }
+
+    /**
+     * Helper to get any available subscription for the user.
+     */
+    private function getSubscription($user)
+    {
+        return $user->subscription('default') 
+            ?: $user->subscriptions()->whereIn('stripe_status', ['active', 'trialing', 'past_due', 'incomplete'])->first()
+            ?: $user->subscriptions()->first();
     }
 
     /**
@@ -354,4 +364,5 @@ class SubscriptionController extends Controller
 
         return true;
     }
+
 }

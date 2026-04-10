@@ -157,10 +157,10 @@
                     {{-- Right: tags --}}
                     <div class="flex items-center gap-1.5 shrink-0">
                         @if($trade)
-                            <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap" style="{{ $tagStyle }}">{{ $trade }}</span>
+                            <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-tight" style="{{ $tagStyle }}">{{ $trade }}</span>
                         @endif
                         @if($city)
-                            <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap" style="{{ $tagStyle }}">{{ $city }}</span>
+                            <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-tight" style="{{ $tagStyle }}">{{ $city }}</span>
                         @endif
                     </div>
                 </div>

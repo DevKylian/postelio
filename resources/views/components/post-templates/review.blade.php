@@ -79,10 +79,10 @@
         <div class="absolute -bottom-12 -left-12 w-48 h-48 rounded-full blur-3xl pointer-events-none" style="background: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.15)' }}"></div>
 
         {{-- Verified Badge --}}
-        <div class="mb-4 relative z-10 h-6 inline-flex items-center gap-1.5 px-3 rounded-full border shadow-sm backdrop-blur-sm transition-all" 
+        <div class="mb-4 relative z-10 h-6 inline-flex items-center gap-1.5 px-3 pt-[2px] rounded-full border shadow-sm backdrop-blur-sm transition-all text-center justify-center" 
              style="background: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)' }}; border-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}">
-            <svg class="w-2.5 h-2.5" fill="none" stroke="{{ $brandTextColor }}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-            <span class="text-[8px] font-black uppercase tracking-[0.2em] leading-none mb-[1px]" style="color: {{ $brandTextColor }}">Témoignage Vérifié</span>
+            <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="{{ $brandTextColor }}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+            <span class="text-[8px] font-black uppercase tracking-[0.2em] leading-tight" style="color: {{ $brandTextColor }}">Témoignage Vérifié</span>
         </div>
 
         {{-- Stars --}}
@@ -124,9 +124,9 @@
                      style="background: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.05)' }}; border-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)' }}">
                     
                     {{-- Initials Avatar --}}
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-inner" 
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-inner pt-[2px]" 
                          style="background: {{ $brandTextColor }}; color: {{ $brandColor }}">
-                        <span class="text-xs font-black tracking-tighter leading-none mb-[1px]">{{ $initials }}</span>
+                        <span class="text-xs font-black tracking-tighter leading-none">{{ $initials }}</span>
                     </div>
 
                     <div class="flex flex-col items-start min-w-0">
@@ -175,10 +175,10 @@
 
                 <div class="flex items-center justify-center gap-2 mt-4">
                     @if($trade)
-                        <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap" style="{{ $tagStyle }}">{{ $trade }}</span>
+                        <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-tight" style="{{ $tagStyle }}">{{ $trade }}</span>
                     @endif
                     @if($city)
-                        <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap" style="{{ $tagStyle }}">{{ $city }}</span>
+                        <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-tight" style="{{ $tagStyle }}">{{ $city }}</span>
                     @endif
                 </div>
         </div>

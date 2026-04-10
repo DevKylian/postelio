@@ -86,10 +86,10 @@
         </div>
         <div class="flex items-center gap-1.5">
             @if($trade)
-                <span class="px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-wider border" style="background: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $accentTextColor }}">{{ $trade }}</span>
+                <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[7px] font-black uppercase tracking-wider border leading-tight" style="background: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $accentTextColor }}">{{ $trade }}</span>
             @endif
             @if($city)
-                <span class="px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-wider border" style="background: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $accentTextColor }}">{{ $city }}</span>
+                <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[7px] font-black uppercase tracking-wider border leading-tight" style="background: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $accentTextColor }}">{{ $city }}</span>
             @endif
         </div>
     </div>
@@ -109,9 +109,9 @@
         <div {!! $slide0Alpine !!} style="{{ $slide0Style }}" class="relative z-10">
 
             {{-- FAQ Chip --}}
-            <div class="inline-flex items-center gap-2 mb-5 px-3 py-1.5 rounded-full" style="{{ $chipStyle }}">
-                <span class="text-lg font-black leading-none" style="color: {{ $chipIconColor }}">?</span>
-                <span class="text-[9px] font-black uppercase tracking-[0.25em]">Question fréquente</span>
+            <div class="inline-flex items-center gap-2 mb-5 px-3 h-7 rounded-full pt-[2px]" style="{{ $chipStyle }}">
+                <span class="text-lg font-black leading-none mb-[2px]" style="color: {{ $chipIconColor }}">?</span>
+                <span class="text-[9px] font-black uppercase tracking-[0.25em] leading-tight">Question fréquente</span>
             </div>
 
             {{-- Separator --}}
@@ -137,9 +137,9 @@
         <div {!! $slide1Alpine !!} style="{{ $slide1Style }}" class="relative z-10">
 
             {{-- Answer Chip --}}
-            <div class="inline-flex items-center gap-2 mb-5 px-3 py-1.5 rounded-full" style="{{ $chipStyle }}">
+            <div class="inline-flex items-center gap-2 mb-5 px-3 h-7 rounded-full pt-[2px]" style="{{ $chipStyle }}">
                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: {{ $chipIconColor }}"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                <span class="text-[9px] font-black uppercase tracking-[0.25em]">Notre réponse</span>
+                <span class="text-[9px] font-black uppercase tracking-[0.25em] leading-tight">Notre réponse</span>
             </div>
 
             {{-- Separator --}}
@@ -196,10 +196,10 @@
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
                 @if($trade)
-                    <span class="px-2 py-0.5 rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap" style="{{ $tagStyle }}">{{ $trade }}</span>
+                    <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-tight" style="{{ $tagStyle }}">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-2 py-0.5 rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap" style="{{ $tagStyle }}">{{ $city }}</span>
+                    <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-tight" style="{{ $tagStyle }}">{{ $city }}</span>
                 @endif
             </div>
         </div>

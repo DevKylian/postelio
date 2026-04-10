@@ -65,8 +65,8 @@
             <div class="w-1/2 relative overflow-hidden border-r border-white/20 bg-gray-300 flex items-center justify-center">
                 @if ($imageBeforeUrl)
                     <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
-                    <div class="absolute top-6 left-6 px-4 h-7 inline-flex items-center justify-center rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none mb-[1px]">Avant</p>
+                    <div class="absolute top-6 left-6 px-4 h-7 inline-flex items-center justify-center pt-[2px] rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-tight">Avant</p>
                     </div>
                 @else
                     <div class="text-center text-gray-500">
@@ -78,8 +78,8 @@
             <div class="w-1/2 relative overflow-hidden bg-gray-400 flex items-center justify-center">
                 @if ($imageAfterUrl)
                     <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
-                    <div class="absolute top-6 right-6 px-4 h-7 inline-flex items-center justify-center rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none mb-[1px]">Après</p>
+                    <div class="absolute top-6 right-6 px-4 h-7 inline-flex items-center justify-center pt-[2px] rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-tight">Après</p>
                     </div>
                 @else
                     <div class="text-center text-gray-100">
@@ -99,8 +99,8 @@
         <div class="absolute inset-0 bg-slate-900 flex items-center justify-center" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if ($imageBeforeUrl)
                 <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute top-6 left-6 px-4 h-7 inline-flex items-center justify-center rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none mb-[1px]">Avant</p>
+                <div class="absolute top-6 left-6 px-4 h-7 inline-flex items-center justify-center pt-[2px] rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-tight">Avant</p>
                 </div>
             @endif
         </div>
@@ -114,8 +114,8 @@
         <div class="absolute inset-0 bg-slate-900 flex items-center justify-center" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if ($imageAfterUrl)
                 <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute top-6 right-6 px-4 h-7 inline-flex items-center justify-center rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
-                    <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none mb-[1px]">Après</p>
+                <div class="absolute top-6 right-6 px-4 h-7 inline-flex items-center justify-center pt-[2px] rounded-full shadow-2xl z-20 border" style="{{ $badgeStyle }}">
+                    <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-tight">Après</p>
                 </div>
             @endif
         </div>
@@ -187,7 +187,7 @@
                         @endif
                         <p class="font-black tracking-[0.15em] text-[6px] uppercase text-center leading-tight line-clamp-2" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
                         @if($trade)
-                            <span class="px-2 h-4 inline-flex items-center justify-center rounded text-[5px] font-black uppercase tracking-wide border whitespace-nowrap" style="{{ $tagStyle }}">{{ $trade }}</span>
+                            <span class="px-2 h-4 inline-flex items-center justify-center pt-[1.5px] rounded text-[5px] font-black uppercase tracking-wide border whitespace-nowrap" style="{{ $tagStyle }}">{{ $trade }}</span>
                         @endif
                     </div>
                 </div>

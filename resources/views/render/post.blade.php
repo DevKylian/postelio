@@ -10,7 +10,26 @@
     <meta name="viewport" content="width={{ $canvasWidth }}, initial-scale=1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=block" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('file:///{{ str_replace('\\', '/', storage_path('fonts/Montserrat-Regular.ttf')) }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('file:///{{ str_replace('\\', '/', storage_path('fonts/Montserrat-Bold.ttf')) }}') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('file:///{{ str_replace('\\', '/', storage_path('fonts/Montserrat-Black.ttf')) }}') format('truetype');
+            font-weight: 900;
+            font-style: normal;
+        }
+    </style>
     @vite(['resources/css/app.css'])
     <style>
         body {
@@ -23,6 +42,7 @@
             -webkit-font-smoothing: subpixel-antialiased !important;
             -moz-osx-font-smoothing: auto !important;
             text-rendering: optimizeLegibility;
+            padding-top: 1.2px; /* Correctif global de baseline pour Linux/Chromium */
         }
         ::-webkit-scrollbar { display: none; }
     </style>

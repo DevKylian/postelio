@@ -75,7 +75,7 @@
                     $slideText = $slideContents[$index] ?? (($index === 0) ? $title : '');
                 @endphp
 
-                @if(!empty($slideText))
+                @if(!empty($slideText) && $index === 0)
                     @php
                         $sLen = mb_strlen($slideText);
                         $sFontSize = 'text-[11px]';

@@ -16,6 +16,7 @@ export default {
                 sans: ['Inter', 'Figtree', ...defaultTheme.fontFamily.sans],
                 display: ['Outfit', 'Inter', 'Figtree', ...defaultTheme.fontFamily.sans],
                 logo: ['Plus Jakarta Sans', 'Inter', ...defaultTheme.fontFamily.sans],
+                montserrat: ['Montserrat', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 midnight: '#111827', // Gray 900

@@ -25,13 +25,12 @@
                             <p class="text-xs text-gray-400 mt-0.5">Gérez vos factures, votre mode de paiement ou résiliez.</p>
                         </div>
                     </div>
-                    <form method="POST" action="{{ route('subscription.portal') }}">
-                        @csrf
-                        <x-primary-button type="submit" class="!gap-2">
+                    <a href="{{ route('subscription.billing') }}" wire:navigate>
+                        <x-primary-button type="button" class="!gap-2">
                             Gérer mon abonnement
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                         </x-primary-button>
-                    </form>
+                    </a>
                 </div>
             @endif
 

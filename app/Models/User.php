@@ -40,6 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'used_credits',
         'last_quota_reset_at',
         'newsletter_opt_in',
+        'retention_offer_used_at',
     ];
 
     /**
@@ -71,6 +72,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'total_credits' => 'integer',
             'used_credits' => 'integer',
             'newsletter_opt_in' => 'boolean',
+            'retention_offer_used_at' => 'datetime',
         ];
     }
 
@@ -195,6 +197,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function hasActiveSubscription(): bool
     {
         return $this->subscribed('default');
+    }
+
+    /**
+     * Whether the retention offer (-50%) has already been shown to this user.
+     */
+    public function hasSeenRetentionOffer(): bool
+    {
+        return $this->retention_offer_used_at !== null;
     }
 
     /**

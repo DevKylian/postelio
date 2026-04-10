@@ -10,6 +10,20 @@ use Livewire\Component;
 #[Layout('layouts.app')]
 class TemplateManager extends Component
 {
+    public bool $visualStylesEnabled = true;
+
+    public function mount()
+    {
+        $this->visualStylesEnabled = (bool) \App\Models\Setting::get('enable_visual_styles', true);
+    }
+
+    public function toggleVisualStyles()
+    {
+        $this->visualStylesEnabled = !$this->visualStylesEnabled;
+        \App\Models\Setting::set('enable_visual_styles', $this->visualStylesEnabled);
+        $this->dispatch('notify', 'La visibilité des styles alternatifs a été mise à jour.');
+    }
+
     public function toggleNative($slug)
     {
         $setting = NativeTemplateSetting::where('slug', $slug)->first();

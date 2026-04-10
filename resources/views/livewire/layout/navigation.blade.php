@@ -278,7 +278,7 @@ $logout = function (Logout $logout) {
                     @endphp
                     <div class="h-full bg-gradient-to-r {{ $colorClass }} transition-all duration-1000 rounded-full relative"
                          style="width: {{ $percentage }}%">
-                        <div class="absolute inset-0 bg-white/20 opacity-50 group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+
                     </div>
                 </div>
 

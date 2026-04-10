@@ -61,9 +61,16 @@ class PostGenerator extends Component
     // Templates requiring before+after
     const BEFORE_AFTER_TEMPLATES = ['project'];
 
+    public bool $visualStylesEnabled = true;
+
     public function mount()
     {
         $this->isFeatureDisabled = !\App\Models\Setting::get('post_generation_enabled', true);
+        $this->visualStylesEnabled = (bool) \App\Models\Setting::get('enable_visual_styles', true);
+
+        if (!$this->visualStylesEnabled) {
+            $this->visualStyle = 'standard';
+        }
 
         $company = Auth::user()->company;
         $this->platforms = [];
@@ -227,7 +234,7 @@ class PostGenerator extends Component
             'scheduleType'  => 'required|in:now,scheduled',
             'scheduledAt'   => $this->scheduleType === 'scheduled' ? 'required|date|after:now' : 'nullable',
             'tone'          => 'required|in:professionnel,chaleureux,expert,dynamique',
-            'visualStyle'   => 'required|in:' . (Auth::user()->hasFullTemplateAccess() ? 'standard,glass,blueprint,kraft,beton' : 'standard'),
+            'visualStyle'   => 'required|in:' . ($this->visualStylesEnabled ? (Auth::user()->hasFullTemplateAccess() ? 'standard,glass,blueprint,kraft,beton' : 'standard') : 'standard'),
             'aspectRatio'   => 'required|in:1:1,4:5',
         ];
     }

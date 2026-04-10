@@ -16,9 +16,32 @@
         </div>
     </x-slot>
 
-    <div class="py-8 px-4 sm:px-6 lg:px-8">
+    <div class="py-10 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto space-y-12">
-            
+
+            {{-- Global Visibility Toggle --}}
+            <section class="bg-gradient-to-br from-midnight to-slate-900 rounded-3xl p-8 text-white shadow-xl shadow-midnight/20 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 -tr-8 w-64 h-64 bg-copper/10 rounded-full blur-3xl group-hover:bg-copper/20 transition-all duration-700"></div>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <h2 class="text-2xl font-black tracking-tight mb-2">Modes de Design Avancés</h2>
+                        <p class="text-slate-400 text-sm max-w-xl leading-relaxed">
+                            Contrôlez l'accès aux styles <strong>Glassmorphism</strong>, <strong>Blueprint</strong>, <strong>Kraft</strong> et <strong>Béton</strong>. 
+                            Désactivez-les pour simplifier l'interface et ne conserver que le style <strong>Classique</strong>.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-4 bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+                        <span class="text-sm font-bold {{ $visualStylesEnabled ? 'text-copper' : 'text-slate-400' }}">
+                            {{ $visualStylesEnabled ? 'Styles Activés' : 'Uniquement Classique' }}
+                        </span>
+                        <button wire:click="toggleVisualStyles" 
+                                class="relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none {{ $visualStylesEnabled ? 'bg-copper' : 'bg-slate-700' }}">
+                            <span class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition duration-300 ease-in-out {{ $visualStylesEnabled ? 'translate-x-7' : 'translate-x-0' }}"></span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
             {{-- Gabarits Natifs --}}
             <section>
                 <div class="flex items-center gap-4 mb-6">

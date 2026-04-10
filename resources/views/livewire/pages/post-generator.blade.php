@@ -919,6 +919,7 @@
                         @error('aspectRatio') <p class="text-red-500 text-[11px] font-bold mt-2">{{ $message }}</p> @enderror
                     </div>
 
+                    @if($visualStylesEnabled)
                     {{-- ── Style visuel ── --}}
                     <div>
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Style graphique</p>
@@ -997,6 +998,7 @@
                             @endforeach
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
 

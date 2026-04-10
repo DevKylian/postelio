@@ -202,7 +202,12 @@ $deleteTemplate = function (int $id) {
     }
 };
 
+$visualStylesEnabled = computed(fn() => (bool) \App\Models\Setting::get('enable_visual_styles', true));
+
 $switchTab = function ($tab) {
+    if (!$this->visualStylesEnabled && $tab !== 'standard') {
+        return;
+    }
     $this->activeTab = $tab;
 };
 
@@ -220,39 +225,46 @@ $switchTab = function ($tab) {
                         <div wire:loading class="absolute top-0 left-0 right-0 h-0.5 bg-copper/30 animate-pulse pointer-events-none"></div>
 
                         <button wire:click="switchTab('standard')"
+                                wire:key="tab-standard"
                                 wire:loading.attr="disabled"
                                 class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 relative
                                     {{ $activeTab === 'standard' ? 'bg-white text-midnight shadow-lg shadow-gray-200 ring-1 ring-gray-100' : 'text-gray-400 hover:text-gray-600' }}">
                             Style Classique
                         </button>
 
-                        <button wire:click="switchTab('glass')"
-                                wire:loading.attr="disabled"
-                                class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
-                                    {{ $activeTab === 'glass' ? 'bg-midnight text-white shadow-lg shadow-midnight/20' : 'text-gray-400 hover:text-gray-600' }}">
-                            Style Glassmorphism
-                        </button>
+                        @if($this->visualStylesEnabled)
+                            <button wire:click="switchTab('glass')"
+                                    wire:key="tab-glass"
+                                    wire:loading.attr="disabled"
+                                    class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
+                                        {{ $activeTab === 'glass' ? 'bg-midnight text-white shadow-lg shadow-midnight/20' : 'text-gray-400 hover:text-gray-600' }}">
+                                Style Glassmorphism
+                            </button>
 
-                        <button wire:click="switchTab('blueprint')"
-                                wire:loading.attr="disabled"
-                                class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
-                                    {{ $activeTab === 'blueprint' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-400 hover:text-gray-600' }}">
-                            Style Blueprint
-                        </button>
+                            <button wire:click="switchTab('blueprint')"
+                                    wire:key="tab-blueprint"
+                                    wire:loading.attr="disabled"
+                                    class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
+                                        {{ $activeTab === 'blueprint' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-400 hover:text-gray-600' }}">
+                                Style Blueprint
+                            </button>
 
-                        <button wire:click="switchTab('kraft')"
-                                wire:loading.attr="disabled"
-                                class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
-                                    {{ $activeTab === 'kraft' ? 'bg-[#BC9A7E] text-slate-900 shadow-lg shadow-[#BC9A7E]/20' : 'text-gray-400 hover:text-gray-600' }}">
-                            Style Kraft
-                        </button>
+                            <button wire:click="switchTab('kraft')"
+                                    wire:key="tab-kraft"
+                                    wire:loading.attr="disabled"
+                                    class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
+                                        {{ $activeTab === 'kraft' ? 'bg-[#BC9A7E] text-slate-900 shadow-lg shadow-[#BC9A7E]/20' : 'text-gray-400 hover:text-gray-600' }}">
+                                Style Kraft
+                            </button>
 
-                        <button wire:click="switchTab('beton')"
-                                wire:loading.attr="disabled"
-                                class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
-                                    {{ $activeTab === 'beton' ? 'bg-slate-600 text-white shadow-lg shadow-slate-600/20' : 'text-gray-400 hover:text-gray-600' }}">
-                            Style Béton
-                        </button>
+                            <button wire:click="switchTab('beton')"
+                                    wire:key="tab-beton"
+                                    wire:loading.attr="disabled"
+                                    class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
+                                        {{ $activeTab === 'beton' ? 'bg-slate-600 text-white shadow-lg shadow-slate-600/20' : 'text-gray-400 hover:text-gray-600' }}">
+                                Style Béton
+                            </button>
+                        @endif
                     </div>
 
                     {{-- Dynamic Color Pickers --}}
@@ -310,67 +322,17 @@ $switchTab = function ($tab) {
                 <div wire:loading.class="opacity-50 blur-[1px] transition-all duration-300" class="w-full">
 
                 {{-- Composant StyleGrid avec Lazy Loading - Séparé par onglet pour une réactivité maximale --}}
-                @if($activeTab === 'standard')
-                    <livewire:components.style-grid 
-                        wire:key="grid-standard-{{ $brandColor }}-{{ $accentColor }}"
-                        :activeTab="'standard'" 
-                        :brandColor="$brandColor"
-                        :companyLabel="$companyLabel"
-                        :companyCity="$companyCity"
-                        :brandTextColor="$this->brandTextColor"
-                        :logoUrl="$logoUrl"
-                        :accentColor="$accentColor"
-                        :accentTextColor="$this->accentTextColor"
-                    />
-                @elseif($activeTab === 'glass')
-                    <livewire:components.style-grid 
-                        wire:key="grid-glass-{{ $brandColor }}-{{ $accentColor }}"
-                        :activeTab="'glass'" 
-                        :brandColor="$brandColor"
-                        :companyLabel="$companyLabel"
-                        :companyCity="$companyCity"
-                        :brandTextColor="$brandTextColor"
-                        :logoUrl="$logoUrl"
-                        :accentColor="$accentColor"
-                        :accentTextColor="$accentTextColor"
-                    />
-                @elseif($activeTab === 'blueprint')
-                    <livewire:components.style-grid 
-                        wire:key="grid-blueprint-{{ $brandColor }}-{{ $accentColor }}"
-                        :activeTab="'blueprint'" 
-                        :brandColor="$brandColor"
-                        :companyLabel="$companyLabel"
-                        :companyCity="$companyCity"
-                        :brandTextColor="$brandTextColor"
-                        :logoUrl="$logoUrl"
-                        :accentColor="$accentColor"
-                        :accentTextColor="$accentTextColor"
-                    />
-                @elseif($activeTab === 'kraft')
-                    <livewire:components.style-grid 
-                        wire:key="grid-kraft-{{ $brandColor }}-{{ $accentColor }}"
-                        :activeTab="'kraft'" 
-                        :brandColor="$brandColor"
-                        :companyLabel="$companyLabel"
-                        :companyCity="$companyCity"
-                        :brandTextColor="$brandTextColor"
-                        :logoUrl="$logoUrl"
-                        :accentColor="$accentColor"
-                        :accentTextColor="$accentTextColor"
-                    />
-                @elseif($activeTab === 'beton')
-                    <livewire:components.style-grid 
-                        wire:key="grid-beton-{{ $brandColor }}-{{ $accentColor }}"
-                        :activeTab="'beton'" 
-                        :brandColor="$brandColor"
-                        :companyLabel="$companyLabel"
-                        :companyCity="$companyCity"
-                        :brandTextColor="$brandTextColor"
-                        :logoUrl="$logoUrl"
-                        :accentColor="$accentColor"
-                        :accentTextColor="$accentTextColor"
-                    />
-                @endif
+                <livewire:components.style-grid 
+                    wire:key="grid-{{ $activeTab }}-{{ $brandColor }}-{{ $accentColor }}"
+                    :activeTab="$activeTab" 
+                    :brandColor="$brandColor"
+                    :companyLabel="$companyLabel"
+                    :companyCity="$companyCity"
+                    :brandTextColor="$this->brandTextColor"
+                    :logoUrl="$logoUrl"
+                    :accentColor="$accentColor"
+                    :accentTextColor="$this->accentTextColor"
+                />
             </div>
         </div>
 
@@ -470,6 +432,7 @@ $switchTab = function ($tab) {
                             <x-post-templates.custom 
                                 :template="$generatedTemplate" 
                                 :brandColor="$brandColor" 
+                                :brandTextColor="$this->brandTextColor"
                                 :companyLabel="$companyLabel" 
                                 :logoUrl="$logoUrl" 
                                 :preview="true"

@@ -8,6 +8,9 @@
         $canvasHeight = ($aspectRatio === '4:5') ? 450 : 360;
     @endphp
     <meta name="viewport" content="width={{ $canvasWidth }}, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css'])
     <style>
         body {

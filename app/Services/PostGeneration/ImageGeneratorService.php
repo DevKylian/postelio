@@ -41,6 +41,7 @@ class ImageGeneratorService
             ->clip(0, 0, $width, $height)
             ->format('png')
             ->noSandbox()
+            ->waitUntilNetworkIdle()
             ->timeout(60);
     }
 

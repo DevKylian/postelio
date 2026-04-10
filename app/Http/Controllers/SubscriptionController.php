@@ -39,7 +39,8 @@ class SubscriptionController extends Controller
                     $renewalDate = \Carbon\Carbon::createFromTimestamp($periodEnd);
                 }
             } catch (\Exception $e) {
-                // Stripe unavailable (local/test env without live subscription)
+                // Fallback for test subscriptions (Tinker) or when Stripe is unreachable
+                $renewalDate = $subscription->created_at->addMonth();
             }
         }
 

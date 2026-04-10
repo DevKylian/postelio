@@ -22,10 +22,31 @@
             font-weight: 400;
             font-style: normal;
         }
+        /* weight 300 → Regular (no Montserrat-Light available) */
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('data:font/ttf;base64,{{ $fontRegular }}') format('truetype');
+            font-weight: 300;
+            font-style: normal;
+        }
+        /* weight 500 → Regular (closest available) */
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('data:font/ttf;base64,{{ $fontRegular }}') format('truetype');
+            font-weight: 500;
+            font-style: normal;
+        }
         @font-face {
             font-family: 'Montserrat';
             src: url('data:font/ttf;base64,{{ $fontBold }}') format('truetype');
             font-weight: 700;
+            font-style: normal;
+        }
+        /* weight 600 → Bold (closest available) */
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('data:font/ttf;base64,{{ $fontBold }}') format('truetype');
+            font-weight: 600;
             font-style: normal;
         }
         @font-face {
@@ -34,8 +55,49 @@
             font-weight: 900;
             font-style: normal;
         }
+        /* weight 800 → Black (closest available) */
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('data:font/ttf;base64,{{ $fontBlack }}') format('truetype');
+            font-weight: 800;
+            font-style: normal;
+        }
     </style>
-    @vite(['resources/css/app.css'])
+    @php
+        /*
+         * In production, inline the compiled Tailwind CSS directly so Browsershot
+         * doesn't need to fetch any external URLs (which can fail due to SSL/network
+         * restrictions on the server, silently breaking all font-* and text-* classes).
+         * External @import statements (Google Fonts CDN) are stripped since fonts are
+         * already embedded as base64 above.
+         * In development (no manifest), fall back to the normal @vite directive.
+         */
+        $rendererCss = null;
+        $viteManifest = public_path('build/manifest.json');
+        if (file_exists($viteManifest)) {
+            try {
+                $manifest = json_decode(file_get_contents($viteManifest), true);
+                $cssEntry  = $manifest['resources/css/app.css'] ?? null;
+                if ($cssEntry && !empty($cssEntry['file'])) {
+                    $cssPath = public_path('build/' . $cssEntry['file']);
+                    if (file_exists($cssPath)) {
+                        $raw = file_get_contents($cssPath);
+                        // Strip CDN @import lines (Google Fonts etc.) – fonts are embedded
+                        $rendererCss = preg_replace(
+                            '/@import\s+url\([\'"]?https?:\/\/[^)]+[\'"]?\)\s*(?:layer\([^)]*\))?\s*;/i',
+                            '',
+                            $raw
+                        );
+                    }
+                }
+            } catch (\Throwable $e) {}
+        }
+    @endphp
+    @if($rendererCss !== null)
+        <style>{!! $rendererCss !!}</style>
+    @else
+        @vite(['resources/css/app.css'])
+    @endif
     <style>
         body {
             margin: 0;

@@ -60,10 +60,10 @@
                 @if ($imageUrl)
                     <img src="{{ $imageUrl }}" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] object-cover">
                 @else
-                    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] flex items-center justify-center {{ $index % 2 === 0 ? 'bg-gray-600' : 'bg-gray-500' }}">
+                    <div class="h-full w-full flex items-center justify-center {{ $index % 2 === 0 ? 'bg-gray-600' : 'bg-gray-500' }}">
                          <div class="text-center">
                             <svg class="w-10 h-10 mx-auto mb-2 opacity-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            <p class="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Photo {{ $index + 1 }}</p>
+                            <p class="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] leading-none">Photo {{ $index + 1 }}</p>
                          </div>
                     </div>
                 @endif
@@ -72,7 +72,8 @@
                 <div class="absolute top-0 inset-x-0 h-0.5 z-10" style="background: linear-gradient(90deg, {{ $brandColor }}, {{ $brandColor }}55)"></div>
 
                 @php
-                    $slideText = $slideContents[$index] ?? (($index === 0) ? $title : '');
+                    // Only show text on the very first slide as requested
+                    $slideText = ($index === 0) ? ($slideContents[0] ?? $title) : '';
                 @endphp
 
                 @if(!empty($slideText))

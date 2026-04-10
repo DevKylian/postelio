@@ -96,20 +96,25 @@
         @vite(['resources/css/app.css'])
     @endif
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            width: {{ $canvasWidth }}px;
-            height: {{ $canvasHeight }}px;
             background: #ffffff;
             overflow: hidden;
-            /* antialiased is consistent on both macOS and Linux headless Chrome;
-               subpixel-antialiased is silently ignored in headless mode on Linux
-               and can cause weight/sharpness inconsistencies. */
+            /* Headless Chromium on Linux renders Montserrat higher than Windows.
+               Increasing offset to 2px for final production stabilization. */
+            padding-top: 2px; 
+            
+            /* Antialiased is the most predictable for headless capture. */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             text-rendering: geometricPrecision;
+            
+            /* Ensure Montserrat is used everywhere by default in this layout */
+            font-family: 'Montserrat', sans-serif !important;
         }
+        
+        /* Force boldness consistency across platforms - ensuring no system font fallback */
+        .font-black { font-weight: 900 !important; font-family: 'Montserrat', sans-serif !important; }
+        .font-bold { font-weight: 700 !important; font-family: 'Montserrat', sans-serif !important; }
+        
         ::-webkit-scrollbar { display: none; }
     </style>
 </head>

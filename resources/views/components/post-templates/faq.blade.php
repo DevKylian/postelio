@@ -109,7 +109,7 @@
         <div {!! $slide0Alpine !!} style="{{ $slide0Style }}" class="relative z-10">
 
             {{-- FAQ Chip --}}
-            <div class="inline-flex items-center gap-2 mb-5 px-3 h-7 rounded-full" style="{{ $chipStyle }}">
+            <div class="inline-flex items-center justify-center gap-2 mb-5 px-3 h-7 rounded-full" style="{{ $chipStyle }}">
                 <span class="text-lg font-black leading-none" style="color: {{ $chipIconColor }}">?</span>
                 <span class="text-[9px] font-black uppercase tracking-[0.25em] leading-none">Question fréquente</span>
             </div>
@@ -137,7 +137,7 @@
         <div {!! $slide1Alpine !!} style="{{ $slide1Style }}" class="relative z-10">
 
             {{-- Answer Chip --}}
-            <div class="inline-flex items-center gap-2 mb-5 px-3 h-7 rounded-full" style="{{ $chipStyle }}">
+            <div class="inline-flex items-center justify-center gap-2 mb-5 px-3 h-7 rounded-full" style="{{ $chipStyle }}">
                 <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: {{ $chipIconColor }}"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                 <span class="text-[9px] font-black uppercase tracking-[0.25em] leading-none">Notre réponse</span>
             </div>

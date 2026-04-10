@@ -79,10 +79,10 @@
         <div class="absolute -bottom-12 -left-12 w-48 h-48 rounded-full blur-3xl pointer-events-none" style="background: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.15)' }}"></div>
 
         {{-- Verified Badge --}}
-        <div class="mb-4 relative z-10 h-6 inline-flex items-center gap-1.5 px-3 rounded-full border shadow-sm backdrop-blur-sm transition-all text-center justify-center" 
+        <div class="mb-4 relative z-10 h-6 inline-flex items-center justify-center gap-1.5 px-3 rounded-full border shadow-sm backdrop-blur-sm transition-all" 
              style="background: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)' }}; border-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}">
             <svg class="w-2.5 h-2.5 shrink-0" fill="none" stroke="{{ $brandTextColor }}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-            <span class="text-[8px] font-black uppercase tracking-[0.2em] leading-none" style="color: {{ $brandTextColor }}">Témoignage Vérifié</span>
+            <span class="text-[8px] font-black uppercase tracking-[0.2em] leading-none">Témoignage Vérifié</span>
         </div>
 
         {{-- Stars --}}
@@ -130,13 +130,13 @@
                     </div>
 
                     <div class="flex flex-col items-start min-w-0">
-                        <div class="flex items-center gap-1.5 mb-0.5 max-w-full">
-                            <span class="font-black text-xs uppercase tracking-wider truncate" style="color: {{ $brandTextColor }}">{{ $customerName }}</span>
-                            <div class="flex-shrink-0 mt-[1px]">
+                        <div class="flex items-center gap-1.5 mb-1 max-w-full h-4">
+                            <span class="font-black text-xs uppercase tracking-wider truncate leading-none" style="color: {{ $brandTextColor }}">{{ $customerName }}</span>
+                            <div class="flex-shrink-0 inline-flex items-center justify-center">
                                 <svg class="w-3 h-3" viewBox="0 0 24 24" fill="{{ $brandTextColor }}"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                             </div>
                         </div>
-                        <div class="flex items-center gap-1.5">
+                        <div class="flex items-center gap-1.5 h-3">
                             @if ($logoUrl)
                                 <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-90 brightness-0 {{ $brandTextColor === '#FFFFFF' ? 'invert' : '' }}">
                             @endif

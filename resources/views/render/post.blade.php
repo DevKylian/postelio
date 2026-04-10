@@ -10,7 +10,7 @@
     <meta name="viewport" content="width={{ $canvasWidth }}, initial-scale=1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=block" rel="stylesheet">
     @vite(['resources/css/app.css'])
     <style>
         body {
@@ -20,6 +20,9 @@
             height: {{ $canvasHeight }}px;
             background: #ffffff;
             overflow: hidden;
+            -webkit-font-smoothing: subpixel-antialiased !important;
+            -moz-osx-font-smoothing: auto !important;
+            text-rendering: optimizeLegibility;
         }
         ::-webkit-scrollbar { display: none; }
     </style>

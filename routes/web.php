@@ -55,6 +55,9 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
     Route::post('/subscription/portal', [SubscriptionController::class, 'portal'])->name('subscription.portal');
     Route::post('/subscription/resume', [SubscriptionController::class, 'resume'])->name('subscription.resume');
     Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    Route::get('/subscription/cancel-offer', [SubscriptionController::class, 'cancelOffer'])->name('subscription.cancel-offer');
+    Route::post('/subscription/accept-retention-offer', [SubscriptionController::class, 'acceptRetentionOffer'])->name('subscription.accept-retention-offer');
+    Route::post('/subscription/decline-retention-offer', [SubscriptionController::class, 'declineRetentionOffer'])->name('subscription.decline-retention-offer');
     Route::post('/subscription/change-plan', [SubscriptionController::class, 'changePlan'])->name('subscription.change-plan');
 });
 

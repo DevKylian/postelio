@@ -1129,8 +1129,20 @@
     <section class="relative z-20 pb-20 -mt-8 sm:-mt-16" x-data="demoShowcase()"
       x-init="$nextTick(() => { setTimeout(() => startAnimation(), 800) })" x-intersect:enter.half="startAnimation()"
       x-intersect:leave="stopAnimation()">
+
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="md-showcase flex flex-col" x-ref="showcase">
+        <!-- isolation: isolate crée un stacking context local pour que z-index:-1 reste derrière la card -->
+        <div class="relative" style="isolation: isolate;">
+
+          <!-- Glow + particules : Équilibré et sans coupure entre sections -->
+          <div class="absolute pointer-events-none" style="inset: -220px; z-index: 5;">
+            {{-- Halo équilibré (dégradé diffus) --}}
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.13) 45%, transparent 75%); filter: blur(45px);"></div>
+            <canvas id="hero-dust" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
+          </div>
+          
+          {{-- md-showcase avec z-index supérieur pour rester au-dessus du glow --}}
+          <div class="md-showcase flex flex-col relative z-20" x-ref="showcase">
 
           <!-- Persistent Safari UI -->
           <div class="md-topbar relative z-20">
@@ -1608,7 +1620,7 @@
     </script>
 
     <!-- Phone Mockup Section -->
-    <section class="py-24 overflow-hidden relative">
+    <section class="py-24 relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
 
@@ -1680,7 +1692,7 @@
             class="flex-1 relative w-full max-w-[340px] mx-auto lg:max-w-none lg:mx-0 flex justify-center mt-12 lg:mt-0"
             x-intersect.once="$el.classList.add('reveal-right')">
             <div
-              class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-amber-200/40 to-blue-200/40 blur-[70px] rounded-full pointer-events-none">
+              class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[130%] bg-gradient-to-tr from-amber-200/50 to-blue-200/40 blur-[80px] rounded-full pointer-events-none z-0">
             </div>
 
             <div
@@ -1774,12 +1786,135 @@
               </div>
             </div>
           </div>
-        </div>
+        </div><!-- /isolation wrapper -->
       </div>
+
+      <!-- Micro-dust particle animation -->
+      <script>
+        (function () {
+          const canvas = document.getElementById('hero-dust');
+          if (!canvas) return;
+          const ctx = canvas.getContext('2d');
+
+          const COLORS = ['#F59E0B', '#f97316', '#fbbf24', '#fde68a', '#fb923c', '#fcd34d', '#fff7ed'];
+          // Must match CSS inset values on the glow wrapper (inset: -80px -60px)
+          const MX = 60, MY = 80;
+
+          let W = 0, H = 0, particles = [], raf = null;
+          const COUNT = 180;
+
+          // Returns a position on the edge of the motion window
+          function borderPos() {
+            // Gap between canvas edge and card edge (inset: -220px)
+            const GX = 220, GY = 220;
+            const cardW = W - GX * 2;
+            const cardH = H - GY * 2;
+            
+            const perimeter = (cardW + cardH) * 2;
+            const ratioW = cardW / (cardW + cardH); // Probabilité basée sur la largeur totale / périmètre partiel
+            
+            const side = Math.random();
+            // Distribution proportionnelle à la longueur des bords
+            if (side < ratioW / 2) { // Top
+              return { x: GX + Math.random() * cardW, y: GY, vx: (Math.random() - 0.5) * 0.4, vy: -(0.4 + Math.random() * 0.6) };
+            } else if (side < ratioW) { // Bottom
+              return { x: GX + Math.random() * cardW, y: GY + cardH, vx: (Math.random() - 0.5) * 0.4, vy: (0.4 + Math.random() * 0.6) };
+            } else if (side < ratioW + (1 - ratioW) / 2) { // Left
+              return { x: GX, y: GY + Math.random() * cardH, vx: -(0.4 + Math.random() * 0.6), vy: (Math.random() - 0.5) * 0.4 };
+            } else { // Right
+              return { x: GX + cardW, y: GY + Math.random() * cardH, vx: (0.4 + Math.random() * 0.6), vy: (Math.random() - 0.5) * 0.4 };
+            }
+          }
+
+          function spawn(isRespawn) {
+            const lifespan = 150 + Math.random() * 200;
+            const p = borderPos();
+            
+            return {
+              x: p.x, 
+              y: p.y,
+              r:          0.4 + Math.random() * 1.4,
+              color:      COLORS[Math.floor(Math.random() * COLORS.length)],
+              alpha:      0,
+              peakAlpha:  0.15 + Math.random() * 0.35,
+              vx:         p.vx * 0.7,
+              vy:         p.vy * 0.7,
+              twinkle:    Math.random() * Math.PI * 2,
+              twinkleSpd: 0.03 + Math.random() * 0.06,
+              life:       isRespawn ? 0 : Math.random() * lifespan,
+              lifespan,
+            };
+          }
+
+          function resize() {
+            W = canvas.width  = canvas.offsetWidth;
+            H = canvas.height = canvas.offsetHeight;
+          }
+
+          for (let i = 0; i < COUNT; i++) particles.push(spawn(false));
+
+          function draw() {
+            ctx.clearRect(0, 0, W, H);
+
+            for (let i = 0; i < particles.length; i++) {
+              const p = particles[i];
+              p.life++;
+              p.x += p.vx;
+              p.y += p.vy;
+              p.twinkle += p.twinkleSpd;
+
+              const t = p.life / p.lifespan;
+              let env;
+              if      (t < 0.15) env = t / 0.15;
+              else if (t > 0.82) env = (1 - t) / 0.18;
+              else               env = 1;
+
+              p.alpha = p.peakAlpha * env * (0.75 + 0.25 * Math.sin(p.twinkle));
+
+              if (p.life >= p.lifespan || p.x < 0 || p.x > W || p.y < 0 || p.y > H) {
+                particles[i] = spawn(true);
+                continue;
+              }
+
+              ctx.save();
+              ctx.globalAlpha = p.alpha;
+              ctx.shadowBlur  = p.r * 6 + 4;
+              ctx.shadowColor = p.color;
+              ctx.fillStyle   = p.color;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+              ctx.fill();
+              // Bright core
+              ctx.globalAlpha = p.alpha * 0.7;
+              ctx.shadowBlur  = p.r * 14;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.r * 0.45, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            }
+
+            raf = requestAnimationFrame(draw);
+          }
+
+          const section = canvas.closest('section');
+          const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+              if (e.isIntersecting) { if (!raf) draw(); }
+              else { cancelAnimationFrame(raf); raf = null; }
+            });
+          }, { threshold: 0.05 });
+          if (section) observer.observe(section);
+
+          resize();
+          window.addEventListener('resize', resize);
+          draw();
+        })();
+      </script>
+
     </section>
 
     <!-- Templates Showcase -->
-    <section id="gabarits" class="py-28 bg-slate-50 relative overflow-hidden">
+    <section id="gabarits" class="py-28 relative">
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-copper/5 blur-[140px] rounded-full pointer-events-none"></div>
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -2090,7 +2225,7 @@
     </section>
 
     <!-- Pourquoi ça marche -->
-    <section id="benefices" class="py-24 bg-slate-900 text-white relative overflow-hidden">
+    <section id="benefices" class="py-24 bg-slate-900 text-white relative">
       <div
         class="absolute top-0 right-0 w-[500px] h-[500px] bg-copper/10 blur-[100px] rounded-full pointer-events-none">
       </div>
@@ -2139,7 +2274,7 @@
     </section>
 
     <!-- Stats Section -->
-    <section class="py-24 border-y border-slate-200/40 bg-white/40 backdrop-blur-sm">
+    <section class="py-24 border-y border-slate-200/40 shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           class="grid sm:grid-cols-3 gap-12 sm:gap-6 text-center divide-y sm:divide-y-0 sm:divide-x divide-slate-200/60">

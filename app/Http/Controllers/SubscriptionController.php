@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Cashier\Cashier;
 
 class SubscriptionController extends Controller
 {
@@ -18,6 +19,31 @@ class SubscriptionController extends Controller
         $subscription = $user->subscription('default');
 
         return view('subscription.plans', compact('plans', 'currentPlan', 'subscription'));
+    }
+
+    /**
+     * Show the billing management page.
+     */
+    public function billing()
+    {
+        $user = Auth::user();
+        $plans = config('subscription.plans');
+        $currentPlan = $user->currentPlanKey();
+        $subscription = $user->subscription('default');
+
+        $renewalDate = null;
+        if ($subscription && $subscription->valid() && !$subscription->onGracePeriod()) {
+            try {
+                $periodEnd = $subscription->asStripeSubscription()->current_period_end;
+                if ($periodEnd) {
+                    $renewalDate = \Carbon\Carbon::createFromTimestamp($periodEnd);
+                }
+            } catch (\Exception $e) {
+                // Stripe unavailable (local/test env without live subscription)
+            }
+        }
+
+        return view('subscription.billing', compact('user', 'plans', 'currentPlan', 'subscription', 'renewalDate'));
     }
 
     /**
@@ -40,9 +66,9 @@ class SubscriptionController extends Controller
 
         $user = Auth::user();
 
-        // If already subscribed, redirect to billing portal or plans
+        // If already subscribed, redirect to billing page
         if ($user->subscribed('default')) {
-            return $user->redirectToBillingPortal(route('subscription.plans'));
+            return redirect()->route('subscription.billing');
         }
 
         return $user->newSubscription('default', $priceId)
@@ -74,11 +100,6 @@ class SubscriptionController extends Controller
         return redirect()->route('dashboard')->with('success', 'Abonnement activé avec succès !');
     }
 
-    public function billing()
-    {
-        return redirect()->route('subscription.plans');
-    }
-
     public function portal(Request $request)
     {
         $user = Auth::user();
@@ -87,7 +108,7 @@ class SubscriptionController extends Controller
             return redirect()->route('subscription.plans')->with('error', 'Aucun abonnement actif.');
         }
 
-        return $user->redirectToBillingPortal(route('subscription.plans'));
+        return $user->redirectToBillingPortal(route('subscription.billing'));
     }
 
     /**
@@ -100,26 +121,113 @@ class SubscriptionController extends Controller
 
         if ($subscription && $subscription->onGracePeriod()) {
             $subscription->resume();
-            return back()->with('success', 'Abonnement réactivé !');
+            return redirect()->route('subscription.billing')->with('success', 'Abonnement réactivé !');
         }
 
-        return back()->with('error', 'Impossible de réactiver cet abonnement.');
+        return redirect()->route('subscription.billing')->with('error', 'Impossible de réactiver cet abonnement.');
     }
 
     /**
-     * Cancel the subscription (with grace period).
+     * Intercept cancellation: redirect to the retention offer page (first attempt)
+     * or proceed directly if the offer was already presented.
      */
     public function cancel()
     {
         $user = Auth::user();
         $subscription = $user->subscription('default');
 
-        if ($subscription && $subscription->valid() && !$subscription->onGracePeriod()) {
-            $subscription->cancel();
-            return back()->with('success', 'Abonnement annulé. Vous conservez l\'accès jusqu\'à la fin de la période en cours.');
+        if (!$subscription || !$subscription->valid() || $subscription->onGracePeriod()) {
+            return redirect()->route('subscription.billing')->with('error', 'Impossible d\'annuler cet abonnement.');
         }
 
-        return back()->with('error', 'Impossible d\'annuler cet abonnement.');
+        // Only show the retention offer on monthly subscriptions and if not already shown
+        $isMonthly = $this->isMonthlySubscription($subscription);
+        if ($isMonthly && !$user->hasSeenRetentionOffer()) {
+            return redirect()->route('subscription.cancel-offer');
+        }
+
+        // Offer already shown or yearly plan: cancel directly
+        $subscription->cancel();
+        return redirect()->route('subscription.billing')
+            ->with('success', 'Abonnement annulé. Vous conservez l\'accès jusqu\'à la fin de la période en cours.');
+    }
+
+    /**
+     * Show the retention offer page (-50% on next billing).
+     */
+    public function cancelOffer()
+    {
+        $user = Auth::user();
+        $subscription = $user->subscription('default');
+
+        if (!$subscription || !$subscription->valid() || $subscription->onGracePeriod()) {
+            return redirect()->route('subscription.billing');
+        }
+
+        $plans = config('subscription.plans');
+        $currentPlan = $user->currentPlanKey();
+        $currentPlanData = $currentPlan ? ($plans[$currentPlan] ?? null) : null;
+
+        return view('subscription.cancel-offer', compact('subscription', 'plans', 'currentPlan', 'currentPlanData', 'user'));
+    }
+
+    /**
+     * User accepts the -50% retention offer.
+     * Apply a one-time 50% coupon on the next invoice and keep the subscription.
+     */
+    public function acceptRetentionOffer()
+    {
+        $user = Auth::user();
+        $subscription = $user->subscription('default');
+
+        if (!$subscription || !$subscription->valid() || $subscription->onGracePeriod()) {
+            return redirect()->route('subscription.billing')->with('error', 'Aucun abonnement actif.');
+        }
+
+        // Create a one-time 50% coupon via Stripe and apply it to the subscription
+        try {
+            $stripe = Cashier::stripe();
+
+            $coupon = $stripe->coupons->create([
+                'percent_off' => 50,
+                'duration'    => 'once',
+                'name'        => 'Offre fidélité -50%',
+            ]);
+
+            $stripe->subscriptions->update($subscription->stripe_id, [
+                'coupon' => $coupon->id,
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->route('subscription.billing')
+                ->with('error', 'Une erreur est survenue lors de l\'application de la réduction. Veuillez réessayer.');
+        }
+
+        // Mark offer as used so it won't be shown again
+        $user->update(['retention_offer_used_at' => now()]);
+
+        return redirect()->route('subscription.billing')
+            ->with('success', 'Super ! 🎉 Votre réduction de -50% a bien été appliquée sur votre prochaine facture. Merci pour votre fidélité !');
+    }
+
+    /**
+     * User declines the retention offer and confirms cancellation.
+     */
+    public function declineRetentionOffer()
+    {
+        $user = Auth::user();
+        $subscription = $user->subscription('default');
+
+        if (!$subscription || !$subscription->valid() || $subscription->onGracePeriod()) {
+            return redirect()->route('subscription.billing')->with('error', 'Impossible d\'annuler cet abonnement.');
+        }
+
+        // Mark offer as seen so it won't be shown again
+        $user->update(['retention_offer_used_at' => now()]);
+
+        $subscription->cancel();
+
+        return redirect()->route('subscription.billing')
+            ->with('success', 'Abonnement annulé. Vous conservez l\'accès jusqu\'à la fin de la période en cours.');
     }
 
     /**
@@ -157,5 +265,21 @@ class SubscriptionController extends Controller
         ]);
 
         return back()->with('success', "Abonnement changé vers {$plan['name']} !");
+    }
+
+    /**
+     * Determine if the current subscription is on a monthly price.
+     */
+    private function isMonthlySubscription($subscription): bool
+    {
+        $plans = config('subscription.plans');
+
+        foreach ($plans as $plan) {
+            if (!empty($plan['yearly_stripe_price_id']) && $subscription->hasPrice($plan['yearly_stripe_price_id'])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

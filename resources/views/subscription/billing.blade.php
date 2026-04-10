@@ -76,9 +76,7 @@
                                         <p class="text-sm text-gray-600">
                                             Prochain renouvellement :
                                             <span class="font-semibold text-midnight">
-                                                {{ $subscription->asStripeSubscription()->current_period_end
-                                                    ? \Carbon\Carbon::createFromTimestamp($subscription->asStripeSubscription()->current_period_end)->translatedFormat('d F Y')
-                                                    : 'N/A' }}
+                                                {{ $renewalDate ? $renewalDate->translatedFormat('d F Y') : 'N/A' }}
                                             </span>
                                         </p>
                                     </div>
@@ -182,8 +180,7 @@
                                     <p class="text-sm font-medium text-midnight">Résilier l'abonnement</p>
                                     <p class="text-xs text-gray-400 mt-0.5">Vous conservez l'accès jusqu'à la fin de la période</p>
                                 </div>
-                                <form method="POST" action="{{ route('subscription.cancel') }}"
-                                      onsubmit="return confirm('Êtes-vous sûr de vouloir résilier votre abonnement ?')">
+                                <form method="POST" action="{{ route('subscription.cancel') }}">
                                     @csrf
                                     <button type="submit"
                                         class="text-sm font-semibold text-red-500 hover:text-red-600 transition-colors">

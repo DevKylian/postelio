@@ -123,10 +123,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function currentPlanKey(): ?string
     {
-        // Try to find any subscription that is valid or recently created
-        $subscription = $this->subscriptions()->whereIn('stripe_status', ['active', 'trialing', 'past_due', 'incomplete'])->first()
-                     ?: $this->subscription('default')
-                     ?: $this->subscriptions()->first();
+        $subscription = $this->subscription('default');
 
         if (!$subscription || !$subscription->valid()) {
             return null;

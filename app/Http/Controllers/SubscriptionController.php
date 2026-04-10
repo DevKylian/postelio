@@ -29,21 +29,25 @@ class SubscriptionController extends Controller
         $user = Auth::user();
         $plans = config('subscription.plans');
         $currentPlan = $user->currentPlanKey();
-        $subscription = $user->subscription('default');
+        
+        // Get 'default' subscription or fallback to the first one found
+        $subscription = $user->subscription('default') ?: $user->subscriptions()->first();
 
         $renewalDate = null;
-        if ($subscription && $subscription->stripe_id && !$subscription->onGracePeriod()) {
+        if ($subscription) {
             try {
+                // Try to get real end date from Stripe
                 $stripeSubscription = $subscription->asStripeSubscription();
-                $periodEnd = $stripeSubscription->current_period_end;
-                if ($periodEnd) {
-                    $renewalDate = \Carbon\Carbon::createFromTimestamp($periodEnd);
+                if (isset($stripeSubscription->current_period_end)) {
+                    $renewalDate = \Carbon\Carbon::createFromTimestamp($stripeSubscription->current_period_end);
                 }
             } catch (\Exception $e) {
+                // Log only in local for debugging
                 if (app()->environment('local')) {
-                    logger()->error("Erreur récupération date Stripe: " . $e->getMessage());
+                    logger()->error("Billing: Fallback to created_at + 1 month. Error: " . $e->getMessage());
                 }
-                // Fallback for test subscriptions (Tinker) or when Stripe is unreachable
+                
+                // Fallback: created_at + 1 month
                 $renewalDate = $subscription->created_at->addMonth();
             }
         }

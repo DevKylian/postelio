@@ -91,7 +91,7 @@
     {{-- Contact Card --}}
     <div class="relative z-10 w-full max-w-[260px] rounded-[2.5rem] p-8 flex flex-col items-center text-center {{ $cardStyle }}">
         
-        <h2 class="text-xl font-black tracking-tighter mb-1 leading-tight uppercase">{{ $companyLabel }}</h2>
+        <h2 class="text-xl font-black tracking-tighter mb-1 leading-tight font-display">{{ $companyLabel }}</h2>
         
         @if($trade || $city)
             <div class="mb-6 flex flex-wrap justify-center gap-1.5">
@@ -144,9 +144,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18" />
                         </svg>
                     </div>
-                    <div class="min-w-0 flex-1">
-                        <p class="text-[7px] font-black uppercase tracking-[0.2em] opacity-30 mb-0.5 leading-none">Site internet</p>
-                        <p class="text-[11px] font-black tracking-tight truncate leading-tight">{{ preg_replace('(^https?://)', '', $website) }}</p>
+                    <div class="min-w-0 flex-1 flex flex-col justify-center">
+                        <p class="text-[7px] font-black uppercase tracking-[0.2em] opacity-30 mb-0.5 leading-none font-montserrat">Site internet</p>
+                        <p class="text-[11px] font-black tracking-tight truncate leading-tight font-montserrat">{{ preg_replace('(^https?://)', '', $website) }}</p>
                     </div>
                 </div>
             @endif

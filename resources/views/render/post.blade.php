@@ -22,7 +22,7 @@
     </style>
 </head>
 <body>
-    <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; overflow: hidden; position: relative;">
+    <div class="font-montserrat" style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; overflow: hidden; position: relative;">
     @php
         use Illuminate\Support\Facades\Storage;
         
@@ -154,29 +154,8 @@
             }
         }
 
-        // Determine total slides for this template (logic must match ImageGeneratorService)
-        $totalSlidesBeforeContact = 1;
-        if ($template === 'guide_pedagogique') {
-            $totalSlidesBeforeContact = is_array($contentData) && isset($contentData['slides']) ? count($contentData['slides']) : 3;
-            $totalSlidesBeforeContact += 1;
-        } elseif ($template === 'project') {
-            $totalSlidesBeforeContact = 3;
-        } elseif ($template === 'faq') {
-            $faqSlides = (is_array($contentData) && isset($contentData['slides']) && is_array($contentData['slides'])) ? $contentData['slides'] : [];
-            $totalSlidesBeforeContact = 1 + count($faqSlides);
-        } elseif ($template === 'chantier_detail' || $template === 'step_by_step') {
-            $totalSlidesBeforeContact = count($slides ?? []);
-        }
-
-        $hasContactInfo = !empty($commonProps['phone']) || !empty($commonProps['email']) || !empty($commonProps['website']);
-        $totalSlides = $totalSlidesBeforeContact + ($hasContactInfo ? 1 : 0);
-        $isContactSlide = ($slideIndexFinal !== null && $slideIndexFinal >= $totalSlidesBeforeContact && $hasContactInfo);
-
         // Template specific data
-        if ($isContactSlide) {
-            $componentName = 'post-templates.contact-slide';
-            $props = $commonProps;
-        } elseif ($template === 'project') {
+        if ($template === 'project') {
             $props = array_merge($commonProps, [
                 'imageBeforeUrl' => $post->image_before_path ? asset(Storage::url($post->image_before_path)) : null,
                 'imageAfterUrl' => $post->image_after_path ? asset(Storage::url($post->image_after_path)) : null,
@@ -237,22 +216,7 @@
         }
     @endphp
 
-    <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; overflow: hidden; position: relative;">
-    @if($isContactSlide)
-         <x-post-templates.contact-slide
-            :brand-color="$props['brandColor']"
-            :company-label="$props['companyLabel']"
-            :phone="$props['phone']"
-            :email="$props['email']"
-            :website="$props['website']"
-            :trade="$props['trade']"
-            :city="$props['city']"
-            :visual-style="$props['visualStyle']"
-            :brand-text-color="$brandTextColor"
-            :accent-color="$props['accentColor']"
-            :accent-text-color="$props['accentTextColor']"
-        />
-    @elseif($template === 'lifestyle')
+    @if($template === 'lifestyle')
         <x-post-templates.lifestyle
             :brand-color="$props['brandColor']"
             :company-label="$props['companyLabel']"
@@ -263,6 +227,9 @@
             :image-url="$props['imageUrl']"
             :trade="$props['trade']"
             :city="$props['city']"
+            :phone="$props['phone']"
+            :email="$props['email']"
+            :website="$props['website']"
             :brand-text-color="$brandTextColor"
             :visual-style="$visualStyle"
             :accent-color="$props['accentColor']"
@@ -290,13 +257,16 @@
             :template="$props['template'] ?? null"
             :trade="$props['trade'] ?? null"
             :city="$props['city'] ?? null"
+            :phone="$props['phone'] ?? null"
+            :email="$props['email'] ?? null"
+            :website="$props['website'] ?? null"
             :brand-text-color="$brandTextColor"
             :accent-color="$props['accentColor'] ?? $accentColor"
             :accent-text-color="$props['accentTextColor'] ?? $accentTextColor"
             :exporting="$props['exporting'] ?? false"
         />
     @else
-        <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: {{ $brandColor }}; color: {{ $brandTextColor }}; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 40px; text-align: center;">
+        <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: {{ $brandColor }}; color: {{ $brandTextColor }}; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 16px; padding: 40px; text-align: center; font-family: 'Montserrat', sans-serif; font-weight: 900; line-height: 1.2;">
             {{ $rawText }}
         </div>
     @endif

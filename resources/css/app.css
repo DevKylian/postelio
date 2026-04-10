@@ -190,6 +190,10 @@
         font-family: 'Outfit', sans-serif;
     }
 
+    .font-montserrat {
+        font-family: 'Montserrat', sans-serif;
+    }
+
     /* Scroll reveal */
     .reveal-up    { animation: reveal-up    0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
     .reveal-left  { animation: reveal-left  0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }

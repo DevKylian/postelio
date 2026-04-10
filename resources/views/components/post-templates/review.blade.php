@@ -35,7 +35,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] relative overflow-hidden flex flex-col justify-end {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] relative overflow-hidden flex flex-col justify-end font-montserrat {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
 
     {{-- Slide 0 --}}
     @php
@@ -108,7 +108,7 @@
                 <div class="absolute top-0 left-0 -translate-x-6 -translate-y-8 opacity-[0.08] select-none pointer-events-none z-0" 
                      style="font-size: 110px; font-family: serif; color: {{ $brandTextColor }}; font-weight: 900; line-height: 1;">“</div>
                 
-                <p class="font-black tracking-tight {{ $fontSize }} leading-tight font-montserrat relative z-10" style="color: {{ $brandTextColor }}">
+                <p class="font-black tracking-tight {{ $fontSize }} leading-[1.1] font-display relative z-10" style="color: {{ $brandTextColor }}">
                     {!! nl2br(e(str_replace(['"', '«', '»'], '', $text))) !!}
                 </p>
 

@@ -41,7 +41,8 @@ class ImageGeneratorService
             ->clip(0, 0, $width, $height)
             ->format('png')
             ->noSandbox()
-            ->timeout(60);
+            ->waitUntilNetworkIdle()
+            ->timeout(90);
     }
 
     private function generateCarouselViaBrowsershot(Post $post): array

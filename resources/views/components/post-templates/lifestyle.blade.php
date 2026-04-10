@@ -147,7 +147,7 @@
                         {{-- Quote text --}}
                         <div class="flex-1 min-w-0">
                             @if($text)
-                                <h3 class="font-black {{ $fontSize }} leading-tight tracking-tight line-clamp-3" style="color: {{ $accentTextColor }}">
+                                <h3 class="font-black {{ $fontSize }} leading-tight tracking-tight line-clamp-3 font-display" style="color: {{ $accentTextColor }}">
                                     {!! nl2br(e($text ?? 'La passion du métier.')) !!}
                                 </h3>
                             @endif
@@ -163,7 +163,7 @@
                             @else
                                 <div class="w-4 h-4 rounded-full shrink-0" style="background-color: {{ $brandColor }}"></div>
                             @endif
-                            <p class="font-black tracking-[0.15em] text-[6px] uppercase text-center leading-tight line-clamp-2" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                            <p class="font-black tracking-[0.15em] text-[6px] uppercase text-center leading-tight line-clamp-2 font-montserrat" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
                             @php
                                 $hex = str_replace('#', '', $brandColor);
                                 if(strlen($hex) == 3) {
@@ -189,7 +189,7 @@
                                 $tagStyle = "background-color: $tagBg; border-color: $tagBorder; color: $tagText;";
                             @endphp
                             @if($trade)
-                                <span class="px-1.5 py-0.5 rounded text-[5px] font-black uppercase tracking-wide border whitespace-nowrap" style="{{ $tagStyle }}">{{ $trade }}</span>
+                                <span class="px-1.5 py-0.5 rounded text-[5px] font-black uppercase tracking-wide border whitespace-nowrap font-montserrat" style="{{ $tagStyle }}">{{ $trade }}</span>
                             @endif
                         </div>
                     </div>

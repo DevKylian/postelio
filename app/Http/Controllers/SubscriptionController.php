@@ -31,7 +31,19 @@ class SubscriptionController extends Controller
         $currentPlan = $user->currentPlanKey();
         $subscription = $user->subscription('default');
 
-        return view('subscription.billing', compact('user', 'plans', 'currentPlan', 'subscription'));
+        $renewalDate = null;
+        if ($subscription && $subscription->valid() && !$subscription->onGracePeriod()) {
+            try {
+                $periodEnd = $subscription->asStripeSubscription()->current_period_end;
+                if ($periodEnd) {
+                    $renewalDate = \Carbon\Carbon::createFromTimestamp($periodEnd);
+                }
+            } catch (\Exception $e) {
+                // Stripe unavailable (local/test env without live subscription)
+            }
+        }
+
+        return view('subscription.billing', compact('user', 'plans', 'currentPlan', 'subscription', 'renewalDate'));
     }
 
     /**

@@ -76,9 +76,7 @@
                                         <p class="text-sm text-gray-600">
                                             Prochain renouvellement :
                                             <span class="font-semibold text-midnight">
-                                                {{ $subscription->asStripeSubscription()->current_period_end
-                                                    ? \Carbon\Carbon::createFromTimestamp($subscription->asStripeSubscription()->current_period_end)->translatedFormat('d F Y')
-                                                    : 'N/A' }}
+                                                {{ $renewalDate ? $renewalDate->translatedFormat('d F Y') : 'N/A' }}
                                             </span>
                                         </p>
                                     </div>

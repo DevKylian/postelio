@@ -96,10 +96,10 @@
         @if($trade || $city)
             <div class="mb-6 flex flex-wrap justify-center gap-1.5">
                 @if($trade)
-                    <span class="px-3 py-1 rounded-lg text-[7px] font-black uppercase tracking-[0.15em] border" style="{{ $brandTagStyle }}">{{ $trade }}</span>
+                    <span class="px-3 h-5 inline-flex items-center justify-center rounded-lg text-[7px] font-black uppercase tracking-[0.15em] border whitespace-nowrap" style="{{ $brandTagStyle }}"><span class="mb-[1px]">{{ $trade }}</span></span>
                 @endif
                 @if($city)
-                    <span class="px-3 py-1 rounded-lg text-[7px] font-black uppercase tracking-[0.15em] border" style="{{ $brandTagStyle }}">{{ $city }}</span>
+                    <span class="px-3 h-5 inline-flex items-center justify-center rounded-lg text-[7px] font-black uppercase tracking-[0.15em] border whitespace-nowrap" style="{{ $brandTagStyle }}"><span class="mb-[1px]">{{ $city }}</span></span>
                 @endif
             </div>
         @else

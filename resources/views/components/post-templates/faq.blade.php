@@ -186,20 +186,24 @@
     @endphp
     @if($showFooter && !$exporting)
     <div class="absolute bottom-5 inset-x-0 mx-auto w-[85%] z-20" {!! $footerAlpine !!}>
-        <div class="backdrop-blur-xl rounded-2xl px-4 py-2.5 shadow-xl border border-white/10 flex items-center justify-between gap-3"
+        <div class="backdrop-blur-xl rounded-2xl px-4 py-2.5 shadow-xl border border-white/10 flex items-center justify-between gap-3 h-11"
              style="background-color: {{ $accentColor }}cc;">
-            <div class="flex items-center gap-2 min-w-0">
+            <div class="flex items-center justify-center gap-2 min-w-0 h-full">
                 @if($logoUrl)
                     <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
                 @endif
-                <p class="font-black tracking-[0.18em] text-[7px] uppercase truncate leading-none" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                <p class="font-black tracking-[0.18em] text-[7px] uppercase truncate leading-none v-align-fix" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
             </div>
-            <div class="flex items-center gap-1.5 shrink-0">
+            <div class="flex items-center gap-1.5 shrink-0 h-full">
                 @if($trade)
-                    <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-none" style="{{ $tagStyle }}">{{ $trade }}</span>
+                    <span class="px-2 h-4 grid-center rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-none" style="{{ $tagStyle }}">
+                        <span class="v-align-fix">{{ $trade }}</span>
+                    </span>
                 @endif
                 @if($city)
-                    <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-none" style="{{ $tagStyle }}">{{ $city }}</span>
+                    <span class="px-2 h-4 grid-center rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap leading-none" style="{{ $tagStyle }}">
+                        <span class="v-align-fix">{{ $city }}</span>
+                    </span>
                 @endif
             </div>
         </div>

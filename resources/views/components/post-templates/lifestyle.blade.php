@@ -163,7 +163,7 @@
                             @else
                                 <div class="w-4 h-4 rounded-full shrink-0" style="background-color: {{ $brandColor }}"></div>
                             @endif
-                            <p class="font-black tracking-[0.15em] text-[6px] uppercase text-center leading-none line-clamp-2" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                            <p class="font-black tracking-[0.15em] text-[6px] uppercase text-center leading-none line-clamp-2 v-align-fix" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
                             @php
                                 $hex = str_replace('#', '', $brandColor);
                                 if(strlen($hex) == 3) {
@@ -189,7 +189,9 @@
                                 $tagStyle = "background-color: $tagBg; border-color: $tagBorder; color: $tagText;";
                             @endphp
                             @if($trade)
-                                <span class="px-2 h-3.5 inline-flex items-center justify-center rounded text-[5px] font-black uppercase tracking-wide border whitespace-nowrap leading-none" style="{{ $tagStyle }}">{{ $trade }}</span>
+                                <span class="px-2 h-3.5 grid-center rounded text-[5px] font-black uppercase tracking-wide border whitespace-nowrap leading-none" style="{{ $tagStyle }}">
+                                    <span class="v-align-fix">{{ $trade }}</span>
+                                </span>
                             @endif
                         </div>
                     </div>

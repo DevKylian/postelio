@@ -98,9 +98,9 @@
     <style>
             background: #ffffff;
             overflow: hidden;
-            /* Headless Chromium on Linux renders Montserrat higher than Windows.
-               Increasing offset to 2px for final production stabilization. */
-            padding-top: 2px; 
+            /* Remove global padding-top as it doesn't fix internal flex alignment. 
+               We will use targeted compensation instead. */
+            padding-top: 0; 
             
             /* Antialiased is the most predictable for headless capture. */
             -webkit-font-smoothing: antialiased;
@@ -111,6 +111,19 @@
             font-family: 'Montserrat', sans-serif !important;
         }
         
+        /* THE ULTIMATE FIX: Targeted vertical offset for Linux baseline issues 
+           We apply a slight push down to centered text elements. */
+        .v-align-fix {
+            transform: translateY(1.5px) !important;
+        }
+
+        /* Force Grid centering for badges which is more stable than Flex on some OS. */
+        .grid-center {
+            display: inline-grid !important;
+            place-content: center !important;
+            align-items: center !important;
+        }
+
         /* Force boldness consistency across platforms - ensuring no system font fallback */
         .font-black { font-weight: 900 !important; font-family: 'Montserrat', sans-serif !important; }
         .font-bold { font-weight: 700 !important; font-family: 'Montserrat', sans-serif !important; }

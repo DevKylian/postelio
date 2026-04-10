@@ -124,14 +124,14 @@
                      style="background: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.05)' }}; border-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)' }}">
                     
                     {{-- Initials Avatar --}}
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-inner" 
+                    <div class="w-10 h-10 rounded-full grid-center flex-shrink-0 shadow-inner" 
                          style="background: {{ $brandTextColor }}; color: {{ $brandColor }}">
-                        <span class="text-xs font-black tracking-tighter leading-none">{{ $initials }}</span>
+                        <span class="text-xs font-black tracking-tighter leading-none v-align-fix">{{ $initials }}</span>
                     </div>
 
                     <div class="flex flex-col items-start min-w-0">
                         <div class="flex items-center gap-1.5 mb-1 max-w-full h-4">
-                            <span class="font-black text-xs uppercase tracking-wider truncate leading-none" style="color: {{ $brandTextColor }}">{{ $customerName }}</span>
+                            <span class="font-black text-xs uppercase tracking-wider truncate leading-none v-align-fix" style="color: {{ $brandTextColor }}">{{ $customerName }}</span>
                             <div class="flex-shrink-0 inline-flex items-center justify-center">
                                 <svg class="w-3 h-3" viewBox="0 0 24 24" fill="{{ $brandTextColor }}"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                             </div>
@@ -140,7 +140,7 @@
                             @if ($logoUrl)
                                 <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-90 brightness-0 {{ $brandTextColor === '#FFFFFF' ? 'invert' : '' }}">
                             @endif
-                            <p class="font-black tracking-[0.2em] text-[7px] uppercase truncate leading-none" style="color: {{ $brandTextColor }}">{{ $companyLabel }}</p>
+                            <p class="font-black tracking-[0.2em] text-[7px] uppercase truncate leading-none v-align-fix" style="color: {{ $brandTextColor }}">{{ $companyLabel }}</p>
                         </div>
                     </div>
                 </div>
@@ -148,10 +148,14 @@
 
                 <div class="flex items-center justify-center gap-2 mt-4">
                     @if($trade)
-                        <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[7px] font-black uppercase tracking-wider border leading-none" style="background: rgba({{ $brandTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $brandTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $brandTextColor }}">{{ $trade }}</span>
+                        <span class="px-2 h-4 grid-center rounded-md text-[7px] font-black uppercase tracking-wider border leading-none" style="background: rgba({{ $brandTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $brandTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $brandTextColor }}">
+                            <span class="v-align-fix">{{ $trade }}</span>
+                        </span>
                     @endif
                     @if($city)
-                        <span class="px-2 h-4 inline-flex items-center justify-center rounded-md text-[7px] font-black uppercase tracking-wider border leading-none" style="background: rgba({{ $brandTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $brandTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $brandTextColor }}">{{ $city }}</span>
+                        <span class="px-2 h-4 grid-center rounded-md text-[7px] font-black uppercase tracking-wider border leading-none" style="background: rgba({{ $brandTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $brandTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $brandTextColor }}">
+                            <span class="v-align-fix">{{ $city }}</span>
+                        </span>
                     @endif
                 </div>
         </div>

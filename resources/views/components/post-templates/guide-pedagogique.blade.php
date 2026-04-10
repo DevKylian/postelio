@@ -154,7 +154,7 @@
                     @if ($logoUrl)
                         <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
                     @endif
-                    <p class="font-black tracking-[0.2em] text-[7px] uppercase truncate leading-none" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                    <p class="font-black tracking-[0.2em] text-[7px] uppercase truncate leading-none v-align-fix" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
                 </div>
                 
                 <div class="flex items-center justify-center gap-1.5 overflow-hidden h-4">

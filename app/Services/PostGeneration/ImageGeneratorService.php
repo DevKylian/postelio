@@ -42,6 +42,7 @@ class ImageGeneratorService
             ->format('png')
             ->noSandbox()
             ->waitUntilNetworkIdle()
+            ->waitForFunction('document.fonts.status === "loaded"')
             ->timeout(60);
     }
 

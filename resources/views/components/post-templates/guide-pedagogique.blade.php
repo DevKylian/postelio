@@ -12,6 +12,9 @@
     'slideIndex' => null,
     'preview' => false,
     'brandTextColor' => '#FFFFFF',
+    'accentColor' => '#0F172A',
+    'accentTextColor' => '#FFFFFF',
+    'exporting' => false,
 ])
 
 @if($preview)
@@ -36,15 +39,11 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full relative">
-    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-gray-50 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-slate-50 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
 
-        {{-- Subtle dot pattern --}}
-        <div class="absolute inset-0 opacity-[0.03]" style="background-image: radial-gradient(circle at 2px 2px, black 1px, transparent 0); background-size: 24px 24px;"></div>
-
-        {{-- Gradient top bar --}}
-        <div class="absolute inset-x-0 top-0 h-0.5 z-10" style="background: linear-gradient(90deg, {{ $brandColor }}, {{ $brandColor }}66)"></div>
-
+        {{-- Background Sophistication --}}
+        <div class="absolute inset-0 opacity-[0.05]" style="background-image: radial-gradient(circle at 2px 2px, #000 1px, transparent 0); background-size: 32px 32px;"></div>
+        
         {{-- Cover Slide --}}
         @php
             $isCoverVisible = $slideIndex === null || $slideIndex === 0;
@@ -52,29 +51,33 @@
             $coverAlpine = $slideIndex === null ? 'x-show="current === 0"' : '';
 
             $titleLen = mb_strlen($title ?? '');
-            $fontSizeClass = 'text-2xl';
+            $fontSizeClass = 'text-3xl';
             if ($titleLen > 80) {
                 $fontSizeClass = 'text-lg';
             } elseif ($titleLen > 45) {
-                $fontSizeClass = 'text-xl';
+                $fontSizeClass = 'text-2xl';
             }
         @endphp
-        <div class="absolute inset-0 p-10 pb-24 flex flex-col justify-center text-center" {!! $coverAlpine !!} style="{{ $coverStyle }}">
+        <div class="absolute inset-0 p-10 pb-24 flex flex-col justify-center text-center overflow-hidden" {!! $coverAlpine !!} style="{{ $coverStyle }}">
+            {{-- Ambient glows --}}
+            <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full blur-[100px] pointer-events-none opacity-50" style="background: radial-gradient(circle, {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.3)' }}, transparent 70%)"></div>
+            <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full blur-[100px] pointer-events-none opacity-30" style="background: radial-gradient(circle, {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.2)' }}, transparent 70%)"></div>
+
             {{-- Label --}}
-            <div class="inline-flex items-center justify-center gap-1.5 mb-5">
-                <span class="inline-block w-1.5 h-1.5 rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.5)' }}"></span>
-                <p class="font-bold text-[10px] uppercase tracking-[0.2em] font-montserrat select-none" style="color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.5)' }}">CONSEIL D'EXPERT</p>
+            <div class="inline-flex items-center justify-center gap-2 mb-6 relative z-10">
+                <span class="w-2 h-2 rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.5)' }}"></span>
+                <p class="font-black text-[10px] uppercase tracking-[0.3em] font-montserrat select-none" style="color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.4)' }}">GUIDE ARTISAN</p>
             </div>
 
             @if($title)
-                <div class="max-h-[160px] overflow-hidden">
-                    <h2 class="font-black {{ $fontSizeClass }} leading-tight font-montserrat" style="color: {{ $brandTextColor }}">{!! nl2br(e($title)) !!}</h2>
+                {{-- Glass Title Card --}}
+                <div class="relative z-10 backdrop-blur-xl bg-white/10 border border-white/20 p-8 rounded-3xl shadow-2xl overflow-hidden">
+                    <h2 class="font-black {{ $fontSizeClass }} leading-tight font-montserrat tracking-tight" style="color: {{ $brandTextColor }}">{!! nl2br(e($title)) !!}</h2>
                 </div>
             @else
-                <div class="space-y-3">
-                    <div class="h-2 w-full rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.3)' }}"></div>
-                    <div class="h-2 w-5/6 mx-auto rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.3)' }}"></div>
-                    <div class="h-2 w-4/6 mx-auto rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.3)' }}"></div>
+                <div class="space-y-4">
+                    <div class="h-2 w-full rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}"></div>
+                    <div class="h-2 w-5/6 mx-auto rounded-full" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}"></div>
                 </div>
             @endif
         </div>
@@ -87,14 +90,15 @@
                 $slideStyle = !$isSlideVisible ? 'display: none;' : '';
                 $slideAlpine = $slideIndex === null ? "x-show=\"current === $realIdx\" style=\"display: none;\"" : '';
             @endphp
-            <div class="absolute inset-0 p-10 pb-20 flex flex-col justify-center text-center" {!! $slideAlpine !!} style="{{ $slideStyle }}">
-                <div class="rounded-2xl shadow-xl border relative" style="background: white; border-color: rgba(0,0,0,0.06); padding: 1.5rem 1.75rem 1.5rem">
-                    {{-- Top accent --}}
-                    <div class="absolute top-0 inset-x-0 h-0.5 rounded-t-2xl" style="background: linear-gradient(90deg, transparent, {{ $brandColor }}, transparent)"></div>
+            <div class="absolute inset-0 p-8 pb-32 flex flex-col justify-center text-center overflow-hidden" {!! $slideAlpine !!} style="{{ $slideStyle }}">
+                {{-- Ambient glows for slides --}}
+                <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-[100px] pointer-events-none opacity-20" style="background: radial-gradient(circle, {{ $brandColor }}, transparent 70%)"></div>
 
-                    {{-- Number badge (in flow, centered) --}}
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shadow-md mx-auto mb-4" style="background-color: {{ $brandColor }}; color: {{ $brandTextColor }}">
-                        {{ $realIdx }}
+                <div class="backdrop-blur-xl bg-white/95 rounded-3xl p-8 shadow-2xl border border-white relative z-10">
+                    {{-- Indicator --}}
+                    <div class="w-10 h-10 rounded-2xl flex flex-col items-center justify-center shadow-xl mx-auto mb-6 bg-slate-900 border border-slate-800">
+                         <span class="text-[8px] font-black font-montserrat text-slate-500 leading-none mb-1 uppercase">Step</span>
+                         <span class="font-black text-sm font-montserrat text-white leading-none">{{ sprintf('%02d', $realIdx) }}</span>
                     </div>
 
                     @php
@@ -102,10 +106,9 @@
                         $cFontSize = 'text-xl';
                         if ($cLen > 150) $cFontSize = 'text-sm';
                         elseif ($cLen > 80) $cFontSize = 'text-base';
-                        elseif ($cLen > 40) $cFontSize = 'text-lg';
                     @endphp
-                    <div class="max-h-[180px] overflow-hidden">
-                        <p class="text-gray-800 font-black {{ $cFontSize }} tracking-tight leading-tight font-montserrat">
+                    <div class="max-h-[200px] overflow-hidden">
+                        <p class="text-slate-800 font-black {{ $cFontSize }} tracking-tight leading-tight font-montserrat">
                             {{ $content }}
                         </p>
                     </div>
@@ -114,8 +117,8 @@
         @endforeach
 
         {{-- Contact Slide --}}
+        @foreach([count($slideContents) + 1] as $contactIdx)
         @php
-            $contactIdx = count($slideContents) + 1;
             $isContactVisible = $slideIndex === null || (int)$slideIndex === $contactIdx;
             $contactAlpine = $slideIndex === null ? "x-show=\"current === $contactIdx\" style=\"display: none;\"" : '';
             $contactStyle = (int)$slideIndex !== $contactIdx && $slideIndex !== null ? 'display: none;' : '';
@@ -131,44 +134,75 @@
                 :trade="$trade"
                 :city="$city"
                 :brand-text-color="$brandTextColor"
+                :accent-color="$accentColor"
+                :accent-text-color="$accentTextColor"
             />
         </div>
         @endif
+        @endforeach
 
-        {{-- Footer --}}
-        <div class="absolute bottom-0 inset-x-0 py-2.5 flex flex-col items-center justify-center px-6 gap-1.5" style="background-color: #1E293B">
-            <p class="text-white/70 font-bold tracking-widest text-[9px] font-montserrat">{{ $companyLabel }}</p>
-            <div class="flex items-center gap-2">
-                @php
-                    $tagTextCol = $brandColor;
-                    $hexTag = str_replace('#', '', $brandColor);
-                    if (strlen($hexTag) == 3) $hexTag = $hexTag[0].$hexTag[0].$hexTag[1].$hexTag[1].$hexTag[2].$hexTag[2];
-                    $rTag = hexdec(substr($hexTag, 0, 2));
-                    $gTag = hexdec(substr($hexTag, 2, 2));
-                    $bTag = hexdec(substr($hexTag, 4, 2));
-                    $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
-                    if ($yiqTag > 235) $tagTextCol = '#1E293B';
-                @endphp
+        {{-- Branding Overlay (Integrated Glass) --}}
+        @php
+            $footerAlpine = $slideIndex === null ? "x-show=\"current < $contactIdx\"" : '';
+            $showFooter = $hasContactInfo ? ($slideIndex === null || (int)$slideIndex < $contactIdx) : true;
+        @endphp
+        @if($showFooter && !$exporting)
+        <div class="absolute bottom-6 inset-x-0 mx-auto w-[90%] z-20" {!! $footerAlpine !!}>
+            <div class="backdrop-blur-xl rounded-3xl px-4 py-3.5 shadow-2xl border border-white/10 flex flex-col items-center"
+                 style="background-color: {{ $accentColor }}d9;">
+                <div class="flex items-center gap-2 mb-2.5">
+                    @if ($logoUrl)
+                        <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
+                    @endif
+                    <p class="font-black tracking-[0.2em] text-[7px] uppercase truncate leading-none" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                </div>
+                
+                <div class="flex items-center gap-1.5 overflow-hidden">
+                    @php
+                        $hex = str_replace('#', '', $brandColor);
+                        if(strlen($hex) == 3) {
+                            $r = hexdec(substr($hex,0,1).substr($hex,0,1));
+                            $g = hexdec(substr($hex,1,1).substr($hex,1,1));
+                            $b = hexdec(substr($hex,2,1).substr($hex,2,1));
+                        } else {
+                            $r = hexdec(substr($hex,0,2));
+                            $g = hexdec(substr($hex,2,2));
+                            $b = hexdec(substr($hex,4,2));
+                        }
+                        $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+                        $isDarkBrand = $yiq < 120;
 
-                @if($trade)
-                    <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $trade }}</span>
-                @endif
-                @if($city)
-                    <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $city }}</span>
-                @endif
+                        if ($isDarkBrand) {
+                            $tagBg = 'rgba(255,255,255,0.1)';
+                            $tagBorder = 'rgba(255,255,255,0.2)';
+                            $tagText = 'rgba(255,255,255,0.9)';
+                        } else {
+                            $tagBg = $brandColor . '25';
+                            $tagBorder = $brandColor . '40';
+                            $tagText = $brandColor;
+                        }
+                        $tagStyle = "background-color: $tagBg; border-color: $tagBorder; color: $tagText;";
+                    @endphp
+                    @if($trade)
+                        <span class="px-2 py-0.5 rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap" style="{{ $tagStyle }}">{{ $trade }}</span>
+                    @endif
+                    @if($city)
+                        <span class="px-2 py-0.5 rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap" style="{{ $tagStyle }}">{{ $city }}</span>
+                    @endif
+                </div>
             </div>
         </div>
+        @endif
 
         {{-- Alpine Navigation --}}
-        @if($preview)
-            <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        @if($preview && !$exporting)
+            <div class="absolute top-1/2 -translate-y-1/2 inset-x-4 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-30 pointer-events-none">
+                <button @click="current = (current - 1 + total) % total" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/40 border border-white/30 transition-all pointer-events-auto">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
-                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <button @click="current = (current + 1) % total" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/40 border border-white/30 transition-all pointer-events-auto">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
             </div>
         @endif
     </div>
-</div>

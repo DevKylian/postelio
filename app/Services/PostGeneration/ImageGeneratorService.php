@@ -37,9 +37,9 @@ class ImageGeneratorService
 
         return \Spatie\Browsershot\Browsershot::html($html)
             ->windowSize($width, $height)
-            ->deviceScaleFactor(3)
+            ->deviceScaleFactor(4)
             ->clip(0, 0, $width, $height)
-            ->format('jpeg')
+            ->format('png')
             ->noSandbox()
             ->timeout(60);
     }
@@ -94,7 +94,7 @@ class ImageGeneratorService
         for ($i = 0; $i < $totalSlides; $i++) {
             $html = view('render.post', ['post' => $post, 'slideIndex' => $i])->render();
             $runId    = $post->template_options['_variant_run'] ?? $post->id;
-            $fileName = "posts/{$runId}_{$i}.jpg";
+            $fileName = "posts/{$runId}_{$i}.png";
             $fullPath = storage_path('app/public/' . $fileName);
             
             if (!file_exists(dirname($fullPath))) {
@@ -106,9 +106,9 @@ class ImageGeneratorService
             $manager = new ImageManager(new Driver());
             $image = $manager->read($imageData);
             $image->cover($targetWidth, $targetHeight);
-            $image->toJpeg(90)->save($fullPath);
+            $image->toPng()->save($fullPath);
             
-            Log::debug("Image Generator: Slide $i saved as JPEG", ['path' => $fullPath, 'dimensions' => "{$targetWidth}x{$targetHeight}"]);
+            Log::debug("Image Generator: Slide $i saved as PNG", ['path' => $fullPath, 'dimensions' => "{$targetWidth}x{$targetHeight}"]);
             $slides[] = $fileName;
         }
         

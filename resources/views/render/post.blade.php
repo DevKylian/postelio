@@ -28,6 +28,7 @@
         
         $company = $post->company;
         $brandColor = $company->brand_color ?? '#F59E0B';
+        $accentColor = $company->secondary_color ?? '#0F172A';
         
         $getContrastColor = function($hex) {
             $hex = str_replace('#', '', $hex);
@@ -41,6 +42,7 @@
             return ($yiq >= 186) ? '#1E293B' : '#FFFFFF';
         };
         $brandTextColor = $getContrastColor($brandColor);
+        $accentTextColor = $getContrastColor($accentColor);
         
         $name = $company->name;
         $words = explode(' ', $name);
@@ -121,6 +123,8 @@
             'companyLabel' => $companyLabel,
             'logoUrl' => $logoUrl,
             'preview' => $preview,
+            'accentColor' => $accentColor,
+            'accentTextColor' => $accentTextColor,
             'slideIndex' => $slideIndexFinal,
             'phone' => $post->template_options['company_phone'] ?? $company->phone,
             'email' => $post->template_options['company_email'] ?? $company->email,
@@ -128,6 +132,7 @@
             'trade' => $post->template_options['company_trade'] ?? $company->trade,
             'city' => $post->template_options['company_city'] ?? $company->city,
             'visualStyle' => $visualStyle,
+            'exporting' => true,
         ];
 
         // Prepare specialized data early for count calculation
@@ -180,7 +185,7 @@
         } elseif ($template === 'review') {
             $props = array_merge($commonProps, [
                 'text' => $rawText,
-                'customerName' => $contentData['customerName'] ?? ($contentData['clientName'] ?? 'Client'),
+                'customerName' => $contentData['customer_name'] ?? ($contentData['customerName'] ?? ($contentData['clientName'] ?? 'Client')),
             ]);
         } elseif ($template === 'faq') {
             $faqSlides = (is_array($contentData) && isset($contentData['slides']) && is_array($contentData['slides']))
@@ -244,202 +249,26 @@
             :city="$props['city']"
             :visual-style="$props['visualStyle']"
             :brand-text-color="$brandTextColor"
+            :accent-color="$props['accentColor']"
+            :accent-text-color="$props['accentTextColor']"
         />
     @elseif($template === 'lifestyle')
-        {{-- ... existing lifestyle code ... --}}
-        {{-- INLINE lifestyle rendering — bypasses component system entirely --}}
-        @php
-            $lifestyleText = $rawText ?: 'Sur le terrain';
-            $lifestyleLen = mb_strlen($lifestyleText);
-            $lifestyleFontSize = $lifestyleLen > 25 ? '10px' : ($lifestyleLen > 18 ? '11px' : '13px');
-            $lifestyleImgUrl = $props['imageUrl'] ?? null;
-        @endphp
-
-        @if($visualStyle === 'blueprint')
-            {{-- BLUEPRINT lifestyle: blue background, grid, photo frame, text label, white footer --}}
-            <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: #0047AB; position: relative; overflow: hidden;">
-                {{-- Grid overlay --}}
-                <div style="position: absolute; inset: 0; opacity: 0.1; pointer-events: none; background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 30px 30px;"></div>
-
-                {{-- Photo frame: top area --}}
-                <div style="position: absolute; top: 20px; left: 20px; right: 20px; height: 230px; background: white; padding: 5px; overflow: hidden;">
-                    @if($lifestyleImgUrl)
-                        <img src="{{ $lifestyleImgUrl }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-                    @else
-                        <div style="width: 100%; height: 100%; background: #ddd;"></div>
-                    @endif
-                </div>
-
-                {{-- Text label: centered between photo bottom (255px) and footer top (310px) --}}
-                <div style="position: absolute; top: 258px; left: 20px; right: 20px; height: 48px; display: flex; align-items: center; justify-content: center;">
-                    <div style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.3); padding: 6px 16px; max-width: 100%; overflow: hidden;">
-                        <span style="color: white; font-size: {{ $lifestyleFontSize }}; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; line-height: 1.3; text-align: center; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Courier New', monospace;">{{ $lifestyleText }}</span>
-                    </div>
-                </div>
-
-                {{-- Footer bar --}}
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: white; border-top: 2px solid #0047AB; padding: 0 28px; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <span style="color: #0047AB; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; font-family: 'Courier New', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">{{ $companyLabel }}</span>
-                        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }}; border: 1px solid rgba(0,71,171,0.2);"></div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px; overflow: hidden;">
-                        @if($props['trade'] ?? null)
-                            <span style="color: #0047AB; font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Courier New', monospace; opacity: 0.5; border: 1px solid rgba(0, 71, 171, 0.2); padding: 1px 4px; white-space: nowrap;">{{ $props['trade'] }}</span>
-                        @endif
-                        @if($props['city'] ?? null)
-                            <span style="color: #0047AB; font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Courier New', monospace; opacity: 0.5; border: 1px solid rgba(0, 71, 171, 0.2); padding: 1px 4px; white-space: nowrap;">{{ $props['city'] }}</span>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-        @elseif($visualStyle === 'kraft')
-            {{-- KRAFT lifestyle --}}
-            <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: #BC9A7E; position: relative; overflow: hidden;">
-                {{-- Texture overlay --}}
-                <div style="position: absolute; inset: 0; opacity: 0.4; pointer-events: none; mix-blend-mode: multiply; background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
-
-                {{-- Photo area --}}
-                <div style="position: absolute; top: 28px; left: 28px; right: 28px; height: 220px; border: 8px solid #1e293b; padding: 10px; background: white; transform: rotate(1deg); overflow: hidden;">
-                    @if($lifestyleImgUrl)
-                        <img src="{{ $lifestyleImgUrl }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-                    @else
-                        <div style="width: 100%; height: 100%; background: #ddd;"></div>
-                    @endif
-                </div>
-
-                {{-- Footer --}}
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 85px; background: #CBB198; border-top: 6px solid #1e293b; padding: 0 28px; display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; flex-direction: column; max-width: 200px; overflow: hidden;">
-                        <span style="color: #1e293b; font-size: {{ $lifestyleFontSize }}; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $lifestyleText }}</span>
-                        <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-                            <span style="color: rgba(30,41,59,0.4); font-size: 8px; font-weight: 900; text-transform: uppercase; font-family: 'Courier New', monospace;">{{ $companyLabel }}</span>
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                                @if($props['trade'] ?? null)
-                                    <span style="color: rgba(30,41,59,0.4); font-size: 6px; font-weight: 900; text-transform: uppercase; border: 1px solid rgba(30,41,59,0.2); padding: 0 3px; white-space: nowrap;">{{ $props['trade'] }}</span>
-                                @endif
-                                @if($props['city'] ?? null)
-                                    <span style="color: rgba(30,41,59,0.4); font-size: 6px; font-weight: 900; text-transform: uppercase; border: 1px solid rgba(30,41,59,0.2); padding: 0 3px; white-space: nowrap;">{{ $props['city'] }}</span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    <div style="width: 40px; height: 40px; border-radius: 50%; border: 4px solid #1e293b; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <div style="width: 16px; height: 16px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
-                    </div>
-                </div>
-            </div>
-
-        @elseif($visualStyle === 'glass')
-            {{-- GLASS lifestyle --}}
-            <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; overflow: hidden;">
-                {{-- Photo --}}
-                <div style="position: absolute; top: 20px; left: 20px; right: 20px; height: 230px; border-radius: 16px; overflow: hidden;">
-                    @if($lifestyleImgUrl)
-                        <img src="{{ $lifestyleImgUrl }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-                    @else
-                        <div style="width: 100%; height: 100%; background: #ddd;"></div>
-                    @endif
-                </div>
-
-                {{-- Text label --}}
-                <div style="position: absolute; top: 258px; left: 20px; right: 20px; height: 48px; display: flex; align-items: center; justify-content: center;">
-                    <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 8px 20px; max-width: 100%; overflow: hidden;">
-                        <span style="color: white; font-size: {{ $lifestyleFontSize }}; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; text-align: center; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $lifestyleText }}</span>
-                    </div>
-                </div>
-
-                {{-- Footer --}}
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 0 28px; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <span style="color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.9;">{{ $companyLabel }}</span>
-                        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        @if($props['trade'] ?? null)
-                            <span style="color: white; font-size: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 1px 5px; white-space: nowrap;">{{ $props['trade'] }}</span>
-                        @endif
-                        @if($props['city'] ?? null)
-                            <span style="color: white; font-size: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 1px 5px; white-space: nowrap;">{{ $props['city'] }}</span>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-        @elseif($visualStyle === 'beton')
-            {{-- BETON lifestyle --}}
-            <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: #4a4a4a; position: relative; overflow: hidden;">
-                {{-- Concrete texture --}}
-                <div style="position: absolute; inset: 0; opacity: 0.3; pointer-events: none; background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');"></div>
-
-                {{-- Photo --}}
-                <div style="position: absolute; top: 20px; left: 20px; right: 20px; height: 230px; overflow: hidden;">
-                    @if($lifestyleImgUrl)
-                        <img src="{{ $lifestyleImgUrl }}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-                    @else
-                        <div style="width: 100%; height: 100%; background: #ddd;"></div>
-                    @endif
-                </div>
-
-                {{-- Text label --}}
-                <div style="position: absolute; top: 258px; left: 20px; right: 20px; height: 48px; display: flex; align-items: center; justify-content: center;">
-                    <div style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); padding: 6px 16px; max-width: 100%; overflow: hidden;">
-                        <span style="color: white; font-size: {{ $lifestyleFontSize }}; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; text-align: center; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $lifestyleText }}</span>
-                    </div>
-                </div>
-
-                {{-- Footer --}}
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 60px; background: rgba(0,0,0,0.3); padding: 0 28px; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <span style="color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.8;">{{ $companyLabel }}</span>
-                        <div style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ $brandColor }};"></div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        @if($props['trade'] ?? null)
-                            <span style="color: white; font-size: 6px; font-weight: 800; text-transform: uppercase; opacity: 0.4; border: 1px solid rgba(255,255,255,0.15); padding: 1px 4px; white-space: nowrap;">{{ $props['trade'] }}</span>
-                        @endif
-                        @if($props['city'] ?? null)
-                            <span style="color: white; font-size: 6px; font-weight: 800; text-transform: uppercase; opacity: 0.4; border: 1px solid rgba(255,255,255,0.15); padding: 1px 4px; white-space: nowrap;">{{ $props['city'] }}</span>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-        @else
-            {{-- STANDARD lifestyle: full-bleed photo with gradient overlay --}}
-            <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: #374151; position: relative; overflow: hidden;">
-                {{-- Full-bleed photo --}}
-                @if($lifestyleImgUrl)
-                    <img src="{{ $lifestyleImgUrl }}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;">
-                @endif
-
-                {{-- Dark gradient on lower half --}}
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 55%; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);"></div>
-
-                {{-- Text label above footer --}}
-                @if($lifestyleText)
-                <div style="position: absolute; left: 24px; right: 24px; bottom: 68px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                    <div style="background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 7px 16px; max-width: 100%; overflow: hidden;">
-                        <span style="color: white; font-size: {{ $lifestyleFontSize }}; font-weight: 900; letter-spacing: 0.15em; line-height: 1.3; text-align: center; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $lifestyleText }}</span>
-                    </div>
-                </div>
-                @endif
-
-                {{-- Bottom branding bar --}}
-                <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 20px 10px; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: flex; flex-direction: column; align-items: center; gap: 4px; border-top: 2px solid {{ $brandColor }};">
-                    <span style="color: rgba(255,255,255,0.9); font-size: 9px; font-weight: 700; letter-spacing: 0.2em;">{{ $companyLabel }}</span>
-                    <div style="display: flex; align-items: center; gap: 6px; overflow: hidden;">
-                        @if($props['trade'] ?? null)
-                            <span style="color: rgba(255,255,255,0.5); font-size: 6px; font-weight: 700; letter-spacing: 0.1em; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); border-radius: 3px; padding: 1px 5px; white-space: nowrap;">{{ $props['trade'] }}</span>
-                        @endif
-                        @if($props['city'] ?? null)
-                            <span style="color: rgba(255,255,255,0.5); font-size: 6px; font-weight: 700; letter-spacing: 0.1em; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); border-radius: 3px; padding: 1px 5px; white-space: nowrap;">{{ $props['city'] }}</span>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        @endif
+        <x-post-templates.lifestyle
+            :brand-color="$props['brandColor']"
+            :company-label="$props['companyLabel']"
+            :logo-url="$props['logoUrl']"
+            :preview="$props['preview']"
+            :slide-index="$props['slideIndex']"
+            :text="$props['text']"
+            :image-url="$props['imageUrl']"
+            :trade="$props['trade']"
+            :city="$props['city']"
+            :brand-text-color="$brandTextColor"
+            :visual-style="$visualStyle"
+            :accent-color="$props['accentColor']"
+            :accent-text-color="$props['accentTextColor']"
+            :exporting="true"
+        />
 
     @elseif($props)
         <x-dynamic-component :component="$componentName"
@@ -462,6 +291,9 @@
             :trade="$props['trade'] ?? null"
             :city="$props['city'] ?? null"
             :brand-text-color="$brandTextColor"
+            :accent-color="$props['accentColor'] ?? $accentColor"
+            :accent-text-color="$props['accentTextColor'] ?? $accentTextColor"
+            :exporting="$props['exporting'] ?? false"
         />
     @else
         <div style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; background: {{ $brandColor }}; color: {{ $brandTextColor }}; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 40px; text-align: center;">

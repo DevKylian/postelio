@@ -10,7 +10,8 @@
     'imageAfterUrl' => null,
     'text' => 'TRANSFORMATION',
     'preview' => false,
-    'slideIndex' => null, // null = interactive alpine preview, int = render specific slide
+    'slideIndex' => null,
+    'exporting' => false,
 ])
 
 @if($preview)
@@ -30,6 +31,15 @@
     $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
     $total = 3 + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
+
+    // Contrast logic for tags
+    $hex = str_replace('#', '', $brandColor);
+    if (strlen($hex) == 3) $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+    $tagTextCol = ($yiq > 180) ? '#1E293B' : '#FFFFFF';
 @endphp
 
 <div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
@@ -56,7 +66,9 @@
                         <span class="text-white/20 text-[7px] font-black font-mono-technical uppercase">AVANT</span>
                     </div>
                 @endif
-                <div class="absolute top-0 left-0 px-3 py-1 bg-white text-[#0047AB] text-[9px] font-black font-mono-technical uppercase shadow-xl">AVANT</div>
+                <div class="absolute top-2 left-2 px-3 py-1 rounded-full shadow-xl z-20" style="background-color: {{ $brandColor }}">
+                    <p class="text-[9px] font-black font-mono-technical uppercase tracking-wider leading-none" style="color: {{ $tagTextCol }}">Avant</p>
+                </div>
             </div>
             <div class="relative overflow-hidden bg-blue-900 border border-white/10">
                 @if($imageAfterUrl)
@@ -66,7 +78,9 @@
                         <span class="text-white/20 text-[7px] font-black font-mono-technical uppercase tracking-widest">APRÈS</span>
                     </div>
                 @endif
-                <div class="absolute top-0 left-0 px-3 py-1 bg-white text-[#0047AB] text-[9px] font-black font-mono-technical uppercase shadow-xl">APRÈS</div>
+                <div class="absolute top-2 right-2 px-3 py-1 rounded-full shadow-xl z-20" style="background-color: {{ $brandColor }}">
+                    <p class="text-[9px] font-black font-mono-technical uppercase tracking-wider leading-none" style="color: {{ $tagTextCol }}">Après</p>
+                </div>
             </div>
         </div>
 
@@ -79,7 +93,9 @@
         <div class="absolute inset-6 bg-slate-950 border-2 border-white/20" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if($imageBeforeUrl)
                 <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute top-0 left-0 px-5 py-2 bg-white text-[#0047AB] text-xs font-black font-mono-technical uppercase tracking-[0.2em] shadow-2xl">ETAT INITIAL / AVANT</div>
+                <div class="absolute top-2 left-2 px-5 py-2 rounded-full shadow-2xl z-20" style="background-color: {{ $brandColor }}">
+                    <p class="text-xs font-black font-mono-technical uppercase tracking-[0.2em] leading-none" style="color: {{ $tagTextCol }}">Avant</p>
+                </div>
             @endif
         </div>
 
@@ -92,7 +108,9 @@
         <div class="absolute inset-6 bg-slate-900 border-2 border-white/20" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if($imageAfterUrl)
                 <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute top-0 left-0 px-5 py-2 bg-white text-[#0047AB] text-xs font-black font-mono-technical uppercase tracking-[0.2em] shadow-2xl">PROJET FINALISÉ / APRÈS</div>
+                <div class="absolute top-2 right-2 px-5 py-2 rounded-full shadow-2xl z-20" style="background-color: {{ $brandColor }}">
+                    <p class="text-xs font-black font-mono-technical uppercase tracking-[0.2em] leading-none" style="color: {{ $tagTextCol }}">Après</p>
+                </div>
             @endif
         </div>
 
@@ -117,8 +135,7 @@
         </div>
         @endif
 
-        {{-- Controls (Preview Only) --}}
-        @if($preview)
+        @if($preview && !$exporting)
             <div class="absolute top-1/2 -translate-y-1/2 inset-x-4 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-30">
                 <button @click="current = (current - 1 + total) % total" class="w-10 h-10 bg-white text-[#0047AB] flex items-center justify-center hover:bg-white/90 shadow-xl border border-[#0047AB]/20">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -128,7 +145,7 @@
                 </button>
             </div>
             <div class="absolute top-10 right-10 bg-white text-[#0047AB] text-[10px] font-black font-mono-technical px-3 py-1.5 shadow-xl z-30" x-text="(current + 1) + ' / ' + total"></div>
-        @elseif($slideIndex !== null)
+        @elseif($slideIndex !== null && !$exporting)
              <div class="absolute top-10 right-10 bg-white text-[#0047AB] text-[10px] font-black font-mono-technical px-3 py-1.5 shadow-xl z-30">
                 {{ (int)$slideIndex + 1 }} / {{ $total }}
             </div>

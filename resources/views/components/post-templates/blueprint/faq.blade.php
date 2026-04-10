@@ -11,6 +11,7 @@
     'logoUrl' => null,
     'preview' => false,
     'slideIndex' => null,
+    'exporting' => false,
 ])
 
 @if($preview)
@@ -121,7 +122,7 @@
                 @php
                     $showPagination = $hasContactInfo ? ((int)$slideIndex < 2) : true;
                 @endphp
-                @if($showPagination)
+                @if($showPagination && !$exporting)
                 <span class="opacity-50" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
                     @if(!$preview) {{ (int)$slideIndex + 1 }} / {{ $total }} @endif
                 </span>
@@ -138,8 +139,7 @@
         </div>
     </div>
 
-    {{-- Controls (Preview Only) --}}
-    @if($preview)
+    @if($preview && !$exporting)
         <div class="absolute inset-y-0 inset-x-2 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity z-30 pointer-events-none">
             <button @click="current = (current - 1 + total) % total" class="w-8 h-8 bg-white border border-[#0047AB] text-[#0047AB] flex items-center justify-center hover:bg-[#0047AB] hover:text-white pointer-events-auto transition-colors shadow-lg">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>

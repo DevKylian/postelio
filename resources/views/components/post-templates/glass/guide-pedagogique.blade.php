@@ -10,6 +10,7 @@
     'slideContents' => [], // array of steps (text)
     'preview' => false,
     'slideIndex' => null,
+    'exporting' => false,
 ])
 
 @if($preview)
@@ -132,7 +133,7 @@
         <div {!! $footerAlpine !!} class="absolute inset-x-0 bottom-0 py-3 px-10 backdrop-blur-md bg-white/5 flex flex-col gap-1 border-t border-white/10 z-30">
              <div class="flex items-center justify-between">
                  <span class="text-white/50 text-[9px] font-black uppercase tracking-[0.3em] font-montserrat truncate max-w-[200px]">{{ $companyLabel }}</span>
-                 @if($total > 1)
+                 @if($total > 1 && !$exporting)
                     <div class="text-white/20 text-[10px] font-black" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
                         @if(!$preview) {{ ($slideIndex ?? 0) + 1 }} / {{ $total }} @endif
                     </div>
@@ -149,7 +150,7 @@
         </div>
         @endif
 
-        @if($preview)
+        @if($preview && !$exporting)
             <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40">
                 <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-slate-900/50 text-white flex items-center justify-center hover:bg-slate-900">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>

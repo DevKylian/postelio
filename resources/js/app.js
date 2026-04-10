@@ -1,4 +1,5 @@
 import './bootstrap';
+import './onboarding-tour';
 
 // Unregister any previously installed service workers
 if ('serviceWorker' in navigator) {

@@ -11,6 +11,7 @@
     'city' => null,
     'preview' => false,
     'slideIndex' => null,
+    'exporting' => false,
 ])
 
 @if($preview)
@@ -117,7 +118,7 @@
                 @php
                     $showTotal = $hasContactInfo ? ((int)$slideIndex !== 2) : true;
                 @endphp
-                @if($showTotal)
+                @if($showTotal && !$exporting)
                 <div class="text-white/20 text-[10px] font-bold tracking-widest" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
                     @if(!$preview) {{ $slideIndex + 1 }} / {{ $total }} @endif
                 </div>
@@ -134,8 +135,7 @@
         </div>
     </div>
 
-    {{-- Controls (Preview Only) --}}
-    @if($preview)
+    @if($preview && !$exporting)
         <div class="absolute inset-y-0 inset-x-4 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity z-30 pointer-events-none">
             <button @click="current = (current - 1 + total) % total" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 text-white flex items-center justify-center hover:bg-white/10 backdrop-blur-md pointer-events-auto transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>

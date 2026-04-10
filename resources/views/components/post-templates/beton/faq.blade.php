@@ -10,6 +10,7 @@
     'answer' => '',
     'preview' => false,
     'slideIndex' => null,
+    'exporting' => false,
 ])
 
 @if($preview)
@@ -115,7 +116,7 @@
          <div class="flex items-center justify-between">
              <span class="text-gray-900 text-xs font-black font-montserrat uppercase tracking-[0.2em] truncate max-w-[200px]">{{ $companyLabel }}</span>
              
-             @if($preview || $slideIndex !== null)
+             @if(($preview || $slideIndex !== null) && !$exporting)
                 <div class="flex items-center gap-3">
                     <div class="text-gray-900/40 text-[10px] font-black" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
                         @if(!$preview) {{ (int)$slideIndex + 1 }} / {{ $total }} @endif
@@ -133,8 +134,7 @@
          </div>
     </div>
 
-    {{-- Controls (Preview Only) --}}
-    @if($preview)
+    @if($preview && !$exporting)
         <div class="absolute inset-y-0 inset-x-2 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity z-40 pointer-events-none">
             <button @click="current = (current - 1 + total) % total" class="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center hover:bg-gray-800 pointer-events-auto transition-all shadow-xl">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>

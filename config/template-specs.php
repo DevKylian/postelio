@@ -38,6 +38,16 @@ return [
         'ai_content_instructions' => 'Transforme le témoignage client en contenu Instagram premium. Préfère utiliser les mots EXACTS du client si un témoignage est présent dans le vocal.',
         'fields' => [
             [
+                'name' => 'customer_name',
+                'label' => 'Nom du client',
+                'purpose' => 'Prénom ou nom du client (ex: "Marie" ou "Mme Martin"). Laisse vide ou mets "Client" si inconnu.',
+                'idealChars' => [5, 20],
+                'maxChars' => 25,
+                'lineClamp' => 1,
+                'count' => 1,
+                'isArray' => false,
+            ],
+            [
                 'name' => 'image_text',
                 'label' => 'Citation client',
                 'purpose' => 'Citation percutante tirée de l\'avis client, utilisant les mots exacts du témoignage si disponibles. Phrase complète, sans hashtag, sans emoji.',
@@ -180,18 +190,22 @@ return [
     'lifestyle' => [
         'type' => 'single',
         'description' => 'Partagez l\'ambiance et le quotidien de votre métier',
-        'vocal_hint' => 'Décrivez brièvement la scène ou le projet que montre votre photo : le lieu, l\'ambiance, ce que vous avez réalisé.',
+        'vocal_hint' => 'Décrivez la scène ou le moment : une réalisation, une fin de journée, une anecdote du chantier, une ambiance.',
         'context_fields' => [],
-        'ai_role' => 'Tu es un expert en marketing pour artisans, spécialisé dans le contenu lifestyle.',
-        'ai_content_instructions' => 'Le texte image est une ÉTIQUETTE courte qui nomme le sujet, comme un titre d\'album photo. Méthode : identifie le SUJET en 1-2 mots, puis ajoute UN qualificatif. Exemples : "Cuisine sur mesure", "Douche italienne", "Terrasse bois". INTERDIT : phrases avec verbe, articles introductifs ("Création de...", "Une cuisine...").',
+        'ai_role' => 'Tu es un expert en marketing pour artisans, spécialisé dans le contenu lifestyle authentique.',
+        'ai_content_instructions' => 'Le texte image doit capturer l\'essentiel de la photo ou de l\'ambiance en une expression courte et percutante. '
+            . 'Deux cas : '
+            . '(1) Si le vocal parle d\'un projet/réalisation : étiquette comme un titre d\'album photo ("Cuisine sur mesure", "Terrasse bois", "Douche italienne"). '
+            . '(2) Si le vocal parle d\'un moment du quotidien/ambiance (fin de semaine, urgence, ambiance chantier...) : expression lifestyle courte et expressive de 4 à 7 mots ("Vendredi sous la flotte !", "Semaine intense, repos mérité", "Trois urgences, on assure !"). '
+            . 'INTERDIT dans les deux cas : articles introductifs ("Une cuisine...", "Le chantier de..."), phrases trop longues, hashtags, emojis.',
         'fields' => [
             [
                 'name' => 'image_text',
-                'label' => 'Étiquette du projet',
-                'purpose' => 'Étiquette courte nommant le sujet du projet (1-3 mots max). PAS de phrase, PAS de verbe, PAS d\'article introductif. Ex: "Cuisine sur mesure", "Parquet chêne massif".',
-                'idealChars' => [10, 25],
-                'maxChars' => 30,
-                'lineClamp' => 1,
+                'label' => 'Expression lifestyle',
+                'purpose' => 'Expression courte capturant l\'ambiance ou nommant le projet. Projet : "Cuisine sur mesure" (2-4 mots). Ambiance/quotidien : phrase courte expressive de 4-7 mots ("Semaine chargée, repos mérité"). Sans hashtag, sans emoji.',
+                'idealChars' => [18, 45],
+                'maxChars' => 55,
+                'lineClamp' => 2,
                 'count' => 1,
                 'isArray' => false,
             ],

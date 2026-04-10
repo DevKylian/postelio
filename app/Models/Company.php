@@ -15,6 +15,7 @@ class Company extends Model
         'website',
         'trade',
         'brand_color',
+        'secondary_color',
         'bio_text',
         'bio_audio_path',
         'logo_path',

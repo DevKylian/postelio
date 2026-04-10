@@ -10,19 +10,20 @@
     'slides' => [null, null, null, null], // array of image URLs
     'slideContents' => [], // array of texts corresponding to slides
     'preview' => false,
-    'slideIndex' => null, 
+    'slideIndex' => null,
+    'exporting' => false,
 ])
 
 @if($preview)
     @php
         $title = 'Focus sur l\'installation du système de chauffage';
-        $slides = [
+        $slides = !empty($slides) ? $slides : [
             'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?q=80&w=800',
             'https://images.unsplash.com/photo-1590644365607-1c5a519a7a37?q=80&w=800',
             'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800',
             'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800'
         ];
-        $slideContents = [
+        $slideContents = !empty($slideContents) ? $slideContents : [
             'Préparation technique et traçage des réseaux.',
             'Installation des collecteurs et mise en pression.',
             'Finalisation des raccordements et test de chauffe.',
@@ -119,7 +120,7 @@
                   </div>
                   <div class="flex flex-col items-end">
                       <span class="text-white/40 text-[8px] font-black uppercase tracking-widest italic leading-none mb-1 truncate max-w-[150px] text-right">{{ $companyLabel }}</span>
-                      @if($total > 1)
+                      @if($total > 1 && !$exporting)
                          <div class="text-white/20 text-[7px] font-bold" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
                              @if(!$preview) {{ (int)($slideIndex ?? 0) + 1 }} / {{ $total }} @endif
                          </div>
@@ -137,7 +138,7 @@
         </div>
         @endif
 
-        @if($preview)
+        @if($preview && !$exporting)
             <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40 px-2 pointer-events-none">
                 <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-gray-800 pointer-events-auto border-2 border-white shadow-xl">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>

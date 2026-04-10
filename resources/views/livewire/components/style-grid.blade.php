@@ -11,15 +11,19 @@ state([
     'brandTextColor' => '#FFFFFF',
     'hasLogo' => false,
     'logoUrl' => null,
+    'accentColor' => '#0F172A',
+    'accentTextColor' => '#FFFFFF',
 ]);
 
-mount(function ($activeTab = 'standard', $brandColor = '#F59E0B', $companyLabel = 'Votre Société', $companyCity = '', $brandTextColor = '#FFFFFF', $logoUrl = null) {
+mount(function ($activeTab = 'standard', $brandColor = '#F59E0B', $companyLabel = 'Votre Société', $companyCity = '', $brandTextColor = '#FFFFFF', $logoUrl = null, $accentColor = '#0F172A', $accentTextColor = '#FFFFFF') {
     $this->activeTab = $activeTab;
     $this->brandColor = $brandColor;
     $this->companyLabel = $companyLabel;
     $this->companyCity = $companyCity;
     $this->brandTextColor = $brandTextColor;
     $this->logoUrl = $logoUrl;
+    $this->accentColor = $accentColor;
+    $this->accentTextColor = $accentTextColor;
 });
 
 $nativeSettings = computed(fn() => NativeTemplateSetting::all()->pluck('is_active', 'slug'));
@@ -38,61 +42,95 @@ $nativeSettings = computed(fn() => NativeTemplateSetting::all()->pluck('is_activ
         @if($activeTab === 'standard')
             @if($this->nativeSettings['project'] ?? true)
                 <div class="space-y-4 group">
-                    <x-post-templates.project :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
+                    <x-post-templates.project 
+                        :brandColor="$brandColor" 
+                        :companyLabel="$companyLabel" 
+                        :city="$companyCity" 
+                        :preview="true" 
+                        :brand-text-color="$brandTextColor" 
+                        :accentColor="$accentColor"
+                        :accentTextColor="$accentTextColor"
+                        imageBeforeUrl="{{ asset('images/templates/avant_postelio.png') }}"
+                        imageAfterUrl="{{ asset('images/templates/apres_postelio.png') }}"
+                    />
                     <div><h4 class="font-bold text-midnight text-lg">Avant / Après</h4><p class="text-gray-500 text-sm">Parfait pour valoriser vos rénovations et finitions.</p></div>
                 </div>
             @endif
             @if($this->nativeSettings['review'] ?? true)
                 <div class="space-y-4 group">
-                    <x-post-templates.review :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$logoUrl" :preview="true" :brand-text-color="$brandTextColor" />
+                    <x-post-templates.review :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$logoUrl" :preview="true" :brand-text-color="$brandTextColor" :accentColor="$accentColor" :accentTextColor="$accentTextColor" />
                     <div><h4 class="font-bold text-midnight text-lg">Avis Client</h4><p class="text-gray-500 text-sm">Transformez vos témoignages en preuves sociales fortes.</p></div>
                 </div>
             @endif
             @if($this->nativeSettings['faq'] ?? true)
                 <div class="space-y-4 group">
-                    <x-post-templates.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$logoUrl" :preview="true" :brand-text-color="$brandTextColor" />
+                    <x-post-templates.faq :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$logoUrl" :preview="true" :brand-text-color="$brandTextColor" :accentColor="$accentColor" :accentTextColor="$accentTextColor" />
                     <div><h4 class="font-bold text-midnight text-lg">FAQ Artisan</h4><p class="text-gray-500 text-sm">Éduquez vos clients et affirmez votre professionnalisme.</p></div>
                 </div>
             @endif
             @if($this->nativeSettings['lifestyle'] ?? true)
                 <div class="space-y-4 group">
-                    <x-post-templates.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$logoUrl" :preview="true" :brand-text-color="$brandTextColor" />
+                    <x-post-templates.lifestyle 
+                        :brandColor="$brandColor" 
+                        :companyLabel="$companyLabel" 
+                        :city="$companyCity" 
+                        :logoUrl="$logoUrl" 
+                        :preview="true" 
+                        :brand-text-color="$brandTextColor" 
+                        :accentColor="$accentColor"
+                        :accentTextColor="$accentTextColor"
+                        imageUrl="{{ asset('images/templates/lifestyle_postelio.png') }}"
+                    />
                     <div><h4 class="font-bold text-midnight text-lg">Lifestyle</h4><p class="text-gray-500 text-sm">Une immersion brute dans votre métier, sans artifices.</p></div>
                 </div>
             @endif
             @if($this->nativeSettings['quality_focus'] ?? true)
                 <div class="space-y-4 group">
-                    <x-post-templates.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$logoUrl" :preview="true" :brand-text-color="$brandTextColor" />
+                    <x-post-templates.quality-focus :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$logoUrl" :preview="true" :brand-text-color="$brandTextColor" :accentColor="$accentColor" :accentTextColor="$accentTextColor" />
                     <div><h4 class="font-bold text-midnight text-lg">Focus Qualité</h4><p class="text-gray-500 text-sm">Valorisez la qualité de vos matériaux et équipements.</p></div>
                 </div>
             @endif
             @if($this->nativeSettings['chantier_detail'] ?? true)
                 <div class="space-y-4 group">
-                    <x-post-templates.chantier-detail :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$logoUrl" :preview="true" :brand-text-color="$brandTextColor" />
+                    <x-post-templates.chantier-detail 
+                        :brandColor="$brandColor" 
+                        :companyLabel="$companyLabel" 
+                        :city="$companyCity" 
+                        :logoUrl="$logoUrl" 
+                        :preview="true" 
+                        :brand-text-color="$brandTextColor" 
+                        :accentColor="$accentColor"
+                        :accentTextColor="$accentTextColor"
+                        :slides="[
+                            asset('images/templates/chantier_one_postelio.png'),
+                            asset('images/templates/chantier_two_postelio.png'),
+                            asset('images/templates/chantier_three_postelio.png')
+                        ]"
+                    />
                     <div><h4 class="font-bold text-midnight text-lg">Chantier en Détail</h4><p class="text-gray-500 text-sm">Une immersion complète avec plusieurs photos d'un même projet.</p></div>
                 </div>
             @endif
             @if($this->nativeSettings['step_by_step'] ?? true)
                 <div class="space-y-4 group">
-                    <x-post-templates.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
+                    <x-post-templates.step-by-step :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" :accentColor="$accentColor" :accentTextColor="$accentTextColor" />
                     <div><h4 class="font-bold text-midnight text-lg">Step-by-Step</h4><p class="text-gray-500 text-sm">Expliquez votre expertise étape par étape.</p></div>
                 </div>
             @endif
             @if($this->nativeSettings['conseil_saisonnier'] ?? true)
                 <div class="space-y-4 group">
-                    <x-post-templates.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$logoUrl" :preview="true" :brand-text-color="$brandTextColor" />
+                    <x-post-templates.conseil-saisonnier :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$logoUrl" :preview="true" :brand-text-color="$brandTextColor" :accentColor="$accentColor" :accentTextColor="$accentTextColor" />
                     <div><h4 class="font-bold text-midnight text-lg">Conseil Saisonnier</h4><p class="text-gray-500 text-sm">Anticipez les besoins de vos clients selon la saison.</p></div>
                 </div>
             @endif
             @if($this->nativeSettings['erreur_a_eviter'] ?? true)
                 <div class="space-y-4 group">
-                    <x-post-templates.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$logoUrl" :preview="true" :brand-text-color="$brandTextColor" />
+                    <x-post-templates.erreur-a-eviter :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :logoUrl="$logoUrl" :preview="true" :brand-text-color="$brandTextColor" :accentColor="$accentColor" :accentTextColor="$accentTextColor" />
                     <div><h4 class="font-bold text-midnight text-lg">Erreur à Éviter</h4><p class="text-gray-500 text-sm">Un format alerte très engageant pour éduquer vos clients.</p></div>
                 </div>
             @endif
             @if($this->nativeSettings['guide_pedagogique'] ?? true)
                 <div class="space-y-4 group">
-                    <x-post-templates.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" />
+                    <x-post-templates.guide-pedagogique :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :preview="true" :brand-text-color="$brandTextColor" :accentColor="$accentColor" :accentTextColor="$accentTextColor" />
                     <div><h4 class="font-bold text-midnight text-lg">Guide Pédagogique</h4><p class="text-gray-500 text-sm">Apportez de la valeur et positionnez-vous en expert conseil.</p></div>
                 </div>
             @endif
@@ -112,7 +150,7 @@ $nativeSettings = computed(fn() => NativeTemplateSetting::all()->pluck('is_activ
                 <div><h4 class="font-bold text-midnight text-lg">Glass FAQ</h4><p class="text-gray-500 text-sm italic">Répondez aux questions avec un design premium.</p></div>
             </div>
             <div class="space-y-4 group">
-                <x-post-templates.glass.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" :brand-text-color="$brandTextColor" />
+                <x-post-templates.glass.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :imageUrl="asset('images/templates/lifestyle_postelio.png')" :preview="true" :brand-text-color="$brandTextColor" />
                 <div><h4 class="font-bold text-midnight text-lg">Glass Lifestyle</h4><p class="text-gray-500 text-sm italic">Une immersion brute et moderne.</p></div>
             </div>
             <div class="space-y-4 group">
@@ -155,7 +193,7 @@ $nativeSettings = computed(fn() => NativeTemplateSetting::all()->pluck('is_activ
                 <div><h4 class="font-bold text-midnight text-lg">Blueprint FAQ</h4><p class="text-gray-500 text-sm italic">Réponses claires et documentées.</p></div>
             </div>
             <div class="space-y-4 group">
-                <x-post-templates.blueprint.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" :brand-text-color="$brandTextColor" />
+                <x-post-templates.blueprint.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :imageUrl="asset('images/templates/lifestyle_postelio.png')" :preview="true" :brand-text-color="$brandTextColor" />
                 <div><h4 class="font-bold text-midnight text-lg">Blueprint Lifestyle</h4><p class="text-gray-500 text-sm italic">L'immersion brute.</p></div>
             </div>
             <div class="space-y-4 group">
@@ -198,7 +236,7 @@ $nativeSettings = computed(fn() => NativeTemplateSetting::all()->pluck('is_activ
                 <div><h4 class="font-bold text-midnight text-lg">Kraft FAQ</h4><p class="text-gray-500 text-sm italic">Réponses franches.</p></div>
             </div>
             <div class="space-y-4 group">
-                <x-post-templates.kraft.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :imageUrl="'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=400'" :preview="true" :brand-text-color="$brandTextColor" />
+                <x-post-templates.kraft.lifestyle :brandColor="$brandColor" :companyLabel="$companyLabel" :city="$companyCity" :imageUrl="asset('images/templates/lifestyle_postelio.png')" :preview="true" :brand-text-color="$brandTextColor" />
                 <div><h4 class="font-bold text-midnight text-lg">Kraft Lifestyle</h4><p class="text-gray-500 text-sm italic">Métier au naturel.</p></div>
             </div>
             <div class="space-y-4 group">

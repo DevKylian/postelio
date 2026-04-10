@@ -10,12 +10,16 @@
     'trade' => null,
     'city' => null,
     'slideIndex' => null,
+    'visualStyle' => 'standard',
     'preview' => false,
     'brandTextColor' => '#FFFFFF',
+    'accentColor' => '#0F172A',
+    'accentTextColor' => '#FFFFFF',
+    'exporting' => false,
 ])
 
-@if($preview)
-    @php
+@php
+    if($preview) {
         $imageUrl = $imageUrl ?? 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800';
         $text = $text ?? 'La passion du métier se lit dans chaque geste.';
         $phone = $phone ?? '01 23 45 67 89';
@@ -23,16 +27,18 @@
         $website = $website ?? 'www.votre-artisan.fr';
         $trade = $trade ?? 'Artisan';
         $city = $city ?? 'Ma Ville';
-    @endphp
-@endif
+    }
 
-@php
     $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
     $total = 1 + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
+    
+    $len = mb_strlen($text ?? '');
+    $fontSize = $len > 80 ? 'text-xs' : ($len > 40 ? 'text-sm' : 'text-base');
+    $inlineFontSize = $len > 25 ? '10px' : ($len > 18 ? '11px' : '13px');
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] bg-gray-700 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }} font-montserrat">
 
     {{-- Slide 0: Main Content --}}
     @php
@@ -41,81 +47,165 @@
         $slide0Style = (int)$slideIndex !== 0 && $slideIndex !== null ? 'display: none;' : '';
     @endphp
     <div class="absolute inset-0" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
-        {{-- Full-bleed photo --}}
-        @if ($imageUrl)
-            <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover">
-        @else
-            <div class="absolute inset-0 flex items-center justify-center">
-                <div class="text-center text-gray-400 select-none pointer-events-none">
-                    <svg class="w-14 h-14 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    <p class="text-xs font-bold uppercase tracking-widest text-gray-500">Votre photo</p>
+        
+        @if($visualStyle === 'blueprint')
+            {{-- BLUEPRINT style --}}
+            <div class="absolute inset-0 bg-[#0047AB]">
+                <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 30px 30px;"></div>
+                <div class="absolute top-[20px] left-[20px] right-[20px] bottom-[110px] bg-white p-1.5 overflow-hidden">
+                    @if($imageUrl) <img src="{{ $imageUrl }}" class="w-full h-full object-cover"> @else <div class="w-full h-full bg-slate-100"></div> @endif
+                </div>
+                <div class="absolute bottom-[70px] inset-x-5 flex items-center justify-center">
+                    <div class="bg-white/10 border border-white/30 px-4 py-2 text-center max-w-full">
+                         <span class="text-white font-black uppercase tracking-[0.15em] leading-tight block truncate font-mono" style="font-size: {{ $inlineFontSize }}">{{ $text }}</span>
+                    </div>
+                </div>
+                <div class="absolute bottom-0 inset-x-0 h-[60px] bg-white border-t-2 border-[#0047AB] px-7 flex flex-col justify-center gap-0.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[#0047AB] font-black uppercase tracking-widest text-[10px] truncate font-mono">{{ $companyLabel }}</span>
+                        <div class="w-2.5 h-2.5 rounded-full" style="background-color: {{ $brandColor }}; border: 1px solid rgba(0,71,171,0.2);"></div>
+                    </div>
+                    <div class="flex items-center gap-1.5 opacity-50">
+                        @if($trade)<span class="text-[#0047AB] text-[6px] font-black uppercase border border-current px-1 font-mono">{{ $trade }}</span>@endif
+                        @if($city)<span class="text-[#0047AB] text-[6px] font-black uppercase border border-current px-1 font-mono">{{ $city }}</span>@endif
+                    </div>
                 </div>
             </div>
-        @endif
-
-        {{-- Dark gradient lower half --}}
-        <div class="absolute inset-x-0 bottom-0 h-[55%] pointer-events-none" style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)"></div>
-
-        {{-- Gradient top bar --}}
-        <div class="absolute top-0 inset-x-0 h-0.5" style="background: linear-gradient(90deg, {{ $brandColor }}, {{ $brandColor }}55)"></div>
-
-        {{-- Company label — bottom bar --}}
-        <div class="absolute inset-x-0 bottom-0 py-2.5 px-5 flex flex-col items-center z-10" style="background: rgba(0,0,0,0.3); backdrop-filter: blur(4px)">
-            <div class="w-full flex items-center justify-center gap-2 mb-1.5">
-                @if ($logoUrl)
-                    <img src="{{ $logoUrl }}" alt="Logo" class="h-3.5 w-3.5 object-contain rounded">
-                @endif
-                <p class="text-white/80 font-bold text-[9px] tracking-widest font-montserrat truncate">{{ $companyLabel }}</p>
-            </div>
-            <div class="flex items-center gap-2">
-                @php
-                    $tagTextCol = $brandColor;
-                    $hexTag = str_replace('#', '', $brandColor);
-                    if (strlen($hexTag) == 3) $hexTag = $hexTag[0].$hexTag[0].$hexTag[1].$hexTag[1].$hexTag[2].$hexTag[2];
-                    $rTag = hexdec(substr($hexTag, 0, 2));
-                    $gTag = hexdec(substr($hexTag, 2, 2));
-                    $bTag = hexdec(substr($hexTag, 4, 2));
-                    $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
-                    if ($yiqTag > 235) $tagTextCol = '#1E293B';
-                @endphp
-
-                @if($trade)
-                    <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $trade }}</span>
-                @endif
-                @if($city)
-                    <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $city }}</span>
-                @endif
-            </div>
-        </div>
-
-        {{-- Text overlay --}}
-        @if($text)
-            @php
-                $len = mb_strlen($text);
-                $fontSize = 'text-sm';
-                if ($len > 25) $fontSize = 'text-[10px]';
-                elseif ($len > 18) $fontSize = 'text-xs';
-            @endphp
-            <div class="absolute inset-x-5 bottom-[52px] flex items-end justify-start z-10 pb-2 overflow-hidden">
-                <div class="backdrop-blur-sm px-3.5 py-2.5 rounded-xl border" style="background: rgba(0,0,0,0.45); border-color: rgba(255,255,255,0.08)">
-                    <div class="flex items-center gap-1.5 mb-1">
-                        <span class="inline-block w-1 h-1 rounded-full" style="background-color: {{ $brandColor }}"></span>
-                        <span class="text-[8px] font-bold uppercase tracking-widest font-montserrat" style="color: {{ $brandColor }}">Réalisation</span>
+        @elseif($visualStyle === 'kraft')
+            {{-- KRAFT style --}}
+            <div class="absolute inset-0 bg-[#BC9A7E]">
+                <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
+                <div class="absolute top-7 left-7 right-7 bottom-[110px] border-8 border-slate-900 bg-white p-2.5 transform rotate-1 overflow-hidden">
+                    @if($imageUrl) <img src="{{ $imageUrl }}" class="w-full h-full object-cover"> @else <div class="w-full h-full bg-slate-100"></div> @endif
+                </div>
+                <div class="absolute bottom-0 inset-x-0 h-[85px] bg-[#CBB198] border-t-4 border-slate-900 px-7 flex items-center justify-between">
+                    <div class="flex flex-col max-w-[200px]">
+                        <span class="text-slate-900 font-black uppercase tracking-tight leading-none truncate font-serif" style="font-size: {{ $inlineFontSize }}">{{ $text }}</span>
+                        <div class="flex flex-col gap-0.5 mt-1.5 opacity-40">
+                             <span class="text-slate-900 text-[8px] font-black uppercase font-mono">{{ $companyLabel }}</span>
+                             <div class="flex items-center gap-1">
+                                @if($trade)<span class="text-slate-900 text-[6px] font-black uppercase border border-slate-900 px-1">{{ $trade }}</span>@endif
+                                @if($city)<span class="text-slate-900 text-[6px] font-black uppercase border border-slate-900 px-1">{{ $city }}</span>@endif
+                             </div>
+                        </div>
                     </div>
-                    <h3 class="text-white font-black {{ $fontSize }} leading-snug font-montserrat" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $text }}</h3>
+                    <div class="w-10 h-10 rounded-full border-4 border-slate-900 flex items-center justify-center shrink-0">
+                        <div class="w-4 h-4 rounded-full" style="background-color: {{ $brandColor }}"></div>
+                    </div>
+                </div>
+            </div>
+
+        @elseif($visualStyle === 'beton')
+            {{-- BETON style --}}
+            <div class="absolute inset-0 bg-[#4a4a4a]">
+                <div class="absolute inset-0 opacity-30 pointer-events-none" style="background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');"></div>
+                <div class="absolute top-5 left-5 right-5 bottom-[110px] overflow-hidden">
+                    @if($imageUrl) <img src="{{ $imageUrl }}" class="w-full h-full object-cover"> @else <div class="w-full h-full bg-slate-500"></div> @endif
+                </div>
+                <div class="absolute bottom-[70px] inset-x-5 flex items-center justify-center">
+                    <div class="bg-white/5 border border-white/20 px-4 py-1.5 text-center max-w-full backdrop-blur-sm">
+                         <span class="text-white font-black uppercase tracking-[0.15em] leading-tight block truncate" style="font-size: {{ $inlineFontSize }}">{{ $text }}</span>
+                    </div>
+                </div>
+                <div class="absolute bottom-0 inset-x-0 h-[60px] bg-black/30 px-7 flex flex-col justify-center gap-0.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-white font-black uppercase tracking-widest text-[10px] opacity-80">{{ $companyLabel }}</span>
+                        <div class="w-2.5 h-2.5 rounded-full" style="background-color: {{ $brandColor }}"></div>
+                    </div>
+                    <div class="flex items-center gap-1.5 opacity-40">
+                        @if($trade)<span class="text-white text-[6px] font-black uppercase border border-white/30 px-1">{{ $trade }}</span>@endif
+                        @if($city)<span class="text-white text-[6px] font-black uppercase border border-white/30 px-1">{{ $city }}</span>@endif
+                    </div>
+                </div>
+            </div>
+
+        @else
+            {{-- STANDARD style — photo-first, minimal overlay --}}
+            @if ($imageUrl)
+                <img src="{{ $imageUrl }}" class="absolute inset-0 w-full h-full object-cover">
+            @else
+                <div class="absolute inset-0 bg-slate-800 flex items-center justify-center">
+                    <div class="text-center text-white/20">
+                        <svg class="w-14 h-14 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        <p class="text-[10px] font-black uppercase tracking-widest">Votre photo</p>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Top brand accent line --}}
+            <div class="absolute top-0 inset-x-0 h-1 z-20" style="background: linear-gradient(90deg, {{ $brandColor }}, {{ $brandColor }}44)"></div>
+
+            {{-- Bottom gradient for readability --}}
+            <div class="absolute inset-0 pointer-events-none" style="background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.15) 55%, transparent 100%)"></div>
+
+            {{-- Glass Card — compact horizontal layout --}}
+            <div class="absolute inset-x-0 mx-auto w-[85%] bottom-6 z-20 {{ $exporting ? '' : 'animate-fade-up' }}">
+                <div class="backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden" 
+                     style="background-color: {{ $accentColor }}cc; border: 1px solid rgba(255,255,255,0.1); border-top: 2px solid {{ $brandColor }}">
+
+                    <div class="px-4 py-3 flex items-center gap-3">
+                        {{-- Quote text --}}
+                        <div class="flex-1 min-w-0">
+                            @if($text)
+                                <h3 class="font-black {{ $fontSize }} leading-tight tracking-tight line-clamp-3" style="color: {{ $accentTextColor }}">
+                                    {!! nl2br(e($text ?? 'La passion du métier.')) !!}
+                                </h3>
+                            @endif
+                        </div>
+
+                        {{-- Vertical separator --}}
+                        <div class="w-px self-stretch bg-white/10 shrink-0"></div>
+
+                        {{-- Branding column --}}
+                        <div class="shrink-0 flex flex-col items-center gap-1.5 max-w-[72px]">
+                            @if ($logoUrl)
+                                <img src="{{ $logoUrl }}" alt="Logo" class="h-4 w-4 object-contain rounded opacity-80 brightness-0 invert">
+                            @else
+                                <div class="w-4 h-4 rounded-full shrink-0" style="background-color: {{ $brandColor }}"></div>
+                            @endif
+                            <p class="font-black tracking-[0.15em] text-[6px] uppercase text-center leading-tight line-clamp-2" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                            @php
+                                $hex = str_replace('#', '', $brandColor);
+                                if(strlen($hex) == 3) {
+                                    $r = hexdec(substr($hex,0,1).substr($hex,0,1));
+                                    $g = hexdec(substr($hex,1,1).substr($hex,1,1));
+                                    $b = hexdec(substr($hex,2,1).substr($hex,2,1));
+                                } else {
+                                    $r = hexdec(substr($hex,0,2));
+                                    $g = hexdec(substr($hex,2,2));
+                                    $b = hexdec(substr($hex,4,2));
+                                }
+                                $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+                                $isDarkBrand = $yiq < 120;
+                                if ($isDarkBrand) {
+                                    $tagBg = 'rgba(255,255,255,0.1)';
+                                    $tagBorder = 'rgba(255,255,255,0.2)';
+                                    $tagText = 'rgba(255,255,255,0.9)';
+                                } else {
+                                    $tagBg = $brandColor . '25';
+                                    $tagBorder = $brandColor . '40';
+                                    $tagText = $brandColor;
+                                }
+                                $tagStyle = "background-color: $tagBg; border-color: $tagBorder; color: $tagText;";
+                            @endphp
+                            @if($trade)
+                                <span class="px-1.5 py-0.5 rounded text-[5px] font-black uppercase tracking-wide border whitespace-nowrap" style="{{ $tagStyle }}">{{ $trade }}</span>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
         @endif
     </div>
 
-    {{-- Slide 1: Contact --}}
+    {{-- Slide 1: Contact (Standardized) --}}
     @php
         $isSlide1 = (int)$slideIndex === 1;
         $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
         $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
     @endphp
     @if($hasContactInfo)
-    <div class="absolute inset-0 bg-gray-900" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
+    <div class="absolute inset-0" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
          <x-post-templates.contact-slide
             :brand-color="$brandColor"
             :company-label="$companyLabel"
@@ -124,19 +214,21 @@
             :website="$website"
             :trade="$trade"
             :city="$city"
+            :visual-style="$visualStyle === 'standard' ? 'standard' : $visualStyle"
             :brand-text-color="$brandTextColor"
-            visualStyle="glass"
+            :accent-color="$accentColor"
+            :accent-text-color="$accentTextColor"
         />
     </div>
     @endif
 
-    @if($preview)
-        <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-20">
-            <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    @if($preview && !$exporting)
+        <div class="absolute top-1/2 -translate-y-1/2 inset-x-4 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-30 pointer-events-none">
+            <button @click="current = (current - 1 + total) % total" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/40 border border-white/30 transition-all pointer-events-auto">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <button @click="current = (current + 1) % total" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/40 border border-white/30 transition-all pointer-events-auto">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
         </div>
     @endif

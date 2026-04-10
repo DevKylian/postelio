@@ -1,118 +1,138 @@
 @props([
-    'brandColor' => '#F59E0B',
-    'companyLabel' => 'Votre Société',
-    'text' => '',
-    'logoUrl' => null,
-    'phone' => null,
-    'email' => null,
-    'website' => null,
-    'trade' => null,
-    'city' => null,
-    'slideIndex' => null,
-    'preview' => false,
+    'brandColor'     => '#F59E0B',
+    'companyLabel'   => 'Votre Société',
+    'text'           => '',
+    'logoUrl'        => null,
+    'phone'          => null,
+    'email'          => null,
+    'website'        => null,
+    'trade'          => null,
+    'city'           => null,
+    'slideIndex'     => null,
+    'preview'        => false,
     'brandTextColor' => '#FFFFFF',
+    'accentColor'    => '#0F172A',
+    'accentTextColor' => '#FFFFFF',
+    'exporting'      => false,
 ])
 
 @if($preview)
     @php
-        $text = 'L\'erreur fatale : négliger l\'étanchéité sous le carrelage de votre douche.';
-        $phone = $phone ?? '01 23 45 67 89';
-        $email = $email ?? 'contact@votre-artisan.fr';
+        $text  = 'L\'erreur fatale : négliger l\'étanchéité sous le carrelage de votre douche.';
+        $phone = $phone   ?? '01 23 45 67 89';
+        $email = $email   ?? 'contact@votre-artisan.fr';
         $website = $website ?? 'www.votre-artisan.fr';
-        $trade = $trade ?? 'Artisan';
-        $city = $city ?? 'Ma Ville';
+        $trade = $trade   ?? 'Artisan';
+        $city  = $city    ?? 'Ma Ville';
     @endphp
 @endif
 
 @php
+    // Contrast calc
+    $hex = str_replace('#', '', $brandColor);
+    if (strlen($hex) == 3) $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+    $r   = hexdec(substr($hex, 0, 2));
+    $g   = hexdec(substr($hex, 2, 2));
+    $b   = hexdec(substr($hex, 4, 2));
+    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+    $badgeTextCol = ($yiq >= 186) ? '#1E293B' : '#FFFFFF';
+    $isDarkBrand  = $yiq < 120;
+
+    // Tag style
+    if ($isDarkBrand) {
+        $tagBg = 'rgba(255,255,255,0.12)'; $tagBorder = 'rgba(255,255,255,0.2)'; $tagText = 'rgba(255,255,255,0.9)';
+    } else {
+        $tagBg = $brandColor . '25'; $tagBorder = $brandColor . '40'; $tagText = $brandColor;
+    }
+    $tagStyle = "background-color: $tagBg; border-color: $tagBorder; color: $tagText;";
+
+    // Chip style for elements on LIGHT backgrounds
+    if ($yiq > 195) {
+        $chipStyle     = "background-color: {$brandColor}12; border: 1.5px solid {$brandColor}70; color: #374151;";
+        $chipIconColor = $brandColor;
+    } else {
+        $chipStyle     = "background-color: {$brandColor}; color: {$badgeTextCol}; border: none;";
+        $chipIconColor = $badgeTextCol;
+    }
+
     $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
-    $total = 1 + ($hasContactInfo ? 1 : 0);
+    $total      = 1 + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
+
+    $len      = mb_strlen($text ?? '');
+    $fontSize = $len > 150 ? 'text-lg' : ($len > 80 ? 'text-xl' : 'text-2xl');
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: #111827; border-top: 3px solid {{ $brandColor }};">
+<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] relative overflow-hidden flex flex-col {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: #F8FAFC;">
 
-    {{-- Slide 0 --}}
-    @php
-        $isSlide0 = (int)$slideIndex === 0 || $slideIndex === null;
-        $slide0Alpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
-        $slide0Style = (int)$slideIndex !== 0 && $slideIndex !== null ? 'display: none;' : '';
-    @endphp
-    <div class="absolute inset-0" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
-
-        {{-- Diagonal X pattern overlay --}}
-        <div class="absolute inset-0 overflow-hidden pointer-events-none" style="opacity:0.035">
-            <div class="absolute w-full h-3 top-1/2 left-0" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}; transform: rotate(45deg) scaleX(1.6) translateY(-50%)"></div>
-            <div class="absolute w-full h-3 top-1/2 left-0" style="background-color: {{ $brandTextColor === '#1E293B' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)' }}; transform: rotate(-45deg) scaleX(1.6) translateY(-50%)"></div>
+    {{-- ── TOP BRAND STRIP ── --}}
+    <div class="shrink-0 flex items-center justify-between px-6 py-4" style="background-color: {{ $accentColor }}">
+        <div class="flex items-center gap-2.5">
+            @if($logoUrl)
+                <img src="{{ $logoUrl }}" alt="Logo" class="h-5 w-5 object-contain rounded {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
+            @endif
+            <span class="font-black tracking-[0.18em] text-[10px] uppercase truncate" style="color: {{ $accentTextColor }}">{{ $companyLabel }}</span>
         </div>
-
-        {{-- Ambient glows --}}
-        <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none" style="background: radial-gradient(circle, {{ $brandColor }}2E, transparent 65%)"></div>
-        <div class="absolute -bottom-12 -left-12 w-40 h-40 rounded-full blur-3xl pointer-events-none" style="background: radial-gradient(circle, {{ $brandColor }}1A, transparent 70%)"></div>
-
-        <div class="absolute inset-0 p-10 pb-24 flex flex-col justify-center">
-            {{-- Warning label badge --}}
-            <div class="inline-flex items-center gap-2 mb-5">
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="{{ $brandColor }}" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-                </svg>
-                <span class="font-black uppercase tracking-[0.2em] text-[10px] font-montserrat" style="color: {{ $brandColor }}">Erreur à Éviter</span>
-            </div>
-
-            {{-- Accent line --}}
-            <span class="inline-block w-8 h-px mb-5" style="background-color: {{ $brandColor }}; opacity: 0.5"></span>
-
-            @php
-                $len = mb_strlen($text);
-                $fontSize = 'text-2xl';
-                if ($len > 150) $fontSize = 'text-base';
-                elseif ($len > 80) $fontSize = 'text-lg';
-                elseif ($len > 40) $fontSize = 'text-xl';
-            @endphp
-            <div class="max-h-[160px] overflow-hidden">
-                <p class="text-white font-black {{ $fontSize }} leading-snug font-montserrat">{!! nl2br(e($text)) !!}</p>
-            </div>
-        </div>
-
-        {{-- Footer --}}
-        <div class="absolute bottom-0 inset-x-0 px-8 py-3 flex flex-col gap-1.5" style="background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); border-top: 1px solid rgba(255,255,255,0.07)">
-            <div class="flex items-center gap-2">
-                @if ($logoUrl)
-                    <img src="{{ $logoUrl }}" alt="Logo" class="h-3.5 w-3.5 object-contain rounded">
-                @endif
-                <p class="font-bold text-[9px] tracking-widest font-montserrat truncate" style="color: {{ $brandColor }}">{{ $companyLabel }}</p>
-            </div>
-            <div class="flex items-center gap-2">
-                @php
-                    $tagTextCol = $brandColor;
-                    $hexTag = str_replace('#', '', $brandColor);
-                    if (strlen($hexTag) == 3) $hexTag = $hexTag[0].$hexTag[0].$hexTag[1].$hexTag[1].$hexTag[2].$hexTag[2];
-                    $rTag = hexdec(substr($hexTag, 0, 2));
-                    $gTag = hexdec(substr($hexTag, 2, 2));
-                    $bTag = hexdec(substr($hexTag, 4, 2));
-                    $yiqTag = (($rTag * 299) + ($gTag * 587) + ($bTag * 114)) / 1000;
-                    if ($yiqTag > 235) $tagTextCol = '#1E293B';
-                @endphp
-
-                @if($trade)
-                    <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $trade }}</span>
-                @endif
-                @if($city)
-                    <span class="px-2 py-0.5 rounded-full bg-white text-[7px] font-black uppercase tracking-[0.15em] shadow-sm ring-1 ring-black/5" style="color: {{ $tagTextCol }}">{{ $city }}</span>
-                @endif
-            </div>
+        <div class="flex items-center gap-1.5">
+            @if($trade)
+                <span class="px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-wider border" style="background: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $accentTextColor }}">{{ $trade }}</span>
+            @endif
+            @if($city)
+                <span class="px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-wider border" style="background: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.12); border-color: rgba({{ $accentTextColor === '#FFFFFF' ? '255,255,255' : '0,0,0' }},0.2); color: {{ $accentTextColor }}">{{ $city }}</span>
+            @endif
         </div>
     </div>
 
-    {{-- Slide 1: Contact --}}
+    {{-- ── MAIN CONTENT AREA ── --}}
+    <div class="flex-1 flex flex-col justify-center px-7 relative overflow-hidden">
+
+
+        {{-- ── SLIDE 0 : WARNING CONTENT ── --}}
+        @php
+            $isSlide0     = (int)$slideIndex === 0 || $slideIndex === null;
+            $slide0Alpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
+            $slide0Style  = (int)$slideIndex !== 0 && $slideIndex !== null ? 'display: none;' : '';
+        @endphp
+        <div {!! $slide0Alpine !!} style="{{ $slide0Style }}" class="relative z-10 flex flex-col items-start translate-y-[-15px]">
+
+            {{-- Warning chip --}}
+            <div class="inline-flex items-center gap-2 mb-5 px-3 py-1.5 rounded-full" style="{{ $chipStyle }}">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" style="color: {{ $chipIconColor }}">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <span class="text-[9px] font-black uppercase tracking-[0.25em]">Erreur à éviter</span>
+            </div>
+
+            {{-- Separator bar --}}
+            <div class="w-10 h-1 rounded-full mb-5" style="background-color: {{ $brandColor }}"></div>
+
+            {{-- Main warning card --}}
+            <div class="w-full bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                {{-- Left accent bar --}}
+                <div class="flex">
+                    <div class="w-1.5 shrink-0" style="background-color: {{ $brandColor }}"></div>
+                    <div class="p-6">
+                        <div class="max-h-[260px] overflow-hidden">
+                            <p class="font-black {{ $fontSize }} leading-tight tracking-tight text-slate-900 font-montserrat">
+                                {!! nl2br(e($text)) !!}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {{-- ── SLIDE CONTACT — couvre tout le template (hors flex) ── --}}
     @php
-        $isSlide1 = (int)$slideIndex === 1;
+        $isSlide1     = (int)$slideIndex === 1;
         $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
-        $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
+        $slide1Style  = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
     @endphp
     @if($hasContactInfo)
-    <div class="absolute inset-0 bg-[#111827]" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
-         <x-post-templates.contact-slide
+    <div class="absolute inset-0 z-40" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
+        <x-post-templates.contact-slide
             :brand-color="$brandColor"
             :company-label="$companyLabel"
             :phone="$phone"
@@ -121,19 +141,49 @@
             :trade="$trade"
             :city="$city"
             :brand-text-color="$brandTextColor"
-            visualStyle="glass"
+            :accent-color="$accentColor"
+            :accent-text-color="$accentTextColor"
         />
     </div>
     @endif
 
-    @if($preview)
-        <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-20">
-            <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    {{-- ── BOTTOM BRANDING PILL ── --}}
+    @php
+        $footerAlpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
+        $showFooter   = $hasContactInfo ? ($slideIndex === null || (int)$slideIndex === 0) : true;
+    @endphp
+    @if($showFooter && !$exporting)
+    <div class="absolute bottom-5 inset-x-0 mx-auto w-[85%] z-20" {!! $footerAlpine !!}>
+        <div class="backdrop-blur-xl rounded-2xl px-4 py-2.5 shadow-xl border border-white/10 flex items-center justify-between gap-3"
+             style="background-color: {{ $accentColor }}cc;">
+            <div class="flex items-center gap-2 min-w-0">
+                @if($logoUrl)
+                    <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
+                @endif
+                <p class="font-black tracking-[0.18em] text-[7px] uppercase truncate leading-none" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+                @if($trade)
+                    <span class="px-2 py-0.5 rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap" style="{{ $tagStyle }}">{{ $trade }}</span>
+                @endif
+                @if($city)
+                    <span class="px-2 py-0.5 rounded-md text-[6px] font-black uppercase tracking-[0.05em] border whitespace-nowrap" style="{{ $tagStyle }}">{{ $city }}</span>
+                @endif
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- ── NAVIGATION (Preview) ── --}}
+    @if($preview && !$exporting)
+        <div class="absolute top-1/2 -translate-y-1/2 inset-x-4 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
+            <button @click="current = (current - 1 + total) % total" class="w-10 h-10 rounded-full bg-slate-900/20 backdrop-blur-md text-slate-700 flex items-center justify-center hover:bg-slate-900/30 border border-slate-200 transition-all pointer-events-auto">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
-            <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <button @click="current = (current + 1) % total" class="w-10 h-10 rounded-full bg-slate-900/20 backdrop-blur-md text-slate-700 flex items-center justify-center hover:bg-slate-900/30 border border-slate-200 transition-all pointer-events-auto">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
         </div>
+        <div class="absolute top-[72px] right-5 z-30 px-2.5 py-1 rounded-full text-[9px] font-black border" style="background-color: {{ $brandColor }}20; border-color: {{ $brandColor }}40; color: {{ $brandColor }}" x-text="(current + 1) + ' / ' + total"></div>
     @endif
 </div>

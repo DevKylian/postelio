@@ -11,6 +11,7 @@
     'city' => null,
     'preview' => false,
     'slideIndex' => null, // null = interactive alpine preview, int = render specific slide
+    'exporting' => false,
 ])
 
 @if($preview)
@@ -30,6 +31,15 @@
     $hasContactInfo = !empty($phone) || !empty($email) || !empty($website);
     $total = 3 + ($hasContactInfo ? 1 : 0);
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
+
+    // Contrast logic for tags
+    $hex = str_replace('#', '', $brandColor);
+    if (strlen($hex) == 3) $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+    $tagTextCol = ($yiq > 180) ? '#1E293B' : '#FFFFFF';
 @endphp
 
 <div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-gray-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/20 group-hover:-translate-y-2' : '' }}">
@@ -52,6 +62,14 @@
                     <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 @endif
             </div>
+            
+            <div class="absolute top-6 left-6 px-3 py-1.5 rounded-full shadow-2xl z-20" style="background-color: {{ $brandColor }}">
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none" style="color: {{ $tagTextCol }}">Avant</p>
+            </div>
+            <div class="absolute top-6 right-6 px-3 py-1.5 rounded-full shadow-2xl z-20" style="background-color: {{ $brandColor }}">
+                <p class="text-[10px] font-black uppercase tracking-[0.2em] leading-none" style="color: {{ $tagTextCol }}">Après</p>
+            </div>
+
             {{-- Glass Divider --}}
             <div class="absolute inset-y-0 left-1/2 -ml-px w-0.5 bg-white/30 backdrop-blur-md z-10"></div>
         </div>
@@ -65,8 +83,8 @@
         <div class="absolute inset-0 bg-slate-950" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if ($imageBeforeUrl)
                 <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute top-6 left-6 backdrop-blur-xl bg-white/10 border border-white/20 px-4 py-2 rounded-xl z-20 shadow-2xl">
-                    <p class="text-white text-[10px] font-black uppercase tracking-[0.3em] leading-none">Avant</p>
+                <div class="absolute top-6 left-6 px-4 py-2 rounded-full z-20 shadow-2xl" style="background-color: {{ $brandColor }}">
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] leading-none" style="color: {{ $tagTextCol }}">Avant</p>
                 </div>
             @endif
         </div>
@@ -80,8 +98,8 @@
         <div class="absolute inset-0 bg-slate-900" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if ($imageAfterUrl)
                 <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute top-6 right-6 backdrop-blur-xl bg-white/20 border border-white/30 px-4 py-2 rounded-xl z-20 shadow-2xl">
-                    <p class="text-white text-[10px] font-black uppercase tracking-[0.3em] leading-none">Après</p>
+                <div class="absolute top-6 right-6 px-4 py-2 rounded-full z-20 shadow-2xl" style="background-color: {{ $brandColor }}">
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] leading-none" style="color: {{ $tagTextCol }}">Après</p>
                 </div>
             @endif
         </div>
@@ -108,8 +126,8 @@
         @endif
 
         {{-- Controls (Preview Only) --}}
-        @if($preview)
-            <div class="absolute top-1/2 -translate-y-1/2 inset-x-4 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-30">
+        @if($preview && !$exporting)
+            <div class="absolute top-1/2 -translate-y-1/2 inset-x-4 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40">
                 <button @click="current = (current - 1 + total) % total" class="w-10 h-10 rounded-2xl backdrop-blur-xl bg-white/10 text-white flex items-center justify-center hover:bg-white/20 border border-white/10 shadow-2xl">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
@@ -122,7 +140,7 @@
             @php
                 $showTotal = $hasContactInfo ? ((int)$slideIndex !== 3) : true;
             @endphp
-            @if($showTotal)
+            @if($showTotal && !$exporting)
             <div class="absolute top-6 right-6 backdrop-blur-xl bg-black/40 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl z-30 border border-white/10">
                 {{ $slideIndex + 1 }} / {{ $total }}
             </div>

@@ -12,6 +12,7 @@ state([
     'email'             => fn () => auth()->user()->company?->email ?? '',
     'website'           => fn () => auth()->user()->company?->website ?? '',
     'brand_color'       => fn () => auth()->user()->company?->brand_color ?? '#F59E0B',
+    'secondary_color'   => fn () => auth()->user()->company?->secondary_color ?? '#0F172A',
     'weekly_posts_goal' => fn () => auth()->user()->company?->weekly_posts_goal ?? 3,
 ]);
 
@@ -23,6 +24,7 @@ $updateCompanySettings = function () {
         'email'             => ['nullable', 'email', 'max:255'],
         'website'           => ['nullable', 'url', 'max:255'],
         'brand_color'       => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+        'secondary_color'   => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         'weekly_posts_goal' => ['required', 'integer', 'min:0', 'max:7'],
     ]);
 
@@ -36,6 +38,7 @@ $updateCompanySettings = function () {
         'email'             => $this->email,
         'website'           => $this->website,
         'brand_color'       => $this->brand_color,
+        'secondary_color'   => $this->secondary_color,
         'weekly_posts_goal' => $this->weekly_posts_goal,
     ];
 
@@ -53,6 +56,7 @@ $updateCompanySettings = function () {
     $this->email             = $user->company->email ?? '';
     $this->website           = $user->company->website ?? '';
     $this->brand_color       = $user->company->brand_color;
+    $this->secondary_color   = $user->company->secondary_color ?? '#0F172A';
     $this->weekly_posts_goal = $user->company->weekly_posts_goal;
 
     $this->dispatch('company-updated');
@@ -151,6 +155,24 @@ $updateCompanySettings = function () {
             </div>
             <p class="mt-1 text-xs text-gray-500">Utilisée comme couleur principale dans vos visuels.</p>
             <x-input-error class="mt-2" :messages="$errors->get('brand_color')" />
+        </div>
+
+        <!-- Couleur des bandeaux -->
+        <div>
+            <x-input-label for="secondary_color" value="Couleur des bandeaux" />
+            <div class="mt-1 flex items-center gap-3">
+                <input wire:model="secondary_color"
+                       id="secondary_color"
+                       name="secondary_color"
+                       type="color"
+                       class="h-10 w-16 cursor-pointer rounded-lg border border-gray-300 p-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-copper" />
+                <x-text-input wire:model="secondary_color"
+                              type="text"
+                              class="w-36 uppercase"
+                              placeholder="#0F172A" />
+            </div>
+            <p class="mt-1 text-xs text-gray-500">Utilisée pour les bandeaux et cartes de vos visuels.</p>
+            <x-input-error class="mt-2" :messages="$errors->get('secondary_color')" />
         </div>
 
         <!-- Objectif hebdomadaire de posts -->

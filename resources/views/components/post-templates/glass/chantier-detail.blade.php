@@ -11,18 +11,19 @@
     'slideContents' => [], // array of texts corresponding to slides
     'preview' => false,
     'slideIndex' => null,
+    'exporting' => false,
 ])
 
 @if($preview)
     @php
         $title = 'Focus sur l\'installation du système de chauffage';
-        $slides = [
+        $slides = !empty($slides) ? $slides : [
             'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?q=80&w=800',
             'https://images.unsplash.com/photo-1590644365607-1c5a519a7a37?q=80&w=800',
             'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800',
             'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800'
         ];
-        $slideContents = [
+        $slideContents = !empty($slideContents) ? $slideContents : [
             'Préparation technique et traçage des réseaux.',
             'Installation des collecteurs et mise en pression.',
             'Finalisation des raccordements et test de chauffe.',
@@ -123,7 +124,7 @@
              </div>
              <span class="text-white text-xs font-black uppercase tracking-[0.2em] font-montserrat" style="color: {{ $brandColor }}">Zoom Chantier</span>
          </div>
-             @if($total > 1)
+             @if($total > 1 && !$exporting)
                 <div class="text-white/20 text-[10px] font-black" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
                     @if(!$preview) {{ ($slideIndex ?? 0) + 1 }} / {{ $total }} @endif
                 </div>
@@ -131,7 +132,7 @@
         </div>
         @endif
 
-        @if($preview)
+        @if($preview && !$exporting)
             <div class="absolute top-1/2 -translate-y-1/2 inset-x-4 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40">
                 <button @click="current = (current - 1 + total) % total" class="w-10 h-10 rounded-full backdrop-blur-md bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/20 shadow-2xl">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>

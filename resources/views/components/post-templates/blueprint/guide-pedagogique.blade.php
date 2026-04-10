@@ -10,6 +10,7 @@
     'slideContents' => [], // array of steps (text)
     'preview' => false,
     'slideIndex' => null,
+    'exporting' => false,
 ])
 
 @if($preview)
@@ -130,9 +131,9 @@
         <div {!! $footerAlpine !!} class="absolute bottom-0 inset-x-0 py-2.5 bg-white px-10 border-t-2 border-[#0047AB] flex flex-col gap-1 z-30 min-h-14">
              <div class="flex items-center justify-between">
                  <span class="text-[#0047AB] text-[9px] font-black font-mono-technical uppercase tracking-widest italic truncate max-w-[200px]">{{ $companyLabel }}</span>
-                 @if($total > 1)
-                    <div class="text-[#0047AB]/40 text-[9px] font-black font-mono-technical" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
-                        @if(!$preview) {{ ($slideIndex ?? 0) + 1 }} / {{ $total }} @endif
+                 @if($total > 1 && !$exporting)
+                    <div class="text-white/20 text-[10px] font-black shrink-0" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
+                        @if(!$preview) {{ (int)($slideIndex ?? 0) + 1 }} / {{ $total }} @endif
                     </div>
                  @endif
              </div>
@@ -147,13 +148,13 @@
         </div>
         @endif
 
-        @if($preview)
-            <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40">
-                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-blue-900/50 text-white flex items-center justify-center hover:bg-blue-900">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        @if($preview && !$exporting)
+            <div class="absolute top-1/2 -translate-y-1/2 inset-x-2 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity z-40 px-2 pointer-events-none">
+                <button @click="current = (current - 1 + total) % total" class="w-8 h-8 rounded-full bg-white text-[#0047AB] flex items-center justify-center hover:bg-white/90 shadow-xl border border-[#0047AB]/20 pointer-events-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
-                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-blue-900/50 text-white flex items-center justify-center hover:bg-blue-900">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <button @click="current = (current + 1) % total" class="w-8 h-8 rounded-full bg-white text-[#0047AB] flex items-center justify-center hover:bg-white/90 shadow-xl border border-[#0047AB]/20 pointer-events-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
             </div>
         @endif

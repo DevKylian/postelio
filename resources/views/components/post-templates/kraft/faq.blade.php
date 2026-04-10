@@ -11,6 +11,7 @@
     'logoUrl' => null,
     'preview' => false,
     'slideIndex' => null,
+    'exporting' => false,
 ])
 
 @if($preview)
@@ -114,7 +115,7 @@
          <div class="flex items-center justify-between">
              <span class="text-gray-900 text-[11px] font-black uppercase tracking-[0.2em] font-montserrat truncate max-w-[200px]">{{ $companyLabel }}</span>
              
-             @if($preview || $slideIndex !== null)
+             @if(($preview || $slideIndex !== null) && !$exporting)
                 <div class="text-gray-900/50 text-[10px] font-black font-montserrat tracking-widest" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
                     @if(!$preview) {{ (int)$slideIndex + 1 }} / {{ $total }} @endif
                 </div>
@@ -130,8 +131,7 @@
          </div>
     </div>
 
-    {{-- Controls (Preview Only) --}}
-    @if($preview)
+    @if($preview && !$exporting)
         <div class="absolute inset-y-0 inset-x-2 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity z-30 pointer-events-none">
             <button @click="current = (current - 1 + total) % total" class="w-10 h-10 border-4 border-gray-900 bg-white text-gray-900 flex items-center justify-center hover:bg-gray-900 hover:text-white pointer-events-auto transition-all shadow-xl">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>

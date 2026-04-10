@@ -251,7 +251,7 @@
                                         <div class="text-[10px] text-gray-400 mt-1 font-medium">{{ $u->remaining_credits }} posts left</div>
                                     </td>
                                     <td class="px-4 py-3 text-gray-400 text-xs text-right font-medium">
-                                        {{ $u->created_at->format('d M H:i') }}
+                                        {{ $u->created_at->translatedFormat('d M H:i') }}
                                     </td>
                                 </tr>
                                 @empty

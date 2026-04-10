@@ -24,5 +24,9 @@ class AppServiceProvider extends ServiceProvider
         if (request()->header('X-Forwarded-Proto') === 'https' || request()->isSecure()) {
             URL::forceScheme('https');
         }
+
+        // Force French locale for dates
+        \Carbon\Carbon::setLocale('fr');
+        setlocale(LC_TIME, 'fr_FR.utf8', 'fra', 'fr_FR');
     }
 }

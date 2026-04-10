@@ -119,6 +119,11 @@ if [ "$FRONTEND_CHANGED" -gt 0 ]; then
     mkdir -p public/build
     
     log "npm install..."
+    if [ -d "node_modules" ]; then
+        log "Récupération des droits sur node_modules..."
+        sudo chown -R $(whoami):$(whoami) node_modules || true
+    fi
+    
     # On tente npm ci (plus sûr), sinon npm install (plus flexible)
     if ! npm ci --quiet 2>/dev/null; then
         npm install --quiet

@@ -88,8 +88,6 @@ class StripeWebhookController extends CashierController
      */
     public function handleInvoicePaymentSucceeded(array $payload): void
     {
-        parent::handleInvoicePaymentSucceeded($payload);
-
         $stripeCustomerId = $payload['data']['object']['customer'] ?? null;
 
         if (!$stripeCustomerId) return;
@@ -115,8 +113,6 @@ class StripeWebhookController extends CashierController
      */
     public function handleInvoicePaymentFailed(array $payload): void
     {
-        parent::handleInvoicePaymentFailed($payload);
-
         $stripeCustomerId = $payload['data']['object']['customer'] ?? null;
 
         if (!$stripeCustomerId) return;

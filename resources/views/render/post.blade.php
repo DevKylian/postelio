@@ -112,9 +112,10 @@
         }
         
         /* THE ULTIMATE FIX: Targeted vertical offset for Linux baseline issues 
-           We apply a slight push down to centered text elements. */
+           We apply a slight push down to centered text elements. 
+           Increased to 2.2px as 1.5px was still a bit high. */
         .v-align-fix {
-            transform: translateY(1.5px) !important;
+            transform: translateY(2.2px) !important;
         }
 
         /* Force Grid centering for badges which is more stable than Flex on some OS. */

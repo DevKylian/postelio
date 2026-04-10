@@ -11,21 +11,26 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
+        @php
+            $fontRegular = base64_encode(file_get_contents(storage_path('fonts/Montserrat-Regular.ttf')));
+            $fontBold = base64_encode(file_get_contents(storage_path('fonts/Montserrat-Bold.ttf')));
+            $fontBlack = base64_encode(file_get_contents(storage_path('fonts/Montserrat-Black.ttf')));
+        @endphp
         @font-face {
             font-family: 'Montserrat';
-            src: url('file:///{{ str_replace('\\', '/', storage_path('fonts/Montserrat-Regular.ttf')) }}') format('truetype');
+            src: url('data:font/ttf;base64,{{ $fontRegular }}') format('truetype');
             font-weight: 400;
             font-style: normal;
         }
         @font-face {
             font-family: 'Montserrat';
-            src: url('file:///{{ str_replace('\\', '/', storage_path('fonts/Montserrat-Bold.ttf')) }}') format('truetype');
+            src: url('data:font/ttf;base64,{{ $fontBold }}') format('truetype');
             font-weight: 700;
             font-style: normal;
         }
         @font-face {
             font-family: 'Montserrat';
-            src: url('file:///{{ str_replace('\\', '/', storage_path('fonts/Montserrat-Black.ttf')) }}') format('truetype');
+            src: url('data:font/ttf;base64,{{ $fontBlack }}') format('truetype');
             font-weight: 900;
             font-style: normal;
         }

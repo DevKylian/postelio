@@ -83,23 +83,23 @@
                 @enderror
             </div>
 
-            {{-- Message --}}
+            {{-- Body --}}
             <div>
-                <label for="contact-message" class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Message</label>
+                <label for="contact-body" class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Message</label>
                 <textarea
-                    id="contact-message"
-                    wire:model="message"
+                    id="contact-body"
+                    wire:model="body"
                     rows="6"
                     placeholder="Décrivez votre demande en détail..."
                     class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-midnight text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-copper/30 focus:border-copper/50 transition-all resize-none"
                 ></textarea>
                 <div class="flex justify-between mt-1.5">
-                    @error('message')
+                    @error('body')
                         <p class="text-xs text-red-500">{{ $message }}</p>
                     @else
                         <span></span>
                     @enderror
-                    <span class="text-xs text-slate-300 tabular-nums">{{ strlen($message) }}/2000</span>
+                    <span class="text-xs text-slate-300 tabular-nums">{{ strlen($body) }}/2000</span>
                 </div>
             </div>
 

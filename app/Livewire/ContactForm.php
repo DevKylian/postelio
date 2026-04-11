@@ -20,7 +20,7 @@ class ContactForm extends Component
     public string $subject = '';
 
     #[Validate('required|string|min:10|max:2000')]
-    public string $message = '';
+    public string $body = '';
 
     public bool $sent = false;
     public ?string $error = null;
@@ -45,10 +45,10 @@ class ContactForm extends Component
                     senderName: $this->name,
                     senderEmail: $this->email,
                     subject: $this->subject,
-                    messageBody: $this->message,
+                    messageBody: $this->body,
                 ));
 
-            $this->reset(['name', 'email', 'subject', 'message']);
+            $this->reset(['name', 'email', 'subject', 'body']);
             $this->error = null;
             $this->sent = true;
         } catch (\Exception $e) {

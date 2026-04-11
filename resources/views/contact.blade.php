@@ -50,6 +50,7 @@
                     <div class="hidden md:flex items-center gap-6">
                         <a href="/" class="text-sm font-medium text-slate-500 hover:text-midnight transition-colors">Accueil</a>
                         <a href="{{ route('blog.index') }}" class="text-sm font-medium text-slate-500 hover:text-midnight transition-colors">Blog</a>
+                        <a href="{{ route('contact') }}" class="text-sm font-bold text-midnight">Contact</a>
                         @if(auth()->check())
                             <a href="{{ route('dashboard') }}" class="btn-primary px-5 py-2 text-xs">Dashboard</a>
                         @else

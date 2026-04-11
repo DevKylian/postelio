@@ -172,7 +172,11 @@
           class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
           :class="navReady ? 'nav-entry-stagger' : 'opacity-0'"
           style="animation-delay: 400ms">Blog</a>
-        
+        <a href="{{ route('contact') }}"
+          class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
+          :class="navReady ? 'nav-entry-stagger' : 'opacity-0'"
+          style="animation-delay: 425ms">Contact</a>
+
         <div class="w-px h-4 bg-slate-200 mx-1"
              :class="navReady ? 'nav-entry-stagger' : 'opacity-0'"
              style="animation-delay: 450ms"></div>
@@ -228,6 +232,8 @@
           class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Tarifs</a>
         <a href="{{ route('blog.index') }}" @click="isMenuOpen = false"
           class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Blog</a>
+        <a href="{{ route('contact') }}" @click="isMenuOpen = false"
+          class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Contact</a>
 
         @auth
           <a href="{{ route('dashboard') }}" wire:navigate class="block w-full text-center btn-primary mt-4">

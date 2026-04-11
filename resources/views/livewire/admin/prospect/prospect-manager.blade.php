@@ -143,7 +143,7 @@
                             <tr>
                                 <th class="px-6 py-4 font-medium w-1/4">Compte</th>
                                 <th class="px-6 py-4 font-medium">Statut</th>
-                                <th class="px-6 py-4 font-medium w-28">Script</th>
+                                <th class="px-6 py-4 font-medium" style="min-width:130px">Script</th>
                                 <th class="px-6 py-4 font-medium">Notes</th>
                                 <th class="px-6 py-4 font-medium text-right w-1/6">Dernière action</th>
                                 <th class="px-6 py-4 font-medium text-right w-12"></th>
@@ -202,7 +202,8 @@
                                 <td class="px-6 py-4">
                                     <select
                                         wire:change="updateScript({{ $prospect->id }}, $event.target.value)"
-                                        class="appearance-none block w-full px-2.5 py-1.5 border rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-copper/30 transition-colors {{ $prospect->script_version ? 'bg-copper/10 text-amber-700 border-amber-200' : 'bg-gray-50 text-gray-400 border-gray-200' }}"
+                                        class="appearance-none block w-full px-3 py-1.5 border rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-copper/30 transition-colors {{ $prospect->script_version ? 'bg-copper/10 text-amber-700 border-amber-200' : 'bg-gray-50 text-gray-400 border-gray-200' }}"
+                                        style="min-width:110px"
                                     >
                                         <option value="">—</option>
                                         @foreach($scripts as $num => $label)

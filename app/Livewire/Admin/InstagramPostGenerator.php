@@ -552,6 +552,13 @@ class InstagramPostGenerator extends Component
         
         $this->caption = $this->normalizeCaption($rawCaption);
 
+        // Story templates never support carousel – flatten to first slide if AI ignores the rule
+        if (str_starts_with($this->template, 'story-') && isset($data['slides']) && is_array($data['slides'])) {
+            $first = $data['slides'][0] ?? [];
+            $data = array_merge($first, ['instagram_caption' => $rawCaption ?: ($first['instagram_caption'] ?? '')]);
+            unset($data['slides']);
+        }
+
         // Handle Carousel (Multi-Slide) response
         if (isset($data['slides']) && is_array($data['slides'])) {
             $this->slides = $data['slides'];
@@ -1023,7 +1030,7 @@ class InstagramPostGenerator extends Component
             Règles de STRUCTURE (CRITICAL) :
             - Réponds UNIQUEMENT en JSON valide.
             - POLITIQUES DE SLIDES :
-                - SI stats, cta, temoignage, question, avantapres, appmockup, comparaison, educatif, feature-app : INTERDIT DE FAIRE UN CARROUSEL. Réponds avec un seul objet JSON simple à la racine.
+                - SI stats, cta, temoignage, question, avantapres, appmockup, comparaison, educatif, feature-app, article-blog, story-article-blog : INTERDIT DE FAIRE UN CARROUSEL. Réponds avec un seul objet JSON simple à la racine.
                 - SI conseil, annonce, avantages : CARROUSEL AUTORISÉ (tableau "slides": [ ... ]).
             - "title" : Titre principal (4-8 mots). OBLIGATOIRE.
             - "body" : Texte descriptif (15-25 mots).

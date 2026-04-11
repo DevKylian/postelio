@@ -766,7 +766,7 @@
                                             </div>
 
                                             {{-- Carousel Navigation Overlay --}}
-                                            @if(count($slides) > 1)
+                                            @if(count($slides) > 1 && !str_starts_with($template, 'story-'))
                                             <div class="absolute inset-0 flex items-center justify-between px-2 pointer-events-none">
                                                 <button 
                                                     wire:click.stop="prevSlide" 
@@ -800,7 +800,8 @@
 
                                 @if($hasContent)
                                 <div class="w-full mt-10 space-y-6">
-                                    {{-- Caption Section --}}
+                                    {{-- Caption Section (hidden for story templates) --}}
+                                    @if(!str_starts_with($template, 'story-'))
                                     <div wire:key="caption-right-{{ $template }}" class="bg-white rounded-2xl border border-gray-200 shadow-xl shadow-midnight/5 overflow-hidden animate-in fade-in zoom-in-95 duration-500">
                                         <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
                                             <div class="flex items-center gap-2">
@@ -838,6 +839,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    @endif
 
                                     <div class="space-y-3">
                                         <button
@@ -875,7 +877,13 @@
                                                 Exportation haute qualité…
                                             </div>
                                         </button>
-                                        <p class="text-[10px] text-center text-gray-400 font-medium">Format optimal : 1080 × 1080 px (Carré Instagram)</p>
+                                        <p class="text-[10px] text-center text-gray-400 font-medium">
+                                            @if(str_starts_with($template, 'story-'))
+                                                Format optimal : 1080 × 1920 px (Story 9:16)
+                                            @else
+                                                Format optimal : 1080 × 1080 px (Carré Instagram)
+                                            @endif
+                                        </p>
                                     </div>
                                 </div>
                                 @endif

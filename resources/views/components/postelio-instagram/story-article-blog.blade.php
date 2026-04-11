@@ -41,11 +41,11 @@
          TOP SAFE ZONE  (y: 4 – 84)
          Only light branding — Instagram profile bar will overlap this
     ══════════════════════════════════════════════════════════════ --}}
-    <div style="position:absolute;top:16px;left:22px;display:flex;align-items:center;gap:7px;">
-        <div style="width:4px;height:4px;border-radius:50%;background:#F59E0B;"></div>
-        <span style="color:#F59E0B;font-size:8px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;">{!! $cleanTag !!}</span>
-    </div>
-    <div style="position:absolute;top:18px;right:22px;">
+    <div style="position:absolute;top:16px;left:22px;right:22px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:7px;">
+            <div style="width:4px;height:4px;border-radius:50%;background:#F59E0B;flex-shrink:0;"></div>
+            <span style="color:#F59E0B;font-size:8px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;">{!! $cleanTag !!}</span>
+        </div>
         <span style="color:rgba(255,255,255,0.28);font-size:8px;font-weight:600;letter-spacing:0.08em;">{{ $url }}</span>
     </div>
 

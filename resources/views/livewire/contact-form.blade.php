@@ -108,18 +108,14 @@
                 <button
                     type="submit"
                     wire:loading.attr="disabled"
-                    class="w-full sm:w-auto btn-primary px-8 py-3.5 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                    class="w-full sm:w-auto btn-primary px-8 py-3.5 inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                    <span wire:loading.remove wire:target="send">
-                        Envoyer le message
-                    </span>
-                    <span wire:loading wire:target="send" class="flex items-center gap-2">
-                        <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                        </svg>
-                        Envoi en cours...
-                    </span>
+                    <svg wire:loading wire:target="send" class="animate-spin w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" style="display:none">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    <span wire:loading.remove wire:target="send">Envoyer le message</span>
+                    <span wire:loading wire:target="send" style="display:none">Envoi en cours...</span>
                 </button>
             </div>
 

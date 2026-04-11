@@ -44,7 +44,7 @@ class ContactForm extends Component
                 ->send(new ContactMail(
                     senderName: $this->name,
                     senderEmail: $this->email,
-                    subject: $this->subject,
+                    contactSubject: $this->subject,
                     messageBody: $this->body,
                 ));
 

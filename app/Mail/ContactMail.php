@@ -15,14 +15,14 @@ class ContactMail extends Mailable
     public function __construct(
         public string $senderName,
         public string $senderEmail,
-        public string $subject,
+        public string $contactSubject,
         public string $messageBody
     ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '[Contact Postelio] ' . $this->subject,
+            subject: '[Contact Postelio] ' . $this->contactSubject,
             replyTo: [
                 new \Illuminate\Mail\Mailables\Address($this->senderEmail, $this->senderName),
             ],
@@ -33,6 +33,9 @@ class ContactMail extends Mailable
     {
         return new Content(
             view: 'emails.contact',
+            with: [
+                'subject' => $this->contactSubject,
+            ],
         );
     }
 }

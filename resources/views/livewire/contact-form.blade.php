@@ -88,7 +88,7 @@
                 <label for="contact-body" class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Message</label>
                 <textarea
                     id="contact-body"
-                    wire:model="body"
+                    wire:model.live="body"
                     rows="6"
                     placeholder="Décrivez votre demande en détail..."
                     class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-midnight text-sm placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-copper/30 focus:border-copper/50 transition-all resize-none"

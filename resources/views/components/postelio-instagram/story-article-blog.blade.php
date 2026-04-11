@@ -8,167 +8,98 @@
 ])
 
 @php
-    $cleanTitle  = html_entity_decode($title, ENT_QUOTES, 'UTF-8');
-    $cleanTag    = html_entity_decode($tag, ENT_QUOTES, 'UTF-8');
-    $cleanCta    = html_entity_decode($cta, ENT_QUOTES, 'UTF-8');
+    $cleanTitle  = html_entity_decode($title,  ENT_QUOTES, 'UTF-8');
+    $cleanTag    = html_entity_decode($tag,    ENT_QUOTES, 'UTF-8');
+    $cleanCta    = html_entity_decode($cta,    ENT_QUOTES, 'UTF-8');
     $cleanExcerpt = $excerpt ? html_entity_decode($excerpt, ENT_QUOTES, 'UTF-8') : null;
 
     $titleLen  = mb_strlen($cleanTitle);
-    $titleSize = $titleLen > 70 ? '20px' : ($titleLen > 50 ? '24px' : ($titleLen > 35 ? '28px' : '32px'));
+    $titleSize = $titleLen > 70 ? '18px' : ($titleLen > 50 ? '22px' : ($titleLen > 32 ? '26px' : '30px'));
 
-    // Base64 logic for export reliability
-    $base64Image = null;
-    if ($image_url && str_contains($image_url, 'livewire-tmp')) {
-        try {
-            $pathParts = explode('/', parse_url($image_url, PHP_URL_PATH));
-            $fileName  = end($pathParts);
-            $localPath = storage_path('app/livewire-tmp/' . $fileName);
-            if (file_exists($localPath)) {
-                $type        = pathinfo($localPath, PATHINFO_EXTENSION);
-                $data        = file_get_contents($localPath);
-                $base64Image = 'data:image/' . $type . ';base64,' . base64_encode($data);
-            }
-        } catch (\Exception $e) {}
+    // Resolve image to base64 for Browsershot reliability
+    $finalImage = null;
+    if ($image_url) {
+        if (str_starts_with($image_url, 'data:image')) {
+            $finalImage = $image_url;
+        } elseif (str_contains($image_url, 'livewire-tmp')) {
+            try {
+                $pathParts = explode('/', parse_url($image_url, PHP_URL_PATH));
+                $fileName  = end($pathParts);
+                $localPath = storage_path('app/livewire-tmp/' . $fileName);
+                if (file_exists($localPath)) {
+                    $mime      = 'image/' . strtolower(pathinfo($localPath, PATHINFO_EXTENSION));
+                    $finalImage = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($localPath));
+                }
+            } catch (\Exception $e) {}
+        } else {
+            $finalImage = $image_url;
+        }
     }
-    if ($image_url && str_starts_with($image_url, 'data:image')) {
-        $base64Image = $image_url;
-    }
-    $finalImage = $base64Image ?? $image_url;
 @endphp
 
-<div style="
-    width: 360px; height: 640px;
-    background: #F9FAFB;
-    position: relative; overflow: hidden;
-    font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
-">
-    {{-- ── Top image section (310px) ─────────────────────────────────────── --}}
-    <div style="
-        position: absolute; top: 0; left: 0; right: 0; height: 310px;
-        background: #1F2937;
-        overflow: hidden;
-    ">
-        @if($finalImage)
-            <img src="{{ $finalImage }}" style="
-                width: 100%; height: 100%;
-                object-fit: cover;
-                display: block;
-            ">
-        @else
-            {{-- Placeholder --}}
-            <div style="
-                width: 100%; height: 100%;
-                background: linear-gradient(135deg, #1F2937 0%, #374151 100%);
-                display: flex; flex-direction: column;
-                align-items: center; justify-content: center; gap: 12px;
-            ">
-                <svg style="width: 48px; height: 48px; color: #4B5563;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-                <span style="color: #6B7280; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;">Ajoutez votre photo</span>
-            </div>
-        @endif
+{{--
+    Root: 360 × 640 px — all children use explicit px so Browsershot / Puppeteer
+    never has to compute a relative width. No flex on the outer shell.
+--}}
+<div style="width:360px;height:640px;position:relative;overflow:hidden;font-family:'Outfit','Inter',-apple-system,sans-serif;background:#111827;">
 
-        {{-- Gradient overlay bottom of image --}}
-        <div style="
-            position: absolute; bottom: 0; left: 0; right: 0; height: 100px;
-            background: linear-gradient(to bottom, transparent, rgba(249,250,251,0.95));
-        "></div>
-
-        {{-- Top copper accent bar --}}
-        <div style="
-            position: absolute; top: 0; left: 0; right: 0; height: 4px;
-            background: linear-gradient(90deg, #F59E0B, #D97706);
-        "></div>
-
-        {{-- Blog label badge (top-left) --}}
-        <div style="position: absolute; top: 20px; left: 20px;">
-            <span style="
-                background: rgba(245,158,11,0.9);
-                color: #111827;
-                font-size: 9px; font-weight: 800;
-                letter-spacing: 0.18em; text-transform: uppercase;
-                padding: 5px 14px; border-radius: 100px;
-                backdrop-filter: blur(4px);
-            ">{!! $cleanTag !!}</span>
+    {{-- ── Full-bleed background image (CSS bg — most reliable in Puppeteer) ── --}}
+    @if($finalImage)
+    <div style="position:absolute;top:0;left:0;width:360px;height:640px;background-image:url('{{ $finalImage }}');background-size:cover;background-position:center center;"></div>
+    @else
+    {{-- Placeholder gradient when no image --}}
+    <div style="position:absolute;top:0;left:0;width:360px;height:640px;background:linear-gradient(160deg,#1e293b 0%,#334155 50%,#1e293b 100%);"></div>
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;">
+        <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.06);margin:0 auto 12px auto;display:flex;align-items:center;justify-content:center;">
+            <svg style="width:28px;height:28px;color:#64748b;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         </div>
+        <span style="color:#64748b;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;">Ajoutez votre photo</span>
+    </div>
+    @endif
 
-        {{-- URL label (top-right) --}}
-        <div style="position: absolute; top: 24px; right: 20px;">
-            <span style="
-                color: rgba(255,255,255,0.75);
-                font-size: 9px; font-weight: 600;
-                letter-spacing: 0.05em;
-                text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-            ">{{ $url }}</span>
-        </div>
+    {{-- ── Progressive dark overlay: transparent top → near-black bottom ──────── --}}
+    <div style="position:absolute;top:0;left:0;width:360px;height:640px;background:linear-gradient(to bottom,rgba(0,0,0,0.04) 0%,rgba(0,0,0,0.18) 35%,rgba(0,0,0,0.68) 62%,rgba(0,0,0,0.88) 82%,rgba(0,0,0,0.96) 100%);"></div>
+
+    {{-- ── Copper accent bar ───────────────────────────────────────────────────── --}}
+    <div style="position:absolute;top:0;left:0;width:360px;height:4px;background:linear-gradient(90deg,#F59E0B,#D97706);"></div>
+
+    {{-- ── Tag badge — top-left ───────────────────────────────────────────────── --}}
+    <div style="position:absolute;top:22px;left:22px;background:rgba(245,158,11,0.92);border-radius:100px;padding:5px 14px;">
+        <span style="color:#111827;font-size:9px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;white-space:nowrap;">{!! $cleanTag !!}</span>
     </div>
 
-    {{-- ── Bottom content section (330px) ─────────────────────────────────── --}}
-    <div style="
-        position: absolute; top: 310px; left: 0; right: 0; bottom: 0;
-        display: flex; flex-direction: column;
-        padding: 28px 28px 28px 28px;
-        background: #F9FAFB;
-    ">
-        {{-- Grid pattern --}}
-        <div style="
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-image: radial-gradient(rgba(0,0,0,0.025) 1px, transparent 1px);
-            background-size: 20px 20px;
-            pointer-events: none;
-        "></div>
+    {{-- ── URL — top-right ────────────────────────────────────────────────────── --}}
+    <div style="position:absolute;top:26px;right:22px;">
+        <span style="color:rgba(255,255,255,0.65);font-size:9px;font-weight:600;letter-spacing:0.05em;">{{ $url }}</span>
+    </div>
 
-        {{-- Warm glow accent --}}
-        <div style="
-            position: absolute; right: -30px; bottom: -30px;
-            width: 160px; height: 160px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%);
-            pointer-events: none;
-        "></div>
+    {{-- ── Bottom content block (pinned to bottom, explicit pixel heights) ──────── --}}
+    <div style="position:absolute;bottom:0;left:0;width:360px;padding:30px 28px 36px 28px;box-sizing:border-box;">
 
         {{-- Title --}}
-        <div style="position: relative; flex: 1; display: flex; flex-direction: column; justify-content: flex-start;">
-            <h1 style="
-                color: #111827;
-                font-size: {{ $titleSize }}; font-weight: 900;
-                line-height: 1.2; letter-spacing: -0.03em;
-                margin: 0 0 16px 0;
-            ">{!! $cleanTitle !!}</h1>
-
-            @if($cleanExcerpt)
-            <p style="
-                color: #4B5563;
-                font-size: 13px; font-weight: 500;
-                line-height: 1.55;
-                margin: 0 0 20px 0;
-                flex: 1;
-            ">{!! $cleanExcerpt !!}</p>
-            @endif
+        <div style="margin-bottom:14px;">
+            <h1 style="color:#FFFFFF;font-size:{{ $titleSize }};font-weight:900;line-height:1.2;letter-spacing:-0.025em;margin:0;text-shadow:0 2px 12px rgba(0,0,0,0.5);">{!! $cleanTitle !!}</h1>
         </div>
 
-        {{-- CTA + branding row --}}
-        <div style="
-            position: relative;
-            display: flex; align-items: center; justify-content: space-between;
-            margin-top: 12px;
-        ">
-            <div style="
-                background: linear-gradient(135deg, #F59E0B, #D97706);
-                color: #111827;
-                font-size: 12px; font-weight: 900;
-                padding: 12px 22px;
-                border-radius: 10px;
-                box-shadow: 0 4px 12px -2px rgba(217,119,6,0.35);
-                letter-spacing: -0.01em;
-            ">
+        {{-- Excerpt (optional) --}}
+        @if($cleanExcerpt)
+        <div style="margin-bottom:22px;">
+            <p style="color:rgba(255,255,255,0.82);font-size:13px;font-weight:500;line-height:1.55;margin:0;">{!! $cleanExcerpt !!}</p>
+        </div>
+        @else
+        <div style="margin-bottom:22px;"></div>
+        @endif
+
+        {{-- CTA row --}}
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#111827;font-size:12px;font-weight:900;padding:11px 22px;border-radius:10px;letter-spacing:-0.01em;white-space:nowrap;">
                 {!! $cleanCta !!} →
             </div>
-
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <div style="width: 5px; height: 5px; border-radius: 50%; background: #F59E0B;"></div>
-                <span style="color: #6B7280; font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;">Postelio</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:5px;height:5px;border-radius:50%;background:#F59E0B;flex-shrink:0;"></div>
+                <span style="color:rgba(255,255,255,0.7);font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;">Postelio</span>
             </div>
         </div>
     </div>
+
 </div>

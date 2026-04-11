@@ -93,7 +93,13 @@
 
                         <div class="p-8 flex flex-col flex-grow">
                             {{-- Header --}}
-                            <div class="mb-8">
+                            @php
+                            $monthlyOriginal = $plan['price'];
+                            $yearlyMonthlyOriginal = $plan['yearly_price'] > 0 ? round($plan['yearly_price'] / 12) : 0;
+                            $monthlyDiscounted = $promo['active'] && !$isFree ? round($monthlyOriginal * (1 - $promo['discount'] / 100)) : null;
+                            $yearlyDiscounted  = $promo['active'] && !$isFree && $yearlyMonthlyOriginal > 0 ? round($yearlyMonthlyOriginal * (1 - $promo['discount'] / 100)) : null;
+                        @endphp
+                        <div class="mb-8">
                                     <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-sm {{ $isFree ? 'bg-slate-50 border border-slate-100' : ($isPopular ? 'bg-amber-50 border border-amber-100' : 'bg-blue-50 border border-blue-100') }}">
                                         @if($isFree)
                                             <span class="text-2xl">⚡</span>
@@ -103,18 +109,28 @@
                                             <span class="text-2xl">🚀</span>
                                         @endif
                                     </div>
-                                <h3 class="text-xl font-bold text-midnight">{{ $plan['name'] }}</h3>
-                                <div class="mt-4 flex items-baseline gap-1">
-                                    <span class="text-4xl font-black text-midnight tracking-tighter" x-text="billingPeriod === 'yearly' ? '{{ $plan['yearly_price'] > 0 ? number_format($plan['yearly_price'] / 12, 0, ',', '.') : 0 }}€' : '{{ number_format($plan['price'], 0, ',', '.') }}€'">{{ number_format($plan['price'], 0, ',', '.') }}€</span>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="text-xl font-bold text-midnight">{{ $plan['name'] }}</h3>
+                                    @if($promo['active'] && !$isFree)
+                                        <span class="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">-{{ $promo['discount'] }}%</span>
+                                    @endif
+                                </div>
+                                <div class="mt-4 flex items-baseline gap-2">
+                                    @if($monthlyDiscounted !== null)
+                                        <span class="text-4xl font-black text-copper tracking-tighter"
+                                            x-text="billingPeriod === 'yearly' ? '{{ $yearlyDiscounted }}€' : '{{ $monthlyDiscounted }}€'">{{ $monthlyDiscounted }}€</span>
+                                        <span class="text-lg font-bold text-slate-300 line-through"
+                                            x-text="billingPeriod === 'yearly' ? '{{ $yearlyMonthlyOriginal }}€' : '{{ $monthlyOriginal }}€'">{{ $monthlyOriginal }}€</span>
+                                    @else
+                                        <span class="text-4xl font-black text-midnight tracking-tighter"
+                                            x-text="billingPeriod === 'yearly' ? '{{ $yearlyMonthlyOriginal > 0 ? $yearlyMonthlyOriginal : 0 }}€' : '{{ $monthlyOriginal }}€'">{{ $monthlyOriginal }}€</span>
+                                    @endif
                                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest" x-show="!{{ $isFree ? 'true' : 'false' }}">/ mois</span>
                                 </div>
                                 @if(!$isFree && $plan['price'] > 0 && $plan['yearly_price'] > 0)
                                     <template x-if="billingPeriod === 'yearly'">
                                         <p class="text-xs text-gray-400 mt-1">soit {{ number_format($plan['yearly_price'], 0, ',', '.') }}€ facturé par an</p>
                                     </template>
-                                @endif
-                                @if(isset($plan['old_price']) && $plan['old_price'] > 0)
-                                    <p class="text-[11px] font-bold text-gray-400 line-through mt-0.5">{{ number_format($plan['old_price'], 2, ',', '') }}&euro;</p>
                                 @endif
                             </div>
 

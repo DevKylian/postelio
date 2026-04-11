@@ -106,6 +106,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
         Route::get('/admin/prospects', \App\Livewire\Admin\Prospect\ProspectManager::class)->name('admin.prospects.index');
         Route::get('/admin/announcements', \App\Livewire\Admin\Settings\AnnouncementManager::class)->name('admin.announcements.index');
         Route::get('/admin/social-settings', \App\Livewire\Admin\Settings\SocialSettings::class)->name('admin.social-settings');
+        Route::get('/admin/promotion', \App\Livewire\Admin\Settings\PromotionManager::class)->name('admin.promotion');
         Route::get('/admin/newsletter', \App\Livewire\Admin\Newsletter\NewsletterManager::class)->name('admin.newsletter.index');
         Route::get('/admin/guides', \App\Livewire\Admin\Guide\GuideManager::class)->name('admin.guides.index');
         Route::get('/admin/guides/all-leads', \App\Livewire\Admin\Guide\GuideAllLeads::class)->name('admin.guides.all-leads');

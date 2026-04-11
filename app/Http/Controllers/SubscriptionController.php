@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Cashier\Cashier;
@@ -18,7 +19,13 @@ class SubscriptionController extends Controller
         $currentPlan = $user->currentPlanKey();
         $subscription = $user->subscription('default');
 
-        return view('subscription.plans', compact('plans', 'currentPlan', 'subscription'));
+        $promo = [
+            'active'   => (bool) Setting::get('promo_active', false),
+            'discount' => (int)  Setting::get('promo_discount', 20),
+            'label'    => (string) Setting::get('promo_label', 'PROMO'),
+        ];
+
+        return view('subscription.plans', compact('plans', 'currentPlan', 'subscription', 'promo'));
     }
 
     /**
@@ -73,12 +80,23 @@ class SubscriptionController extends Controller
             return redirect()->route('subscription.billing');
         }
 
+        $checkoutOptions = [
+            'success_url' => route('subscription.success') . '?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url'  => route('subscription.plans'),
+        ];
+
+        $promoActive = (bool) Setting::get('promo_active', false);
+        $promoCodeId = trim((string) Setting::get('promo_stripe_promotion_code_id', ''));
+
+        if ($promoActive && $promoCodeId) {
+            // Pre-apply the Stripe promotion code (disables manual code entry on the form)
+            $checkoutOptions['discounts'] = [['promotion_code' => $promoCodeId]];
+            return $user->newSubscription('default', $priceId)->checkout($checkoutOptions);
+        }
+
         return $user->newSubscription('default', $priceId)
             ->allowPromotionCodes()
-            ->checkout([
-                'success_url' => route('subscription.success') . '?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => route('subscription.plans'),
-            ]);
+            ->checkout($checkoutOptions);
     }
 
     /**

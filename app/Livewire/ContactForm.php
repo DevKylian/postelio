@@ -16,10 +16,10 @@ class ContactForm extends Component
     #[Validate('required|email|max:255')]
     public string $email = '';
 
-    #[Validate('required|string|min:3|max:150')]
+    #[Validate('required|string|min:3|max:150', as: 'sujet')]
     public string $subject = '';
 
-    #[Validate('required|string|min:10|max:2000')]
+    #[Validate('required|string|min:10|max:2000', as: 'message')]
     public string $body = '';
 
     public bool $sent = false;

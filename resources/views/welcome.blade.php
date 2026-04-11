@@ -1,4 +1,6 @@
 @php
+  // Deploy test
+
   $announcementText = \App\Models\Setting::get('announcement_text', 'Recherche 10 artisans pour tester gratuitement l\'app !');
   $announcementLinkText = \App\Models\Setting::get('announcement_link_text', 'Rejoindre le test →');
   $announcementRoute = \App\Models\Setting::get('announcement_route', 'register');

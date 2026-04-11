@@ -135,6 +135,23 @@
                                     </div>
                                 </div>
 
+                                {{-- Stories Section --}}
+                                <div>
+                                    <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3 px-2">
+                                        Stories / Highlights
+                                    </h4>
+                                    <div class="grid grid-cols-1 gap-1.5">
+                                        <button
+                                            wire:click="$set('template', 'story-article-blog')"
+                                            class="group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all {{ $template === 'story-article-blog' ? 'bg-copper text-midnight shadow-md shadow-copper/10' : 'text-gray-600 hover:bg-gray-50' }}"
+                                        >
+                                            <span class="text-base transition-transform group-hover:scale-110">📖</span>
+                                            <span class="flex-1 text-left">Article blog</span>
+                                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full {{ $template === 'story-article-blog' ? 'bg-midnight/20 text-midnight' : 'bg-gray-100 text-gray-400' }} uppercase tracking-wider">9:16</span>
+                                        </button>
+                                    </div>
+                                </div>
+
                                 {{-- Visual Section --}}
                                 <div>
                                     <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3 px-2">
@@ -553,16 +570,24 @@
                                     <textarea wire:model.live="hero_body" rows="3" maxlength="160" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
                                 </div>
 
-                            @elseif($template === 'article-blog')
+                            @elseif($template === 'article-blog' || $template === 'story-article-blog')
+                                @if($template === 'story-article-blog')
+                                <div class="flex items-center gap-2 px-3 py-2 bg-midnight/5 rounded-xl mb-1">
+                                    <span class="text-base">📖</span>
+                                    <span class="text-[11px] font-bold text-midnight uppercase tracking-wider">Story 9:16 — Article de blog</span>
+                                </div>
+                                @endif
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-2 font-bold uppercase tracking-wider">Miniature de l'article (Photo centrale)</label>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-2 font-bold uppercase tracking-wider">
+                                        {{ $template === 'story-article-blog' ? 'Photo de couverture (Story)' : 'Miniature de l\'article (Photo centrale)' }}
+                                    </label>
                                     <label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl cursor-pointer transition-all h-32
                                         {{ $uploadImage1 ? 'border-copper bg-copper/5' : 'border-gray-200 hover:border-copper/50 bg-gray-50' }}">
                                         @if($uploadImage1)
                                             <img src="{{ $uploadImage1->temporaryUrl() }}" class="w-full h-full object-cover rounded-lg">
                                         @else
                                             <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                            <span class="text-xs text-gray-400 font-bold">Uploader la miniature</span>
+                                            <span class="text-xs text-gray-400 font-bold">Uploader la photo</span>
                                         @endif
                                         <input wire:model="uploadImage1" type="file" accept="image/*" class="hidden">
                                     </label>
@@ -576,8 +601,10 @@
                                     <textarea wire:model.live="article_blog_title" rows="2" maxlength="100" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Extrait / Accroche</label>
-                                    <textarea wire:model.live="article_blog_excerpt" rows="3" maxlength="160" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">
+                                        {{ $template === 'story-article-blog' ? 'Accroche courte (optionnel)' : 'Extrait / Accroche' }}
+                                    </label>
+                                    <textarea wire:model.live="article_blog_excerpt" rows="2" maxlength="160" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
                                 </div>
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
@@ -632,6 +659,8 @@
                                             'feature-app' => '🚀',
                                             'educatif' => '🎓',
                                             'hero' => '💎',
+                                            'article-blog' => '📰',
+                                            'story-article-blog' => '📖',
                                             default => '📄'
                                         } }}
                                     </div>
@@ -673,9 +702,19 @@
                                     {{-- Background glow --}}
                                     <div class="absolute -inset-4 bg-gradient-to-tr from-copper/20 to-midnight/5 rounded-[2rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                                     
+                                    @php
+                                        $previewIsStory = str_starts_with($template, 'story-');
+                                        if ($previewIsStory) {
+                                            $outerW = 202; $outerH = 359;
+                                            $innerH = 640; $previewScale = '0.5611';
+                                        } else {
+                                            $outerW = 280; $outerH = 350;
+                                            $innerH = 450; $previewScale = '0.777';
+                                        }
+                                    @endphp
                                     <div class="relative z-10 p-4 bg-white rounded-[2rem] shadow-2xl border border-gray-100">
-                                        <div class="relative" style="width: 280px; height: 350px;">
-                                            <div style="width: 360px; height: 450px; transform: scale(0.777); transform-origin: top left; border-radius: 12px; overflow: hidden; background: white;">
+                                        <div class="relative" style="width: {{ $outerW }}px; height: {{ $outerH }}px;">
+                                            <div style="width: 360px; height: {{ $innerH }}px; transform: scale({{ $previewScale }}); transform-origin: top left; border-radius: 12px; overflow: hidden; background: white;">
 
                                                 @if(!$hasContent)
                                                     <div style="width: 360px; height: 360px; background: #F9FAFB; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border: 2px dashed #E5E7EB; border-radius: 12px;">
@@ -713,6 +752,8 @@
                                                     <x-postelio-instagram.hero :tag="$hero_tag" :headline="$hero_headline" :body="$hero_body" />
                                                 @elseif($template === 'article-blog')
                                                     <x-postelio-instagram.article-blog :tag="$article_blog_tag" :title="$article_blog_title" :excerpt="$article_blog_excerpt" :cta="$article_blog_cta" :url="$article_blog_url" :image_url="$uploadImage1 ? $uploadImage1->temporaryUrl() : null" />
+                                                @elseif($template === 'story-article-blog')
+                                                    <x-postelio-instagram.story-article-blog :tag="$article_blog_tag" :title="$article_blog_title" :excerpt="$article_blog_excerpt" :cta="$article_blog_cta" :url="$article_blog_url" :image_url="$uploadImage1 ? $uploadImage1->temporaryUrl() : null" />
                                                 @elseif($template === 'chantier')
                                                     <x-postelio-instagram.chantier 
                                                         :tag="$photo_tag" 

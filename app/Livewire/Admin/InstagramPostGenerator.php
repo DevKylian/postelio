@@ -117,7 +117,7 @@ class InstagramPostGenerator extends Component
     public string $photo_caption  = '';
 
     // ── Image-based templates ─────────────────────────────────────────────────
-    private const IMAGE_TEMPLATES = ['avantapres', 'appmockup', 'feature-app', 'article-blog'];
+    private const IMAGE_TEMPLATES = ['avantapres', 'appmockup', 'feature-app', 'article-blog', 'story-article-blog'];
 
     public function mount(): void
     {
@@ -196,7 +196,7 @@ class InstagramPostGenerator extends Component
     {
         $this->validate([
             'topic'    => 'required|min:3',
-            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog,feature-app',
+            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog,feature-app,story-article-blog',
             'tone'     => 'required|in:professionnel,accessible,dynamique,inspirant',
         ]);
 
@@ -363,7 +363,7 @@ class InstagramPostGenerator extends Component
                 'headline' => $this->hero_headline,
                 'body'     => $this->hero_body,
             ],
-            'article-blog' => [
+            'article-blog', 'story-article-blog' => [
                 'tag'     => $this->article_blog_tag,
                 'title'   => $this->article_blog_title,
                 'excerpt' => $this->article_blog_excerpt,
@@ -402,9 +402,12 @@ class InstagramPostGenerator extends Component
                     throw new \RuntimeException("Impossible de créer le fichier ZIP.");
                 }
 
+            $isStory  = str_starts_with($this->template, 'story-');
+            $frameH   = $isStory ? 640 : 450;
+
             foreach ($this->slides as $i => $slide) {
                 $slideData = $this->prepareSlideData($slide, $i);
-                
+
                 // Embed images if relevant
                 if ($this->uploadImage1) $slideData['image1_b64'] = $this->fileToDataUri($this->uploadImage1);
                 if ($this->uploadImage2) $slideData['image2_b64'] = $this->fileToDataUri($this->uploadImage2);
@@ -416,9 +419,9 @@ class InstagramPostGenerator extends Component
                 ])->render();
 
                     $png = Browsershot::html($html)
-                        ->windowSize(360, 450)
+                        ->windowSize(360, $frameH)
                         ->deviceScaleFactor(3)
-                        ->clip(0, 0, 360, 450)
+                        ->clip(0, 0, 360, $frameH)
                         ->noSandbox()
                         ->waitUntilNetworkIdle()
                         ->delay(500)
@@ -433,6 +436,9 @@ class InstagramPostGenerator extends Component
             }
 
             // Case 2: Single Slide (Regular)
+            $isStory = str_starts_with($this->template, 'story-');
+            $frameH  = $isStory ? 640 : 450;
+
             $data = $this->buildDataArray();
             if ($this->uploadImage1) $data['image1_b64'] = $this->fileToDataUri($this->uploadImage1);
             if ($this->uploadImage2) $data['image2_b64'] = $this->fileToDataUri($this->uploadImage2);
@@ -443,9 +449,9 @@ class InstagramPostGenerator extends Component
             ])->render();
 
             $png = Browsershot::html($html)
-                ->windowSize(360, 450)
+                ->windowSize(360, $frameH)
                 ->deviceScaleFactor(3)
-                ->clip(0, 0, 360, 450)
+                ->clip(0, 0, 360, $frameH)
                 ->noSandbox()
                 ->waitUntilNetworkIdle()
                 ->delay(500)
@@ -574,7 +580,7 @@ class InstagramPostGenerator extends Component
                 'appmockup'   => $this->fillAppmockup($data),
                 'educatif'    => $this->fillEducatif($data),
                 'hero'        => $this->fillHero($data),
-                'article-blog' => $this->fillArticleBlog($data),
+                'article-blog', 'story-article-blog' => $this->fillArticleBlog($data),
                 'feature-app'  => $this->fillFeatureApp($data),
             };
         }
@@ -973,6 +979,19 @@ class InstagramPostGenerator extends Component
                     "instagram_caption": "Caption engageante avec le lien en bio, 2-3 hashtags pertinents"
                 }
                 RÈGLE : Le titre doit rester fidèle à l'article. L'extrait doit créer de la curiosité sans être vague.
+                PROMPT,
+            'story-article-blog' => <<<PROMPT
+                Story Instagram "Annonce d'article de blog" (format 9:16 portrait). IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
+                Objectif : capter l'attention en 2 secondes et donner envie de swipe up / lien en bio.
+                JSON : {
+                    "tag": "NOUVEL ARTICLE",
+                    "title": "Titre percutant (max 55 car., direct et fort)",
+                    "excerpt": "Accroche ultra-courte (15-25 mots max) qui intrigue sans révéler la conclusion",
+                    "cta": "Lire l'article",
+                    "url": "postelio.fr/blog",
+                    "instagram_caption": "Caption courte avec emoji, lien en bio, 2-3 hashtags"
+                }
+                RÈGLE : Le titre doit être encore plus court et percutant que pour un post classique. L'extrait est facultatif mais très efficace.
                 PROMPT,
             'feature-app' => <<<PROMPT
                 Post "Mise en avant d'une fonctionnalité Postelio". IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).

@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=360, initial-scale=1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    @php $renderHeight = str_starts_with($template, 'story-') ? 640 : 450; @endphp
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             margin: 0; padding: 0;
-            width: 360px; height: 450px;
+            width: 360px; height: {{ $renderHeight }}px;
             overflow: hidden;
             background: #111827;
         }
@@ -17,7 +18,7 @@
     </style>
 </head>
 <body>
-    <div style="width: 360px; height: 450px; overflow: hidden; position: relative;">
+    <div style="width: 360px; height: {{ $renderHeight }}px; overflow: hidden; position: relative;">
         @php
             // Base64 logic for export reliability
             $base64Image = null;
@@ -133,6 +134,15 @@
             />
         @elseif($template === 'article-blog')
             <x-postelio-instagram.article-blog
+                :tag="$data['tag'] ?? 'NOUVEL ARTICLE'"
+                :title="$data['title'] ?? ''"
+                :excerpt="$data['excerpt'] ?? ''"
+                :cta="$data['cta'] ?? 'Lire l\'article'"
+                :url="$data['url'] ?? 'postelio.fr/blog'"
+                :image_url="$data['image_url'] ?? $data['image1_b64'] ?? null"
+            />
+        @elseif($template === 'story-article-blog')
+            <x-postelio-instagram.story-article-blog
                 :tag="$data['tag'] ?? 'NOUVEL ARTICLE'"
                 :title="$data['title'] ?? ''"
                 :excerpt="$data['excerpt'] ?? ''"

@@ -59,18 +59,13 @@
 
     {{-- ── Content block: quote (top) + author / branding (bottom) ─────────── --}}
     {{-- Flex-column with spacer pushes author to the bottom of the safe zone --}}
-    <div style="position:absolute;top:178px;left:28px;width:304px;height:340px;display:flex;flex-direction:column;">
+    <div style="position:absolute;top:178px;left:28px;width:304px;">
 
         {{-- Quote --}}
-        <div style="flex:0 0 auto;">
-            <p style="color:#1F2937;font-size:{{ $fontSize }};font-weight:{{ $fontWeight }};line-height:{{ $lineHeight }};font-style:italic;margin:0;">"{{ $quote }}"</p>
-        </div>
-
-        {{-- Spacer --}}
-        <div style="flex:1;min-height:24px;"></div>
+        <p style="color:#1F2937;font-size:{{ $fontSize }};font-weight:{{ $fontWeight }};line-height:{{ $lineHeight }};font-style:italic;margin:0 0 28px 0;">"{{ $quote }}"</p>
 
         {{-- Author block --}}
-        <div style="flex:0 0 auto;display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
             {{-- Avatar circle --}}
             <div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#F59E0B,#D97706);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#FFFFFF;box-shadow:0 4px 12px rgba(245,158,11,0.28);">{{ $initial }}</div>
             <div style="flex:1;">
@@ -80,7 +75,7 @@
         </div>
 
         {{-- Separator + branding --}}
-        <div style="flex:0 0 auto;border-top:1px solid rgba(0,0,0,0.07);padding-top:14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="border-top:1px solid rgba(0,0,0,0.07);padding-top:14px;display:flex;align-items:center;justify-content:space-between;">
             <div style="display:flex;align-items:center;gap:6px;">
                 <div style="width:5px;height:5px;border-radius:50%;background:#F59E0B;flex-shrink:0;"></div>
                 <span style="color:#6B7280;font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;">Postelio</span>

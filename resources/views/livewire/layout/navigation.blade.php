@@ -209,6 +209,13 @@ $logout = function (Logout $logout) {
                 </svg>
                 <span>Newsletter</span>
             </x-sidebar-link>
+
+            <x-sidebar-link :href="route('admin.social-settings')" :active="request()->routeIs('admin.social-settings')" wire:navigate>
+                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                </svg>
+                <span>Réseaux sociaux</span>
+            </x-sidebar-link>
             @endif
 
             <!-- Section: Compte -->

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use App\Services\ZernioService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,6 +20,11 @@ class FacebookController extends Controller
      */
     public function connect(): RedirectResponse
     {
+        if (!Setting::get('facebook_connection_enabled', true)) {
+            return redirect()->route('post-settings')
+                ->with('error', 'La connexion Facebook est temporairement désactivée.');
+        }
+
         try {
             $company   = Auth::user()->company;
             $profileId = $company->getZernioProfileId();

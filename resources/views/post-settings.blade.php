@@ -116,6 +116,14 @@
                                         Déconnecter
                                     </button>
                                 </form>
+                            @elseif(!\App\Models\Setting::get('instagram_connection_enabled', true))
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="w-2 h-2 rounded-full bg-orange-300 shrink-0"></span>
+                                    <span class="text-sm text-gray-500">Temporairement indisponible</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">
+                                    La connexion Instagram est momentanément désactivée. Revenez plus tard.
+                                </p>
                             @else
                                 <div class="flex items-center gap-2 mb-3">
                                     <span class="w-2 h-2 rounded-full bg-gray-300 shrink-0"></span>
@@ -186,6 +194,14 @@
                                         Déconnecter
                                     </button>
                                 </form>
+                            @elseif(!\App\Models\Setting::get('facebook_connection_enabled', true))
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="w-2 h-2 rounded-full bg-orange-300 shrink-0"></span>
+                                    <span class="text-sm text-gray-500">Temporairement indisponible</span>
+                                </div>
+                                <p class="text-xs text-gray-400 leading-relaxed">
+                                    La connexion Facebook est momentanément désactivée. Revenez plus tard.
+                                </p>
                             @else
                                 <div class="flex items-center gap-2 mb-3">
                                     <span class="w-2 h-2 rounded-full bg-gray-300 shrink-0"></span>

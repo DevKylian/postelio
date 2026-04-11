@@ -73,31 +73,28 @@
         <span style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35);color:#F59E0B;font-size:8px;font-weight:800;letter-spacing:0.25em;text-transform:uppercase;padding:4px 14px;border-radius:100px;white-space:nowrap;">NOUVEL ARTICLE</span>
     </div>
 
-    {{-- ── TITLE  (y: 252) ─────────────────────────────────────────────────────── --}}
+    {{-- ── CONTENT BLOCK: titre + extrait + CTA, en flux naturel (y: 252) ──────── --}}
     <div style="position:absolute;top:252px;left:28px;width:304px;">
-        <h1 style="color:#FFFFFF;font-size:{{ $titleSize }};font-weight:900;line-height:{{ $titleLH }};letter-spacing:-0.025em;margin:0;">{!! $cleanTitle !!}</h1>
-    </div>
 
-    {{-- ── EXCERPT  (y: dynamic — placed via JS-free calc: title block ~130px max) --}}
-    {{-- We fix it at y:398 to guarantee CTA stays above the bottom safe zone --}}
-    @if($cleanExcerpt)
-    <div style="position:absolute;top:400px;left:28px;width:304px;">
-        <p style="color:rgba(255,255,255,0.55);font-size:13px;font-weight:500;line-height:1.6;margin:0;">{!! $cleanExcerpt !!}</p>
-    </div>
-    @endif
+        {{-- Title --}}
+        <h1 style="color:#FFFFFF;font-size:{{ $titleSize }};font-weight:900;line-height:{{ $titleLH }};letter-spacing:-0.025em;margin:0 0 18px 0;">{!! $cleanTitle !!}</h1>
 
-    {{-- ── CTA ROW  (y: 490 — safely above y:555 bottom danger) ───────────────── --}}
-    <div style="position:absolute;top:490px;left:28px;width:304px;display:flex;align-items:center;justify-content:space-between;">
+        {{-- Excerpt --}}
+        @if($cleanExcerpt)
+        <p style="color:rgba(255,255,255,0.55);font-size:13px;font-weight:500;line-height:1.6;margin:0 0 24px 0;">{!! $cleanExcerpt !!}</p>
+        @else
+        <div style="height:24px;"></div>
+        @endif
 
-        {{-- Button --}}
-        <div style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#111827;font-size:12px;font-weight:900;padding:12px 24px;border-radius:10px;letter-spacing:-0.01em;white-space:nowrap;">
-            {!! $cleanCta !!} →
-        </div>
-
-        {{-- Brand --}}
-        <div style="display:flex;align-items:center;gap:5px;">
-            <div style="width:5px;height:5px;border-radius:50%;background:#F59E0B;flex-shrink:0;"></div>
-            <span style="color:rgba(255,255,255,0.4);font-size:10px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;">Postelio</span>
+        {{-- CTA row --}}
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="background:linear-gradient(135deg,#F59E0B,#D97706);color:#111827;font-size:12px;font-weight:900;padding:12px 24px;border-radius:10px;letter-spacing:-0.01em;white-space:nowrap;">
+                {!! $cleanCta !!} →
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;">
+                <div style="width:5px;height:5px;border-radius:50%;background:#F59E0B;flex-shrink:0;"></div>
+                <span style="color:rgba(255,255,255,0.4);font-size:10px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;">Postelio</span>
+            </div>
         </div>
 
     </div>

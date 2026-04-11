@@ -10,6 +10,7 @@ class InstagramProspect extends Model
         'account_name',
         'profile_url',
         'status',
+        'script_version',
         'last_action_date',
         'notes',
     ];
@@ -24,6 +25,15 @@ class InstagramProspect extends Model
     public const STATUS_RELANCE_1 = 'relance_1';
     public const STATUS_NOT_INTERESTED = 'not_interested';
     public const STATUS_RESPONDED = 'responded';
+
+    public static function getScripts(): array
+    {
+        $scripts = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $scripts[$i] = "Script $i";
+        }
+        return $scripts;
+    }
 
     public static function getStatuses(): array
     {

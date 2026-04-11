@@ -160,11 +160,7 @@
           class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
           :class="navReady ? 'nav-entry-stagger' : ''"
           style="animation-delay: 250ms">Réalisations</a>
-        <a href="#benefices"
-          class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
-          :class="navReady ? 'nav-entry-stagger' : ''"
-          style="animation-delay: 300ms">Avantages</a>
-        <a href="#tarifs" 
+        <a href="#tarifs"
            class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
            :class="navReady ? 'nav-entry-stagger' : ''"
            style="animation-delay: 350ms">Tarifs</a>
@@ -172,7 +168,11 @@
           class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
           :class="navReady ? 'nav-entry-stagger' : 'opacity-0'"
           style="animation-delay: 400ms">Blog</a>
-        
+        <a href="{{ route('contact') }}"
+          class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
+          :class="navReady ? 'nav-entry-stagger' : 'opacity-0'"
+          style="animation-delay: 425ms">Contact</a>
+
         <div class="w-px h-4 bg-slate-200 mx-1"
              :class="navReady ? 'nav-entry-stagger' : 'opacity-0'"
              style="animation-delay: 450ms"></div>
@@ -222,12 +222,12 @@
           méthode</a>
         <a href="#galerie" @click="isMenuOpen = false"
           class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Réalisations</a>
-        <a href="#benefices" @click="isMenuOpen = false"
-          class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Avantages</a>
         <a href="#tarifs" @click="isMenuOpen = false"
           class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Tarifs</a>
         <a href="{{ route('blog.index') }}" @click="isMenuOpen = false"
           class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Blog</a>
+        <a href="{{ route('contact') }}" @click="isMenuOpen = false"
+          class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Contact</a>
 
         @auth
           <a href="{{ route('dashboard') }}" wire:navigate class="block w-full text-center btn-primary mt-4">
@@ -2382,6 +2382,19 @@
     </section>
 
     <!-- Pricing -->
+    @php
+      $__promo = [
+          'active'   => (bool) \App\Models\Setting::get('promo_active', false),
+          'discount' => (int)  \App\Models\Setting::get('promo_discount', 20),
+          'label'    => (string) \App\Models\Setting::get('promo_label', 'PROMO'),
+      ];
+      // Basic: 19€/mo, 15€/mo yearly
+      $__basicMonthlyD = round(19 * (1 - $__promo['discount'] / 100));
+      $__basicYearlyD  = round(15 * (1 - $__promo['discount'] / 100));
+      // Pro: 29€/mo, 23€/mo yearly
+      $__proMonthlyD   = round(29 * (1 - $__promo['discount'] / 100));
+      $__proYearlyD    = round(23 * (1 - $__promo['discount'] / 100));
+    @endphp
     <section id="tarifs" class="py-32 relative" x-data="{ billingPeriod: 'monthly' }">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-3xl mx-auto mb-10" x-intersect.once="$el.classList.add('reveal-up')">
@@ -2481,10 +2494,22 @@
                   class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-blue-50 border border-blue-100 shadow-sm">
                   <span class="text-2xl">🚀</span>
                 </div>
-                <h3 class="text-xl font-bold text-midnight">Basic</h3>
-                <div class="mt-4 flex items-baseline gap-1">
-                  <span class="text-4xl font-black text-midnight tracking-tighter"
-                    x-text="billingPeriod === 'yearly' ? '15€' : '19€'">19€</span>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="text-xl font-bold text-midnight">Basic</h3>
+                  @if($__promo['active'])
+                    <span class="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">-{{ $__promo['discount'] }}%</span>
+                  @endif
+                </div>
+                <div class="mt-4 flex items-baseline gap-2">
+                  @if($__promo['active'])
+                    <span class="text-4xl font-black text-copper tracking-tighter"
+                      x-text="billingPeriod === 'yearly' ? '{{ $__basicYearlyD }}€' : '{{ $__basicMonthlyD }}€'">{{ $__basicMonthlyD }}€</span>
+                    <span class="text-lg font-bold text-slate-300 line-through"
+                      x-text="billingPeriod === 'yearly' ? '15€' : '19€'">19€</span>
+                  @else
+                    <span class="text-4xl font-black text-midnight tracking-tighter"
+                      x-text="billingPeriod === 'yearly' ? '15€' : '19€'">19€</span>
+                  @endif
                   <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
                 </div>
                 <template x-if="billingPeriod === 'yearly'">
@@ -2554,10 +2579,22 @@
                   class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-amber-50 border border-amber-100 shadow-sm">
                   <span class="text-2xl">👑</span>
                 </div>
-                <h3 class="text-xl font-bold text-midnight">Professionnel</h3>
-                <div class="mt-4 flex items-baseline gap-1">
-                  <span class="text-4xl font-black text-midnight tracking-tighter"
-                    x-text="billingPeriod === 'yearly' ? '23€' : '29€'">29€</span>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="text-xl font-bold text-midnight">Professionnel</h3>
+                  @if($__promo['active'])
+                    <span class="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">-{{ $__promo['discount'] }}%</span>
+                  @endif
+                </div>
+                <div class="mt-4 flex items-baseline gap-2">
+                  @if($__promo['active'])
+                    <span class="text-4xl font-black text-copper tracking-tighter"
+                      x-text="billingPeriod === 'yearly' ? '{{ $__proYearlyD }}€' : '{{ $__proMonthlyD }}€'">{{ $__proMonthlyD }}€</span>
+                    <span class="text-lg font-bold text-slate-300 line-through"
+                      x-text="billingPeriod === 'yearly' ? '23€' : '29€'">29€</span>
+                  @else
+                    <span class="text-4xl font-black text-midnight tracking-tighter"
+                      x-text="billingPeriod === 'yearly' ? '23€' : '29€'">29€</span>
+                  @endif
                   <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
                 </div>
                 <template x-if="billingPeriod === 'yearly'">
@@ -2863,7 +2900,7 @@
             <li><a href="{{ route('legal.cgv') }}" class="hover:text-copper transition-colors font-light">CGV</a></li>
             <li><a href="{{ route('legal.confidentialite') }}"
                 class="hover:text-copper transition-colors font-light">Confidentialité</a></li>
-            <li><a href="mailto:hello@postelio.fr" class="hover:text-copper transition-colors font-light">Contact</a>
+            <li><a href="{{ route('contact') }}" class="hover:text-copper transition-colors font-light">Contact</a>
             </li>
           </ul>
         </div>

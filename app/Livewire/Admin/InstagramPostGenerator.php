@@ -196,7 +196,7 @@ class InstagramPostGenerator extends Component
     {
         $this->validate([
             'topic'    => 'required|min:3',
-            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog,feature-app',
+            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog,feature-app,story-article-blog,story-temoignage',
             'tone'     => 'required|in:professionnel,accessible,dynamique,inspirant',
         ]);
 
@@ -315,7 +315,7 @@ class InstagramPostGenerator extends Component
                 'cta'         => $this->cta,
                 'url'         => $this->url,
             ],
-            'temoignage' => [
+            'temoignage', 'story-temoignage' => [
                 'quote'      => $this->quote,
                 'author'     => $this->author,
                 'profession' => $this->profession,
@@ -363,7 +363,7 @@ class InstagramPostGenerator extends Component
                 'headline' => $this->hero_headline,
                 'body'     => $this->hero_body,
             ],
-            'article-blog' => [
+            'article-blog', 'story-article-blog' => [
                 'tag'     => $this->article_blog_tag,
                 'title'   => $this->article_blog_title,
                 'excerpt' => $this->article_blog_excerpt,
@@ -402,9 +402,12 @@ class InstagramPostGenerator extends Component
                     throw new \RuntimeException("Impossible de créer le fichier ZIP.");
                 }
 
+            $isStory  = str_starts_with($this->template, 'story-');
+            $frameH   = $isStory ? 640 : 450;
+
             foreach ($this->slides as $i => $slide) {
                 $slideData = $this->prepareSlideData($slide, $i);
-                
+
                 // Embed images if relevant
                 if ($this->uploadImage1) $slideData['image1_b64'] = $this->fileToDataUri($this->uploadImage1);
                 if ($this->uploadImage2) $slideData['image2_b64'] = $this->fileToDataUri($this->uploadImage2);
@@ -416,9 +419,9 @@ class InstagramPostGenerator extends Component
                 ])->render();
 
                     $png = Browsershot::html($html)
-                        ->windowSize(360, 450)
+                        ->windowSize(360, $frameH)
                         ->deviceScaleFactor(3)
-                        ->clip(0, 0, 360, 450)
+                        ->clip(0, 0, 360, $frameH)
                         ->noSandbox()
                         ->waitUntilNetworkIdle()
                         ->delay(500)
@@ -433,6 +436,9 @@ class InstagramPostGenerator extends Component
             }
 
             // Case 2: Single Slide (Regular)
+            $isStory = str_starts_with($this->template, 'story-');
+            $frameH  = $isStory ? 640 : 450;
+
             $data = $this->buildDataArray();
             if ($this->uploadImage1) $data['image1_b64'] = $this->fileToDataUri($this->uploadImage1);
             if ($this->uploadImage2) $data['image2_b64'] = $this->fileToDataUri($this->uploadImage2);
@@ -443,9 +449,9 @@ class InstagramPostGenerator extends Component
             ])->render();
 
             $png = Browsershot::html($html)
-                ->windowSize(360, 450)
+                ->windowSize(360, $frameH)
                 ->deviceScaleFactor(3)
-                ->clip(0, 0, 360, 450)
+                ->clip(0, 0, 360, $frameH)
                 ->noSandbox()
                 ->waitUntilNetworkIdle()
                 ->delay(500)
@@ -546,6 +552,13 @@ class InstagramPostGenerator extends Component
         
         $this->caption = $this->normalizeCaption($rawCaption);
 
+        // Story templates never support carousel – flatten to first slide if AI ignores the rule
+        if (str_starts_with($this->template, 'story-') && isset($data['slides']) && is_array($data['slides'])) {
+            $first = $data['slides'][0] ?? [];
+            $data = array_merge($first, ['instagram_caption' => $rawCaption ?: ($first['instagram_caption'] ?? '')]);
+            unset($data['slides']);
+        }
+
         // Handle Carousel (Multi-Slide) response
         if (isset($data['slides']) && is_array($data['slides'])) {
             $this->slides = $data['slides'];
@@ -566,7 +579,7 @@ class InstagramPostGenerator extends Component
                 'conseil'     => $this->fillConseil($data),
                 'stats'       => $this->fillStats($data),
                 'cta'         => $this->fillCta($data),
-                'temoignage'  => $this->fillTemoignage($data),
+                'temoignage', 'story-temoignage' => $this->fillTemoignage($data),
                 'avantages'   => $this->fillAvantages($data),
                 'question'    => $this->fillQuestion($data),
                 'comparaison' => $this->fillComparaison($data),
@@ -574,7 +587,7 @@ class InstagramPostGenerator extends Component
                 'appmockup'   => $this->fillAppmockup($data),
                 'educatif'    => $this->fillEducatif($data),
                 'hero'        => $this->fillHero($data),
-                'article-blog' => $this->fillArticleBlog($data),
+                'article-blog', 'story-article-blog' => $this->fillArticleBlog($data),
                 'feature-app'  => $this->fillFeatureApp($data),
             };
         }
@@ -704,7 +717,7 @@ class InstagramPostGenerator extends Component
 
     private function fillTemoignage(array $d): void
     {
-        $this->quote      = $d['quote']      ?? '';
+        $this->quote      = $d['quote'] ?? $d['body'] ?? $d['title'] ?? '';
         $this->author     = $d['author']     ?? 'Marc D.';
         $this->profession = $d['profession'] ?? 'Artisan';
         $this->stars      = (int) ($d['stars'] ?? 5);
@@ -938,6 +951,12 @@ class InstagramPostGenerator extends Component
                 Post "Avis". IMAGE UNIQUE (Interdit : Pas de carrousel).
                 JSON : { "quote": "...", "author": "...", "profession": "...", "stars": 5, "instagram_caption": "..." }
                 PROMPT,
+            'story-temoignage' => <<<PROMPT
+                Story Instagram "Avis client" (format 9:16 portrait). IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
+                Objectif : mettre en valeur un témoignage client percutant en story Instagram.
+                JSON : { "quote": "Citation courte et impactante (50-120 car. max)", "author": "Prénom N.", "profession": "Métier — Ville", "stars": 5, "instagram_caption": "..." }
+                RÈGLE : La citation doit être courte, émotionnelle et crédible. Pas de jargon marketing.
+                PROMPT,
             'question' => <<<PROMPT
                 Post "Question". IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
                 Structure JSON : { "title": "La question posée (6-10 mots)", "body": "Le contexte ou l'amorce (12-15 mots)", "tag": "...", "instagram_caption": "..." }
@@ -974,6 +993,19 @@ class InstagramPostGenerator extends Component
                 }
                 RÈGLE : Le titre doit rester fidèle à l'article. L'extrait doit créer de la curiosité sans être vague.
                 PROMPT,
+            'story-article-blog' => <<<PROMPT
+                Story Instagram "Annonce d'article de blog" (format 9:16 portrait). IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
+                Objectif : capter l'attention en 2 secondes et donner envie de swipe up / lien en bio.
+                JSON : {
+                    "tag": "NOUVEL ARTICLE",
+                    "title": "Titre percutant (max 55 car., direct et fort)",
+                    "excerpt": "Accroche ultra-courte (15-25 mots max) qui intrigue sans révéler la conclusion",
+                    "cta": "Lire l'article",
+                    "url": "postelio.fr/blog",
+                    "instagram_caption": "Caption courte avec emoji, lien en bio, 2-3 hashtags"
+                }
+                RÈGLE : Le titre doit être encore plus court et percutant que pour un post classique. L'extrait est facultatif mais très efficace.
+                PROMPT,
             'feature-app' => <<<PROMPT
                 Post "Mise en avant d'une fonctionnalité Postelio". IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
                 Objectif : présenter UNE fonctionnalité précise de Postelio avec son bénéfice concret pour l'artisan.
@@ -1004,7 +1036,7 @@ class InstagramPostGenerator extends Component
             Règles de STRUCTURE (CRITICAL) :
             - Réponds UNIQUEMENT en JSON valide.
             - POLITIQUES DE SLIDES :
-                - SI stats, cta, temoignage, question, avantapres, appmockup, comparaison, educatif, feature-app : INTERDIT DE FAIRE UN CARROUSEL. Réponds avec un seul objet JSON simple à la racine.
+                - SI stats, cta, temoignage, question, avantapres, appmockup, comparaison, educatif, feature-app, article-blog, story-article-blog, story-temoignage : INTERDIT DE FAIRE UN CARROUSEL. Réponds avec un seul objet JSON simple à la racine.
                 - SI conseil, annonce, avantages : CARROUSEL AUTORISÉ (tableau "slides": [ ... ]).
             - "title" : Titre principal (4-8 mots). OBLIGATOIRE.
             - "body" : Texte descriptif (15-25 mots).

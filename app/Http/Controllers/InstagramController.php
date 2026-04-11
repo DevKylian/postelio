@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use App\Services\ZernioService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,11 @@ class InstagramController extends Controller
      */
     public function connect(): RedirectResponse
     {
+        if (!Setting::get('instagram_connection_enabled', true)) {
+            return redirect()->route('post-settings')
+                ->with('error', 'La connexion Instagram est temporairement désactivée.');
+        }
+
         try {
             $company   = Auth::user()->company;
             $profileId = $company->getZernioProfileId();

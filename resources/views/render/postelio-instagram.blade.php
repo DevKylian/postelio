@@ -141,6 +141,13 @@
                 :url="$data['url'] ?? 'postelio.fr/blog'"
                 :image_url="$data['image_url'] ?? $data['image1_b64'] ?? null"
             />
+        @elseif($template === 'story-temoignage')
+            <x-postelio-instagram.story-temoignage
+                :quote="$data['quote'] ?? ''"
+                :author="$data['author'] ?? 'Marc D.'"
+                :profession="$data['profession'] ?? 'Artisan'"
+                :stars="(int)($data['stars'] ?? 5)"
+            />
         @elseif($template === 'story-article-blog')
             <x-postelio-instagram.story-article-blog
                 :tag="$data['tag'] ?? 'ARTICLE DE BLOG'"

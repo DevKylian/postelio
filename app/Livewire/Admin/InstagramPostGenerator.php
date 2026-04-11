@@ -196,7 +196,7 @@ class InstagramPostGenerator extends Component
     {
         $this->validate([
             'topic'    => 'required|min:3',
-            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog,feature-app,story-article-blog',
+            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog,feature-app,story-article-blog,story-temoignage',
             'tone'     => 'required|in:professionnel,accessible,dynamique,inspirant',
         ]);
 
@@ -315,7 +315,7 @@ class InstagramPostGenerator extends Component
                 'cta'         => $this->cta,
                 'url'         => $this->url,
             ],
-            'temoignage' => [
+            'temoignage', 'story-temoignage' => [
                 'quote'      => $this->quote,
                 'author'     => $this->author,
                 'profession' => $this->profession,
@@ -579,7 +579,7 @@ class InstagramPostGenerator extends Component
                 'conseil'     => $this->fillConseil($data),
                 'stats'       => $this->fillStats($data),
                 'cta'         => $this->fillCta($data),
-                'temoignage'  => $this->fillTemoignage($data),
+                'temoignage', 'story-temoignage' => $this->fillTemoignage($data),
                 'avantages'   => $this->fillAvantages($data),
                 'question'    => $this->fillQuestion($data),
                 'comparaison' => $this->fillComparaison($data),
@@ -951,6 +951,12 @@ class InstagramPostGenerator extends Component
                 Post "Avis". IMAGE UNIQUE (Interdit : Pas de carrousel).
                 JSON : { "quote": "...", "author": "...", "profession": "...", "stars": 5, "instagram_caption": "..." }
                 PROMPT,
+            'story-temoignage' => <<<PROMPT
+                Story Instagram "Avis client" (format 9:16 portrait). IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
+                Objectif : mettre en valeur un témoignage client percutant en story Instagram.
+                JSON : { "quote": "Citation courte et impactante (50-120 car. max)", "author": "Prénom N.", "profession": "Métier — Ville", "stars": 5, "instagram_caption": "..." }
+                RÈGLE : La citation doit être courte, émotionnelle et crédible. Pas de jargon marketing.
+                PROMPT,
             'question' => <<<PROMPT
                 Post "Question". IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
                 Structure JSON : { "title": "La question posée (6-10 mots)", "body": "Le contexte ou l'amorce (12-15 mots)", "tag": "...", "instagram_caption": "..." }
@@ -1030,7 +1036,7 @@ class InstagramPostGenerator extends Component
             Règles de STRUCTURE (CRITICAL) :
             - Réponds UNIQUEMENT en JSON valide.
             - POLITIQUES DE SLIDES :
-                - SI stats, cta, temoignage, question, avantapres, appmockup, comparaison, educatif, feature-app, article-blog, story-article-blog : INTERDIT DE FAIRE UN CARROUSEL. Réponds avec un seul objet JSON simple à la racine.
+                - SI stats, cta, temoignage, question, avantapres, appmockup, comparaison, educatif, feature-app, article-blog, story-article-blog, story-temoignage : INTERDIT DE FAIRE UN CARROUSEL. Réponds avec un seul objet JSON simple à la racine.
                 - SI conseil, annonce, avantages : CARROUSEL AUTORISÉ (tableau "slides": [ ... ]).
             - "title" : Titre principal (4-8 mots). OBLIGATOIRE.
             - "body" : Texte descriptif (15-25 mots).

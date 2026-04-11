@@ -141,14 +141,19 @@
                                         Stories / Highlights
                                     </h4>
                                     <div class="grid grid-cols-1 gap-1.5">
+                                        @foreach([
+                                            ['story-article-blog', '📖', 'Article blog'],
+                                            ['story-temoignage',   '⭐', 'Avis client'],
+                                        ] as [$val, $icon, $label])
                                         <button
-                                            wire:click="$set('template', 'story-article-blog')"
-                                            class="group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all {{ $template === 'story-article-blog' ? 'bg-copper text-midnight shadow-md shadow-copper/10' : 'text-gray-600 hover:bg-gray-50' }}"
+                                            wire:click="$set('template', '{{ $val }}')"
+                                            class="group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all {{ $template === $val ? 'bg-copper text-midnight shadow-md shadow-copper/10' : 'text-gray-600 hover:bg-gray-50' }}"
                                         >
-                                            <span class="text-base transition-transform group-hover:scale-110">📖</span>
-                                            <span class="flex-1 text-left">Article blog</span>
-                                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full {{ $template === 'story-article-blog' ? 'bg-midnight/20 text-midnight' : 'bg-gray-100 text-gray-400' }} uppercase tracking-wider">9:16</span>
+                                            <span class="text-base transition-transform group-hover:scale-110">{{ $icon }}</span>
+                                            <span class="flex-1 text-left">{{ $label }}</span>
+                                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full {{ $template === $val ? 'bg-midnight/20 text-midnight' : 'bg-gray-100 text-gray-400' }} uppercase tracking-wider">9:16</span>
                                         </button>
+                                        @endforeach
                                     </div>
                                 </div>
 
@@ -361,7 +366,7 @@
                                     <input wire:model.live="url" type="text" maxlength="40" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
                                 </div>
 
-                            @elseif($template === 'temoignage')
+                            @elseif($template === 'temoignage' || $template === 'story-temoignage')
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-600 mb-1">Témoignage</label>
                                     <textarea wire:model.live="quote" rows="3" maxlength="160" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
@@ -653,6 +658,7 @@
                                             'hero' => '💎',
                                             'article-blog' => '📰',
                                             'story-article-blog' => '📖',
+                                            'story-temoignage'   => '⭐',
                                             default => '📄'
                                         } }}
                                     </div>
@@ -746,6 +752,8 @@
                                                     <x-postelio-instagram.article-blog :tag="$article_blog_tag" :title="$article_blog_title" :excerpt="$article_blog_excerpt" :cta="$article_blog_cta" :url="$article_blog_url" :image_url="$uploadImage1 ? $uploadImage1->temporaryUrl() : null" />
                                                 @elseif($template === 'story-article-blog')
                                                     <x-postelio-instagram.story-article-blog :tag="$article_blog_tag" :title="$article_blog_title" :excerpt="$article_blog_excerpt" :cta="$article_blog_cta" :url="$article_blog_url" />
+                                                @elseif($template === 'story-temoignage')
+                                                    <x-postelio-instagram.story-temoignage :quote="$quote" :author="$author" :profession="$profession" :stars="$stars" />
                                                 @elseif($template === 'chantier')
                                                     <x-postelio-instagram.chantier 
                                                         :tag="$photo_tag" 

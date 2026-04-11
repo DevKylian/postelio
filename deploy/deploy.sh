@@ -98,7 +98,12 @@ FRONTEND_REGEX="(resources/|lang/|app/View/|app/Livewire/|package|vite\.config|t
 log "Vérification des changements frontend..."
 # On utilise une sous-shell et || true pour ne pas crash le script si grep ne trouve rien
 FRONTEND_FILES=$(git diff "${PREV_COMMIT}" "${NEW_COMMIT}" --name-only 2>/dev/null | grep -E "$FRONTEND_REGEX" || true)
-FRONTEND_CHANGED=$(echo "$FRONTEND_FILES" | grep -v '^$' | wc -l)
+
+if [ -z "$FRONTEND_FILES" ]; then
+    FRONTEND_CHANGED=0
+else
+    FRONTEND_CHANGED=$(echo "$FRONTEND_FILES" | wc -l)
+fi
 
 # On force aussi si le dossier build est manquant
 if [ ! -d "public/build" ]; then

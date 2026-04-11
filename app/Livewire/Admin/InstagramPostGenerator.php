@@ -117,7 +117,7 @@ class InstagramPostGenerator extends Component
     public string $photo_caption  = '';
 
     // ── Image-based templates ─────────────────────────────────────────────────
-    private const IMAGE_TEMPLATES = ['avantapres', 'appmockup', 'feature-app', 'article-blog', 'story-article-blog'];
+    private const IMAGE_TEMPLATES = ['avantapres', 'appmockup', 'feature-app', 'article-blog'];
 
     public function mount(): void
     {

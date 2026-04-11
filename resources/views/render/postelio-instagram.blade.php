@@ -143,12 +143,11 @@
             />
         @elseif($template === 'story-article-blog')
             <x-postelio-instagram.story-article-blog
-                :tag="$data['tag'] ?? 'NOUVEL ARTICLE'"
+                :tag="$data['tag'] ?? 'ARTICLE DE BLOG'"
                 :title="$data['title'] ?? ''"
                 :excerpt="$data['excerpt'] ?? ''"
                 :cta="$data['cta'] ?? 'Lire l\'article'"
                 :url="$data['url'] ?? 'postelio.fr/blog'"
-                :image_url="$data['image_url'] ?? $data['image1_b64'] ?? null"
             />
         @elseif($template === 'feature-app')
             <x-postelio-instagram.feature-app

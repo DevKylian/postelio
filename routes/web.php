@@ -27,6 +27,9 @@ Route::view('/mentions-legales', 'legal.mentions')->name('legal.mentions');
 Route::view('/cgv', 'legal.cgv')->name('legal.cgv');
 Route::view('/politique-confidentialite', 'legal.confidentialite')->name('legal.confidentialite');
 
+// Contact page (public)
+Route::view('/contact', 'contact')->name('contact');
+
 // Stripe webhooks (no CSRF verification)
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])
     ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class)

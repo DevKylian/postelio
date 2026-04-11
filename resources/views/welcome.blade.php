@@ -2863,7 +2863,7 @@
             <li><a href="{{ route('legal.cgv') }}" class="hover:text-copper transition-colors font-light">CGV</a></li>
             <li><a href="{{ route('legal.confidentialite') }}"
                 class="hover:text-copper transition-colors font-light">Confidentialité</a></li>
-            <li><a href="mailto:hello@postelio.fr" class="hover:text-copper transition-colors font-light">Contact</a>
+            <li><a href="{{ route('contact') }}" class="hover:text-copper transition-colors font-light">Contact</a>
             </li>
           </ul>
         </div>

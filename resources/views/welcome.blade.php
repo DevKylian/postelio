@@ -2391,9 +2391,16 @@
       // Basic: 19€/mo, 15€/mo yearly
       $__basicMonthlyD = round(19 * (1 - $__promo['discount'] / 100));
       $__basicYearlyD  = round(15 * (1 - $__promo['discount'] / 100));
+      $__basicMonthlySaved = 19 - $__basicMonthlyD;
+      $__basicAnnualSaved  = (19 * 12) - ($__basicYearlyD * 12);
+      $__basicYearlyTotalBilled = $__promo['active'] ? ($__basicYearlyD * 12) : 180;
+
       // Pro: 29€/mo, 23€/mo yearly
       $__proMonthlyD   = round(29 * (1 - $__promo['discount'] / 100));
       $__proYearlyD    = round(23 * (1 - $__promo['discount'] / 100));
+      $__proMonthlySaved = 29 - $__proMonthlyD;
+      $__proAnnualSaved  = (29 * 12) - ($__proYearlyD * 12);
+      $__proYearlyTotalBilled = $__promo['active'] ? ($__proYearlyD * 12) : 280;
     @endphp
     <section id="tarifs" class="py-32 relative" x-data="{ billingPeriod: 'monthly' }">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -2441,28 +2448,36 @@
 
               <div class="h-px bg-slate-100 mb-8"></div>
 
-              <ul class="space-y-4 mb-10 flex-grow">
-                @foreach(["Jusqu'à 2 posts par mois", "1 version générée par post", "Modèles de posts standards", "Historique des posts sur 7 jours", "Support par email"] as $feature)
-                  <li class="flex items-start gap-3">
-                    <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
-                      <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span class="text-xs font-medium text-slate-600 leading-relaxed">{{ $feature }}</span>
-                  </li>
+              <div class="mb-10 flex-grow flex flex-col gap-6">
+                @foreach(config('subscription.plans.free.features') as $section => $features)
+                  <div>
+                    <h4 class="text-[10px] font-bold text-midnight uppercase tracking-widest mb-3">{{ $section }}</h4>
+                    <ul class="space-y-3">
+                      @foreach($features as $feature)
+                        @if($feature['enabled'])
+                          <li class="flex items-start gap-3">
+                            <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-copper/10 flex items-center justify-center">
+                              <svg class="w-2.5 h-2.5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                            <span class="text-xs font-medium text-slate-600 leading-relaxed">{!! $feature['name'] !!}</span>
+                          </li>
+                        @else
+                          <li class="flex items-start gap-3 opacity-60">
+                            <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center">
+                              <svg class="w-2.5 h-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </div>
+                            <span class="text-xs font-medium text-slate-400 leading-relaxed line-through">{!! $feature['name'] !!}</span>
+                          </li>
+                        @endif
+                      @endforeach
+                    </ul>
+                  </div>
                 @endforeach
-                @foreach(["Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium", "Support prioritaire dédié"] as $feature)
-                  <li class="flex items-start gap-3 opacity-70">
-                    <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center">
-                      <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </div>
-                    <span class="text-xs font-medium text-slate-500 leading-relaxed line-through">{{ $feature }}</span>
-                  </li>
-                @endforeach
-              </ul>
+              </div>
 
               <div class="mt-auto">
                 @auth
@@ -2497,7 +2512,10 @@
                 <div class="flex items-center gap-2 mb-1">
                   <h3 class="text-xl font-bold text-midnight">Basic</h3>
                   @if($__promo['active'])
-                    <span class="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">-{{ $__promo['discount'] }}%</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest bg-gradient-to-r from-copper to-amber-500 text-white shadow-md shadow-copper/20 px-2.5 py-0.5 rounded-full ring-2 ring-white/50 relative overflow-hidden group">
+                        <span class="absolute inset-0 bg-white/20 translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-500"></span>
+                        -{{ $__promo['discount'] }}%
+                    </span>
                   @endif
                 </div>
                 <div class="mt-4 flex items-baseline gap-2">
@@ -2512,35 +2530,50 @@
                   @endif
                   <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
                 </div>
+                @if($__promo['active'])
+                  <div class="mt-1 flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100/50 px-2 py-0.5 rounded-lg w-fit">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                    <span>Économisez <span x-text="billingPeriod === 'yearly' ? '{{ $__basicAnnualSaved }}€ / an' : '{{ $__basicMonthlySaved }}€ / mois'">{{ $__basicMonthlySaved }}€ / mois</span></span>
+                  </div>
+                @endif
+
                 <template x-if="billingPeriod === 'yearly'">
-                  <p class="text-xs text-gray-400 mt-1">soit 180€ facturé par an</p>
+                  <p class="text-xs text-gray-400 mt-1">soit {{ $__basicYearlyTotalBilled }}€ facturé par an</p>
                 </template>
               </div>
 
               <div class="h-px bg-slate-100 mb-8"></div>
 
-              <ul class="space-y-4 mb-10 flex-grow">
-                @foreach(["Jusqu'à 15 posts par mois", "2 versions générées par post au choix", "Modèles de posts standards", "Historique des posts sur 30 jours", "Support prioritaire dédié"] as $feature)
-                  <li class="flex items-start gap-3">
-                    <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
-                      <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span class="text-xs font-medium text-slate-600 leading-relaxed">{{ $feature }}</span>
-                  </li>
+              <div class="mb-10 flex-grow flex flex-col gap-6">
+                @foreach(config('subscription.plans.basic.features') as $section => $features)
+                  <div>
+                    <h4 class="text-[10px] font-bold text-midnight uppercase tracking-widest mb-3">{{ $section }}</h4>
+                    <ul class="space-y-3">
+                      @foreach($features as $feature)
+                        @if($feature['enabled'])
+                          <li class="flex items-start gap-3">
+                            <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-copper/10 flex items-center justify-center">
+                              <svg class="w-2.5 h-2.5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                            <span class="text-xs font-medium text-slate-600 leading-relaxed">{!! $feature['name'] !!}</span>
+                          </li>
+                        @else
+                          <li class="flex items-start gap-3 opacity-60">
+                            <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center">
+                              <svg class="w-2.5 h-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </div>
+                            <span class="text-xs font-medium text-slate-400 leading-relaxed line-through">{!! $feature['name'] !!}</span>
+                          </li>
+                        @endif
+                      @endforeach
+                    </ul>
+                  </div>
                 @endforeach
-                @foreach(["Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium"] as $feature)
-                  <li class="flex items-start gap-3 opacity-70">
-                    <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center">
-                      <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </div>
-                    <span class="text-xs font-medium text-slate-500 leading-relaxed line-through">{{ $feature }}</span>
-                  </li>
-                @endforeach
-              </ul>
+              </div>
 
               <div class="mt-auto">
                 @auth
@@ -2582,7 +2615,10 @@
                 <div class="flex items-center gap-2 mb-1">
                   <h3 class="text-xl font-bold text-midnight">Professionnel</h3>
                   @if($__promo['active'])
-                    <span class="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">-{{ $__promo['discount'] }}%</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest bg-gradient-to-r from-copper to-amber-500 text-white shadow-md shadow-copper/20 px-2.5 py-0.5 rounded-full ring-2 ring-white/50 relative overflow-hidden group">
+                        <span class="absolute inset-0 bg-white/20 translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-500"></span>
+                        -{{ $__promo['discount'] }}%
+                    </span>
                   @endif
                 </div>
                 <div class="mt-4 flex items-baseline gap-2">
@@ -2597,25 +2633,50 @@
                   @endif
                   <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
                 </div>
+                @if($__promo['active'])
+                  <div class="mt-1 flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100/50 px-2 py-0.5 rounded-lg w-fit">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                    <span>Économisez <span x-text="billingPeriod === 'yearly' ? '{{ $__proAnnualSaved }}€ / an' : '{{ $__proMonthlySaved }}€ / mois'">{{ $__proMonthlySaved }}€ / mois</span></span>
+                  </div>
+                @endif
+
                 <template x-if="billingPeriod === 'yearly'">
-                  <p class="text-xs text-gray-400 mt-1">soit 280€ facturé par an</p>
+                  <p class="text-xs text-gray-400 mt-1">soit {{ $__proYearlyTotalBilled }}€ facturé par an</p>
                 </template>
               </div>
 
               <div class="h-px bg-slate-100 mb-8"></div>
 
-              <ul class="space-y-4 mb-10 flex-grow">
-                @foreach(["Jusqu'à 30 posts par mois", "3 versions générées par post au choix", "Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium", "Historique des posts illimité", "Support prioritaire dédié"] as $feature)
-                  <li class="flex items-start gap-3">
-                    <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
-                      <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span class="text-xs font-medium text-slate-600 leading-relaxed">{{ $feature }}</span>
-                  </li>
+              <div class="mb-10 flex-grow flex flex-col gap-6">
+                @foreach(config('subscription.plans.pro.features') as $section => $features)
+                  <div>
+                    <h4 class="text-[10px] font-bold text-midnight uppercase tracking-widest mb-3">{{ $section }}</h4>
+                    <ul class="space-y-3">
+                      @foreach($features as $feature)
+                        @if($feature['enabled'])
+                          <li class="flex items-start gap-3">
+                            <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-copper/10 flex items-center justify-center">
+                              <svg class="w-2.5 h-2.5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                            <span class="text-xs font-medium text-slate-600 leading-relaxed">{!! $feature['name'] !!}</span>
+                          </li>
+                        @else
+                          <li class="flex items-start gap-3 opacity-60">
+                            <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center">
+                              <svg class="w-2.5 h-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </div>
+                            <span class="text-xs font-medium text-slate-400 leading-relaxed line-through">{!! $feature['name'] !!}</span>
+                          </li>
+                        @endif
+                      @endforeach
+                    </ul>
+                  </div>
                 @endforeach
-              </ul>
+              </div>
 
               <div class="mt-auto">
                 @auth

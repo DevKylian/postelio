@@ -21,19 +21,24 @@ return [
             'price' => 0,
             'yearly_price' => 0,
             'features' => [
-                'Jusqu\'à 2 posts par mois',
-                '1 version générée par post',
-                'Modèles de posts standards',
-                'Historique des posts sur 7 jours',
-                'Support par email',
+                'Création' => [
+                    ['name' => 'Jusqu\'à <b>2 posts</b> par mois', 'enabled' => true],
+                    ['name' => '<b>1 version</b> générée par post', 'enabled' => true],
+                    ['name' => 'Modèles de posts <b>standards</b>', 'enabled' => true],
+                    ['name' => 'Accès aux modèles <b>premium</b>', 'enabled' => false],
+                ],
+                'Diffusion' => [
+                    ['name' => 'Publication <b>automatique</b> sur vos réseaux', 'enabled' => false],
+                    ['name' => '<b>Planification</b> et <b>programmation</b> des posts', 'enabled' => false],
+                ],
+                'Suivi & Support' => [
+                    ['name' => '<b>Analytics</b> de vos réseaux sociaux', 'enabled' => false],
+                    ['name' => 'Historique des posts sur <b>7 jours</b>', 'enabled' => true],
+                    ['name' => 'Support par <b>email</b>', 'enabled' => true],
+                    ['name' => 'Support <b>prioritaire dédié</b>', 'enabled' => false],
+                ],
             ],
-            'disabled_features' => [
-                'Publication automatique sur vos réseaux',
-                'Planification et programmation des posts',
-                'Analytics de vos réseaux sociaux',
-                'Accès aux modèles premium',
-                'Support prioritaire dédié',
-            ],
+            'disabled_features' => [],
         ],
         'basic' => [
             'name' => 'Basic',
@@ -44,18 +49,23 @@ return [
             'price' => 19,
             'yearly_price' => 180,
             'features' => [
-                'Jusqu\'à 15 posts par mois',
-                '2 versions générées par post au choix',
-                'Modèles de posts standards',
-                'Historique des posts sur 30 jours',
-                'Support prioritaire dédié',
+                'Création' => [
+                    ['name' => 'Jusqu\'à <b>15 posts</b> par mois', 'enabled' => true],
+                    ['name' => '<b>2 versions</b> générées par post au choix', 'enabled' => true],
+                    ['name' => 'Modèles de posts <b>standards</b>', 'enabled' => true],
+                    ['name' => 'Accès aux modèles <b>premium</b>', 'enabled' => false],
+                ],
+                'Diffusion' => [
+                    ['name' => 'Publication <b>automatique</b> sur vos réseaux', 'enabled' => false],
+                    ['name' => '<b>Planification</b> et <b>programmation</b> des posts', 'enabled' => false],
+                ],
+                'Suivi & Support' => [
+                    ['name' => '<b>Analytics</b> de vos réseaux sociaux', 'enabled' => false],
+                    ['name' => 'Historique des posts sur <b>30 jours</b>', 'enabled' => true],
+                    ['name' => 'Support <b>prioritaire dédié</b>', 'enabled' => true],
+                ],
             ],
-            'disabled_features' => [
-                'Publication automatique sur vos réseaux',
-                'Planification et programmation des posts',
-                'Analytics de vos réseaux sociaux',
-                'Accès aux modèles premium',
-            ],
+            'disabled_features' => [],
         ],
         'pro' => [
             'name' => 'Professionnel',
@@ -66,16 +76,23 @@ return [
             'price' => 29,
             'yearly_price' => 280,
             'features' => [
-                'Jusqu\'à 30 posts par mois',
-                '3 versions générées par post au choix',
-                'Publication automatique sur vos réseaux',
-                'Planification et programmation des posts',
-                'Analytics de vos réseaux sociaux',
-                'Accès aux modèles premium',
-                'Historique des posts illimité',
-                'Support prioritaire dédié',
+                'Création' => [
+                    ['name' => 'Jusqu\'à <b>30 posts</b> par mois', 'enabled' => true],
+                    ['name' => '<b>3 versions</b> générées par post au choix', 'enabled' => true],
+                    ['name' => 'Accès aux modèles <b>premium</b>', 'enabled' => true],
+                ],
+                'Diffusion' => [
+                    ['name' => 'Publication <b>automatique</b> sur vos réseaux', 'enabled' => true],
+                    ['name' => '<b>Planification</b> et <b>programmation</b> des posts', 'enabled' => true],
+                ],
+                'Suivi & Support' => [
+                    ['name' => '<b>Analytics</b> de vos réseaux sociaux', 'enabled' => true],
+                    ['name' => 'Historique des posts <b>illimité</b>', 'enabled' => true],
+                    ['name' => 'Support <b>prioritaire dédié</b>', 'enabled' => true],
+                ],
             ],
             'disabled_features' => [],
+
         ],
     ],
 

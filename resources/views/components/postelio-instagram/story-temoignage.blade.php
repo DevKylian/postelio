@@ -36,9 +36,6 @@
     {{-- ░░ Left amber bar — full height ░░ --}}
     <div style="position:absolute;top:0;left:0;width:5px;height:640px;background:linear-gradient(180deg,#FACC15,#F59E0B,#D97706);"></div>
 
-    {{-- ░░ Decorative large quote mark (background) ░░ --}}
-    <div style="position:absolute;top:80px;right:14px;font-size:220px;font-weight:900;line-height:1;color:rgba(245,158,11,0.05);font-family:'Outfit',sans-serif;user-select:none;">"</div>
-
     {{-- ══════════════════════════════════════════════
          TOP AREA (y: 14) — light branding only
     ══════════════════════════════════════════════ --}}

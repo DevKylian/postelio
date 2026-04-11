@@ -717,7 +717,7 @@ class InstagramPostGenerator extends Component
 
     private function fillTemoignage(array $d): void
     {
-        $this->quote      = $d['quote']      ?? '';
+        $this->quote      = $d['quote'] ?? $d['body'] ?? $d['title'] ?? '';
         $this->author     = $d['author']     ?? 'Marc D.';
         $this->profession = $d['profession'] ?? 'Artisan';
         $this->stars      = (int) ($d['stars'] ?? 5);

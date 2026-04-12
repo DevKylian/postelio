@@ -169,7 +169,13 @@ class PostList extends Component
     {
         $post = Post::where('id', $postId)->where('user_id', Auth::id())->first();
 
-        if (!$post || !$post->zernio_id) {
+        if (!$post) {
+            session()->flash('error', 'Post non trouvé.');
+            return;
+        }
+
+        if (!$post->zernio_id) {
+            session()->flash('info', 'Ce post n\'a pas encore d\'identifiant Zernio.');
             return;
         }
 
@@ -190,10 +196,14 @@ class PostList extends Component
                     $post->status = Post::STATUS_FAILED;
                     $post->save();
                     session()->flash('error', 'Le post a échoué sur Zernio.');
+                } else {
+                    session()->flash('info', 'Statut Zernio actuel : ' . $zStatus);
                 }
+            } else {
+                session()->flash('error', 'Aucune donnée reçue de Zernio.');
             }
         } catch (\Throwable $e) {
-            // Silently fail or log minimal error in production
+            session()->flash('error', 'Erreur API : ' . $e->getMessage());
         }
     }
 

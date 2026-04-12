@@ -160,9 +160,9 @@ function cityAutocomplete(initialCity, wireCity, wirePostal, wireContext) {
             this.highlightedIndex = -1;
 
             // Update Livewire component properties
-            $wire.set(wireCity,    result.city);
-            $wire.set(wirePostal,  result.postcode);
-            $wire.set(wireContext, result.context);
+            this.$wire.set(wireCity,    result.city);
+            this.$wire.set(wirePostal,  result.postcode);
+            this.$wire.set(wireContext, result.context);
         },
 
         highlight(direction) {

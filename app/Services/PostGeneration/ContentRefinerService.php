@@ -92,7 +92,11 @@ class ContentRefinerService
             . "N'invente jamais de noms, prénoms, chiffres, dates, réalisations ou détails absents du vocal.\n"
             . "Si le mémo est court ou vague, génère un post court et sobre qui reste dans ce cadre — "
             . "ne complète JAMAIS avec du contenu inventé pour le rendre plus complet.\n"
-            . "Adapte la longueur et la richesse de la légende à la richesse du mémo vocal : mémo court = légende courte.\n\n";
+            . "Adapte la longueur et la richesse de la légende à la richesse du mémo vocal : mémo court = légende courte.\n"
+            . "EXCEPTION OBLIGATOIRE — Noms de communes : La transcription vocale (Whisper) déforme souvent les noms "
+            . "de villes (ex: 'saint-néomai', 'chiré', 'aifre'). Ces formes phonétiques NE SONT PAS des informations "
+            . "fiables. Tu DOIS les corriger en utilisant le nom officiel exact fourni dans la liste des communes "
+            . "ci-dessus. Cette correction n'est PAS une invention : c'est une normalisation orthographique obligatoire.\n\n";
 
         // ── 2. Format rules ──
         $prompt .= "RÈGLE DE FORMAT STRICTE :\n"
@@ -187,6 +191,7 @@ class ContentRefinerService
         $prompt .= "- Les champs image (image_text, title, slides) ne doivent JAMAIS contenir de hashtags, d'emojis ni de numéros d'étape.\n";
         $prompt .= "- Respecte EXACTEMENT les limites de caractères. COMPTE avant de répondre.\n";
         $prompt .= "- Chaque texte doit avoir du SENS seul — jamais une phrase coupée au milieu.\n";
+        $prompt .= $this->citySpellingReminder($options);
 
         if ($photoCount > 0 && $spec['type'] === 'carousel') {
              $prompt .= "- Nous avons {$photoCount} photos. Adapte le nombre de slides en conséquence.\n";
@@ -330,7 +335,11 @@ class ContentRefinerService
             . "N'invente jamais de noms, prénoms, chiffres, dates, réalisations ou détails absents du vocal.\n"
             . "Si le mémo est court ou vague, génère un post court et sobre qui reste dans ce cadre — "
             . "ne complète JAMAIS avec du contenu inventé pour le rendre plus complet.\n"
-            . "Adapte la longueur et la richesse de la légende à la richesse du mémo vocal : mémo court = légende courte.\n\n";
+            . "Adapte la longueur et la richesse de la légende à la richesse du mémo vocal : mémo court = légende courte.\n"
+            . "EXCEPTION OBLIGATOIRE — Noms de communes : La transcription vocale (Whisper) déforme souvent les noms "
+            . "de villes (ex: 'saint-néomai', 'chiré', 'aifre'). Ces formes phonétiques NE SONT PAS des informations "
+            . "fiables. Tu DOIS les corriger en utilisant le nom officiel exact fourni dans la liste des communes "
+            . "ci-dessus. Cette correction n'est PAS une invention : c'est une normalisation orthographique obligatoire.\n\n";
 
         $noMarkdownPrefix = "RÈGLE DE FORMAT STRICTE :\n"
             . "- Jamais de Markdown : aucun **, aucun *, aucun _, aucun #. Instagram n'en supporte pas.\n"
@@ -374,7 +383,8 @@ class ContentRefinerService
 
         $prompt .= "\n\n" . $this->captionStructureInstruction($options);
         $prompt .= "\n\n" . $this->hashtagInstruction($includeHashtags, $options);
-        
+        $prompt .= $this->citySpellingReminder($options);
+
         $prompt .= "\n\nRÉPONDS UNIQUEMENT PAR CE JSON :\n";
         $prompt .= "{\n  \"caption\": \"La légende suivant STRICTEMENT la structure ci-dessus.\",\n  \"image_text\": \"Titre accrocheur ({$imgConstraint})\"\n}";
 
@@ -612,6 +622,37 @@ IMPORTANT : Ne sors RIEN d'autre que du JSON. Sois précis sur les catégories."
         }
 
         return $str;
+    }
+
+    /**
+     * Returns a final reminder about city name spelling, placed at the very end of the prompt
+     * so the LLM sees it last (highest recency weight). Repeats the core rule concisely.
+     */
+    private function citySpellingReminder(array $options): string
+    {
+        $nearbyCities = $options['company_nearby'] ?? [];
+        $baseCity     = $options['company_city']   ?? null;
+
+        if (empty($nearbyCities) && !$baseCity) {
+            return '';
+        }
+
+        $reminder = "\n- ORTHOGRAPHE DES VILLES (priorité maximale) : Si la transcription contient un nom de "
+            . "commune mal orthographié ou phonétique (erreur Whisper), corrige-le impérativement avec le nom officiel exact.";
+
+        if (!empty($nearbyCities)) {
+            // Show a compact sample of nearby city names (without postal codes) to make matching easier
+            $names = array_map(fn($c) => preg_replace('/\s*\(\d+\)$/', '', $c), array_slice($nearbyCities, 0, 40));
+            $reminder .= " Communes officielles du secteur : " . implode(', ', $names) . ".";
+        }
+
+        if ($baseCity) {
+            $reminder .= " Si aucune commune proche ne correspond, utilise « {$baseCity} » par défaut.";
+        }
+
+        $reminder .= " Ne jamais écrire une orthographe phonétique dans le post final.\n";
+
+        return $reminder;
     }
 
     private function toneInstruction(string $tone): string

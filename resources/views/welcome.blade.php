@@ -2492,7 +2492,7 @@
                     x-intersect:enter="if(!visibleCtas.includes('plan-starter')) visibleCtas.push('plan-starter')" 
                     x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-starter')"
                     class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-widest block hover:bg-slate-100 transition-colors">
-                    Démarrer gratuitement
+                    Démarrer avec Starter
                   </a>
                 @endauth
               </div>
@@ -2588,7 +2588,7 @@
                     x-intersect:enter="if(!visibleCtas.includes('plan-basic')) visibleCtas.push('plan-basic')" 
                     x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-basic')"
                     class="btn-primary w-full py-4 text-center block !rounded-2xl">
-                    Essayer Basic gratuitement
+                    Choisir le plan Basic
                   </a>
                 @endauth
               </div>

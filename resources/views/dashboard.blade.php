@@ -362,7 +362,7 @@
     $tourSteps = [
         ['target' => null, 'icon' => '👋', 'title' => 'Bienvenue sur Postelio !', 'desc' => 'En deux minutes, je te montre comment tirer le meilleur de l\'outil. Prêt ?'],
         ['target' => '#sidebar', 'icon' => '🗺️', 'title' => 'Menu de navigation', 'desc' => 'Retrouve ici tous tes outils : calendrier, statistiques, et paramètres de compte.', 'position' => 'right'],
-        ['target' => '#tour-generate', 'icon' => '✨', 'title' => 'Génère un post', 'desc' => 'En un clic, crée un post professionnel adapté à ton activité. Postelio rédige, toi tu publies.', 'perm' => 'can_generate_posts'],
+        ['target' => '#tour-generate', 'icon' => '✨', 'title' => 'Génère un post', 'desc' => 'En un clic, crée un post professionnel adapté à ton activité. Postelio rédige et publie même pour toi avec l\'offre Pro.', 'perm' => 'can_generate_posts'],
         ['target' => '#tour-stats', 'icon' => '📊', 'title' => 'Tes statistiques', 'desc' => 'Suis tes posts créés ce mois, cette semaine et l\'état de tes réseaux sociaux en un coup d\'œil.'],
         ['target' => '#tour-posts', 'icon' => '🖼️', 'title' => 'Tes créations', 'desc' => 'Retrouve ici tous tes posts générés. Visualise-les, télécharge-les, ou crée-en de nouveaux.', 'position' => 'top'],
         ['target' => '#tour-quota', 'icon' => '⚡', 'title' => 'Ton quota mensuel', 'desc' => 'Surveille le nombre de générations restantes. Le compteur se remet à zéro chaque mois.', 'position' => 'top'],

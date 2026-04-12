@@ -72,6 +72,7 @@ class ProcessPostGeneration implements ShouldQueue
                 $templateOptions['company_city']    = $company->city;
                 $templateOptions['company_postal']  = $company->postal_code;
                 $templateOptions['company_context'] = $company->city_context;
+                $templateOptions['company_nearby']  = $company->nearby_cities ?? [];
                 $templateOptions['company_name']    = $company->name;
                 $templateOptions['company_trade']   = $company->trade;
                 $templateOptions['company_phone']   = $company->phone;

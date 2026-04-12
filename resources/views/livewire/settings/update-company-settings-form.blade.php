@@ -10,6 +10,7 @@ state([
     'city'              => fn () => auth()->user()->company?->city ?? '',
     'postal_code'       => fn () => auth()->user()->company?->postal_code ?? '',
     'city_context'      => fn () => auth()->user()->company?->city_context ?? '',
+    'nearby_cities'     => fn () => auth()->user()->company?->nearby_cities ?? [],
     'phone'             => fn () => auth()->user()->company?->phone ?? '',
     'email'             => fn () => auth()->user()->company?->email ?? '',
     'website'           => fn () => auth()->user()->company?->website ?? '',
@@ -38,6 +39,7 @@ $updateCompanySettings = function () {
         'city'              => $this->city,
         'postal_code'       => $this->postal_code ?: null,
         'city_context'      => $this->city_context ?: null,
+        'nearby_cities'     => !empty($this->nearby_cities) ? $this->nearby_cities : null,
         'phone'             => $this->phone,
         'email'             => $this->email,
         'website'           => $this->website,
@@ -58,6 +60,7 @@ $updateCompanySettings = function () {
     $this->city              = $user->company->city ?? '';
     $this->postal_code       = $user->company->postal_code ?? '';
     $this->city_context      = $user->company->city_context ?? '';
+    $this->nearby_cities     = $user->company->nearby_cities ?? [];
     $this->phone             = $user->company->phone ?? '';
     $this->email             = $user->company->email ?? '';
     $this->website           = $user->company->website ?? '';
@@ -102,6 +105,7 @@ $updateCompanySettings = function () {
                 wire-city="city"
                 wire-postal="postal_code"
                 wire-context="city_context"
+                wire-nearby="nearby_cities"
                 :current-city="$city"
                 placeholder="Ex : Lannion, Lyon, Bordeaux..."
                 input-class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"

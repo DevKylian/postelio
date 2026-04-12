@@ -557,21 +557,22 @@ IMPORTANT : Ne sors RIEN d'autre que du JSON. Sois précis sur les catégories."
      */
     private function identityInstruction(array $options): string
     {
-        $name       = $options['company_name']    ?? 'Inconnu';
-        $city       = $options['company_city']    ?? 'France';
-        $postalCode = $options['company_postal']  ?? null;
-        $context    = $options['company_context'] ?? null; // "22, Côtes-d'Armor, Bretagne"
-        $trade      = $options['company_trade']   ?? 'Artisan';
-        $phone      = $options['company_phone']   ?? null;
-        $email      = $options['company_email']   ?? null;
+        $name        = $options['company_name']    ?? 'Inconnu';
+        $city        = $options['company_city']    ?? 'France';
+        $postalCode  = $options['company_postal']  ?? null;
+        $context     = $options['company_context'] ?? null; // "79, Deux-Sèvres, Nouvelle-Aquitaine"
+        $nearbyCities = $options['company_nearby'] ?? [];   // ["Sainte-Néomaye (79260)", "Aiffres (79230)", ...]
+        $trade       = $options['company_trade']   ?? 'Artisan';
+        $phone       = $options['company_phone']   ?? null;
+        $email       = $options['company_email']   ?? null;
 
-        // Build a rich location string: "Lannion (22300) — Côtes-d'Armor, Bretagne"
+        // Build a rich location string: "Niort (79000) — Deux-Sèvres, Nouvelle-Aquitaine"
         $locationStr = $city;
         if ($postalCode) {
             $locationStr .= " ({$postalCode})";
         }
         if ($context) {
-            // context is "22, Côtes-d'Armor, Bretagne" — strip the dept number prefix
+            // context is "79, Deux-Sèvres, Nouvelle-Aquitaine" — strip the dept number prefix
             $contextParts = array_map('trim', explode(',', $context, 2));
             $locationStr .= " — " . ($contextParts[1] ?? $context);
         }
@@ -584,16 +585,30 @@ IMPORTANT : Ne sors RIEN d'autre que du JSON. Sois précis sur les catégories."
         if ($phone) $str .= "\n- TÉLÉPHONE : {$phone}";
         if ($email) $str .= "\n- EMAIL : {$email}";
 
-        // Geographic context instruction: help AI recognise approximate city names from voice
-        if ($postalCode || $context) {
-            $str .= "\n\n═══ GÉOGRAPHIE (CRITIQUE POUR LES VILLES) ═══\n"
-                . "L'artisan est basé à {$locationStr}. "
-                . "Quand le vocal mentionne une commune sous une forme approximative ou phonétique "
-                . "(ex: 'Péros' pour Perros-Guirec, 'Lannion' au lieu de Lannion-Trégor, etc.), "
-                . "tu DOIS identifier et écrire le nom officiel exact de la commune française la plus "
-                . "probable dans cette région. "
-                . "N'écris JAMAIS une orthographe inventée ou phonétique d'une ville : utilise toujours "
-                . "le nom officiel tel qu'il apparaît sur La Poste ou sur les panneaux routiers.";
+        // Geographic context: provide the real list of nearby communes so the AI can
+        // resolve phonetic/approximated city names from Whisper transcriptions.
+        $str .= "\n\n═══ GÉOGRAPHIE — COMMUNES DU SECTEUR (CRITIQUE) ═══\n"
+            . "L'artisan est basé à {$locationStr}.\n";
+
+        if (!empty($nearbyCities)) {
+            $communeList = implode(', ', array_slice($nearbyCities, 0, 50));
+            $str .= "Communes dans un rayon de 35 km (liste officielle issue de l'API gouvernementale) :\n"
+                . $communeList . "\n\n"
+                . "RÈGLE ABSOLUE — Orthographe des villes :\n"
+                . "Quand le vocal mentionne une commune sous une forme phonétique ou approximative "
+                . "(erreur de transcription Whisper), tu DOIS chercher dans la liste ci-dessus la correspondance "
+                . "la plus plausible et utiliser UNIQUEMENT le nom officiel exact.\n"
+                . "Exemples de correction attendus :\n"
+                . "- 'saint-néomai' ou 'saint néomé' → Sainte-Néomaye\n"
+                . "- 'aifre' → Aiffres\n"
+                . "- 'chiré' → Échiré\n"
+                . "N'écris JAMAIS une orthographe phonétique ou inventée d'une ville. "
+                . "Si aucune commune proche ne correspond, utilise {$city} par défaut.";
+        } else {
+            $str .= "RÈGLE ABSOLUE — Orthographe des villes :\n"
+                . "N'écris JAMAIS une orthographe phonétique ou inventée d'une ville. "
+                . "Utilise toujours le nom officiel français exact tel qu'il apparaît "
+                . "sur les panneaux routiers ou sur La Poste.";
         }
 
         return $str;

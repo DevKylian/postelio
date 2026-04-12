@@ -12,6 +12,9 @@ class Company extends Model
         'city',
         'postal_code',
         'city_context',
+        'city_lat',
+        'city_lng',
+        'nearby_cities',
         'phone',
         'email',
         'website',
@@ -38,6 +41,7 @@ class Company extends Model
 
     protected $casts = [
         'instagram_token_expires_at' => 'datetime',
+        'nearby_cities'              => 'array',
     ];
 
     public function getInstagramConnectedAttribute(): bool

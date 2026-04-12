@@ -232,6 +232,24 @@
                         </div>
                     </div>
                 </a>
+
+                <!-- Live Activity Monitor -->
+                <a href="{{ route('admin.activity') }}" wire:navigate class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:border-gray-200 transition-all group">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-midnight">Live Activity</h3>
+                                <p class="text-xs text-gray-400">Monitoring temps réel des requêtes.</p>
+                            </div>
+                        </div>
+                        <div class="text-gray-300 group-hover:text-midnight transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </div>
+                    </div>
+                </a>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">

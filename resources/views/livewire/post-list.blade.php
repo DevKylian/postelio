@@ -1,28 +1,4 @@
 <div @if($hasPendingPosts) wire:poll.5s @endif>
-    <!-- Messages Flash -->
-    @if (session()->has('success') || session()->has('error') || session()->has('info'))
-        <div class="mb-6">
-            @if (session('success'))
-                <div class="p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-xl text-sm font-semibold flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                    {{ session('success') }}
-                </div>
-            @endif
-            @if (session('error'))
-                <div class="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-semibold flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                    {{ session('error') }}
-                </div>
-            @endif
-            @if (session('info'))
-                <div class="p-4 bg-blue-50 border border-blue-100 text-blue-600 rounded-xl text-sm font-semibold flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    {{ session('info') }}
-                </div>
-            @endif
-        </div>
-    @endif
-
     @if($posts->isEmpty())
         <div class="flex flex-col items-center justify-center py-24 text-center">
             <div class="w-20 h-20 bg-white rounded-3xl border border-gray-100 shadow-sm flex items-center justify-center mb-5">

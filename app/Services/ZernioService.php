@@ -145,8 +145,11 @@ class ZernioService
             throw new \RuntimeException('Zernio publish failed: ' . $response->body());
         }
 
-        $zernioId = $response->json('post._id');
-        $post->update(['zernio_id' => $zernioId]);
+        $zernioId = $response->json('post.id') ?? $response->json('post._id') ?? $response->json('id') ?? $response->json('_id');
+        
+        if ($zernioId) {
+            $post->update(['zernio_id' => $zernioId]);
+        }
 
         return $zernioId ?? '';
     }

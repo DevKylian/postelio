@@ -190,7 +190,7 @@ class ProcessPostGeneration implements ShouldQueue
     {
         $knownTerms = array_filter([
             $company->city,
-            $company->name,
+            // Exclu : $company->name pour éviter de remplacer les verbes "rénover" par le nom propre
         ]);
 
         // Also include nearby cities so minor fuzzy deformations are caught
@@ -221,7 +221,7 @@ class ProcessPostGeneration implements ShouldQueue
 
         $knownTerms = array_filter([
             $company->city,
-            $company->name,
+            // Exclu : $company->name pour éviter de remplacer les verbes "rénover" par le nom propre dans le JSON final
         ]);
 
         foreach ($data as $key => $value) {

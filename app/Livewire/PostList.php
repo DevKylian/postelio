@@ -179,20 +179,28 @@ class PostList extends Component
             if ($zernioPost) {
                 // Try to find status at root or in nested post key
                 $zStatus = $zernioPost['status'] ?? $zernioPost['post']['status'] ?? null;
+                $zStatus = strtolower((string) $zStatus);
                 
                 Log::info("Manual Status Refresh for Post #{$post->id}", ['zernio_status' => $zStatus]);
 
-                if ($zStatus === 'published' || $zStatus === 'posted' || $zStatus === 'success') {
-                    $post->update(['status' => Post::STATUS_PUBLISHED]);
-                    session()->flash('success', 'Statut mis à jour : le post est bien en ligne !');
-                } elseif ($zStatus === 'failed' || $zStatus === 'error') {
-                    $post->update(['status' => Post::STATUS_FAILED]);
+                if (in_array($zStatus, ['published', 'posted', 'success'])) {
+                    $post->status = Post::STATUS_PUBLISHED;
+                    if ($post->save()) {
+                        Log::info("Post #{$post->id} successfully updated to published.");
+                        session()->flash('success', 'Statut mis à jour : le post est bien en ligne !');
+                    } else {
+                        Log::error("Failed to save status for Post #{$post->id}");
+                        session()->flash('error', 'Erreur lors de la sauvegarde en base de données.');
+                    }
+                } elseif (in_array($zStatus, ['failed', 'error'])) {
+                    $post->status = Post::STATUS_FAILED;
+                    $post->save();
                     session()->flash('error', 'Le post a échoué sur Zernio.');
                 } else {
                     session()->flash('info', "Le post est en statut '{$zStatus}' sur Zernio.");
                 }
             } else {
-                session()->flash('error', 'Impossible de récupérer le statut depuis Zernio.');
+                session()->flash('error', 'Zernio n\'a pas renvoyé de données pour ce post.');
             }
         } catch (\Throwable $e) {
             session()->flash('error', 'Erreur lors de la synchro : ' . $e->getMessage());

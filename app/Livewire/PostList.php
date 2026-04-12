@@ -210,7 +210,7 @@ class PostList extends Component
     public function render()
     {
         $posts = Post::where('user_id', Auth::id())
-            ->whereIn('status', ['pending', 'processing', 'review_pending', 'completed'])
+            ->whereIn('status', ['pending', 'processing', 'review_pending', 'completed', 'published'])
             ->latest()
             ->get();
 

@@ -163,9 +163,15 @@ class PostGenerator extends Component
             $path = $this->audio->store('temp_memos', 'public');
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] File stored', ['path' => $path]);
 
-            // 2. Transcribe
+            // 2. Transcribe — prime Whisper with nearby commune names so it spells them correctly
             $transcriber = app(\App\Services\PostGeneration\TranscriptionService::class);
-            $transcript = $transcriber->transcribe($path);
+            $company     = Auth::user()->company;
+            $geoPrompt   = \App\Services\PostGeneration\TranscriptionService::buildGeoPrompt(
+                $company?->city,
+                $company?->postal_code,
+                $company?->nearby_cities ?? []
+            );
+            $transcript = $transcriber->transcribe($path, $geoPrompt);
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Transcription finished', ['length' => strlen($transcript)]);
 
             // 3. Pré-remplir le champ texte avec la transcription brute

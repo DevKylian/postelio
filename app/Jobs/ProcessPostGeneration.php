@@ -53,7 +53,12 @@ class ProcessPostGeneration implements ShouldQueue
                     $transcript = $textContent;
                 } elseif ($audioPath) {
                     Log::info("Starting transcription from audio file", ['path' => $audioPath]);
-                    $transcript = $transcriber->transcribe($audioPath);
+                    $geoPrompt = \App\Services\PostGeneration\TranscriptionService::buildGeoPrompt(
+                        $company?->city,
+                        $company?->postal_code,
+                        $company?->nearby_cities ?? []
+                    );
+                    $transcript = $transcriber->transcribe($audioPath, $geoPrompt);
                     Log::info("Transcription finished", ['length' => strlen($transcript)]);
                 } else {
                     throw new Exception("Aucun contenu (audio ou texte) fourni pour la génération.");

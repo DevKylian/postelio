@@ -167,8 +167,21 @@ class PostList extends Component
      */
     public function refreshStatus(Post $post)
     {
+        Log::info("refreshStatus called for Post #{$post->id}", [
+            'zernio_id_model' => $post->zernio_id,
+            'user_id_model' => $post->user_id,
+            'auth_id' => Auth::id()
+        ]);
+
         $post = $post->fresh();
+        
+        Log::info("refreshStatus data after fresh()", [
+            'zernio_id_fresh' => $post->zernio_id,
+            'status_fresh' => $post->status
+        ]);
+
         if (!$post || $post->user_id !== Auth::id() || !$post->zernio_id) {
+            Log::warning("refreshStatus aborted for Post #{$post->id} (Condition failed)");
             return;
         }
 

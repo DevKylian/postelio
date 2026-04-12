@@ -88,12 +88,12 @@ class ContentRefinerService
 
         // ── 1. Global anti-hallucination & Industry Intelligence rule (LOCKED) ──
         $prompt .= "RÈGLES ABSOLUES DE RÉDACTION - SOUS PEINE D'ÉCHEC :\n"
-            . "1. COHÉRENCE DES PRONOMS : Il est STRICTEMENT INTERDIT de mélanger le 'Je' et le 'Nous'. Si l'artisan dit 'Je', tout le texte généré DOIT être au singulier. S'il dit 'On' ou 'Nous', tout doit être au pluriel.\n"
-            . "2. GABARIT 'ERREUR À ÉVITER' / DEVIS : Si la note vocale parle d'un devis, d'un conseil ou d'un constat, il est FORMELLEMENT INTERDIT d'utiliser le mot 'Intervention'. Tu DOIS commencer par '📍 Conseil d'expert - Secteur de [Ville]'.\n"
-            . "3. ANTI-INVENTION : Rédige le post en te basant STRICTEMENT sur le vocal. N'invente aucune prestation absente.\n"
-            . "4. CORRECTION PHONÉTIQUE : Corrige systématiquement les homophones (ex: 'chêne' pas 'chaîne', 'poêle' pas 'poil').\n"
-            . "5. NOM D'ENTREPRISE (NOM PROPRE) : Le nom de l'entreprise (voir 'IDENTITÉ') est un NOM PROPRE. Il est STRICTEMENT INTERDIT de l'utiliser comme un verbe (ex: NE DIS JAMAIS 'quand vous [Nom] votre cuisine' ou 'nous allons [Nom]...'). Si mentionné, il doit être SUJET (ex: 'L'équipe de [Nom]...').\n"
-            . "6. LOGIQUE ET SENS : Le texte doit avoir un sens réel et professionnel. Ne produis pas de phrases absurdes.\n\n";
+            . "1. COHÉRENCE DES PRONOMS : Il est STRICTEMENT INTERDIT de mélanger le 'Je' et le 'Nous'. Tu dois être constant. Si le vocal dit 'Je', tout le texte généré (y compris la conclusion) est au singulier. S'il dit 'On' ou 'Nous', tout est au pluriel.\n"
+            . "2. GABARIT 'ERREUR À ÉVITER' / DEVIS : Si le vocal parle d'un devis ou conseil, INTERDICTION d'utiliser 'Intervention'. Utilise : '📍 Conseil d'expert - Secteur de [Ville]'.\n"
+            . "3. ANTI-HALUCINATION : Ne cite que les matériaux ou tâches réellement mentionnés dans le vocal.\n"
+            . "4. CORRECTION PHONÉTIQUE : Corrige le bois (chêne) vs métal (chaîne), poêle (chauffage) vs poil, etc.\n"
+            . "5. NOM D'ENTREPRISE = NOM PROPRE : Il est STRICTEMENT INTERDIT d'utiliser le nom de l'entreprise comme un VERBE (ex: ne dis jamais 'Lorsque vous NomEntreprise votre cuisine'). Le nom est une entité. Si tu l'utilises, précède-le de 'L'équipe de', 'Chez' ou utilise-le comme sujet ('NomEntreprise a...'). Ne remplace jamais le verbe 'rénover' par le nom de la boite.\n"
+            . "6. LOGIQUE ET BON SENS : Le texte doit être naturel et grammaticalement parfait. Pas de phrases qui ne veulent rien dire.\n\n";
 
         // ── 2. Format rules ──
         $prompt .= "RÈGLE DE FORMAT STRICTE :\n"
@@ -662,7 +662,7 @@ IMPORTANT : Ne sors RIEN d'autre que du JSON. Sois précis sur les catégories."
         }
 
         $str = "═══ IDENTITÉ DE L'ARTISAN (CRITIQUE) ═══\n"
-            . "- ENTREPRISE : {$name}\n"
+            . "- ENTREPRISE : {$name} (RÈGLE : C'est UN NOM PROPRE, jamais un verbe. Utilise 'L'équipe de {$name}' ou 'Chez {$name}')\n"
             . "- VILLE/SECTEUR : {$locationStr}\n"
             . "- MÉTIER : {$trade}";
 

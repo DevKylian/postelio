@@ -1203,7 +1203,6 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold {{ in_array('instagram', $safePlatforms) ? 'text-midnight' : 'text-gray-600' }}">Instagram</p>
-                                <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest">{{ $isPremium ? '1080 × 1080 px' : 'Premium' }}</p>
                             </div>
                             @if(in_array('instagram', $safePlatforms))
                                 <div class="w-5 h-5 rounded-full bg-pink-500 flex items-center justify-center shrink-0">
@@ -1236,7 +1235,6 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold {{ in_array('facebook', $safePlatforms) ? 'text-midnight' : 'text-gray-600' }}">Facebook</p>
-                                <p class="text-[11px] font-bold uppercase tracking-wider {{ $isPremium ? 'text-gray-400' : 'text-copper/70' }}">{{ $isPremium ? '1080 × 1080 px' : 'Premium' }}</p>
                             </div>
                             @if(in_array('facebook', $safePlatforms))
                                 <div class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center shrink-0 shadow-sm">

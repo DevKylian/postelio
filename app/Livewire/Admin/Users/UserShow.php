@@ -79,6 +79,12 @@ class UserShow extends Component
         $this->user->load('company');
         $posts = $this->user->posts()->latest()->paginate(12);
         
-        return view('livewire.admin.users.user-show', compact('posts'));
+        $activityLogs = \App\Models\AuditLog::where('user_id', $this->user->id)
+            ->whereDate('created_at', now()->toDateString())
+            ->latest()
+            ->take(50)
+            ->get();
+        
+        return view('livewire.admin.users.user-show', compact('posts', 'activityLogs'));
     }
 }

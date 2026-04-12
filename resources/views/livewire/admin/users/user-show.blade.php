@@ -241,6 +241,57 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Activity Journey Section (Compact) -->
+            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col max-h-[500px]">
+                <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between bg-gray-50/50 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-midnight text-white flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 class="text-[10px] font-black text-midnight uppercase tracking-widest">Activité Récente</h3>
+                    </div>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-2 sm:p-4 bg-gray-50/20">
+                    <div class="space-y-1">
+                        @forelse($activityLogs as $log)
+                            @php
+                                $dotColor = match($log->tag) {
+                                    'admin' => 'bg-indigo-500',
+                                    'auth'  => 'bg-rose-500',
+                                    'posts' => 'bg-emerald-500',
+                                    default => 'bg-gray-300'
+                                };
+                            @endphp
+                            <div class="flex items-center gap-3 px-3 py-2 rounded-xl border border-transparent hover:border-gray-100 hover:bg-white transition-all group">
+                                <div class="w-2 h-2 rounded-full {{ $dotColor }} shrink-0"></div>
+                                
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between gap-4">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span class="text-[9px] font-black uppercase text-gray-400 shrink-0">
+                                                {{ $log->tag }}
+                                            </span>
+                                            <span class="text-xs font-bold text-midnight truncate font-mono">
+                                                {{ Str::after($log->url, request()->getSchemeAndHttpHost()) ?: '/' }}
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center gap-2 shrink-0">
+                                            <span class="text-[9px] font-bold text-gray-300">{{ $log->created_at->format('H:i') }}</span>
+                                            <span class="text-[9px] font-mono text-gray-400 bg-gray-100 px-1 rounded">{{ $log->response_time }}ms</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="py-10 text-center">
+                                <p class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Aucune donnée</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
 
             <!-- Posts History -->
             <div>

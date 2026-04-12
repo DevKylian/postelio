@@ -1546,7 +1546,7 @@
             await this.wait(720);
           },
           async scene4() {
-            this.currentScene = 4; this.sceneLabel = '04 · Génération IA';
+            this.currentScene = 4; this.sceneLabel = '04 · Génération Postelio';
             const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
             this.moveCursor(sw * 0.8, sh * 0.8, 1.08);
             await this.wait(1260);
@@ -2128,7 +2128,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-3xl mx-auto mb-20" x-intersect.once="$el.classList.add('reveal-up')">
           <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">En ligne en
-            <span class="text-gradient-copper italic">30 secondes chrono.</span></h2>
+            <span class="text-gradient-copper italic">10 secondes chrono.</span></h2>
           <p class="text-xl font-light text-slate-600">Pas besoin d'être un pro du digital. Rangez vos outils, sortez
             votre téléphone, et laissez l'application faire le reste.</p>
         </div>
@@ -2149,7 +2149,7 @@
                 [
                   'icon' => 'mic',
                   'title' => 'Dictez votre note',
-                  'desc' => "Parlez à votre téléphone : « Pose d'une verrière sur-mesure ». L'IA structure votre message.",
+                  'desc' => "Parlez à votre téléphone : « Pose d'une verrière sur-mesure ». Postelio structure votre message.",
                   'num' => '02'
                 ],
                 [
@@ -2858,7 +2858,7 @@
             $faqs = [
               ['q' => "Est-ce que j'ai besoin de beaucoup d'abonnés ?", 'short' => "Non. Quelque centaines de locaux suffisent.", 'a' => "Non. Quelques centaines de personnes locales (vos anciens clients, vos partenaires) suffisent pour créer un bouche-à-oreille qualifié et puissant."],
               ['q' => "Je suis nul en informatique, c'est pour moi ?", 'short' => "Si vous utilisez WhatsApp, c'est bon.", 'a' => "Si vous savez envoyer un message vocal sur WhatsApp, vous savez utiliser Postelio. L'application gère toute la technique."],
-              ['q' => "Combien de temps ça prend par jour ?", 'short' => "Strictement 30 secondes.", 'a' => "Strictement 30 secondes par chantier. Vous parlez, on publie."],
+              ['q' => "Combien de temps ça prend par jour ?", 'short' => "Strictement 10 secondes.", 'a' => "Strictement 10 secondes par chantier. Vous parlez, on publie."],
               ['q' => "Est-ce vraiment rentable ?", 'short' => "Remboursé pour 5 ans dès le 1er devis.", 'a' => "Oui. Un seul devis haut de gamme signé au prix fort grâce à l'image professionnelle de votre page rembourse l'outil pour les 5 prochaines années."],
               ['q' => "Y a-t-il un engagement sur la durée ?", 'short' => "Strictement aucun. Annulez en 1 clic.", 'a' => "Absolument pas. Tous nos abonnements sont sans engagement. Vous pouvez annuler en un clic depuis votre espace client à tout moment. Pas de courrier recommandé, pas de préavis caché."]
             ];

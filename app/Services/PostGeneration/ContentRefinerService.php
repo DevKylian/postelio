@@ -86,17 +86,14 @@ class ContentRefinerService
 
         $prompt = $identity . "\n\n";
 
-        // ── 1. Global anti-hallucination rule ──
-        $prompt .= "RÈGLE FONDAMENTALE — Anti-invention (priorité absolue) :\n"
-            . "Utilise UNIQUEMENT les informations explicitement présentes dans la transcription fournie.\n"
-            . "N'invente jamais de noms, prénoms, chiffres, dates, réalisations ou détails absents du vocal.\n"
-            . "Si le mémo est court ou vague, génère un post court et sobre qui reste dans ce cadre — "
-            . "ne complète JAMAIS avec du contenu inventé pour le rendre plus complet.\n"
-            . "Adapte la longueur et la richesse de la légende à la richesse du mémo vocal : mémo court = légende courte.\n"
-            . "EXCEPTION OBLIGATOIRE — Noms de communes : La transcription vocale (Whisper) déforme souvent les noms "
-            . "de villes (ex: 'saint-néomai', 'chiré', 'aifre'). Ces formes phonétiques NE SONT PAS des informations "
-            . "fiables. Tu DOIS les corriger en utilisant le nom officiel exact fourni dans la liste des communes "
-            . "ci-dessus. Cette correction n'est PAS une invention : c'est une normalisation orthographique obligatoire.\n\n";
+        // ── 1. Global anti-hallucination & Industry Intelligence rule (LOCKED) ──
+        $prompt .= "RÈGLES ABSOLUES DE RÉDACTION - SOUS PEINE D'ÉCHEC :\n"
+            . "1. COHÉRENCE DES PRONOMS : Il est STRICTEMENT INTERDIT de mélanger le 'Je' et le 'Nous'. Si l'artisan dit 'Je', tout le texte généré DOIT être au singulier. S'il dit 'On' ou 'Nous', tout doit être au pluriel.\n"
+            . "2. GABARIT 'ERREUR À ÉVITER' / DEVIS : Si la note vocale parle d'un devis, d'un conseil ou d'un constat, il est FORMELLEMENT INTERDIT d'utiliser le mot 'Intervention'. Tu DOIS commencer par '📍 Conseil d'expert - Secteur de [Ville]'.\n"
+            . "3. ANTI-INVENTION : Rédige le post en te basant STRICTEMENT sur le vocal. N'invente aucune prestation absente.\n"
+            . "4. CORRECTION PHONÉTIQUE : Corrige systématiquement les homophones (ex: 'chêne' pas 'chaîne', 'poêle' pas 'poil').\n"
+            . "5. NOM D'ENTREPRISE (NOM PROPRE) : Le nom de l'entreprise (voir 'IDENTITÉ') est un NOM PROPRE. Il est STRICTEMENT INTERDIT de l'utiliser comme un verbe (ex: NE DIS JAMAIS 'quand vous [Nom] votre cuisine' ou 'nous allons [Nom]...'). Si mentionné, il doit être SUJET (ex: 'L'équipe de [Nom]...').\n"
+            . "6. LOGIQUE ET SENS : Le texte doit avoir un sens réel et professionnel. Ne produis pas de phrases absurdes.\n\n";
 
         // ── 2. Format rules ──
         $prompt .= "RÈGLE DE FORMAT STRICTE :\n"
@@ -255,25 +252,16 @@ class ContentRefinerService
 
         $city       = $options['company_city']   ?? null;
         $postalCode = $options['company_postal'] ?? null;
-        $trade      = $options['company_trade']  ?? null;
-
-        // Build the primary city hashtag (no spaces, no dashes for readability, no postal code)
         $locationTag = $city ? "#" . preg_replace('/[^a-zA-ZÀ-ÿ0-9]/u', '', $city) : null;
-
-        // If a worksite city was mentioned in the vocal, the AI should also hash it; we hint with the base city
-        $tradeTag    = $trade ? "#" . str_replace([' ', '/'], '', $trade) : null;
-
         $locationHint = $locationTag
             ? "Tu DOIS utiliser {$locationTag}" . ($postalCode ? " (code postal {$postalCode})" : "") . "."
             : "Ajoute un hashtag de ville (ex: #Lannion).";
 
-        return "STRUCTURE DES HASHTAGS (Partie 7) : Ajoute exactement entre 5 et 8 hashtags maximum à la fin de la légende, séparés par une ligne vide. "
-            . "Trie-les par pertinence : "
-            . "1. Métier" . ($tradeTag ? " (priorité : {$tradeTag})" : "") . " "
-            . "> 2. Action spécifique "
-            . "> 3. Matériau/Technique "
-            . "> 4. Ville/Secteur OBLIGATOIRE : " . $locationHint . " Si une autre ville de chantier est citée dans le vocal, ajoute également son hashtag officiel. "
-            . "> 5. #Postelio (indispensable à la fin).";
+        return "STRUCTURE DES HASHTAGS (Partie 7) : Ajoute entre 5 et 8 hashtags maximum à la fin.\n"
+            . "- Priorité 1 : Le type de travaux RÉEL décris dans le vocal (ex: #plomberie si le vocal parle de fuite, même si l'artisan est électricien).\n"
+            . "- Priorité 2 : Action ou matériau spécifique cité.\n"
+            . "- Priorité 3 : Ville/Secteur OBLIGATOIRE : " . $locationHint . "\n"
+            . "- Priorité 4 : #Postelio (indispensable à la fin).";
     }
 
     /**
@@ -284,9 +272,9 @@ class ContentRefinerService
         $phone = $options['company_phone'] ?? null;
         $email = $options['company_email'] ?? null;
         
-        $ctaPart = "6. L'Appel à l'action (Le CTA de conversion) : Une phrase d'invitation au contact.";
+        $ctaPart = "6. L'Appel à l'action (Le CTA de conversion) : Utilise OBLIGATOIREMENT cette phrase : \"📩 Un projet en tête ? Contactez-nous en message privé.\"";
         if ($phone || $email) {
-            $ctaPart .= " Ajoute obligatoirement les coordonnées suivantes sur une nouvelle ligne :";
+            $ctaPart .= " Ajoute également les coordonnées suivantes sur une nouvelle ligne :";
             if ($phone) $ctaPart .= "\n📞 {$phone}";
             if ($email) $ctaPart .= "\n📧 {$email}";
         } else {
@@ -295,25 +283,22 @@ class ContentRefinerService
 
         $city       = $options['company_city']   ?? null;
         $postalCode = $options['company_postal'] ?? null;
+        $cityLabel  = $city ? $city . ($postalCode ? " ({$postalCode})" : "") : "[Ville]";
 
-        $locationPart = "2. La Localisation (Le SEO Local) : Une simple mention de la ville ou du secteur pour attirer l'algorithme local d'Instagram.";
-        if ($city) {
-            $cityLabel = $city . ($postalCode ? " ({$postalCode})" : "");
-            $locationPart .= " Applique IMPÉRATIVEMENT la phrase suivante (avec le nom officiel exact de la commune) : 📍 Intervention sur le secteur de {$cityLabel}."
-                . " Si le vocal mentionne un chantier dans une ville différente, utilise le nom officiel exact de cette autre commune (pas une phonétique approximative).";
-        } else {
-            $locationPart .= " (ex: 📍 Intervention sur le secteur de [Ville]).";
-        }
+        $locationPart = "2. La Localisation (Le SEO Local) : Une mention de la ville ou du secteur.\n"
+            . "RÈGLE ABSOLUE : S'il s'agit d'un devis, d'un conseil ou d'une erreur, il est FORMELLEMENT INTERDIT d'utiliser le mot 'Intervention'. Tu DOIS commencer par '📍 Conseil d'expert - Secteur de {$cityLabel}'. Pour un chantier fini, utilise '📍 Intervention sur le secteur de {$cityLabel}'.";
 
         $clientName = $options['clientName'] ?? null;
         $clientPart = $clientName ? " (mentionne le client : {$clientName})" : "";
 
         return "\nSTRUCTURE OBLIGATOIRE DE LA LÉGENDE (Respecte ces 7 points dans l'ordre, séparés par \\n\\n dans le JSON, c'est CRUCIAL) :\n"
-            . "1. L'Accroche visuelle (Le Hook) : Un émoji lié au métier + une phrase courte annonçant la fin du projet ou le type de réalisation{$clientPart}.\n"
+            . "1. L'Accroche visuelle (Le Hook) : Un émoji LIÉ AUX TRAVAUX RÉELS (ex: 🚿 pour plomberie, 🛠️ pour bricolage, 🔌 pour électricité) + une phrase courte annonçant la fin du projet ou le type de réalisation{$clientPart}.\n"
+            . "Attention : si les travaux décrits ne correspondent pas au métier habituel de l'artisan, utilise l'émoji des travaux (ex: n'utilise pas 🔌 si le vocal parle de changer un robinet).\n"
             . "{$locationPart}\n"
             . "3. Le Contexte et la Technique (Le Corps du texte) : Un court paragraphe (2-3 phrases) qui explique ce qui a été fait, les matériaux ou marques utilisés, la spécificité technique. Intègre ici les éléments clés du mémo vocal.\n"
             . "4. Les Bénéfices pour le client (La Preuve de valeur) : Une courte phrase d'introduction puis une liste à puces de 3 ou 4 points (avec des emojis ✔️ ou 🔹). Traduis la technique en avantages concrets pour le client final. INTERDIT d'utiliser des étoiles ⭐ pour la liste.\n"
-            . "5. La Conclusion humaine (La Fierté) : Une phrase chaleureuse sur le résultat final ou la satisfaction du client (ex: \"Une superbe transformation pour moderniser cette pièce de vie ! 👌\"). Ne rajoute AUCUN émoji décoratif supplémentaire.\n"
+            . "5. La Conclusion humaine (La Fierté) : Une phrase chaleureuse unique et SPECIFIQUE au contenu du vocal.\n"
+            . "RÈGLE ABSOLUE : Bannis définitivement la phrase générique 'Nous sommes fiers de...' ou 'moderniser cette pièce de vie'. Rédige une conclusion qui reflète l'expertise ou le résultat réel du vocal. Respecte strictement la règle de cohérence Je/Nous définie au début.\n"
             . "{$ctaPart}\n"
             . "7. Le Bloc de Hashtags : Ajoute OBLIGATOIREMENT le bloc de hashtags juste après une ligne vide. Ne l'oublie JAMAIS. Voir la consigne de hashtags ci-dessous.\n";
     }
@@ -330,16 +315,13 @@ class ContentRefinerService
         $hashtagInstruction = $this->hashtagInstruction($includeHashtags, $options);
         $extraNote = $customNote ? " Note de l'artisan : {$customNote}." : '';
 
-        $noHallucinateGlobal = "RÈGLE FONDAMENTALE — Anti-invention (priorité absolue) :\n"
-            . "Utilise UNIQUEMENT les informations explicitement présentes dans la transcription fournie.\n"
-            . "N'invente jamais de noms, prénoms, chiffres, dates, réalisations ou détails absents du vocal.\n"
-            . "Si le mémo est court ou vague, génère un post court et sobre qui reste dans ce cadre — "
-            . "ne complète JAMAIS avec du contenu inventé pour le rendre plus complet.\n"
-            . "Adapte la longueur et la richesse de la légende à la richesse du mémo vocal : mémo court = légende courte.\n"
-            . "EXCEPTION OBLIGATOIRE — Noms de communes : La transcription vocale (Whisper) déforme souvent les noms "
-            . "de villes (ex: 'saint-néomai', 'chiré', 'aifre'). Ces formes phonétiques NE SONT PAS des informations "
-            . "fiables. Tu DOIS les corriger en utilisant le nom officiel exact fourni dans la liste des communes "
-            . "ci-dessus. Cette correction n'est PAS une invention : c'est une normalisation orthographique obligatoire.\n\n";
+        $noHallucinateGlobal = "RÈGLES ABSOLUES DE RÉDACTION - SOUS PEINE D'ÉCHEC :\n"
+            . "1. COHÉRENCE DES PRONOMS : Il est STRICTEMENT INTERDIT de mélanger le 'Je' et le 'Nous'. Si l'artisan dit 'Je', tout le texte généré DOIT être au singulier. S'il dit 'On' ou 'Nous', tout doit être au pluriel.\n"
+            . "2. GABARIT 'ERREUR À ÉVITER' / DEVIS : Si la note vocale parle d'un devis, d'un conseil ou d'un constat, il est FORMELLEMENT INTERDIT d'utiliser le mot 'Intervention'. Tu DOIS commencer par '📍 Conseil d'expert - Secteur de [Ville]'.\n"
+            . "3. ANTI-INVENTION : Rédige le post en te basant STRICTEMENT sur le vocal. N'invente aucune prestation absente.\n"
+            . "4. CORRECTION PHONÉTIQUE : Corrige systématiquement les homophones (ex: 'chêne' pas 'chaîne', 'poêle' pas 'poil').\n"
+            . "5. NOM D'ENTREPRISE (NOM PROPRE) : Le nom de l'entreprise (voir 'IDENTITÉ') est un NOM PROPRE. Il est STRICTEMENT INTERDIT de l'utiliser comme un verbe (ex: NE DIS JAMAIS 'quand vous [Nom] votre cuisine' ou 'nous allons [Nom]...'). Si mentionné, il doit être SUJET (ex: 'L'équipe de [Nom]...').\n"
+            . "6. LOGIQUE ET SENS : Le texte doit avoir un sens réel et professionnel. Ne produis pas de phrases absurdes.\n\n";
 
         $noMarkdownPrefix = "RÈGLE DE FORMAT STRICTE :\n"
             . "- Jamais de Markdown : aucun **, aucun *, aucun _, aucun #. Instagram n'en supporte pas.\n"

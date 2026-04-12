@@ -142,8 +142,13 @@
                                     <p class="text-[10px] text-gray-300 font-medium">
                                         {{ $post->created_at->format('d/m/Y') }}
                                     </p>
-                                    <span class="flex items-center gap-1 text-[10px] font-bold {{ $post->status_color_class }} px-1.5 py-0.5 rounded-md border">
+                                    <span class="flex items-center gap-1 text-[10px] font-bold {{ $post->status_color_class }} px-1.5 py-0.5 rounded-md border text-center">
                                         {{ $post->status_label }}
+                                        @if($post->status === 'completed' && $post->zernio_id)
+                                            <button wire:click.stop="refreshStatus({{ $post->id }})" title="Vérifier le statut réel" class="ml-1 hover:rotate-180 transition-transform duration-500">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                            </button>
+                                        @endif
                                     </span>
                                 </div>
                                 <p class="text-sm font-semibold text-midnight leading-snug line-clamp-2">

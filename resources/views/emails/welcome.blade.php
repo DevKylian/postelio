@@ -84,7 +84,7 @@
                                                 </td>
                                                 <td style="padding-left: 12px; vertical-align: top;">
                                                     <div style="font-size: 15px; font-weight: 600; color: #1E293B; margin-bottom: 4px;">Dictez une note vocale</div>
-                                                    <div style="font-size: 14px; color: #64748B; font-weight: 400; line-height: 1.5;">Décrivez votre travail en quelques mots. L'IA rédige la publication pour vous.</div>
+                                                    <div style="font-size: 14px; color: #64748B; font-weight: 400; line-height: 1.5;">Décrivez votre travail en quelques mots. Postelio rédige la publication pour vous.</div>
                                                 </td>
                                             </tr>
                                         </table>

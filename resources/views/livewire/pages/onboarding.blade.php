@@ -54,8 +54,16 @@ $nextStep = function () {
             'city'  => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:255'],
-            'website' => ['nullable', 'url', 'max:255'],
+            'website' => ['nullable', 'string', 'max:255', 'regex:/\..+/'],
+        ], [
+            'website.regex' => 'Le site internet doit être au format domaine.fr (contenir un point).',
         ]);
+        
+        if ($this->website) {
+            $this->website = preg_replace('#^https?://#', '', $this->website);
+            $this->website = preg_replace('#^www\.#', '', $this->website);
+            $this->website = rtrim($this->website, '/');
+        }
     }
 
     if ($this->step === 3) {
@@ -81,9 +89,17 @@ $complete = function () {
         'city'        => ['required', 'string', 'max:255'],
         'phone'       => ['nullable', 'string', 'max:30'],
         'email'       => ['nullable', 'email', 'max:255'],
-        'website'     => ['nullable', 'url', 'max:255'],
+        'website'     => ['nullable', 'string', 'max:255', 'regex:/\..+/'],
         'brand_color' => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+    ], [
+        'website.regex' => 'Le site internet doit être au format domaine.fr (contenir un point).',
     ]);
+
+    if ($this->website) {
+        $this->website = preg_replace('#^https?://#', '', $this->website);
+        $this->website = preg_replace('#^www\.#', '', $this->website);
+        $this->website = rtrim($this->website, '/');
+    }
 
     $user    = Auth::user();
     $company = $user->company;
@@ -297,8 +313,8 @@ $complete = function () {
                                 Site internet (optionnel)
                             </label>
                             <input wire:model="website"
-                                   type="url"
-                                   placeholder="Ex : https://www.mon-entreprise.fr"
+                                   type="text"
+                                   placeholder="Ex : mon-entreprise.fr"
                                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm
                                           focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200" />
                             @error('website')
@@ -607,7 +623,7 @@ $complete = function () {
                 >
                     <div class="mb-6">
                         <h1 class="text-2xl font-bold text-slate-800">Présentez-vous</h1>
-                        <p class="text-gray-500 mt-1 text-sm">Cette présentation permettra à l'IA de mieux personnaliser vos posts. Parlez de vous, vos services, votre zone d'intervention…</p>
+                        <p class="text-gray-500 mt-1 text-sm">Cette présentation permettra à Postelio de mieux personnaliser vos posts. Parlez de vous, vos services, votre zone d'intervention…</p>
                     </div>
 
                     {{-- Mode toggle --}}
@@ -716,7 +732,7 @@ $complete = function () {
                             class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 text-sm leading-relaxed resize-none
                                    focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200"
                         ></textarea>
-                        <p class="mt-2 text-xs text-gray-400">Plus vous êtes précis, plus l'IA personnalisera vos posts.</p>
+                        <p class="mt-2 text-xs text-gray-400">Plus vous êtes précis, plus Postelio pourra personnaliser vos posts.</p>
                     </div>
 
                     {{-- Skip link --}}

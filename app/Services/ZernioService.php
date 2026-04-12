@@ -184,6 +184,22 @@ class ZernioService
     }
 
     /**
+     * Get a single post by its Zernio ID.
+     */
+    public function getZernioPost(string $zernioId): ?array
+    {
+        $response = Http::withToken($this->apiKey)
+            ->get("{$this->baseUrl}/posts/{$zernioId}");
+
+        if (!$response->successful()) {
+            Log::error('Zernio getZernioPost failed', ['id' => $zernioId, 'body' => $response->body()]);
+            return null;
+        }
+
+        return $response->json('post');
+    }
+
+    /**
      * Get all account posts (full media library from platform).
      */
     public function getAccountPosts(string $accountId, array $params = []): array

@@ -218,7 +218,7 @@
                                         Postelio automatise ces stratégies pour vous.
                                     </h4>
                                     <p class="text-sm text-slate-400 font-light leading-relaxed">
-                                        Arrêtez de perdre du temps en rédaction. Notre IA transforme vos chantiers en machine à clients.
+                                        Arrêtez de perdre du temps en rédaction. Postelio transforme vos chantiers en machine à clients.
                                     </p>
                                 </div>
 

@@ -17,6 +17,7 @@ state([
     'brand_color'       => fn () => auth()->user()->company?->brand_color ?? '#F59E0B',
     'secondary_color'   => fn () => auth()->user()->company?->secondary_color ?? '#0F172A',
     'weekly_posts_goal' => fn () => auth()->user()->company?->weekly_posts_goal ?? 3,
+    'bio_text'          => fn () => auth()->user()->company?->bio_text ?? '',
 ]);
 
 $updateCompanySettings = function () {
@@ -25,11 +26,20 @@ $updateCompanySettings = function () {
         'city'              => ['nullable', 'string', 'max:255'],
         'phone'             => ['nullable', 'string', 'max:30'],
         'email'             => ['nullable', 'email', 'max:255'],
-        'website'           => ['nullable', 'url', 'max:255'],
+        'website'           => ['nullable', 'string', 'max:255', 'regex:/\..+/'],
         'brand_color'       => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         'secondary_color'   => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         'weekly_posts_goal' => ['required', 'integer', 'min:0', 'max:7'],
+        'bio_text'          => ['nullable', 'string', 'max:2000'],
+    ], [
+        'website.regex' => 'Le site internet doit être au format domaine.fr (contenir un point).',
     ]);
+
+    if ($this->website) {
+        $this->website = preg_replace('#^https?://#', '', $this->website);
+        $this->website = preg_replace('#^www\.#', '', $this->website);
+        $this->website = rtrim($this->website, '/');
+    }
 
     $user = Auth::user();
     $company = $user->company;
@@ -46,6 +56,7 @@ $updateCompanySettings = function () {
         'brand_color'       => $this->brand_color,
         'secondary_color'   => $this->secondary_color,
         'weekly_posts_goal' => $this->weekly_posts_goal,
+        'bio_text'          => $this->bio_text,
     ];
 
     if ($company) {
@@ -67,6 +78,7 @@ $updateCompanySettings = function () {
     $this->brand_color       = $user->company->brand_color;
     $this->secondary_color   = $user->company->secondary_color ?? '#0F172A';
     $this->weekly_posts_goal = $user->company->weekly_posts_goal;
+    $this->bio_text          = $user->company->bio_text ?? '';
 
     $this->dispatch('company-updated');
 };
@@ -150,10 +162,25 @@ $updateCompanySettings = function () {
             <x-text-input wire:model="website"
                           id="website"
                           name="website"
-                          type="url"
+                          type="text"
                           class="mt-1 block w-full"
-                          placeholder="https://www.mon-entreprise.fr" />
+                          placeholder="mon-entreprise.fr" />
             <x-input-error class="mt-2" :messages="$errors->get('website')" />
+        </div>
+
+        <!-- Description de l'activité -->
+        <div>
+            <x-input-label for="bio_text" value="Description de votre activité" />
+            <textarea wire:model="bio_text"
+                      id="bio_text"
+                      name="bio_text"
+                      rows="4"
+                      class="mt-1 block w-full border-gray-300 focus:border-copper focus:ring-copper rounded-md shadow-sm text-sm"
+                      placeholder="Décrivez votre activité en quelques phrases. Ces informations aident Postelio à personnaliser vos posts."></textarea>
+            <p class="mt-1 text-xs text-gray-500">
+                Ces informations aident Postelio à mieux comprendre ce que vous faites pour personnaliser vos posts.
+            </p>
+            <x-input-error class="mt-2" :messages="$errors->get('bio_text')" />
         </div>
 
         <!-- Couleur de marque -->
@@ -238,11 +265,11 @@ $updateCompanySettings = function () {
         </div>
 
         <div class="flex items-center justify-end gap-4">
-            <x-primary-button>Enregistrer</x-primary-button>
-
-            <x-action-message class="me-3" on="company-updated">
+            <x-action-message on="company-updated">
                 Paramètres enregistrés.
             </x-action-message>
+
+            <x-primary-button>Enregistrer</x-primary-button>
         </div>
 
     </form>

@@ -161,6 +161,34 @@ class PostList extends Component
         }
     }
 
+    /**
+     * Synchronize post status from Zernio API if webhook was missed.
+     */
+    public function refreshStatus(Post $post)
+    {
+        if ($post->user_id !== Auth::id() || !$post->zernio_id) return;
+
+        try {
+            $zernio = app(\App\Services\ZernioService::class);
+            $zernioPost = $zernio->getZernioPost($post->zernio_id);
+
+            if ($zernioPost) {
+                $zStatus = $zernioPost['status'] ?? null;
+                if ($zStatus === 'published' || $zStatus === 'posted') {
+                    $post->update(['status' => Post::STATUS_PUBLISHED]);
+                    session()->flash('success', 'Statut mis à jour : le post est bien en ligne !');
+                } elseif ($zStatus === 'failed') {
+                    $post->update(['status' => Post::STATUS_FAILED]);
+                    session()->flash('error', 'Le post a échoué sur Zernio.');
+                } else {
+                    session()->flash('info', 'Le post est toujours en cours de traitement sur Zernio.');
+                }
+            }
+        } catch (\Throwable $e) {
+            session()->flash('error', 'Erreur lors de la synchro : ' . $e->getMessage());
+        }
+    }
+
     public function render()
     {
         $posts = Post::where('user_id', Auth::id())

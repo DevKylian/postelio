@@ -414,7 +414,7 @@ $switchTab = function ($tab) {
                                 <span wire:loading wire:target="refineTemplate">Ajustement...</span>
                             </button>
                         </div>
-                        <p class="text-[10px] text-amber-600/70 mt-2 italic">L'IA détectera automatiquement si vous voulez changer le style, la mise en page ou le mode photo.</p>
+                        <p class="text-[10px] text-amber-600/70 mt-2 italic">Postelio détectera automatiquement si vous voulez changer le style, la mise en page ou le mode photo.</p>
                     </div>
                     @endif
 

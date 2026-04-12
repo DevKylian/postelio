@@ -316,7 +316,7 @@
                             @endphp
                             @if($totalPosts === 0)
                                 <p class="text-white/60 text-xs leading-relaxed">
-                                    Ton premier post est à 30 secondes. Lance-toi, c'est gratuit.
+                                    Ton premier post est à 10 secondes. Lance-toi, c'est gratuit.
                                 </p>
                                 <a href="{{ route('generate-post') }}" wire:navigate class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-copper hover:text-amber-400 transition-colors">
                                     Créer maintenant
@@ -362,7 +362,7 @@
     $tourSteps = [
         ['target' => null, 'icon' => '👋', 'title' => 'Bienvenue sur Postelio !', 'desc' => 'En deux minutes, je te montre comment tirer le meilleur de l\'outil. Prêt ?'],
         ['target' => '#sidebar', 'icon' => '🗺️', 'title' => 'Menu de navigation', 'desc' => 'Retrouve ici tous tes outils : calendrier, statistiques, et paramètres de compte.', 'position' => 'right'],
-        ['target' => '#tour-generate', 'icon' => '✨', 'title' => 'Génère un post IA', 'desc' => 'En un clic, crée un post professionnel adapté à ton activité. L\'IA rédige, toi tu publies.', 'perm' => 'can_generate_posts'],
+        ['target' => '#tour-generate', 'icon' => '✨', 'title' => 'Génère un post', 'desc' => 'En un clic, crée un post professionnel adapté à ton activité. Postelio rédige, toi tu publies.', 'perm' => 'can_generate_posts'],
         ['target' => '#tour-stats', 'icon' => '📊', 'title' => 'Tes statistiques', 'desc' => 'Suis tes posts créés ce mois, cette semaine et l\'état de tes réseaux sociaux en un coup d\'œil.'],
         ['target' => '#tour-posts', 'icon' => '🖼️', 'title' => 'Tes créations', 'desc' => 'Retrouve ici tous tes posts générés. Visualise-les, télécharge-les, ou crée-en de nouveaux.', 'position' => 'top'],
         ['target' => '#tour-quota', 'icon' => '⚡', 'title' => 'Ton quota mensuel', 'desc' => 'Surveille le nombre de générations restantes. Le compteur se remet à zéro chaque mois.', 'position' => 'top'],

@@ -4,14 +4,14 @@
 <p>Les présentes Conditions s'appliquent à l'ensemble des services en ligne proposés par Postelio (Solution SaaS de génération de posts pour professionnels de l'artisanat). En créant un compte sur Postelio, vous (ci-après "l'Utilisateur" ou "l'Artisan") acceptez sans réserve l'intégralité des présentes Conditions Générales de Vente et d'Utilisation.</p>
 
 <h2>1. Objet du Contrat</h2>
-<p>Postelio met à disposition de ses clients une application web (Software as a Service) permettant de formater, retranscrire des notes vocales, et générer automatiquement des publications via Intelligence Artificielle afin de les publier sur leurs propres réseaux sociaux (via l'intégration de jetons officiels Meta/Instagram). Le service a vocation à aider les professionnels du bâtiment à accroître leur visibilité numérique en simplifiant leur fardeau administratif.</p>
+<p>Postelio met à disposition de ses clients une application web (Software as a Service) permettant de formater, retranscrire des notes vocales, et générer automatiquement des publications via nos technologies de génération de contenu afin de les publier sur leurs propres réseaux sociaux (via l'intégration de jetons officiels Meta/Instagram). Le service a vocation à aider les professionnels du bâtiment à accroître leur visibilité numérique en simplifiant leur fardeau administratif.</p>
 
 <h2>2. Accès au service, Maintenance et Disponibilité</h2>
 <p>Postelio s'efforce d'assurer une disponibilité du service 24h/24 et 7j/7. Cependant, l'accès peut être temporairement interrompu pour des raisons de maintenance, de sécurité ou de mises à jour impératives des infrastructures.</p>
 <p>La finalité du service (publication sur des réseaux tiers) dépend intrinsèquement de la disponibilité des <strong>API tierces (Meta, Facebook, Instagram)</strong>. En conséquence, Postelio ne pourra en aucun cas être tenu responsable en cas de bugs, limitations temporaires imposées par Meta, délai de publication ou pannes provenant de ces plateformes sociales externes.</p>
 
-<h2>3. Usage de l'Intelligence Artificielle et Responsabilité</h2>
-<p>Les publications générées par Postelio sont propulsées par des modèles de langage complexes de pointe (Intelligence Artificielle générative). Bien que Postelio applique des "prompts" de sécurité garantissant une terminologie professionnelle, l'IA peut occasionnellement produire des inexactitudes ou des syntaxes inattendues.</p>
+<h2>3. Technologies de Génération Automatique et Responsabilité</h2>
+<p>Les publications générées par Postelio sont propulsées par des modèles de langage complexes de pointe. Bien que Postelio applique des "prompts" de sécurité garantissant une terminologie professionnelle, le système peut occasionnellement produire des inexactitudes ou des syntaxes inattendues.</p>
 <p><strong>L'utilisateur demeure le seul responsable du contenu publié en son nom et au nom de son entreprise sur Internet.</strong> Il est tenu de systématiquement relire de façon raisonnable les projets d'articles avant publication définitive sur son compte synchronisé. Postelio n'endosse aucune responsabilité concernant un préjudice d'image de marque ou réputationnel résultant de textes non lus préalablement par le client.</p>
 
 <h2>4. Tarifs, Facturation et Recouvrement</h2>

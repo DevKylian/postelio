@@ -90,10 +90,10 @@ class ContentRefinerService
         $prompt .= "RÈGLES ABSOLUES DE RÉDACTION - SOUS PEINE D'ÉCHEC :\n"
             . "1. COHÉRENCE DES PRONOMS : Il est STRICTEMENT INTERDIT de mélanger le 'Je' et le 'Nous'. Tu dois être constant. Si le vocal dit 'Je', tout le texte généré (y compris la conclusion) est au singulier. S'il dit 'On' ou 'Nous', tout est au pluriel.\n"
             . "2. GABARIT 'ERREUR À ÉVITER' / DEVIS : Si le vocal parle d'un devis ou conseil, INTERDICTION d'utiliser 'Intervention'. Utilise : '📍 Conseil d'expert - Secteur de [Ville]'.\n"
-            . "3. ANTI-HALUCINATION : Ne cite que les matériaux ou tâches réellement mentionnés dans le vocal.\n"
+            . "3. ANTI-HALLUCINATION : Ne cite que les matériaux ou tâches réellement mentionnés dans le vocal.\n"
             . "4. CORRECTION PHONÉTIQUE : Corrige le bois (chêne) vs métal (chaîne), poêle (chauffage) vs poil, etc.\n"
-            . "5. NOM D'ENTREPRISE = NOM PROPRE : Il est STRICTEMENT INTERDIT d'utiliser le nom de l'entreprise comme un VERBE (ex: ne dis jamais 'Lorsque vous NomEntreprise votre cuisine'). Le nom est une entité. Si tu l'utilises, précède-le de 'L'équipe de', 'Chez' ou utilise-le comme sujet ('NomEntreprise a...'). Ne remplace jamais le verbe 'rénover' par le nom de la boite.\n"
-            . "6. LOGIQUE ET BON SENS : Le texte doit être naturel et grammaticalement parfait. Pas de phrases qui ne veulent rien dire.\n\n";
+            . "5. NOM D'ENTREPRISE (NOM PROPRE) : Il est STRICTEMENT INTERDIT d'utiliser le nom de l'entreprise dans la TOUTE PREMIÈRE PHRASE du post (l'accroche). Le nom est un Nom Propre INVARIABLE. Il est FORMELLEMENT INTERDIT de l'utiliser comme un verbe (ex: ne dis jamais 'Lorsque vous [Nom]...'). Utilise des verbes réels (rénover, installer, réaliser) et mentionne l'entreprise uniquement plus bas (ex: 'L'équipe de [Nom]...').\n"
+            . "6. LOGIQUE ET BON SENS : Le texte doit être naturel. Pas de phrases qui ne veulent rien dire.\n\n";
 
         // ── 2. Format rules ──
         $prompt .= "RÈGLE DE FORMAT STRICTE :\n"
@@ -293,6 +293,7 @@ class ContentRefinerService
 
         return "\nSTRUCTURE OBLIGATOIRE DE LA LÉGENDE (Respecte ces 7 points dans l'ordre, séparés par \\n\\n dans le JSON, c'est CRUCIAL) :\n"
             . "1. L'Accroche visuelle (Le Hook) : Un émoji LIÉ AUX TRAVAUX RÉELS (ex: 🚿 pour plomberie, 🛠️ pour bricolage, 🔌 pour électricité) + une phrase courte annonçant la fin du projet ou le type de réalisation{$clientPart}.\n"
+            . "RÈGLE CRIMINELLE : Il est STRICTEMENT INTERDIT de mentionner le nom de l'entreprise dans cette première phrase.\n"
             . "Attention : si les travaux décrits ne correspondent pas au métier habituel de l'artisan, utilise l'émoji des travaux (ex: n'utilise pas 🔌 si le vocal parle de changer un robinet).\n"
             . "{$locationPart}\n"
             . "3. Le Contexte et la Technique (Le Corps du texte) : Un court paragraphe (2-3 phrases) qui explique ce qui a été fait, les matériaux ou marques utilisés, la spécificité technique. Intègre ici les éléments clés du mémo vocal.\n"
@@ -662,7 +663,8 @@ IMPORTANT : Ne sors RIEN d'autre que du JSON. Sois précis sur les catégories."
         }
 
         $str = "═══ IDENTITÉ DE L'ARTISAN (CRITIQUE) ═══\n"
-            . "- ENTREPRISE : {$name} (RÈGLE : C'est UN NOM PROPRE, jamais un verbe. Utilise 'L'équipe de {$name}' ou 'Chez {$name}')\n"
+            . "- NOM DE L'ENTREPRISE : {$name}\n"
+            . "  (RÈGLE : C'est un NOM PROPRE invariable, pas un verbe. Ne jamais l'utiliser dans l'accroche.)\n"
             . "- VILLE/SECTEUR : {$locationStr}\n"
             . "- MÉTIER : {$trade}";
 

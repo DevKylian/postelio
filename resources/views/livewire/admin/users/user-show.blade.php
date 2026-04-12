@@ -342,6 +342,20 @@
                     {{ $posts->links() }}
                 </div>
             </div>
+            <!-- Danger Zone -->
+            <div class="mt-20 pt-10 border-t border-gray-100">
+                <div class="bg-red-50/20 rounded-2xl border border-red-100 p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div>
+                        <h3 class="font-bold text-red-600">Supprimer le compte</h3>
+                        <p class="text-xs text-gray-500 mt-1">Action irréversible. Toutes les données seront effacées.</p>
+                    </div>
+                    <button wire:click="deleteUser" 
+                            wire:confirm="Supprimer définitivement l'utilisateur ?"
+                            class="px-5 py-2.5 bg-red-600 text-white text-xs font-bold rounded-xl hover:bg-red-700 transition-all active:scale-95">
+                        Supprimer
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 

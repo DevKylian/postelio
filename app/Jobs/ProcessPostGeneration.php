@@ -65,6 +65,18 @@ class ProcessPostGeneration implements ShouldQueue
                 }
 
                 if ($company) {
+                    // Step 1a: GPT-4o city-name correction (handles severe Whisper deformations)
+                    $nearbyCities = $company->nearby_cities ?? [];
+                    if (!empty($nearbyCities) && $company->city) {
+                        $transcript = $refiner->correctCityNamesInTranscript(
+                            $transcript,
+                            $company->city,
+                            $nearbyCities
+                        );
+                        Log::info("City name correction applied", ['transcript_length' => strlen($transcript)]);
+                    }
+
+                    // Step 1b: PHP fuzzy correction for the base city & company name
                     $transcript = $this->correctKnownTerms($transcript, $company);
                 }
                 $this->post->update(['transcription' => $transcript]);
@@ -179,6 +191,16 @@ class ProcessPostGeneration implements ShouldQueue
             $company->city,
             $company->name,
         ]);
+
+        // Also include nearby cities so minor fuzzy deformations are caught
+        $nearbyCities = $company->nearby_cities ?? [];
+        foreach ($nearbyCities as $entry) {
+            // Strip postal code: "Sainte-Néomaye (79260)" → "Sainte-Néomaye"
+            $cityName = trim(preg_replace('/\s*\(\d+\)$/', '', $entry));
+            if ($cityName) {
+                $knownTerms[] = $cityName;
+            }
+        }
 
         foreach ($knownTerms as $correct) {
             if (!$correct || mb_strlen($correct) < 3) continue;

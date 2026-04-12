@@ -174,12 +174,22 @@ class PostGenerator extends Component
             $transcript = $transcriber->transcribe($path, $geoPrompt);
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Transcription finished', ['length' => strlen($transcript)]);
 
-            // 3. Pré-remplir le champ texte avec la transcription brute
+            // 3. Correct phonetic city name deformations before showing to user
+            $refiner = app(\App\Services\PostGeneration\ContentRefinerService::class);
+            $nearbyCities = $company?->nearby_cities ?? [];
+            if (!empty($nearbyCities) && $company?->city) {
+                $transcript = $refiner->correctCityNamesInTranscript(
+                    $transcript,
+                    $company->city,
+                    $nearbyCities
+                );
+            }
+
+            // 4. Pré-remplir le champ texte avec la transcription corrigée
             $this->textContent = $transcript;
 
-            // 4. Extract fields
+            // 5. Extract fields
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Starting field extraction');
-            $refiner = app(\App\Services\PostGeneration\ContentRefinerService::class);
             $extracted = $refiner->extractFields($transcript);
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Field extraction finished', ['extracted' => $extracted]);
 

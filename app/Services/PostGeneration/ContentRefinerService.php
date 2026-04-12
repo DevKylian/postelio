@@ -506,6 +506,66 @@ class ContentRefinerService
         return $zones[$template][$field] ?? null;
     }
 
+    /**
+     * Correct phonetically deformed city names in a Whisper transcript.
+     *
+     * Whisper sometimes produces heavily distorted renderings of French commune names
+     * (e.g. "saint neon maille" instead of "Sainte-Néomaye"). A dedicated, minimal
+     * GPT-4o call with the official commune list resolves this reliably before the
+     * main post-generation prompt runs.
+     *
+     * Only called when the company has nearby_cities stored (i.e. city was selected
+     * via the autocomplete). Returns the transcript unchanged on any error.
+     */
+    public function correctCityNamesInTranscript(string $transcript, string $baseCity, array $nearbyCities): string
+    {
+        if (empty($nearbyCities)) {
+            return $transcript;
+        }
+
+        // Build a compact list (names only, no postal codes) for the prompt
+        $names = array_map(
+            fn($c) => preg_replace('/\s*\(\d+\)$/', '', $c),
+            array_slice($nearbyCities, 0, 60)
+        );
+        $communeList = implode(', ', $names);
+
+        $prompt = "Tu es un correcteur orthographique spécialisé dans les noms de communes françaises.\n\n"
+            . "La transcription automatique Whisper ci-dessous peut contenir des noms de communes phonétiquement "
+            . "déformés ou mal découpés (exemple : 'saint neon maille' au lieu de 'Sainte-Néomaye', "
+            . "'chiré' au lieu de 'Échiré', 'aifre' au lieu de 'Aiffres').\n\n"
+            . "Communes officielles dans un rayon de 35 km autour de {$baseCity} :\n"
+            . $communeList . "\n\n"
+            . "TÂCHE UNIQUE :\n"
+            . "Identifie dans la transcription tout mot ou groupe de mots qui correspond phonétiquement "
+            . "à l'une des communes de la liste ci-dessus, et remplace-le par le nom officiel exact.\n"
+            . "Ne modifie RIEN d'autre dans le texte. Si aucune commune ne correspond, retourne le texte identique.\n\n"
+            . "Transcription à corriger :\n"
+            . $transcript . "\n\n"
+            . "Réponds UNIQUEMENT avec la transcription corrigée, sans explication ni commentaire.";
+
+        try {
+            $response = OpenAI::chat()->create([
+                'model'       => 'gpt-4o',
+                'messages'    => [['role' => 'user', 'content' => $prompt]],
+                'max_tokens'  => 600,
+                'temperature' => 0,
+            ]);
+
+            $corrected = trim($response->choices[0]->message->content);
+
+            // Safety: if the response is empty or suspiciously short, keep original
+            if (mb_strlen($corrected) < mb_strlen($transcript) * 0.5) {
+                return $transcript;
+            }
+
+            return $corrected;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('[CityCorrection] Failed: ' . $e->getMessage());
+            return $transcript;
+        }
+    }
+
     public function extractFields(string $transcript): array
     {
         \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] ContentRefinerService::extractFields started');

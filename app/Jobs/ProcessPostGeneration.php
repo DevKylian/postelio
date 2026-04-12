@@ -65,15 +65,16 @@ class ProcessPostGeneration implements ShouldQueue
                 }
 
                 if ($company) {
-                    // Step 1a: GPT-4o city-name correction (handles severe Whisper deformations)
-                    $nearbyCities = $company->nearby_cities ?? [];
-                    if (!empty($nearbyCities) && $company->city) {
+                    // Step 1a: GPT-4o city-name correction — always runs when a city is set.
+                    // fetchNearbyCities() is called server-side if nearby_cities not stored yet.
+                    if ($company->city) {
                         $transcript = $refiner->correctCityNamesInTranscript(
                             $transcript,
                             $company->city,
-                            $nearbyCities
+                            $company->nearby_cities ?? [],
+                            $company->postal_code
                         );
-                        Log::info("City name correction applied", ['transcript_length' => strlen($transcript)]);
+                        Log::info("City name correction done", ['transcript_length' => strlen($transcript)]);
                     }
 
                     // Step 1b: PHP fuzzy correction for the base city & company name

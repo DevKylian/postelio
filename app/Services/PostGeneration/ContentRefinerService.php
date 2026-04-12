@@ -517,46 +517,78 @@ class ContentRefinerService
      * Only called when the company has nearby_cities stored (i.e. city was selected
      * via the autocomplete). Returns the transcript unchanged on any error.
      */
-    public function correctCityNamesInTranscript(string $transcript, string $baseCity, array $nearbyCities): string
-    {
-        if (empty($nearbyCities)) {
-            return $transcript;
+    /**
+     * Correct phonetically deformed city names in a Whisper transcript.
+     *
+     * Always runs when a base city is known. If the stored nearby_cities list is empty,
+     * it fetches the communes server-side from the French geo API (cached 24h) using
+     * the postal code — so it works even if the user never clicked the autocomplete.
+     *
+     * @param string      $baseCity     Company's home city (e.g. "Niort")
+     * @param array       $nearbyCities Pre-stored list e.g. ["Sainte-Néomaye (79260)", ...]
+     * @param string|null $postalCode   Used to fetch nearby cities when list is empty
+     */
+    public function correctCityNamesInTranscript(
+        string $transcript,
+        string $baseCity,
+        array $nearbyCities = [],
+        ?string $postalCode = null
+    ): string {
+        // If nearby cities not stored yet, fetch them server-side (cached 24h)
+        if (empty($nearbyCities) && $postalCode) {
+            $nearbyCities = TranscriptionService::fetchNearbyCities($baseCity, $postalCode);
         }
 
-        // Build a compact list (names only, no postal codes) for the prompt
+        // Build commune list for the prompt (names only, no postal codes)
         $names = array_map(
             fn($c) => preg_replace('/\s*\(\d+\)$/', '', $c),
             array_slice($nearbyCities, 0, 60)
         );
-        $communeList = implode(', ', $names);
+        $communeList = !empty($names) ? implode(', ', $names) : null;
+
+        $listSection = $communeList
+            ? "Communes officielles dans un rayon de 35 km autour de {$baseCity} :\n{$communeList}\n\n"
+            : "L'artisan est basé à {$baseCity}.\n\n";
 
         $prompt = "Tu es un correcteur orthographique spécialisé dans les noms de communes françaises.\n\n"
-            . "La transcription automatique Whisper ci-dessous peut contenir des noms de communes phonétiquement "
-            . "déformés ou mal découpés (exemple : 'saint neon maille' au lieu de 'Sainte-Néomaye', "
-            . "'chiré' au lieu de 'Échiré', 'aifre' au lieu de 'Aiffres').\n\n"
-            . "Communes officielles dans un rayon de 35 km autour de {$baseCity} :\n"
-            . $communeList . "\n\n"
-            . "TÂCHE UNIQUE :\n"
-            . "Identifie dans la transcription tout mot ou groupe de mots qui correspond phonétiquement "
-            . "à l'une des communes de la liste ci-dessus, et remplace-le par le nom officiel exact.\n"
-            . "Ne modifie RIEN d'autre dans le texte. Si aucune commune ne correspond, retourne le texte identique.\n\n"
-            . "Transcription à corriger :\n"
+            . "La transcription automatique Whisper ci-dessous peut contenir des noms de communes "
+            . "phonétiquement déformés ou mal découpés.\n"
+            . "Exemples typiques d'erreurs Whisper :\n"
+            . "- 'saint neon maille' → Sainte-Néomaye\n"
+            . "- 'chiré' → Échiré\n"
+            . "- 'aifre' → Aiffres\n"
+            . "- 'peros' → Perros-Guirec\n\n"
+            . $listSection
+            . "TÂCHE : Identifie dans la transcription tout mot ou groupe de mots qui correspond "
+            . "phonétiquement à une commune française réelle" . ($communeList ? " de la liste ci-dessus" : " du secteur de {$baseCity}") . ", "
+            . "et remplace-le par le nom officiel exact.\n"
+            . "Ne modifie RIEN d'autre dans le texte.\n"
+            . "Si aucun nom de commune n'est déformé, retourne le texte identique.\n\n"
+            . "Transcription :\n"
             . $transcript . "\n\n"
-            . "Réponds UNIQUEMENT avec la transcription corrigée, sans explication ni commentaire.";
+            . "Réponds UNIQUEMENT avec la transcription corrigée, sans explication.";
 
         try {
             $response = OpenAI::chat()->create([
                 'model'       => 'gpt-4o',
                 'messages'    => [['role' => 'user', 'content' => $prompt]],
-                'max_tokens'  => 600,
+                'max_tokens'  => 800,
                 'temperature' => 0,
             ]);
 
             $corrected = trim($response->choices[0]->message->content);
 
-            // Safety: if the response is empty or suspiciously short, keep original
+            // Safety: if GPT returns something suspiciously short, keep original
             if (mb_strlen($corrected) < mb_strlen($transcript) * 0.5) {
+                \Illuminate\Support\Facades\Log::warning('[CityCorrection] Response too short, keeping original');
                 return $transcript;
+            }
+
+            if ($corrected !== $transcript) {
+                \Illuminate\Support\Facades\Log::info('[CityCorrection] Corrected transcript', [
+                    'before' => $transcript,
+                    'after'  => $corrected,
+                ]);
             }
 
             return $corrected;

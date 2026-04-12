@@ -174,14 +174,15 @@ class PostGenerator extends Component
             $transcript = $transcriber->transcribe($path, $geoPrompt);
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Transcription finished', ['length' => strlen($transcript)]);
 
-            // 3. Correct phonetic city name deformations before showing to user
+            // 3. Correct phonetic city name deformations before showing to user.
+            //    Always runs when a city is set — fetches nearby communes if not stored yet.
             $refiner = app(\App\Services\PostGeneration\ContentRefinerService::class);
-            $nearbyCities = $company?->nearby_cities ?? [];
-            if (!empty($nearbyCities) && $company?->city) {
+            if ($company?->city) {
                 $transcript = $refiner->correctCityNamesInTranscript(
                     $transcript,
                     $company->city,
-                    $nearbyCities
+                    $company->nearby_cities ?? [],
+                    $company->postal_code
                 );
             }
 

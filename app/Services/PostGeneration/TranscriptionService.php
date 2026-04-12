@@ -4,17 +4,17 @@ namespace App\Services\PostGeneration;
 
 use OpenAI\Laravel\Facades\OpenAI;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class TranscriptionService
 {
     /**
      * Transcribe an audio file using OpenAI Whisper.
      *
-     * @param string      $audioPath    Path relative to the public disk.
-     * @param string|null $whisperPrompt Optional prompt to prime Whisper with proper nouns
-     *                                   (city names, trade vocabulary, etc.) so it can spell
-     *                                   them correctly even when spoken with a regional accent.
-     *                                   Max ~224 tokens. Should be in the same language as the audio.
+     * @param string      $audioPath     Path relative to the public disk.
+     * @param string|null $whisperPrompt Optional prompt to prime Whisper with proper nouns.
      */
     public function transcribe(string $audioPath, ?string $whisperPrompt = null): string
     {
@@ -35,6 +35,64 @@ class TranscriptionService
     }
 
     /**
+     * Fetch the list of communes within 35 km of a given city/postal code.
+     *
+     * Uses the French government's geo API. Results are cached for 24 hours
+     * so repeated calls (multiple posts in a day) cost nothing.
+     *
+     * Returns an array of strings like ["Sainte-Néomaye (79260)", "Aiffres (79230)", ...]
+     * Returns [] on any network/API failure (non-blocking).
+     */
+    public static function fetchNearbyCities(string $city, string $postalCode): array
+    {
+        $cacheKey = 'nearby_cities_' . md5($city . $postalCode);
+
+        return Cache::remember($cacheKey, 86400, function () use ($city, $postalCode) {
+            try {
+                // 1. Resolve coordinates from city + postal code
+                $addrResp = Http::timeout(6)->get('https://api-adresse.data.gouv.fr/search/', [
+                    'q'     => $city . ' ' . $postalCode,
+                    'type'  => 'municipality',
+                    'limit' => 1,
+                ]);
+
+                $features = $addrResp->json('features', []);
+                if (empty($features)) {
+                    Log::warning("[GeoFetch] No address result for {$city} ({$postalCode})");
+                    return [];
+                }
+
+                [$lng, $lat] = $features[0]['geometry']['coordinates'];
+
+                // 2. Fetch communes within 35 km
+                $geoResp = Http::timeout(6)->get('https://geo.api.gouv.fr/communes', [
+                    'lat'      => $lat,
+                    'lon'      => $lng,
+                    'distance' => 35000,
+                    'fields'   => 'nom,codesPostaux',
+                    'boost'    => 'population',
+                    'limit'    => 60,
+                    'type'     => 'commune-actuelle',
+                ]);
+
+                $communes = $geoResp->json() ?? [];
+
+                $result = array_map(
+                    fn($c) => $c['nom'] . ' (' . ($c['codesPostaux'][0] ?? '') . ')',
+                    $communes
+                );
+
+                Log::info("[GeoFetch] Fetched " . count($result) . " communes around {$city}");
+                return $result;
+
+            } catch (\Throwable $e) {
+                Log::warning("[GeoFetch] Failed: " . $e->getMessage());
+                return [];
+            }
+        });
+    }
+
+    /**
      * Build a Whisper priming prompt from a company's geographic context.
      * Lists nearby commune names so Whisper recognises them even when spoken
      * with a regional accent or phonetic approximation.
@@ -43,29 +101,23 @@ class TranscriptionService
      */
     public static function buildGeoPrompt(?string $city, ?string $postalCode, array $nearbyCities = []): ?string
     {
-        if (!$city && empty($nearbyCities)) {
+        if (!$city) {
             return null;
         }
 
-        // Start with a natural-language sentence Whisper can latch onto
-        $base = $city
-            ? "Artisan basé à {$city}" . ($postalCode ? " ({$postalCode})" : "") . "."
-            : "Artisan.";
+        $base = "Artisan basé à {$city}" . ($postalCode ? " ({$postalCode})" : "") . ".";
 
         if (empty($nearbyCities)) {
             return $base;
         }
 
-        // Strip postal codes from stored strings like "Sainte-Néomaye (79260)" → "Sainte-Néomaye"
         $names = array_map(
             fn($c) => preg_replace('/\s*\(\d+\)$/', '', $c),
             $nearbyCities
         );
 
-        // Keep under ~180 tokens: roughly 4 chars/token in French → ~700 chars
         $communeList = implode(', ', $names);
         if (strlen($communeList) > 650) {
-            // Trim to fit — keep the first N communes that fit
             $truncated = [];
             $len = 0;
             foreach ($names as $name) {

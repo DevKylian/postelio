@@ -53,13 +53,31 @@ class ProcessPostGeneration implements ShouldQueue
                     $transcript = $textContent;
                 } elseif ($audioPath) {
                     Log::info("Starting transcription from audio file", ['path' => $audioPath]);
-                    $transcript = $transcriber->transcribe($audioPath);
+                    $geoPrompt = \App\Services\PostGeneration\TranscriptionService::buildGeoPrompt(
+                        $company?->city,
+                        $company?->postal_code,
+                        $company?->nearby_cities ?? []
+                    );
+                    $transcript = $transcriber->transcribe($audioPath, $geoPrompt);
                     Log::info("Transcription finished", ['length' => strlen($transcript)]);
                 } else {
                     throw new Exception("Aucun contenu (audio ou texte) fourni pour la génération.");
                 }
 
                 if ($company) {
+                    // Step 1a: GPT-4o city-name correction — always runs when a city is set.
+                    // fetchNearbyCities() is called server-side if nearby_cities not stored yet.
+                    if ($company->city) {
+                        $transcript = $refiner->correctCityNamesInTranscript(
+                            $transcript,
+                            $company->city,
+                            $company->nearby_cities ?? [],
+                            $company->postal_code
+                        );
+                        Log::info("City name correction done", ['transcript_length' => strlen($transcript)]);
+                    }
+
+                    // Step 1b: PHP fuzzy correction for the base city & company name
                     $transcript = $this->correctKnownTerms($transcript, $company);
                 }
                 $this->post->update(['transcription' => $transcript]);
@@ -69,11 +87,14 @@ class ProcessPostGeneration implements ShouldQueue
             $photoCount = count($this->post->extra_images ?? []);
             if ($company) {
                 $company->refresh();
-                $templateOptions['company_city']  = $company->city;
-                $templateOptions['company_name']  = $company->name;
-                $templateOptions['company_trade'] = $company->trade;
-                $templateOptions['company_phone'] = $company->phone;
-                $templateOptions['company_email'] = $company->email;
+                $templateOptions['company_city']    = $company->city;
+                $templateOptions['company_postal']  = $company->postal_code;
+                $templateOptions['company_context'] = $company->city_context;
+                $templateOptions['company_nearby']  = $company->nearby_cities ?? [];
+                $templateOptions['company_name']    = $company->name;
+                $templateOptions['company_trade']   = $company->trade;
+                $templateOptions['company_phone']   = $company->phone;
+                $templateOptions['company_email']   = $company->email;
                 if (!empty($company->bio_text)) {
                     $templateOptions['artisan_bio'] = $company->bio_text;
                 }
@@ -171,6 +192,16 @@ class ProcessPostGeneration implements ShouldQueue
             $company->city,
             $company->name,
         ]);
+
+        // Also include nearby cities so minor fuzzy deformations are caught
+        $nearbyCities = $company->nearby_cities ?? [];
+        foreach ($nearbyCities as $entry) {
+            // Strip postal code: "Sainte-Néomaye (79260)" → "Sainte-Néomaye"
+            $cityName = trim(preg_replace('/\s*\(\d+\)$/', '', $entry));
+            if ($cityName) {
+                $knownTerms[] = $cityName;
+            }
+        }
 
         foreach ($knownTerms as $correct) {
             if (!$correct || mb_strlen($correct) < 3) continue;

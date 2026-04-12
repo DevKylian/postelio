@@ -13,6 +13,9 @@ state([
     'trade'             => '',
     'name'              => '',
     'city'              => '',
+    'postal_code'       => '',
+    'city_context'      => '',
+    'nearby_cities'     => [],
     'phone'             => '',
     'email'             => '',
     'website'           => '',
@@ -88,6 +91,9 @@ $complete = function () {
     $data = [
         'name'              => $this->name,
         'city'              => $this->city,
+        'postal_code'       => $this->postal_code ?: null,
+        'city_context'      => $this->city_context ?: null,
+        'nearby_cities'     => !empty($this->nearby_cities) ? $this->nearby_cities : null,
         'phone'             => $this->phone,
         'email'             => $this->email,
         'website'           => $this->website,
@@ -239,11 +245,19 @@ $complete = function () {
                             <label class="block text-sm font-semibold text-gray-700 mb-1.5">
                                 Ville <span class="text-amber-400">*</span>
                             </label>
-                            <input wire:model="city"
-                                   type="text"
-                                   placeholder="Ex : Lyon"
-                                   class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm
-                                          focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200" />
+                            <x-city-autocomplete
+                                wire-city="city"
+                                wire-postal="postal_code"
+                                wire-context="city_context"
+                                wire-nearby="nearby_cities"
+                                :current-city="$city"
+                                placeholder="Ex : Lannion, Lyon, Bordeaux..."
+                                :required="true"
+                                input-class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200"
+                            />
+                            @if($city && $postal_code)
+                                <p class="mt-1.5 text-xs text-green-600 font-medium">{{ $city }} — {{ $postal_code }}</p>
+                            @endif
                             @error('city')
                                 <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $message }}</p>
                             @enderror

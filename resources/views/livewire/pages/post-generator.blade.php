@@ -1575,6 +1575,32 @@
 
     {{-- ── REVIEW PENDING ── --}}
     @elseif($status === 'review_pending')
+        {{-- Confetti burst — same as onboarding final step --}}
+        <div x-data="{ showConfetti: false }" x-init="setTimeout(() => showConfetti = true, 100)">
+            <template x-if="showConfetti">
+                <div class="fixed inset-x-0 top-1/2 flex items-center justify-center pointer-events-none z-[100]" x-cloak>
+                    <div class="md-c md-c-1 burst"></div>
+                    <div class="md-c md-c-2 burst"></div>
+                    <div class="md-c md-c-3 burst"></div>
+                    <div class="md-c md-c-4 burst"></div>
+                    <div class="md-c md-c-5 burst"></div>
+                    <div class="md-c md-c-6 burst"></div>
+                    <div class="md-c md-c-7 burst"></div>
+                    <div class="md-c md-c-8 burst"></div>
+                    <div class="md-c md-c-9 burst"></div>
+                    <div class="md-c md-c-10 burst"></div>
+                    <div class="md-c md-c-11 burst"></div>
+                    <div class="md-c md-c-12 burst"></div>
+                    <div class="md-c md-c-13 burst"></div>
+                    <div class="md-c md-c-14 burst"></div>
+                    <div class="md-c md-c-15 burst"></div>
+                    <div class="md-c md-c-16 burst"></div>
+                    <div class="md-c md-c-17 burst"></div>
+                    <div class="md-c md-c-18 burst"></div>
+                </div>
+            </template>
+        </div>
+
         <div class="space-y-5">
 
             {{-- Header --}}

@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PostList extends Component
 {
@@ -176,16 +177,22 @@ class PostList extends Component
             $zernioPost = $zernio->getZernioPost($post->zernio_id);
 
             if ($zernioPost) {
-                $zStatus = $zernioPost['status'] ?? null;
-                if ($zStatus === 'published' || $zStatus === 'posted') {
+                // Try to find status at root or in nested post key
+                $zStatus = $zernioPost['status'] ?? $zernioPost['post']['status'] ?? null;
+                
+                Log::info("Manual Status Refresh for Post #{$post->id}", ['zernio_status' => $zStatus]);
+
+                if ($zStatus === 'published' || $zStatus === 'posted' || $zStatus === 'success') {
                     $post->update(['status' => Post::STATUS_PUBLISHED]);
                     session()->flash('success', 'Statut mis à jour : le post est bien en ligne !');
-                } elseif ($zStatus === 'failed') {
+                } elseif ($zStatus === 'failed' || $zStatus === 'error') {
                     $post->update(['status' => Post::STATUS_FAILED]);
                     session()->flash('error', 'Le post a échoué sur Zernio.');
                 } else {
-                    session()->flash('info', 'Le post est toujours en cours de traitement sur Zernio.');
+                    session()->flash('info', "Le post est en statut '{$zStatus}' sur Zernio.");
                 }
+            } else {
+                session()->flash('error', 'Impossible de récupérer le statut depuis Zernio.');
             }
         } catch (\Throwable $e) {
             session()->flash('error', 'Erreur lors de la synchro : ' . $e->getMessage());

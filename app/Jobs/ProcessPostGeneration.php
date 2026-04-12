@@ -69,11 +69,13 @@ class ProcessPostGeneration implements ShouldQueue
             $photoCount = count($this->post->extra_images ?? []);
             if ($company) {
                 $company->refresh();
-                $templateOptions['company_city']  = $company->city;
-                $templateOptions['company_name']  = $company->name;
-                $templateOptions['company_trade'] = $company->trade;
-                $templateOptions['company_phone'] = $company->phone;
-                $templateOptions['company_email'] = $company->email;
+                $templateOptions['company_city']    = $company->city;
+                $templateOptions['company_postal']  = $company->postal_code;
+                $templateOptions['company_context'] = $company->city_context;
+                $templateOptions['company_name']    = $company->name;
+                $templateOptions['company_trade']   = $company->trade;
+                $templateOptions['company_phone']   = $company->phone;
+                $templateOptions['company_email']   = $company->email;
                 if (!empty($company->bio_text)) {
                     $templateOptions['artisan_bio'] = $company->bio_text;
                 }

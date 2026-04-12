@@ -248,17 +248,26 @@ class ContentRefinerService
             return "N'ajoute aucun hashtag.";
         }
 
-        $city = $options['company_city'] ?? null;
-        $trade = $options['company_trade'] ?? null;
-        $locationTag = $city ? "#" . str_replace(' ', '', $city) : null;
-        $tradeTag = $trade ? "#" . str_replace([' ', '/'], '', $trade) : null;
+        $city       = $options['company_city']   ?? null;
+        $postalCode = $options['company_postal'] ?? null;
+        $trade      = $options['company_trade']  ?? null;
+
+        // Build the primary city hashtag (no spaces, no dashes for readability, no postal code)
+        $locationTag = $city ? "#" . preg_replace('/[^a-zA-ZÀ-ÿ0-9]/u', '', $city) : null;
+
+        // If a worksite city was mentioned in the vocal, the AI should also hash it; we hint with the base city
+        $tradeTag    = $trade ? "#" . str_replace([' ', '/'], '', $trade) : null;
+
+        $locationHint = $locationTag
+            ? "Tu DOIS utiliser {$locationTag}" . ($postalCode ? " (code postal {$postalCode})" : "") . "."
+            : "Ajoute un hashtag de ville (ex: #Lannion).";
 
         return "STRUCTURE DES HASHTAGS (Partie 7) : Ajoute exactement entre 5 et 8 hashtags maximum à la fin de la légende, séparés par une ligne vide. "
             . "Trie-les par pertinence : "
             . "1. Métier" . ($tradeTag ? " (priorité : {$tradeTag})" : "") . " "
             . "> 2. Action spécifique "
             . "> 3. Matériau/Technique "
-            . "> 4. Ville/Secteur OBLIGATOIRE : " . ($locationTag ? "Tu DOIS utiliser {$locationTag}." : "Ajoute un hashtag de ville (ex: #Lannion).") . " "
+            . "> 4. Ville/Secteur OBLIGATOIRE : " . $locationHint . " Si une autre ville de chantier est citée dans le vocal, ajoute également son hashtag officiel. "
             . "> 5. #Postelio (indispensable à la fin).";
     }
 
@@ -279,10 +288,14 @@ class ContentRefinerService
             $ctaPart .= " Ne mets AUCUNE coordonnée (ni téléphone, ni email) si elles ne sont pas fournies dans le contexte.";
         }
 
-        $city = $options['company_city'] ?? null;
+        $city       = $options['company_city']   ?? null;
+        $postalCode = $options['company_postal'] ?? null;
+
         $locationPart = "2. La Localisation (Le SEO Local) : Une simple mention de la ville ou du secteur pour attirer l'algorithme local d'Instagram.";
         if ($city) {
-            $locationPart .= " Applique IMPÉRATIVEMENT la phrase suivante en utilisant la ville de l'identité ci-dessus : 📍 Intervention sur le secteur de {$city}.";
+            $cityLabel = $city . ($postalCode ? " ({$postalCode})" : "");
+            $locationPart .= " Applique IMPÉRATIVEMENT la phrase suivante (avec le nom officiel exact de la commune) : 📍 Intervention sur le secteur de {$cityLabel}."
+                . " Si le vocal mentionne un chantier dans une ville différente, utilise le nom officiel exact de cette autre commune (pas une phonétique approximative).";
         } else {
             $locationPart .= " (ex: 📍 Intervention sur le secteur de [Ville]).";
         }
@@ -544,19 +557,44 @@ IMPORTANT : Ne sors RIEN d'autre que du JSON. Sois précis sur les catégories."
      */
     private function identityInstruction(array $options): string
     {
-        $name = $options['company_name'] ?? 'Inconnu';
-        $city = $options['company_city'] ?? 'France';
-        $trade = $options['company_trade'] ?? 'Artisan';
-        $phone = $options['company_phone'] ?? null;
-        $email = $options['company_email'] ?? null;
+        $name       = $options['company_name']    ?? 'Inconnu';
+        $city       = $options['company_city']    ?? 'France';
+        $postalCode = $options['company_postal']  ?? null;
+        $context    = $options['company_context'] ?? null; // "22, Côtes-d'Armor, Bretagne"
+        $trade      = $options['company_trade']   ?? 'Artisan';
+        $phone      = $options['company_phone']   ?? null;
+        $email      = $options['company_email']   ?? null;
+
+        // Build a rich location string: "Lannion (22300) — Côtes-d'Armor, Bretagne"
+        $locationStr = $city;
+        if ($postalCode) {
+            $locationStr .= " ({$postalCode})";
+        }
+        if ($context) {
+            // context is "22, Côtes-d'Armor, Bretagne" — strip the dept number prefix
+            $contextParts = array_map('trim', explode(',', $context, 2));
+            $locationStr .= " — " . ($contextParts[1] ?? $context);
+        }
 
         $str = "═══ IDENTITÉ DE L'ARTISAN (CRITIQUE) ═══\n"
             . "- ENTREPRISE : {$name}\n"
-            . "- VILLE/SECTEUR : {$city}\n"
+            . "- VILLE/SECTEUR : {$locationStr}\n"
             . "- MÉTIER : {$trade}";
-        
+
         if ($phone) $str .= "\n- TÉLÉPHONE : {$phone}";
         if ($email) $str .= "\n- EMAIL : {$email}";
+
+        // Geographic context instruction: help AI recognise approximate city names from voice
+        if ($postalCode || $context) {
+            $str .= "\n\n═══ GÉOGRAPHIE (CRITIQUE POUR LES VILLES) ═══\n"
+                . "L'artisan est basé à {$locationStr}. "
+                . "Quand le vocal mentionne une commune sous une forme approximative ou phonétique "
+                . "(ex: 'Péros' pour Perros-Guirec, 'Lannion' au lieu de Lannion-Trégor, etc.), "
+                . "tu DOIS identifier et écrire le nom officiel exact de la commune française la plus "
+                . "probable dans cette région. "
+                . "N'écris JAMAIS une orthographe inventée ou phonétique d'une ville : utilise toujours "
+                . "le nom officiel tel qu'il apparaît sur La Poste ou sur les panneaux routiers.";
+        }
 
         return $str;
     }

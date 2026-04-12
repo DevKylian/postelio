@@ -8,6 +8,8 @@ use function Livewire\Volt\{state};
 state([
     'name'              => fn () => auth()->user()->company?->name ?? '',
     'city'              => fn () => auth()->user()->company?->city ?? '',
+    'postal_code'       => fn () => auth()->user()->company?->postal_code ?? '',
+    'city_context'      => fn () => auth()->user()->company?->city_context ?? '',
     'phone'             => fn () => auth()->user()->company?->phone ?? '',
     'email'             => fn () => auth()->user()->company?->email ?? '',
     'website'           => fn () => auth()->user()->company?->website ?? '',
@@ -34,6 +36,8 @@ $updateCompanySettings = function () {
     $data = [
         'name'              => $this->name,
         'city'              => $this->city,
+        'postal_code'       => $this->postal_code ?: null,
+        'city_context'      => $this->city_context ?: null,
         'phone'             => $this->phone,
         'email'             => $this->email,
         'website'           => $this->website,
@@ -52,6 +56,8 @@ $updateCompanySettings = function () {
 
     $this->name              = $user->company->name;
     $this->city              = $user->company->city ?? '';
+    $this->postal_code       = $user->company->postal_code ?? '';
+    $this->city_context      = $user->company->city_context ?? '';
     $this->phone             = $user->company->phone ?? '';
     $this->email             = $user->company->email ?? '';
     $this->website           = $user->company->website ?? '';
@@ -92,12 +98,19 @@ $updateCompanySettings = function () {
         <!-- Ville -->
         <div>
             <x-input-label for="city" value="Ville" />
-            <x-text-input wire:model="city"
-                          id="city"
-                          name="city"
-                          type="text"
-                          class="mt-1 block w-full"
-                          autocomplete="address-level2" />
+            <x-city-autocomplete
+                wire-city="city"
+                wire-postal="postal_code"
+                wire-context="city_context"
+                :current-city="$city"
+                placeholder="Ex : Lannion, Lyon, Bordeaux..."
+                input-class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+            />
+            @if($city && $postal_code)
+                <p class="mt-1 text-xs text-green-600 font-medium">{{ $city }} ({{ $postal_code }})</p>
+            @elseif($city && !$postal_code)
+                <p class="mt-1 text-xs text-amber-600">Tapez votre ville et sélectionnez une suggestion pour enregistrer le code postal.</p>
+            @endif
             <x-input-error class="mt-2" :messages="$errors->get('city')" />
         </div>
 

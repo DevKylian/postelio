@@ -10,6 +10,8 @@ class Company extends Model
         'user_id',
         'name',
         'city',
+        'postal_code',
+        'city_context',
         'phone',
         'email',
         'website',

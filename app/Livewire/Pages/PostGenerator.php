@@ -415,6 +415,8 @@ class PostGenerator extends Component
             'company_email'          => Auth::user()->company?->email,
             'company_website'        => Auth::user()->company?->website,
             'company_city'           => Auth::user()->company?->city,
+            'company_postal'         => Auth::user()->company?->postal_code,
+            'company_context'        => Auth::user()->company?->city_context,
             'company_trade'          => Auth::user()->company?->trade,
             'aspect_ratio'           => $this->aspectRatio,
             'variant_count'          => $user->postVariantsCount(),

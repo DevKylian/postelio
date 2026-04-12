@@ -94,6 +94,7 @@ class ZernioService
 
         $payload = [
             'content'    => $caption,
+            'ref'        => (string) $post->id,
             'publishNow' => true,
             'platforms'  => [
                 ['platform' => $platform, 'accountId' => $accountId]
@@ -145,18 +146,28 @@ class ZernioService
             throw new \RuntimeException('Zernio publish failed: ' . $response->body());
         }
 
+        Log::info("Zernio Response Received", [
+            'status' => $response->status(),
+            'body' => $response->json()
+        ]);
+
         $zernioId = $response->json('post.id') ?? $response->json('post._id') ?? $response->json('id') ?? $response->json('_id');
         
         if ($zernioId) {
             $existingIds = $post->zernio_ids ?? [];
+            if (!is_array($existingIds)) $existingIds = [];
+            
             if (!in_array($zernioId, $existingIds)) {
                 $existingIds[] = $zernioId;
             }
             
-            $post->update([
-                'zernio_id' => $zernioId, // Still set this for backward compatibility and quick lookups
-                'zernio_ids' => $existingIds
-            ]);
+            $post->zernio_id = $zernioId;
+            $post->zernio_ids = $existingIds;
+            $post->save();
+
+            Log::info("Zernio ID saved to post #{$post->id}", ['zernio_id' => $zernioId]);
+        } else {
+            Log::warning("Zernio ID NOT found in response for post #{$post->id}", ['response' => $response->json()]);
         }
 
         return $zernioId ?? '';

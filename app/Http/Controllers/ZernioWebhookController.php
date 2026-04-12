@@ -39,52 +39,58 @@ class ZernioWebhookController extends Controller
         $event = $payload['event'] ?? $payload['type'] ?? null;
         $data  = $payload['data'] ?? $payload;
 
+        $result = ['status' => 'ok', 'event' => $event];
+
         switch ($event) {
             case 'post.published':
             case 'post.sent':
-            case 'post.created': // Sometimes sent when published immediately
-                $this->handlePostPublished($data);
+            case 'post.created':
+                $match = $this->handlePostPublished($data);
+                $result['matched'] = $match ? 'yes' : 'no';
+                $result['zernio_id'] = $data['post']['id'] ?? $data['post']['_id'] ?? $data['post_id'] ?? $data['id'] ?? $data['_id'] ?? 'not_found';
                 break;
 
             case 'post.failed':
-                $this->handlePostFailed($data);
+                $match = $this->handlePostFailed($data);
+                $result['matched'] = $match ? 'yes' : 'no';
                 break;
-
-            case 'account.connected':
-                $this->handleAccountConnected($data);
-                break;
-
-            case 'account.disconnected':
-                $this->handleAccountDisconnected($data);
-                break;
-
+            
             default:
                 Log::info('Zernio Webhook event ignored', ['event' => $event, 'payload' => $payload]);
+                $result['status'] = 'ignored';
                 break;
         }
 
-        return response()->json(['status' => 'ok']);
+        return response()->json($result);
     }
 
-    private function handlePostPublished(array $data)
+    private function handlePostPublished(array $data): bool
     {
         // Try all possible nested or top-level ID fields
         $zernioPostId = $data['post']['id'] ?? $data['post']['_id'] ?? $data['post_id'] ?? $data['id'] ?? $data['_id'] ?? null;
-        
-        if (!$zernioPostId) {
-            Log::warning('Zernio Webhook: Could not find post ID in payload', ['data' => $data]);
-            return;
+        $ref = $data['ref'] ?? $data['post']['ref'] ?? $data['metadata']['ref'] ?? null;
+
+        if (!$zernioPostId && !$ref) {
+            Log::warning('Zernio Webhook: Could not find post ID or Ref in payload', ['data' => $data]);
+            return false;
         }
 
-        // 1. Search in the new JSON array (support for multi-platform)
-        $post = Post::whereJsonContains('zernio_ids', $zernioPostId)->first();
+        // 1. Search by Ref (our internal ID)
+        $post = null;
+        if ($ref) {
+            $post = Post::find($ref);
+        }
 
-        // 2. Fallback to the single string column (legacy)
+        // 2. Search in the new JSON array
+        if (!$post) {
+            $post = Post::whereJsonContains('zernio_ids', $zernioPostId)->first();
+        }
+
+        // 3. Fallback to the single string column
         if (!$post) {
             $post = Post::where('zernio_id', $zernioPostId)->first();
         }
 
-        // 3. Last resort: if it's a published post and we match nothing, log it effectively
         if ($post) {
             $post->update(['status' => Post::STATUS_PUBLISHED]);
             
@@ -97,22 +103,33 @@ class ZernioWebhookController extends Controller
             ]);
 
             Log::info('Post status updated to published via Webhook', ['post_id' => $post->id, 'zernio_id' => $zernioPostId]);
+            return true;
         } else {
             Log::warning('Zernio Post Published but not found in DB', ['zernio_id' => $zernioPostId, 'data' => $data]);
+            return false;
         }
     }
 
-    private function handlePostFailed(array $data)
+    private function handlePostFailed(array $data): bool
     {
         $zernioPostId = $data['post']['id'] ?? $data['post']['_id'] ?? $data['post_id'] ?? $data['id'] ?? $data['_id'] ?? null;
+        $ref = $data['ref'] ?? $data['post']['ref'] ?? $data['metadata']['ref'] ?? null;
         $error = $data['error'] ?? $data['message'] ?? 'Unknown error';
         
-        if (!$zernioPostId) {
-            Log::warning('Zernio Webhook Failed: Could not find post ID in payload', ['data' => $data]);
-            return;
+        if (!$zernioPostId && !$ref) {
+            Log::warning('Zernio Webhook Failed: Could not find post ID or Ref in payload', ['data' => $data]);
+            return false;
         }
 
-        $post = Post::whereJsonContains('zernio_ids', $zernioPostId)->first();
+        $post = null;
+        if ($ref) {
+            $post = Post::find($ref);
+        }
+
+        if (!$post) {
+            $post = Post::whereJsonContains('zernio_ids', $zernioPostId)->first();
+        }
+
         if (!$post) {
             $post = Post::where('zernio_id', $zernioPostId)->first();
         }
@@ -124,12 +141,15 @@ class ZernioWebhookController extends Controller
                 'user_id' => $post->user_id,
                 'company_id' => $post->company_id,
                 'type' => 'post.failed',
-                'message' => "Échec de la publication : {$error}",
+                'message' => "La publication a échoué : " . $error,
                 'data' => $data
             ]);
 
             Log::error('Post status updated to failed via Webhook', ['post_id' => $post->id, 'zernio_id' => $zernioPostId, 'error' => $error]);
+            return true;
         }
+
+        return false;
     }
 
     private function handleAccountConnected(array $data)

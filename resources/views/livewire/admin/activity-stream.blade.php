@@ -92,7 +92,13 @@
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
                                             <div class="flex flex-col">
-                                                <span class="text-[13px] font-semibold text-white group-hover:text-copper transition-colors">{{ $log->email ?? 'Anonymous' }}</span>
+                                                @if($log->user_id)
+                                                    <a href="{{ route('admin.users.show', $log->user_id) }}" wire:navigate class="text-[13px] font-semibold text-white hover:text-copper transition-colors">
+                                                        {{ $log->email }}
+                                                    </a>
+                                                @else
+                                                    <span class="text-[13px] font-semibold text-white">{{ $log->email ?? 'Anonymous' }}</span>
+                                                @endif
                                                 <div class="flex items-center gap-1.5 mt-0.5">
                                                     <span class="px-1.5 py-0.5 rounded border text-[9px] font-black uppercase tracking-tighter {{ $rankColor }}">
                                                         {{ $log->rank }}

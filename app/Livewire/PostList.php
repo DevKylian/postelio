@@ -166,7 +166,10 @@ class PostList extends Component
      */
     public function refreshStatus(Post $post)
     {
-        if ($post->user_id !== Auth::id() || !$post->zernio_id) return;
+        $post = $post->fresh();
+        if (!$post || $post->user_id !== Auth::id() || !$post->zernio_id) {
+            return;
+        }
 
         try {
             $zernio = app(\App\Services\ZernioService::class);

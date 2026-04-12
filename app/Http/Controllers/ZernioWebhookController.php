@@ -20,18 +20,11 @@ class ZernioWebhookController extends Controller
         $payload = $request->all();
         $rawPayload = $request->getContent();
 
-        Log::info('Zernio Webhook received', [
-            'event' => $payload['event'] ?? $payload['type'] ?? 'unknown',
-            'has_signature' => $signature ? 'yes' : 'no',
-            'header_type' => $request->hasHeader('X-Zernio-Signature') ? 'Zernio' : ($request->hasHeader('X-Late-Signature') ? 'Late' : 'none')
-        ]);
-
         // Verify signature if secret is configured
         $secret = config('services.zernio.webhook_secret');
         if ($secret && $signature) {
             $computedSignature = hash_hmac('sha256', $rawPayload, $secret);
             if (!hash_equals($computedSignature, $signature)) {
-                Log::warning('Zernio Webhook signature mismatch');
                 return response()->json(['error' => 'Invalid signature'], 401);
             }
         }
@@ -56,7 +49,6 @@ class ZernioWebhookController extends Controller
                 break;
             
             default:
-                Log::info('Zernio Webhook event ignored', ['event' => $event, 'payload' => $payload]);
                 $result['status'] = 'ignored';
                 break;
         }
@@ -71,7 +63,6 @@ class ZernioWebhookController extends Controller
         $ref = $data['ref'] ?? $data['post']['ref'] ?? $data['metadata']['ref'] ?? null;
 
         if (!$zernioPostId && !$ref) {
-            Log::warning('Zernio Webhook: Could not find post ID or Ref in payload', ['data' => $data]);
             return false;
         }
 
@@ -102,10 +93,8 @@ class ZernioWebhookController extends Controller
                 'data' => $data
             ]);
 
-            Log::info('Post status updated to published via Webhook', ['post_id' => $post->id, 'zernio_id' => $zernioPostId]);
             return true;
         } else {
-            Log::warning('Zernio Post Published but not found in DB', ['zernio_id' => $zernioPostId, 'data' => $data]);
             return false;
         }
     }
@@ -117,7 +106,6 @@ class ZernioWebhookController extends Controller
         $error = $data['error'] ?? $data['message'] ?? 'Unknown error';
         
         if (!$zernioPostId && !$ref) {
-            Log::warning('Zernio Webhook Failed: Could not find post ID or Ref in payload', ['data' => $data]);
             return false;
         }
 

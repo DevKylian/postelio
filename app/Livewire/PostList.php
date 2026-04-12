@@ -165,23 +165,11 @@ class PostList extends Component
     /**
      * Synchronize post status from Zernio API if webhook was missed.
      */
-    public function refreshStatus(Post $post)
+    public function refreshStatus($postId)
     {
-        Log::info("refreshStatus called for Post #{$post->id}", [
-            'zernio_id_model' => $post->zernio_id,
-            'user_id_model' => $post->user_id,
-            'auth_id' => Auth::id()
-        ]);
+        $post = Post::where('id', $postId)->where('user_id', Auth::id())->first();
 
-        $post = $post->fresh();
-        
-        Log::info("refreshStatus data after fresh()", [
-            'zernio_id_fresh' => $post->zernio_id,
-            'status_fresh' => $post->status
-        ]);
-
-        if (!$post || $post->user_id !== Auth::id() || !$post->zernio_id) {
-            Log::warning("refreshStatus aborted for Post #{$post->id} (Condition failed)");
+        if (!$post || !$post->zernio_id) {
             return;
         }
 
@@ -194,29 +182,18 @@ class PostList extends Component
                 $zStatus = $zernioPost['status'] ?? $zernioPost['post']['status'] ?? null;
                 $zStatus = strtolower((string) $zStatus);
                 
-                Log::info("Manual Status Refresh for Post #{$post->id}", ['zernio_status' => $zStatus]);
-
                 if (in_array($zStatus, ['published', 'posted', 'success'])) {
                     $post->status = Post::STATUS_PUBLISHED;
-                    if ($post->save()) {
-                        Log::info("Post #{$post->id} successfully updated to published.");
-                        session()->flash('success', 'Statut mis à jour : le post est bien en ligne !');
-                    } else {
-                        Log::error("Failed to save status for Post #{$post->id}");
-                        session()->flash('error', 'Erreur lors de la sauvegarde en base de données.');
-                    }
+                    $post->save();
+                    session()->flash('success', 'Statut mis à jour : le post est bien en ligne !');
                 } elseif (in_array($zStatus, ['failed', 'error'])) {
                     $post->status = Post::STATUS_FAILED;
                     $post->save();
                     session()->flash('error', 'Le post a échoué sur Zernio.');
-                } else {
-                    session()->flash('info', "Le post est en statut '{$zStatus}' sur Zernio.");
                 }
-            } else {
-                session()->flash('error', 'Zernio n\'a pas renvoyé de données pour ce post.');
             }
         } catch (\Throwable $e) {
-            session()->flash('error', 'Erreur lors de la synchro : ' . $e->getMessage());
+            // Silently fail or log minimal error in production
         }
     }
 

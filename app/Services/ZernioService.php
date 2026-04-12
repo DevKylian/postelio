@@ -132,24 +132,12 @@ class ZernioService
             }, $mediaUrls);
         }
 
-        Log::info("Sending Zernio post request", ['payload' => $payload]);
-
         $response = Http::withToken($this->apiKey)
             ->post("{$this->baseUrl}/posts", $payload);
 
         if (!$response->successful()) {
-            Log::error('Zernio publish failed', [
-                'status' => $response->status(),
-                'body'   => $response->body(),
-                'payload' => $payload,
-            ]);
             throw new \RuntimeException('Zernio publish failed: ' . $response->body());
         }
-
-        Log::info("Zernio Response Received", [
-            'status' => $response->status(),
-            'body' => $response->json()
-        ]);
 
         $zernioId = $response->json('post.id') ?? $response->json('post._id') ?? $response->json('id') ?? $response->json('_id');
         
@@ -164,10 +152,6 @@ class ZernioService
             $post->zernio_id = $zernioId;
             $post->zernio_ids = $existingIds;
             $post->save();
-
-            Log::info("Zernio ID saved to post #{$post->id}", ['zernio_id' => $zernioId]);
-        } else {
-            Log::warning("Zernio ID NOT found in response for post #{$post->id}", ['response' => $response->json()]);
         }
 
         return $zernioId ?? '';

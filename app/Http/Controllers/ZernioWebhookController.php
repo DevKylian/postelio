@@ -15,13 +15,15 @@ class ZernioWebhookController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $signature = $request->header('X-Late-Signature');
+        // Try both possible signature headers (Zernio vs legacy Late)
+        $signature = $request->header('X-Zernio-Signature') ?? $request->header('X-Late-Signature');
         $payload = $request->all();
         $rawPayload = $request->getContent();
 
         Log::info('Zernio Webhook received', [
-            'event' => $payload['event'] ?? 'unknown',
-            'signature' => $signature ? 'present' : 'missing'
+            'event' => $payload['event'] ?? $payload['type'] ?? 'unknown',
+            'has_signature' => $signature ? 'yes' : 'no',
+            'header_type' => $request->hasHeader('X-Zernio-Signature') ? 'Zernio' : ($request->hasHeader('X-Late-Signature') ? 'Late' : 'none')
         ]);
 
         // Verify signature if secret is configured
@@ -34,11 +36,13 @@ class ZernioWebhookController extends Controller
             }
         }
 
-        $event = $payload['event'] ?? null;
-        $data  = $payload['data'] ?? $payload; // User's example had top-level 'post'
+        $event = $payload['event'] ?? $payload['type'] ?? null;
+        $data  = $payload['data'] ?? $payload;
 
         switch ($event) {
             case 'post.published':
+            case 'post.sent':
+            case 'post.created': // Sometimes sent when published immediately
                 $this->handlePostPublished($data);
                 break;
 
@@ -55,7 +59,7 @@ class ZernioWebhookController extends Controller
                 break;
 
             default:
-                Log::info('Zernio Webhook event ignored', ['event' => $event]);
+                Log::info('Zernio Webhook event ignored', ['event' => $event, 'payload' => $payload]);
                 break;
         }
 
@@ -64,8 +68,13 @@ class ZernioWebhookController extends Controller
 
     private function handlePostPublished(array $data)
     {
-        $zernioPostId = $data['post']['id'] ?? $data['post']['_id'] ?? $data['_id'] ?? null;
-        if (!$zernioPostId) return;
+        // Try all possible nested or top-level ID fields
+        $zernioPostId = $data['post']['id'] ?? $data['post']['_id'] ?? $data['post_id'] ?? $data['id'] ?? $data['_id'] ?? null;
+        
+        if (!$zernioPostId) {
+            Log::warning('Zernio Webhook: Could not find post ID in payload', ['data' => $data]);
+            return;
+        }
 
         $post = Post::where('zernio_id', $zernioPostId)->first();
         if ($post) {
@@ -87,10 +96,13 @@ class ZernioWebhookController extends Controller
 
     private function handlePostFailed(array $data)
     {
-        $zernioPostId = $data['post']['id'] ?? $data['post']['_id'] ?? $data['_id'] ?? null;
-        $error = $data['error'] ?? 'Unknown error';
+        $zernioPostId = $data['post']['id'] ?? $data['post']['_id'] ?? $data['post_id'] ?? $data['id'] ?? $data['_id'] ?? null;
+        $error = $data['error'] ?? $data['message'] ?? 'Unknown error';
         
-        if (!$zernioPostId) return;
+        if (!$zernioPostId) {
+            Log::warning('Zernio Webhook Failed: Could not find post ID in payload', ['data' => $data]);
+            return;
+        }
 
         $post = Post::where('zernio_id', $zernioPostId)->first();
         if ($post) {

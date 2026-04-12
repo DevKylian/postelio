@@ -35,6 +35,7 @@ class Post extends Model
         'facebook_slides',
         'extra_images',
         'zernio_id',
+        'zernio_ids',
         'error_message',
     ];
 
@@ -44,6 +45,7 @@ class Post extends Model
         'extra_images'       => 'array',
         'template_options'   => 'array',
         'platforms'          => 'array',
+        'zernio_ids'         => 'array',
         'scheduled_at'       => 'datetime',
         'regeneration_count' => 'integer',
         'post_variants'      => 'array',

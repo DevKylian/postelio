@@ -148,7 +148,15 @@ class ZernioService
         $zernioId = $response->json('post.id') ?? $response->json('post._id') ?? $response->json('id') ?? $response->json('_id');
         
         if ($zernioId) {
-            $post->update(['zernio_id' => $zernioId]);
+            $existingIds = $post->zernio_ids ?? [];
+            if (!in_array($zernioId, $existingIds)) {
+                $existingIds[] = $zernioId;
+            }
+            
+            $post->update([
+                'zernio_id' => $zernioId, // Still set this for backward compatibility and quick lookups
+                'zernio_ids' => $existingIds
+            ]);
         }
 
         return $zernioId ?? '';

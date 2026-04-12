@@ -76,7 +76,15 @@ class ZernioWebhookController extends Controller
             return;
         }
 
-        $post = Post::where('zernio_id', $zernioPostId)->first();
+        // 1. Search in the new JSON array (support for multi-platform)
+        $post = Post::whereJsonContains('zernio_ids', $zernioPostId)->first();
+
+        // 2. Fallback to the single string column (legacy)
+        if (!$post) {
+            $post = Post::where('zernio_id', $zernioPostId)->first();
+        }
+
+        // 3. Last resort: if it's a published post and we match nothing, log it effectively
         if ($post) {
             $post->update(['status' => Post::STATUS_PUBLISHED]);
             
@@ -90,7 +98,7 @@ class ZernioWebhookController extends Controller
 
             Log::info('Post status updated to published via Webhook', ['post_id' => $post->id, 'zernio_id' => $zernioPostId]);
         } else {
-            Log::warning('Zernio Post Published but not found in DB', ['zernio_id' => $zernioPostId]);
+            Log::warning('Zernio Post Published but not found in DB', ['zernio_id' => $zernioPostId, 'data' => $data]);
         }
     }
 
@@ -104,7 +112,11 @@ class ZernioWebhookController extends Controller
             return;
         }
 
-        $post = Post::where('zernio_id', $zernioPostId)->first();
+        $post = Post::whereJsonContains('zernio_ids', $zernioPostId)->first();
+        if (!$post) {
+            $post = Post::where('zernio_id', $zernioPostId)->first();
+        }
+
         if ($post) {
             $post->update(['status' => Post::STATUS_FAILED]);
 

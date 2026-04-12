@@ -5,12 +5,14 @@
         'Posts amateurs ou inexistants',
         'Zéro stratégie de contenu',
         'Clients qui ne vous trouvent pas',
+        'Résultats aléatoires',
     ],
     'col_avec'      => [
         '2 minutes par post, point final',
         'Visuels pro au branding artisan',
         'Contenu cohérent et régulier',
         'Visibilité = nouveaux clients',
+        'Résultats mesurables',
     ],
 ])
 
@@ -64,7 +66,7 @@
                 <span style="color: #F87171; font-size: 9px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;">Sans Postelio</span>
             </div>
 
-            @foreach(array_slice((array)$col_sans, 0, 4) as $item)
+            @foreach(array_slice((array)$col_sans, 0, 5) as $item)
             <div style="display: flex; align-items: flex-start; gap: 8px;">
                 <div style="width: 3px; height: 3px; border-radius: 50%; background: rgba(239,68,68,0.5); flex-shrink: 0; margin-top: 5px;"></div>
                 <span style="
@@ -94,7 +96,7 @@
                 <span style="color: #F59E0B; font-size: 9px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;">Avec Postelio</span>
             </div>
 
-            @foreach(array_slice((array)$col_avec, 0, 4) as $item)
+            @foreach(array_slice((array)$col_avec, 0, 5) as $item)
             <div style="display: flex; align-items: flex-start; gap: 8px;">
                 <div style="width: 3px; height: 3px; border-radius: 50%; background: #F59E0B; flex-shrink: 0; margin-top: 5px;"></div>
                 <span style="

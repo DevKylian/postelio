@@ -150,8 +150,8 @@ class InstagramPostGenerator extends Component
         $this->items = ['', '', '', ''];
         $this->question = $this->question_teaser = $this->question_tag = '';
         $this->comparaison_headline = '';
-        $this->col_sans = ['', '', '', ''];
-        $this->col_avec = ['', '', '', ''];
+        $this->col_sans = ['', '', '', '', ''];
+        $this->col_avec = ['', '', '', '', ''];
         $this->avantapres_tag = $this->avantapres_headline = '';
         $this->appmockup_tag = $this->appmockup_headline = $this->appmockup_subheadline = '';
         $this->feature_tag = $this->feature_name = $this->feature_description = $this->feature_cta = '';
@@ -512,8 +512,8 @@ class InstagramPostGenerator extends Component
             ],
             'comparaison' => [
                 'headline' => $title, 
-                'col_sans' => !empty($slide['col_sans']) ? $slide['col_sans'] : ['Ancien système', 'Perte de temps', 'Compliqué'],
-                'col_avec' => !empty($slide['col_avec']) ? $slide['col_avec'] : ['Postelio AI', 'Gain de temps', 'Intuitif'],
+                'col_sans' => !empty($slide['col_sans']) ? $slide['col_sans'] : ['Ancien système', 'Perte de temps', 'Compliqué', 'Pas de visibilité', 'Résultats aléatoires'],
+                'col_avec' => !empty($slide['col_avec']) ? $slide['col_avec'] : ['Postelio AI', 'Gain de temps', 'Intuitif', 'Visibilité accrue', 'Résultats mesurables'],
             ],
             'avantapres' => [
                 'tag' => $tag, 'headline' => $title,
@@ -742,8 +742,8 @@ class InstagramPostGenerator extends Component
     private function fillComparaison(array $d): void
     {
         $this->comparaison_headline = $d['headline'] ?? 'La différence est réelle.';
-        $this->col_sans             = array_slice((array) ($d['col_sans'] ?? []), 0, 4);
-        $this->col_avec             = array_slice((array) ($d['col_avec'] ?? []), 0, 4);
+        $this->col_sans             = array_slice((array) ($d['col_sans'] ?? []), 0, 5);
+        $this->col_avec             = array_slice((array) ($d['col_avec'] ?? []), 0, 5);
     }
 
     private function fillAvantapres(array $d): void
@@ -924,7 +924,7 @@ class InstagramPostGenerator extends Component
                 PROMPT,
             'comparaison' => <<<PROMPT
                 Post "Comparaison". IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
-                Structure JSON : { "title": "...", "col_sans": ["Point 1", "Point 2", "Point 3"], "col_avec": ["Avantage 1", "Avantage 2", "Avantage 3"], "instagram_caption": "..." }
+                Structure JSON : { "title": "...", "col_sans": ["Point 1", "Point 2", "Point 3", "Point 4", "Point 5"], "col_avec": ["Avantage 1", "Avantage 2", "Avantage 3", "Avantage 4", "Avantage 5"], "instagram_caption": "..." }
                 PROMPT,
             'stats' => <<<PROMPT
                 Post "Stats". IMAGE UNIQUE (Interdit : Pas de carrousel).
@@ -1047,7 +1047,7 @@ class InstagramPostGenerator extends Component
             - AÉRE TON TEXTE DE MANIÈRE EXTRÊME (CRITICAL) : Utilise systématiquement la séquence de caractères \\n\\n (double antislash n) entre CHAQUE idée. 
             - NE METS JAMAIS de vrais sauts de ligne physiques à l'intérieur des valeurs du JSON.
             - Chaque point d'une liste doit être sur sa propre ligne (en utilisant \\n).
-            - SI Comparaison : Les listes "col_sans" et "col_avec" doivent avoir EXACTEMENT 3 ou 4 points percutants.
+            - SI Comparaison : Les listes "col_sans" et "col_avec" doivent avoir EXACTEMENT 5 points percutants.
             - "instagram_caption" (CRITICAL) : Toujours présent à la racine du JSON.
                 STRUCTURE OBLIGATOIRE avec la séquence \\n\\n entre chaque bloc :
 

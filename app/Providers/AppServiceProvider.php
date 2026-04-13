@@ -20,9 +20,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Force HTTPS when behind a reverse proxy (Cloudflare tunnel, etc.)
+        // Force HTTPS and same URL when behind a reverse proxy (Cloudflare tunnel, etc.)
         if (request()->header('X-Forwarded-Proto') === 'https' || request()->isSecure()) {
             URL::forceScheme('https');
+        }
+
+        // Fix for 'artisan optimize' caching wrong APP_URL (e.g. 127.0.0.1 vs localhost vs tunnel)
+        if (!app()->runningInConsole()) {
+            $currentUrl = request()->getSchemeAndHttpHost();
+            URL::forceRootUrl($currentUrl);
+            config(['app.url' => $currentUrl]);
         }
     }
 }

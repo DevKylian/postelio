@@ -4,7 +4,7 @@
             <h1 class="font-bold text-xl lg:text-2xl text-midnight tracking-tight leading-tight">
                 Calendrier éditorial
             </h1>
-            <p class="text-gray-400 text-sm mt-0.5">Visualisez et planifiez vos publications mois par mois.</p>
+            <p class="text-gray-400 text-sm mt-0.5">Visualisez et planifiez vos publications. Glissez-déposez pour replanifier.</p>
         </div>
     </x-slot>
 

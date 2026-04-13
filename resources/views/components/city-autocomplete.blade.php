@@ -20,7 +20,7 @@
     'wireNearby'  => 'nearby_cities',
     'currentCity' => '',
     'inputClass'  => '',
-    'placeholder' => 'Ex : Lannion',
+    'placeholder' => 'Ex : Lyon, Bordeaux...',
     'required'    => false,
 ])
 

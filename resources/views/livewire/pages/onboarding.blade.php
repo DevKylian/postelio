@@ -267,7 +267,7 @@ $complete = function () {
                                 wire-context="city_context"
                                 wire-nearby="nearby_cities"
                                 :current-city="$city"
-                                placeholder="Ex : Lannion, Lyon, Bordeaux..."
+                                placeholder="Ex : Lyon, Bordeaux, Marseille..."
                                 :required="true"
                                 input-class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200"
                             />

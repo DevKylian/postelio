@@ -18,7 +18,7 @@
 
         <!-- Umami Analytics -->
     @if(config('services.umami.id'))
-        <script async src="{{ config('services.umami.url') }}/script.js" data-website-id="{{ config('services.umami.id') }}"></script>
+        <script async src="{{ config('services.umami.url') }}/script.js" data-website-id="{{ config('services.umami.id') }}" data-navigate-once></script>
     @endif
 
     <!-- Scripts -->

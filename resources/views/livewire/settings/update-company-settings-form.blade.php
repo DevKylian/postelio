@@ -86,14 +86,6 @@ $updateCompanySettings = function () {
 ?>
 
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            Paramètres de la société
-        </h2>
-        <p class="mt-1 text-sm text-gray-600">
-            Ces informations apparaissent sur vos posts générés.
-        </p>
-    </header>
 
     <form wire:submit="updateCompanySettings" class="mt-6 space-y-6">
 
@@ -119,8 +111,8 @@ $updateCompanySettings = function () {
                 wire-context="city_context"
                 wire-nearby="nearby_cities"
                 :current-city="$city"
-                placeholder="Ex : Lannion, Lyon, Bordeaux..."
-                input-class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                placeholder="Ex : Lyon, Bordeaux, Marseille..."
+                input-class="mt-1 block w-full border-gray-200 focus:border-copper focus:ring-2 focus:ring-copper/20 rounded-xl shadow-sm transition-all duration-200 text-midnight placeholder:text-gray-300 text-sm"
             />
             @if($city && $postal_code)
                 <p class="mt-1 text-xs text-green-600 font-medium">{{ $city }} ({{ $postal_code }})</p>
@@ -175,7 +167,7 @@ $updateCompanySettings = function () {
                       id="bio_text"
                       name="bio_text"
                       rows="4"
-                      class="mt-1 block w-full border-gray-300 focus:border-copper focus:ring-copper rounded-md shadow-sm text-sm"
+                      class="mt-1 block w-full border-gray-200 focus:border-copper focus:ring-2 focus:ring-copper/20 rounded-xl shadow-sm transition-all duration-200 text-midnight placeholder:text-gray-300 text-sm"
                       placeholder="Décrivez votre activité en quelques phrases. Ces informations aident Postelio à personnaliser vos posts."></textarea>
             <p class="mt-1 text-xs text-gray-500">
                 Ces informations aident Postelio à mieux comprendre ce que vous faites pour personnaliser vos posts.

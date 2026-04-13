@@ -375,6 +375,7 @@
                             <span class="hidden sm:inline">Enregistrer</span>
                             <span class="sm:hidden">Vocal</span>
                         </button>
+                        @if(auth()->user()->is_admin)
                         <button type="button" @click="mode = 'upload'"
                                 :class="mode === 'upload' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
                                 class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm transition-all duration-200">
@@ -384,6 +385,7 @@
                             <span class="hidden sm:inline">Importer</span>
                             <span class="sm:hidden">MP3</span>
                         </button>
+                        @endif
                         <button type="button" @click="mode = 'text'"
                                 :class="mode === 'text' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
                                 class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm transition-all duration-200">
@@ -472,6 +474,7 @@
                         </div>
                     </div>
 
+                    @if(auth()->user()->is_admin)
                     {{-- Upload Mode --}}
                     <div x-show="mode === 'upload'">
                         <div x-data="{
@@ -535,6 +538,7 @@
                             </label>
                         </div>
                     </div>
+                    @endif
 
                     {{-- Text Mode --}}
                     <div x-show="mode === 'text'" x-transition>

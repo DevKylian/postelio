@@ -85,6 +85,10 @@ if [ -n "$MISSING_EXTS" ]; then
     fail "Déploiement avorté : extensions manquantes."
 fi
 
+# --- Mode maintenance -------------------------------------------------------
+log "Mode maintenance ON (pré-rendu activé pour éviter l'erreur 500)..."
+$PHP artisan down --render="errors.503" --retry=60
+
 # --- PHP dependencies -------------------------------------------------------
 log "composer install..."
 if ! composer install --no-dev --optimize-autoloader --no-interaction --quiet 2>&1; then
@@ -140,9 +144,7 @@ else
 fi
 
 
-# --- Mode maintenance -------------------------------------------------------
-log "Mode maintenance ON..."
-$PHP artisan down --retry=60
+# --- Mode maintenance a déjà été activé plus haut ---
 
 # --- Sauvegarde BDD ---------------------------------------------------------
 log "Sauvegarde base de données..."

@@ -52,7 +52,7 @@
                 
                 @php
                     $dlen = mb_strlen($text ?: 'DÉTAIL TECHNIQUE');
-                    $fontSize = 'text-[10px]';
+                    $fontSize = 'sm:text-[10px] text-[8px]';
                     if ($dlen > 30) $fontSize = 'text-[7px]';
                     elseif ($dlen > 20) $fontSize = 'text-[8px]';
                 @endphp
@@ -64,7 +64,7 @@
 
         <div class="h-20 px-10 bg-gray-900 flex flex-col justify-center gap-1 z-20">
              <div class="flex items-center justify-between">
-                 <span class="text-white text-[11px] font-black uppercase tracking-[0.2em] font-montserrat whitespace-normal leading-tight">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel }}</span>
+                 <span class="text-white text-[11px] font-black uppercase tracking-[0.2em] font-montserrat whitespace-normal leading-tight">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                  <div class="flex items-center gap-4 shrink-0">
                       <div class="w-10 h-1.5" style="background-color: {{ $brandColor }}"></div>
                  </div>

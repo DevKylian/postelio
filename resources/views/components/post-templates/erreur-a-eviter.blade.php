@@ -60,7 +60,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 
     $len      = mb_strlen($text ?? '');
-    $fontSize = $len > 150 ? 'text-lg' : ($len > 80 ? 'text-xl' : 'text-2xl');
+    $fontSize = 'sm:text-xl text-lg';
 @endphp
 
 <div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] relative overflow-hidden flex flex-col {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: #F8FAFC;">

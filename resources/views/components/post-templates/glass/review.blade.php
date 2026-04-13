@@ -16,7 +16,7 @@
 @if($preview)
     @php
         $customerName = 'Jean-Pierre D.';
-        $text = $text ?: 'Une expérience parfaite de A à Z. L\'équipe a su transformer notre vision en réalité avec un professionnalisme exemplaire. Les délais ont été respectés et les finitions sont impeccables. Nous recommandons vivement pour vos projets !';
+        $text = $text ?: 'Une expérience parfaite. Équipe professionnelle, vision transformée en réalité avec un souci du détail exemplaire. Nous recommandons !';
         $phone = $phone ?? '01 23 45 67 89';
         $email = $email ?? 'contact@votre-artisan.fr';
         $website = $website ?? 'www.votre-artisan.fr';
@@ -56,11 +56,8 @@
                 </div>
 
                 @php
-                    $len = mb_strlen($text);
-                    $fontSize = 'text-lg';
-                    if ($len > 150) $fontSize = 'text-xs';
-                    elseif ($len > 80) $fontSize = 'text-sm';
-                    elseif ($len > 40) $fontSize = 'text-base';
+                $len = mb_strlen($text);
+                $fontSize = 'sm:text-lg text-base';
                 @endphp
                 <div class="max-h-[220px] overflow-hidden">
                     <p class="text-white {{ $fontSize }} font-medium leading-relaxed italic mb-6 text-center">

@@ -42,7 +42,7 @@
     $tagTextCol = ($yiq > 180) ? '#1E293B' : '#FFFFFF';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" !!}] bg-[#D1D5DB] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' !!}">
+<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#D1D5DB] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Concrete Texture --}}
     <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" style="background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');"></div>
     
@@ -55,21 +55,21 @@
             $slide0Alpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
             $slide0Style = (int)$slideIndex !== 0 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-6 grid grid-cols-2 gap-4" {!! $slide0Alpine !!} style="{{ $slide0Style !!}">
+        <div class="absolute inset-6 grid grid-cols-2 gap-4" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
             <div class="relative rounded-lg overflow-hidden border-2 border-gray-900 shadow-xl bg-gray-400">
                 @if($imageBeforeUrl)
-                    <img src="{{ $imageBeforeUrl !!}" class="absolute inset-0 w-full h-full object-cover">
+                    <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 @endif
-                <div class="absolute top-3 left-3 px-3 py-1 rounded-full shadow-lg z-20" style="background-color: {{ $brandColor !!}">
-                    <p class="text-[10px] font-black uppercase font-montserrat tracking-widest leading-none" style="color: {{ $tagTextCol !!}">Avant</p>
+                <div class="absolute top-3 left-3 px-3 py-1 rounded-full shadow-lg z-20" style="background-color: {{ $brandColor }}">
+                    <p class="text-[10px] font-black uppercase font-montserrat tracking-widest leading-none" style="color: {{ $tagTextCol }}">Avant</p>
                 </div>
             </div>
             <div class="relative rounded-lg overflow-hidden border-2 border-gray-900 shadow-xl bg-gray-500">
                 @if($imageAfterUrl)
-                    <img src="{{ $imageAfterUrl !!}" class="absolute inset-0 w-full h-full object-cover">
+                    <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 @endif
-                <div class="absolute top-3 right-3 px-3 py-1 rounded-full shadow-lg z-20" style="background-color: {{ $brandColor !!}">
-                    <p class="text-[10px] font-black uppercase font-montserrat tracking-widest leading-none" style="color: {{ $tagTextCol !!}">Après</p>
+                <div class="absolute top-3 right-3 px-3 py-1 rounded-full shadow-lg z-20" style="background-color: {{ $brandColor }}">
+                    <p class="text-[10px] font-black uppercase font-montserrat tracking-widest leading-none" style="color: {{ $tagTextCol }}">Après</p>
                 </div>
             </div>
         </div>
@@ -80,11 +80,11 @@
             $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
             $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-6 bg-slate-950 rounded-xl border-4 border-gray-900 overflow-hidden shadow-2xl" {!! $slide1Alpine !!} style="{{ $slide1Style !!}">
+        <div class="absolute inset-6 bg-slate-950 rounded-xl border-4 border-gray-900 overflow-hidden shadow-2xl" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if($imageBeforeUrl)
-                <img src="{{ $imageBeforeUrl !!}" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute top-4 left-4 px-5 py-2 rounded-full shadow-2xl z-20" style="background-color: {{ $brandColor !!}">
-                    <p class="text-xs font-black uppercase font-montserrat tracking-[0.2em] leading-none" style="color: {{ $tagTextCol !!}">Avant</p>
+                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute top-4 left-4 px-5 py-2 rounded-full shadow-2xl z-20" style="background-color: {{ $brandColor }}">
+                    <p class="text-xs font-black uppercase font-montserrat tracking-[0.2em] leading-none" style="color: {{ $tagTextCol }}">Avant</p>
                 </div>
             @endif
         </div>
@@ -95,11 +95,11 @@
             $slide2Alpine = $slideIndex === null ? "x-show=\"current === 2\" style=\"display: none;\"" : '';
             $slide2Style = (int)$slideIndex !== 2 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-6 bg-slate-900 rounded-xl border-4 border-gray-900 overflow-hidden shadow-2xl" {!! $slide2Alpine !!} style="{{ $slide2Style !!}">
+        <div class="absolute inset-6 bg-slate-900 rounded-xl border-4 border-gray-900 overflow-hidden shadow-2xl" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if($imageAfterUrl)
-                <img src="{{ $imageAfterUrl !!}" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute top-4 right-4 px-5 py-2 rounded-full shadow-2xl z-20" style="background-color: {{ $brandColor !!}">
-                    <p class="text-xs font-black uppercase font-montserrat tracking-[0.2em] leading-none" style="color: {{ $tagTextCol !!}">Après</p>
+                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute top-4 right-4 px-5 py-2 rounded-full shadow-2xl z-20" style="background-color: {{ $brandColor }}">
+                    <p class="text-xs font-black uppercase font-montserrat tracking-[0.2em] leading-none" style="color: {{ $tagTextCol }}">Après</p>
                 </div>
             @endif
         </div>
@@ -111,7 +111,7 @@
             $slide3Style = (int)$slideIndex !== 3 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         @if($hasContactInfo)
-        <div class="absolute inset-0 p-8" {!! $slide3Alpine !!} style="{{ $slide3Style !!}">
+        <div class="absolute inset-0 p-8" {!! $slide3Alpine !!} style="{{ $slide3Style }}">
             <x-post-templates.contact-slide 
                 :brand-color="$brandColor" 
                 :company-label="$companyLabel"
@@ -137,7 +137,7 @@
             <div class="absolute top-10 right-10 bg-gray-900 text-white text-[10px] font-black font-montserrat px-3 py-1.5 rounded-lg shadow-2xl z-40" x-text="(current + 1) + ' / ' + total"></div>
         @elseif($slideIndex !== null && !$exporting)
              <div class="absolute top-10 right-10 bg-gray-900 text-white text-[10px] font-black font-montserrat px-3 py-1.5 rounded-lg shadow-2xl z-40">
-                {{ (int)$slideIndex + 1 !!} / {{ $total !!}
+                {{ (int)$slideIndex + 1 }} / {{ $total }}
             </div>
         @endif
 
@@ -176,13 +176,13 @@
              <div class="flex gap-2">
                  @for($i=0; $i<$total; $i++)
                     <div class="w-2 h-2 rounded-full transition-all" 
-                         @if($preview) :class="current === {{ $i !!} ? 'bg-gray-900' : 'bg-gray-300'"
-                         @else style="background-color: {{ (int)($slideIndex ?? 0) === $i ? 'rgb(17, 24, 39)' : 'rgb(209, 213, 219)' !!}" @endif>
+                         @if($preview) :class="current === {{ $i }} ? 'bg-gray-900' : 'bg-gray-300'"
+                         @else style="background-color: {{ (int)($slideIndex ?? 0) === $i ? 'rgb(17, 24, 39)' : 'rgb(209, 213, 219)' }}" @endif>
                     </div>
                  @endfor
              </div>
              <div class="w-12 h-12 rounded-lg border-2 border-gray-900 flex items-center justify-center bg-white shadow-lg">
-                  <div class="w-8 h-8 rounded-full" style="background-color: {{ $brandColor !!}"></div>
+                  <div class="w-8 h-8 rounded-full" style="background-color: {{ $brandColor }}"></div>
              </div>
          </div>
     </div>

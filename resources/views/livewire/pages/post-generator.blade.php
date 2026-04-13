@@ -600,7 +600,7 @@
                     </div>
                 </button>
 
-                <div class="p-6 space-y-6" 
+                <div class="px-4 py-6 sm:p-6 space-y-6" 
                      x-show="expanded" 
                      x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 transform -translate-y-2"
@@ -609,7 +609,7 @@
                     {{-- ── Ton de voix ── --}}
                     <div>
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Ton de voix</p>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                             @php
                             $tones = [
                                 ['id' => 'professionnel', 'label' => 'Professionnel', 'desc' => 'Sérieux & direct', 'icon' => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', 'color' => 'blue'],
@@ -629,21 +629,21 @@
                             <button type="button"
                                     wire:click="$set('tone', '{{ $t['id'] }}')"
                                     @if($isAnalyzing) disabled @endif
-                                    class="group relative flex flex-col items-start gap-2.5 p-3.5 rounded-xl border-2 text-left transition-all duration-200
+                                    class="group relative flex flex-row items-center gap-4 p-4 rounded-xl border-2 text-left transition-all duration-200
                                         {{ $tone === $t['id'] ? $c['sel'] . ' shadow-sm' : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50' }}
                                         {{ $isAnalyzing ? 'animate-pulse opacity-60 pointer-events-none' : '' }}">
-                                <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all {{ $tone === $t['id'] ? $c['icon'] : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200' }}">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0 {{ $tone === $t['id'] ? $c['icon'] : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200' }}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $t['icon'] }}" />
                                     </svg>
                                 </div>
-                                <div>
-                                    <p class="text-sm font-semibold {{ $tone === $t['id'] ? $c['label'] : 'text-midnight' }} leading-tight">{{ $t['label'] }}</p>
-                                    <p class="text-[11px] text-gray-400 mt-0.5">{{ $t['desc'] }}</p>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-bold {{ $tone === $t['id'] ? $c['label'] : 'text-midnight' }} leading-tight">{{ $t['label'] }}</p>
+                                    <p class="text-[11px] text-gray-400 mt-0.5 leading-tight truncate">{{ $t['desc'] }}</p>
                                 </div>
                                 @if($tone === $t['id'])
-                                <div class="absolute top-2.5 right-2.5 w-4 h-4 rounded-full {{ $c['dot'] }} flex items-center justify-center">
-                                    <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="w-5 h-5 rounded-full {{ $c['dot'] }} flex items-center justify-center shrink-0">
+                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                     </svg>
                                 </div>
@@ -655,23 +655,23 @@
 
                     {{-- ── Hashtags ── --}}
                     <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center">
-                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-10 h-10 bg-gray-200/50 rounded-xl flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
                                 </svg>
                             </div>
-                            <div>
-                                <p class="text-sm font-semibold text-midnight">Inclure des hashtags</p>
-                                <p class="text-xs text-gray-400">Postelio ajoute 3-5 hashtags pertinents automatiquement</p>
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold text-midnight leading-tight">Inclure des hashtags</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5 leading-tight truncate sm:whitespace-normal">Ajoute automatiquement 3-5 hashtags</p>
                             </div>
                         </div>
                         <button type="button"
                                 wire:click="$set('includeHashtags', {{ $includeHashtags ? 'false' : 'true' }})"
-                                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none
+                                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none shrink-0
                                     {{ $includeHashtags ? 'bg-copper' : 'bg-gray-300' }}">
                             <span class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200
-                                {{ $includeHashtags ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                                {{ $includeHashtags ? 'translate-x-[22px]' : 'translate-x-1' }}"></span>
                         </button>
                     </div>
 
@@ -751,7 +751,7 @@
                     @if($template === 'faq')
                     <div class="space-y-3 pt-1 border-t border-gray-100">
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest pt-2">Catégorie de la FAQ</p>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                             @php
                             $faqCats = [
                                 ['id' => 'technique',       'label' => 'Technique',       'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
@@ -763,12 +763,14 @@
                             @foreach($faqCats as $cat)
                             <button type="button"
                                     wire:click="$set('faqCategory', '{{ $cat['id'] }}')"
-                                    class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-center transition-all duration-200
+                                    class="flex flex-row items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all duration-200
                                         {{ $faqCategory === $cat['id'] ? 'border-copper bg-amber-50 shadow-sm' : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50' }}">
-                                <svg class="w-5 h-5 {{ $faqCategory === $cat['id'] ? 'text-copper' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $cat['icon'] }}" />
-                                </svg>
-                                <span class="text-xs font-semibold {{ $faqCategory === $cat['id'] ? 'text-amber-700' : 'text-gray-500' }} leading-tight">{{ $cat['label'] }}</span>
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 {{ $faqCategory === $cat['id'] ? 'bg-copper text-white' : 'bg-gray-100 text-gray-400' }}">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $cat['icon'] }}" />
+                                    </svg>
+                                </div>
+                                <span class="text-xs font-bold {{ $faqCategory === $cat['id'] ? 'text-amber-700' : 'text-gray-500' }} leading-tight">{{ $cat['label'] }}</span>
                             </button>
                             @endforeach
                         </div>
@@ -779,23 +781,23 @@
                     @if($template === 'conseil_saisonnier')
                     <div class="space-y-3 pt-1 border-t border-gray-100">
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest pt-2">Saison ciblée</p>
-                        <div class="grid grid-cols-5 gap-2">
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                             @php
                             $seasons = [
-                                ['id' => 'auto',      'label' => 'Auto',      'emoji' => '🤖'],
-                                ['id' => 'printemps', 'label' => 'Printemps', 'emoji' => '🌸'],
-                                ['id' => 'ete',       'label' => 'Été',       'emoji' => '☀️'],
-                                ['id' => 'automne',   'label' => 'Automne',   'emoji' => '🍂'],
-                                ['id' => 'hiver',     'label' => 'Hiver',     'emoji' => '❄️'],
+                                ['id' => 'auto',      'label' => 'Automatique', 'emoji' => '🤖'],
+                                ['id' => 'printemps', 'label' => 'Printemps',   'emoji' => '🌸'],
+                                ['id' => 'ete',       'label' => 'Été',         'emoji' => '☀️'],
+                                ['id' => 'automne',   'label' => 'Automne',     'emoji' => '🍂'],
+                                ['id' => 'hiver',     'label' => 'Hiver',       'emoji' => '❄️'],
                             ];
                             @endphp
                             @foreach($seasons as $s)
                             <button type="button"
                                     wire:click="$set('season', '{{ $s['id'] }}')"
-                                    class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-center transition-all duration-200
+                                    class="flex flex-row items-center justify-center gap-3 p-3.5 rounded-xl border-2 text-center transition-all duration-200
                                         {{ $season === $s['id'] ? 'border-copper bg-amber-50 shadow-sm' : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50' }}">
-                                <span class="text-2xl leading-none">{{ $s['emoji'] }}</span>
-                                <span class="text-[10px] font-semibold {{ $season === $s['id'] ? 'text-amber-700' : 'text-gray-500' }}">{{ $s['label'] }}</span>
+                                <span class="text-xl leading-none shrink-0">{{ $s['emoji'] }}</span>
+                                <span class="text-[11px] font-bold {{ $season === $s['id'] ? 'text-amber-700' : 'text-gray-500' }} leading-tight truncate">{{ $s['label'] }}</span>
                             </button>
                             @endforeach
                         </div>
@@ -1463,11 +1465,11 @@
             @endif
 
             {{-- ── NAVIGATION FOOTER ── --}}
-            <div class="flex items-center gap-4 pt-4">
+            <div id="tour-gen-footer" class="flex flex-col-reverse sm:flex-row items-center gap-3 sm:gap-4 pt-6">
                 @if($currentStep > 1)
                     <button type="button" 
                             wire:click="previousStep"
-                            class="flex-1 bg-white border-2 border-gray-100 text-midnight font-bold py-4 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                            class="w-full sm:flex-1 bg-white border-2 border-gray-100 text-midnight font-bold py-4 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
                         Précédent
                     </button>
                 @endif
@@ -1478,14 +1480,14 @@
                             wire:click="nextStep"
                             wire:loading.attr="disabled"
                             @if(auth()->user()->remaining_credits <= 0) disabled @endif
-                            class="flex-[2] bg-copper text-white font-bold py-4 rounded-2xl shadow-lg shadow-copper/20 hover:bg-amber-500 hover:shadow-xl hover:shadow-copper/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                            class="w-full sm:flex-[2] bg-copper text-white font-bold py-4 rounded-2xl shadow-lg shadow-copper/20 hover:bg-amber-500 hover:shadow-xl hover:shadow-copper/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                         <svg wire:loading wire:target="nextStep" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
                         <span wire:loading.remove wire:target="nextStep">Continuer</span>
                         <span wire:loading wire:target="nextStep">Validation...</span>
                     </button>
                 @else
                     {{-- ── Submit ── --}}
-                    <div class="flex-[2]" x-data="postSubmit()" id="tour-gen-submit">
+                    <div class="w-full sm:flex-[2]" x-data="postSubmit()" id="tour-gen-submit">
                         <button type="button"
                                 @click="navigator.onLine ? $wire.generate() : submitOffline()"
                                 :disabled="isQueuing"
@@ -1582,8 +1584,8 @@
         <div class="space-y-5">
 
             {{-- Header --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-5 sm:px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-start gap-4">
                     <div class="w-10 h-10 bg-copper/10 rounded-xl flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -1591,14 +1593,14 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="font-bold text-midnight text-base">
+                        <h3 class="font-bold text-midnight text-base leading-tight">
                             @if(count($previewVariants) > 1)
                                 Choisissez une version
                             @else
                                 Vérifiez votre post
                             @endif
                         </h3>
-                        <p class="text-sm text-gray-400 mt-0.5">
+                        <p class="text-xs text-gray-400 mt-1 leading-relaxed">
                             @if(count($previewVariants) > 1)
                                 {{ count($previewVariants) }} versions générées — cliquez sur "Valider" sous celle que vous préférez.
                             @else
@@ -1610,7 +1612,7 @@
                 {{-- Rejeter --}}
                 <button wire:click="discardPost" wire:loading.attr="disabled"
                         wire:confirm="Ce post sera supprimé définitivement. Recommencer depuis zéro ?"
-                        class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-400 font-medium py-2 px-3 rounded-xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all duration-200 text-xs disabled:opacity-60 shrink-0">
+                        class="w-full sm:w-auto flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-400 font-medium py-2.5 px-4 rounded-xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all duration-200 text-xs disabled:opacity-60 shrink-0">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     Tout rejeter
                 </button>

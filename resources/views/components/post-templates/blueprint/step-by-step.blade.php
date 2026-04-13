@@ -41,7 +41,7 @@
 @endphp
 
 <div {!! $alpineData !!} class="w-full relative">
-    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" !!}] bg-[#0047AB] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' !!}">
+    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#0047AB] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
         
         <div class="absolute inset-0 opacity-10 pointer-events-none" 
              style="background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 25px 25px;">
@@ -55,11 +55,11 @@
                     : '';
                 $slideStyle = (int)$slideIndex !== $index && $slideIndex !== null ? 'display: none;' : '';
             @endphp
-            <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle !!}">
+            <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
                 {{-- Show image if available --}}
                 @if($imageUrl)
                     <div class="absolute inset-0">
-                        <img src="{{ $imageUrl !!}" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" !!}] object-cover">
+                        <img src="{{ $imageUrl }}" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] object-cover">
                     </div>
                 @endif
 
@@ -69,20 +69,20 @@
                             $isCurrentStep = $index === ($stepIndex + 1);
                             $isPastStep = $index > ($stepIndex + 1);
                         @endphp
-                        <div class="flex items-center gap-4 group/step transition-all duration-300 {{ $isCurrentStep ? 'scale-105 translate-x-2' : ($isPastStep ? 'opacity-40' : 'opacity-10') !!}">
+                        <div class="flex items-center gap-4 group/step transition-all duration-300 {{ $isCurrentStep ? 'scale-105 translate-x-2' : ($isPastStep ? 'opacity-40' : 'opacity-10') }}">
                             <div class="w-8 h-8 border-2 border-[#0047AB] bg-white flex items-center justify-center font-black text-[#0047AB] text-[10px] font-mono-technical shadow-lg shrink-0"
-                                 style="{{ $isCurrentStep ? 'background-color: '.$brandColor.'; color: white; border-color: white;' : '' !!}">
-                                {{ sprintf('%02d', $stepIndex + 1) !!}
+                                 style="{{ $isCurrentStep ? 'background-color: '.$brandColor.'; color: white; border-color: white;' : '' }}">
+                                {{ sprintf('%02d', $stepIndex + 1) }}
                             </div>
-                            <div class="flex-1 bg-white p-3 shadow-xl border-t border-blue-100 max-h-[70px] overflow-hidden {{ $isCurrentStep ? 'border-l-4' : '' !!}"
-                                 style="{{ $isCurrentStep ? 'border-left-color: '.$brandColor : '' !!}">
+                            <div class="flex-1 bg-white p-3 shadow-xl border-t border-blue-100 max-h-[70px] overflow-hidden {{ $isCurrentStep ? 'border-l-4' : '' }}"
+                                 style="{{ $isCurrentStep ? 'border-left-color: '.$brandColor : '' }}">
                                 @php
                                     $sLen = mb_strlen($stepText);
                                     $sFontSize = 'text-[9px]';
                                     if ($sLen > 80) $sFontSize = 'text-[7px]';
                                     elseif ($sLen > 40) $sFontSize = 'text-[8px]';
                                 @endphp
-                                <p class="text-[#0047AB] {{ $sFontSize !!} font-black font-mono-technical uppercase leading-tight">{{ $stepText !!}</p>
+                                <p class="text-[#0047AB] {{ $sFontSize }} font-black font-mono-technical uppercase leading-tight">{{ $stepText }}</p>
                             </div>
                         </div>
                     @endforeach
@@ -105,7 +105,7 @@
             $finalStyle = (int)$slideIndex !== $finalIndex && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         @if($hasContactInfo)
-        <div class="absolute inset-0" {!! $finalAlpine !!} style="{{ $finalStyle !!}">
+        <div class="absolute inset-0" {!! $finalAlpine !!} style="{{ $finalStyle }}">
             <x-post-templates.contact-slide 
                 :brand-color="$brandColor" 
                 :company-label="$companyLabel"
@@ -126,22 +126,22 @@
         @if($showFooter)
         <div {!! $footerAlpine !!} class="absolute bottom-0 inset-x-0 py-2.5 bg-white px-10 border-t-2 border-[#0047AB] flex flex-col gap-1 z-30 min-h-14">
              <div class="flex items-center justify-between">
-                 <span class="text-[#0047AB] text-[9px] font-black font-mono-technical uppercase tracking-widest italic truncate max-w-[200px]">{{ $companyLabel !!}</span>
+                 <span class="text-[#0047AB] text-[9px] font-black font-mono-technical uppercase tracking-widest italic truncate max-w-[200px]">{{ $companyLabel }}</span>
                  <div class="flex items-center gap-3">
                       @for($i=0; $i<$total; $i++)
                         <div class="w-4 h-1 border border-[#0047AB]" 
-                             @if($preview) :class="current === {{ $i !!} ? '' : 'opacity-20'" :style="current === {{ $i !!} ? 'background-color: {{ $brandColor !!}' : ''"
-                             @else style="background-color: {{ (int)($slideIndex ?? 0) === $i ? $brandColor : 'rgba(0, 71, 171, 0.1)' !!}" @endif>
+                             @if($preview) :class="current === {{ $i }} ? '' : 'opacity-20'" :style="current === {{ $i }} ? 'background-color: {{ $brandColor }}' : ''"
+                             @else style="background-color: {{ (int)($slideIndex ?? 0) === $i ? $brandColor : 'rgba(0, 71, 171, 0.1)' }}" @endif>
                         </div>
                       @endfor
                  </div>
              </div>
              <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)
-                    <span class="px-1 py-0.5 rounded-sm bg-blue-50 text-[#0047AB]/50 text-[5px] font-black font-mono-technical uppercase border border-[#0047AB]/10 whitespace-nowrap">{{ $trade !!}</span>
+                    <span class="px-1 py-0.5 rounded-sm bg-blue-50 text-[#0047AB]/50 text-[5px] font-black font-mono-technical uppercase border border-[#0047AB]/10 whitespace-nowrap">{{ $trade }}</span>
                 @endif
                 @if($city)
-                    <span class="px-1 py-0.5 rounded-sm bg-blue-50 text-[#0047AB]/50 text-[5px] font-black font-mono-technical uppercase border border-[#0047AB]/10 whitespace-nowrap">{{ $city !!}</span>
+                    <span class="px-1 py-0.5 rounded-sm bg-blue-50 text-[#0047AB]/50 text-[5px] font-black font-mono-technical uppercase border border-[#0047AB]/10 whitespace-nowrap">{{ $city }}</span>
                 @endif
              </div>
         </div>

@@ -220,14 +220,14 @@ $switchTab = function ($tab) {
 
             {{-- Style Tabs --}}
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                    <div class="flex p-1.5 bg-gray-100 rounded-2xl w-full sm:w-auto shadow-inner ring-1 ring-gray-100 relative overflow-hidden">
+                    <div class="flex p-1.5 bg-gray-100 rounded-2xl w-full sm:w-auto shadow-inner ring-1 ring-gray-100 relative overflow-x-auto no-scrollbar">
                         {{-- Progress bar overlay --}}
                         <div wire:loading class="absolute top-0 left-0 right-0 h-0.5 bg-copper/30 animate-pulse pointer-events-none"></div>
 
                         <button wire:click="switchTab('standard')"
                                 wire:key="tab-standard"
                                 wire:loading.attr="disabled"
-                                class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 relative
+                                class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 relative whitespace-nowrap
                                     {{ $activeTab === 'standard' ? 'bg-white text-midnight shadow-lg shadow-gray-200 ring-1 ring-gray-100' : 'text-gray-400 hover:text-gray-600' }}">
                             Style Classique
                         </button>
@@ -236,7 +236,7 @@ $switchTab = function ($tab) {
                             <button wire:click="switchTab('glass')"
                                     wire:key="tab-glass"
                                     wire:loading.attr="disabled"
-                                    class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
+                                    class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative whitespace-nowrap
                                         {{ $activeTab === 'glass' ? 'bg-midnight text-white shadow-lg shadow-midnight/20' : 'text-gray-400 hover:text-gray-600' }}">
                                 Style Glassmorphism
                             </button>
@@ -244,7 +244,7 @@ $switchTab = function ($tab) {
                             <button wire:click="switchTab('blueprint')"
                                     wire:key="tab-blueprint"
                                     wire:loading.attr="disabled"
-                                    class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
+                                    class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative whitespace-nowrap
                                         {{ $activeTab === 'blueprint' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-400 hover:text-gray-600' }}">
                                 Style Blueprint
                             </button>
@@ -252,7 +252,7 @@ $switchTab = function ($tab) {
                             <button wire:click="switchTab('kraft')"
                                     wire:key="tab-kraft"
                                     wire:loading.attr="disabled"
-                                    class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
+                                    class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative whitespace-nowrap
                                         {{ $activeTab === 'kraft' ? 'bg-[#BC9A7E] text-slate-900 shadow-lg shadow-[#BC9A7E]/20' : 'text-gray-400 hover:text-gray-600' }}">
                                 Style Kraft
                             </button>
@@ -260,7 +260,7 @@ $switchTab = function ($tab) {
                             <button wire:click="switchTab('beton')"
                                     wire:key="tab-beton"
                                     wire:loading.attr="disabled"
-                                    class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative
+                                    class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 relative whitespace-nowrap
                                         {{ $activeTab === 'beton' ? 'bg-slate-600 text-white shadow-lg shadow-slate-600/20' : 'text-gray-400 hover:text-gray-600' }}">
                                 Style Béton
                             </button>
@@ -268,12 +268,12 @@ $switchTab = function ($tab) {
                     </div>
 
                     {{-- Dynamic Color Pickers --}}
-                    <div class="flex items-center gap-4 bg-white p-2.5 rounded-2xl shadow-sm ring-1 ring-gray-100 animate-fade-in text-left">
-                        <div class="flex items-center gap-4 px-3 border-r border-gray-100">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-1 sm:gap-4 bg-white p-2 sm:p-2.5 rounded-2xl shadow-sm ring-1 ring-gray-100 animate-fade-in text-left">
+                        <div class="flex items-center justify-between sm:justify-start gap-4 px-3 py-2 sm:py-0 border-b sm:border-b-0 sm:border-r border-gray-100">
                             <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 whitespace-nowrap">Couleur Principale</label>
                             <x-custom-color-picker wire:model.live="brandColor" />
                         </div>
-                        <div class="flex items-center gap-4 px-3">
+                        <div class="flex items-center justify-between sm:justify-start gap-4 px-3 py-2 sm:py-0">
                             <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 whitespace-nowrap">Couleur Bandeaux</label>
                             <x-custom-color-picker wire:model.live="accentColor" />
                         </div>

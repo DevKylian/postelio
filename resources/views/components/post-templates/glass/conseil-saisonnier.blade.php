@@ -55,10 +55,10 @@
                 <span class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] block mb-2 font-montserrat">Conseil de saison</span>
                 @php
                     $len = mb_strlen($text);
-                    $fontSize = 'text-base';
-                    if ($len > 150) $fontSize = 'text-[10px]';
-                    elseif ($len > 80) $fontSize = 'text-xs';
-                    elseif ($len > 40) $fontSize = 'text-sm';
+                    $fontSize = 'sm:text-base text-sm';
+                    if ($len > 150) $fontSize = 'sm:text-[10px] text-[8px]';
+                    elseif ($len > 80) $fontSize = 'sm:text-xs text-[10px]';
+                    elseif ($len > 40) $fontSize = 'sm:text-sm text-xs';
                 @endphp
                 <div class="max-h-[160px] overflow-hidden">
                     <p class="text-white {{ $fontSize }} font-bold leading-relaxed">

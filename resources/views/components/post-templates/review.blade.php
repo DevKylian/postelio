@@ -20,7 +20,7 @@
 @if($preview)
     @php
         $customerName = ($customerName === 'Client' || empty($customerName)) ? 'Jean-Pierre D.' : $customerName;
-        $text = empty($text) ? '"Une expérience parfaite de A à Z. L\'équipe a su transformer notre vision en réalité avec un professionnalisme exemplaire. Les délais ont été respectés et les finitions sont impeccables. Nous recommandons vivement pour vos projets !"' : $text;
+        $text = empty($text) ? '"Une expérience parfaite. Équipe professionnelle, vision transformée en réalité avec un souci du détail exemplaire. Nous recommandons vivement !"' : $text;
         $phone = $phone ?? '01 23 45 67 89';
         $email = $email ?? 'contact@votre-artisan.fr';
         $website = $website ?? 'www.votre-artisan.fr';
@@ -96,10 +96,7 @@
 
         @php
             $len = mb_strlen($text);
-            $fontSize = 'text-2xl';
-            if ($len > 200) $fontSize = 'text-base';
-            elseif ($len > 120) $fontSize = 'text-lg';
-            elseif ($len > 60) $fontSize = 'text-xl';
+            $fontSize = 'sm:text-lg text-base';
         @endphp
         <div class="flex-1 flex items-center justify-center relative z-10 px-10 w-full min-h-0">
             {{-- Wrapper tightly bound to text width for better horizontal anchoring --}}

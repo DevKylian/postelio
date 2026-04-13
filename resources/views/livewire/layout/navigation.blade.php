@@ -271,7 +271,7 @@ $logout = function (Logout $logout) {
 
         <!-- Quota Progress Bar -->
         <div class="px-3 py-4 border-t border-white/[0.04]">
-            <div class="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4 shadow-sm relative overflow-hidden group">
+            <div id="tour-quota" class="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4 shadow-sm relative overflow-hidden group">
                 <!-- Background decoration -->
                 <div class="absolute -right-4 -top-8 w-16 h-16 bg-copper/10 blur-2xl rounded-full"></div>
                 
@@ -330,14 +330,14 @@ $logout = function (Logout $logout) {
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             @endif
                         </div>
-                        <div class="flex-1 text-left min-w-0 hidden lg:block">
+                        <div class="flex-1 text-left min-w-0">
                             <p class="text-[13px] font-semibold text-slate-200 truncate leading-tight"
                                x-data="{{ json_encode(['name' => auth()->user()->name]) }}"
                                x-text="name"
                                x-on:profile-updated.window="name = $event.detail.name"></p>
                             <p class="text-[11px] text-slate-500 truncate leading-tight mt-0.5">{{ auth()->user()->email }}</p>
                         </div>
-                        <svg class="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 transition-colors shrink-0 hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                         </svg>
                     </button>

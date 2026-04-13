@@ -135,7 +135,7 @@
                  <span class="text-white/50 text-[9px] font-black uppercase tracking-[0.3em] font-montserrat truncate max-w-[200px]">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                  @if($total > 1 && !$exporting)
                     <div class="text-white/20 text-[10px] font-black" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
-                        @if(!$preview) {{ ($slideIndex ?? 0) + 1 }} / {{ $total }} @endif
+                        @if(!$preview) {{ (int)($slideIndex ?? 0) + 1 }} / {{ $total }} @endif
                     </div>
                  @endif
              </div>

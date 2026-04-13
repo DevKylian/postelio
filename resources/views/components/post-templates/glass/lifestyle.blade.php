@@ -54,9 +54,9 @@
             @php
                 $displayText = $text ?: 'LIFESTYLE';
                 $len = mb_strlen($displayText);
-                $fontSize = 'text-sm';
-                if ($len > 25) $fontSize = 'text-[10px]';
-                elseif ($len > 18) $fontSize = 'text-xs';
+                $fontSize = 'sm:text-sm text-xs';
+                if ($len > 25) $fontSize = 'sm:text-[10px] text-[8px]';
+                elseif ($len > 18) $fontSize = 'sm:text-xs text-[10px]';
             @endphp
 
             {{-- Text + company --}}

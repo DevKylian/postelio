@@ -103,9 +103,9 @@
                 </div>
                 @php
                     $len = mb_strlen($text);
-                    $fontSize = 'text-base';
-                    if ($len > 80) $fontSize = 'text-xs';
-                    elseif ($len > 40) $fontSize = 'text-sm';
+                    $fontSize = 'sm:text-base text-sm';
+                    if ($len > 80) $fontSize = 'sm:text-xs text-[10px]';
+                    elseif ($len > 40) $fontSize = 'sm:text-sm text-xs';
                 @endphp
                 <div class="max-h-[100px] overflow-hidden">
                     <h3 class="text-white font-black {{ $fontSize }} leading-snug font-montserrat tracking-tight">{!! nl2br(e($text)) !!}</h3>

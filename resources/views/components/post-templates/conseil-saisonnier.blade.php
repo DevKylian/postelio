@@ -57,9 +57,9 @@
 
             @php
                 $len = mb_strlen($text);
-                $fontSize = 'text-2xl';
-                if ($len > 150) $fontSize = 'text-lg';
-                elseif ($len > 80) $fontSize = 'text-xl';
+                $fontSize = 'sm:text-2xl text-xl';
+                if ($len > 150) $fontSize = 'sm:text-lg text-base';
+                elseif ($len > 80) $fontSize = 'sm:text-xl text-lg';
             @endphp
             <div class="max-h-[180px] overflow-hidden">
                 <p class="text-white font-black {{ $fontSize }} leading-tight font-montserrat tracking-tight">{!! nl2br(e($text)) !!}</p>

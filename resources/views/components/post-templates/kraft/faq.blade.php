@@ -113,7 +113,7 @@
     @endphp
     <div {!! $footerAlpine !!} class="py-2 px-10 border-t-4 border-gray-900 bg-[#CBB198] flex flex-col gap-1 relative z-20 min-h-[4rem]">
          <div class="flex items-center justify-between">
-             <span class="text-gray-900 text-[11px] font-black uppercase tracking-[0.2em] font-montserrat whitespace-normal leading-tight">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel }}</span>
+             <span class="text-gray-900 text-[11px] font-black uppercase tracking-[0.2em] font-montserrat whitespace-normal leading-tight">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
              
              @if(($preview || $slideIndex !== null) && !$exporting)
                 <div class="text-gray-900/50 text-[10px] font-black font-montserrat tracking-widest" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>

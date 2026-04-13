@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-                <h1 class="font-bold text-xl lg:text-2xl text-midnight tracking-tight leading-tight">
+        <div class="flex flex-row items-center justify-between gap-3">
+            <div class="min-w-0">
+                <h1 class="font-bold text-lg sm:text-xl lg:text-2xl text-midnight tracking-tight leading-tight truncate">
                     Tableau de bord
                 </h1>
-                <p class="text-gray-400 text-sm mt-0.5">
+                <p class="text-gray-400 text-[10px] sm:text-sm mt-0.5 truncate uppercase tracking-wider font-medium">
                     {{ now()->isoFormat('dddd D MMMM YYYY') }}
                 </p>
             </div>
@@ -19,11 +19,12 @@
                 </a>
                 @endif
 
-                <x-primary-button id="tour-generate" :href="route('generate-post')" wire:navigate class="!rounded-xl !gap-2 !py-2.5">
+                <x-primary-button id="tour-generate" :href="route('generate-post')" wire:navigate class="!rounded-xl !gap-2 !py-2 sm:!py-2.5 !px-3 sm:!px-4 shrink-0 shadow-lg shadow-copper/20 !normal-case">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
-                    Générer un post
+                    <span class="hidden sm:inline">Générer un post</span>
+                    <span class="sm:hidden">Créer</span>
                 </x-primary-button>
             </div>
         </div>
@@ -75,8 +76,8 @@
     <div class="py-8 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto space-y-6">
 
-            {{-- ── Welcome contextuel ── --}}
-            <div class="glass-panel-dark rounded-3xl p-6 relative overflow-hidden shadow-2xl shadow-midnight/20">
+            {{-- ── Welcome contextuel (Mobile only) ── --}}
+            <div class="lg:hidden glass-panel-dark rounded-3xl p-6 relative overflow-hidden shadow-2xl shadow-midnight/20 transition-all duration-300">
                 <div class="absolute -top-12 -right-12 w-48 h-48 bg-copper/10 rounded-full blur-3xl"></div>
                 <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
                 <div class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -93,7 +94,7 @@
                             <p class="text-white/60 text-sm leading-relaxed max-w-xs sm:text-right">
                                 Votre premier post est à 10 secondes. Lancez-vous, c'est gratuit.
                             </p>
-                            <a href="{{ route('generate-post') }}" wire:navigate class="inline-flex items-center gap-2 text-sm font-bold text-copper hover:text-amber-400 transition-all hover:translate-x-1">
+                            <a href="{{ route('generate-post') }}" wire:navigate class="inline-flex items-center gap-2 text-sm font-bold text-copper hover:text-amber-400 transition-all hover:translate-x-1 mt-2.5">
                                 Créer maintenant
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                             </a>
@@ -103,24 +104,14 @@
                                     🎉 Objectif hebdo atteint !
                                 </p>
                             </div>
-                        @elseif($remaining_this_week === 1)
-                            <div class="flex flex-col sm:items-end">
-                                <p class="text-white/80 text-sm font-medium">
-                                    Plus qu'un seul post !
-                                </p>
-                                <a href="{{ route('generate-post') }}" wire:navigate class="mt-1 inline-flex items-center gap-2 text-sm font-bold text-copper hover:text-amber-400 transition-all hover:translate-x-1">
-                                    Générer maintenant
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                                </a>
-                            </div>
                         @else
                             <div class="flex flex-col sm:items-end">
                                 <p class="text-white/80 text-sm font-medium">
                                     <span class="text-copper">{{ $remaining_this_week }} posts</span> pour atteindre l'objectif.
                                 </p>
-                                <a href="{{ route('generate-post') }}" wire:navigate class="mt-1 inline-flex items-center gap-2 text-sm font-bold text-copper hover:text-amber-400 transition-all hover:translate-x-1">
+                                <a href="{{ route('generate-post') }}" wire:navigate class="inline-flex items-center gap-2 text-sm font-bold text-copper hover:text-amber-400 transition-all hover:translate-x-1 mt-2.5">
                                     Générer un post
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                                 </a>
                             </div>
                         @endif
@@ -184,7 +175,7 @@
             <div id="tour-stats" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
 
                 {{-- Total Posts --}}
-                <div class="glass-panel rounded-2xl p-5 group card-hover">
+                <div id="tour-stats-first" class="glass-panel rounded-2xl p-5 group card-hover">
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all duration-200">
                             <svg class="w-4.5 h-4.5 w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -353,7 +344,46 @@
                     </div>
                 </div>
 
+                {{-- Welcome contextuel (Desktop Side) ── --}}
+                <div class="hidden lg:block">
+                    <div class="glass-panel-dark rounded-3xl p-5 relative overflow-hidden shadow-2xl shadow-midnight/20">
+                        <div class="absolute -top-12 -right-12 w-32 h-32 bg-copper/10 rounded-full blur-2xl"></div>
+                        <div class="relative">
+                            <p class="text-white/50 text-[10px] font-bold uppercase tracking-widest mb-1">Content de vous revoir,</p>
+                            <h3 class="text-white font-bold text-xl tracking-tight mb-4">{{ explode(' ', $user->name)[0] }} 👋</h3>
+                            
+                            <div class="space-y-4">
+                                @php
+                                    $weeklyGoalCtx = $company?->weekly_posts_goal ?? 3;
+                                    $remaining_this_week = max(0, $weeklyGoalCtx - $thisWeek);
+                                @endphp
+                                @if($totalPosts === 0)
+                                    <p class="text-white/60 text-xs leading-relaxed">
+                                        Votre premier post est à 10 secondes. Lancez-vous !
+                                    </p>
+                                @elseif($thisWeek >= $weeklyGoalCtx)
+                                    <div class="bg-green-500/10 border border-green-500/20 rounded-xl px-3 py-2">
+                                        <p class="text-green-400 text-xs font-bold">
+                                            🎉 Objectif atteint !
+                                        </p>
+                                    </div>
+                                @else
+                                    <div>
+                                        <p class="text-white/80 text-xs font-medium">
+                                            <span class="text-copper">{{ $remaining_this_week }} posts</span> pour l'objectif hebdo.
+                                        </p>
+                                    </div>
+                                @endif
 
+                                <a href="{{ route('generate-post') }}" wire:navigate 
+                                   class="inline-flex items-center gap-2 text-xs font-bold text-copper hover:text-amber-400 transition-all hover:translate-x-1">
+                                    Générer un post
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -367,11 +397,11 @@
     ];
     $tourSteps = [
         ['target' => null, 'icon' => '👋', 'title' => 'Bienvenue sur Postelio !', 'desc' => 'En deux minutes, je vous montre comment tirer le meilleur de l\'outil. Prêts ?'],
-        ['target' => '#sidebar', 'icon' => '📂', 'title' => 'Menu de navigation', 'desc' => 'Retrouvez ici tous vos outils : calendrier, statistiques, et paramètres de compte.', 'position' => 'right'],
+        ['target' => '#sidebar', 'mobileTarget' => '#tour-mobile-menu-btn', 'icon' => '📂', 'title' => 'Menu de navigation', 'desc' => 'Retrouvez ici tous vos outils : calendrier, statistiques, et paramètres de compte.', 'position' => 'right'],
         ['target' => '#tour-generate', 'icon' => '✨', 'title' => 'Générez un post', 'desc' => 'En un clic, créez un post professionnel adapté à votre activité. Postelio rédige et publie même pour vous avec l\'offre Pro.', 'perm' => 'can_generate_posts'],
-        ['target' => '#tour-stats', 'icon' => '📊', 'title' => 'Vos statistiques', 'desc' => 'Suivez vos posts créés ce mois, cette semaine et l\'état de vos réseaux sociaux en un coup d\'œil.'],
+        ['target' => '#tour-stats', 'mobileTarget' => '#tour-stats-first', 'icon' => '📊', 'title' => 'Vos statistiques', 'desc' => 'Suivez vos posts créés ce mois, cette semaine et l\'état de vos réseaux sociaux en un coup d\'œil.'],
         ['target' => '#tour-posts', 'icon' => '📝', 'title' => 'Vos créations', 'desc' => 'Retrouvez ici tous vos posts générés. Visualisez-les, téléchargez-les, ou créez-en de nouveaux.', 'position' => 'top'],
-        ['target' => '#tour-quota', 'icon' => '⚡', 'title' => 'Votre quota mensuel', 'desc' => 'Surveillez le nombre de générations restantes. Le compteur se remet à zéro chaque mois.', 'position' => 'top'],
+        ['target' => '#tour-quota', 'mobileTarget' => '#tour-mobile-menu-btn', 'icon' => '⚡', 'title' => 'Votre quota mensuel', 'desc' => 'Sur mobile, retrouvez votre quota de génération en ouvrant le menu.', 'position' => 'top'],
         ['target' => '#tour-instagram', 'icon' => '📷', 'title' => 'Connectez vos réseaux', 'desc' => 'Liez Instagram et Facebook pour suivre l\'état de votre connexion directement depuis le tableau de bord.', 'perm' => 'can_connect_social'],
         ['target' => null, 'icon' => '🎉', 'title' => 'Vous êtes prêts !', 'desc' => 'Vous connaissez l\'essentiel. Maintenant, générez votre premier post et faites briller votre activité !'],
     ];

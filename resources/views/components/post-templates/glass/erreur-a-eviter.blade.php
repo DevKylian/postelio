@@ -53,11 +53,7 @@
             <div class="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 shadow-2xl w-full max-w-[320px] text-center border-t-4 border-t-red-500">
                 <span class="text-[10px] font-black text-red-500/60 uppercase tracking-[0.3em] block mb-2 font-montserrat">Attention : Erreur courante</span>
                 @php
-                    $len = mb_strlen($text);
-                    $fontSize = 'text-base';
-                    if ($len > 150) $fontSize = 'text-[10px]';
-                    elseif ($len > 80) $fontSize = 'text-xs';
-                    elseif ($len > 40) $fontSize = 'text-sm';
+                    $fontSize = 'sm:text-xl text-lg';
                 @endphp
                 <div class="max-h-[140px] overflow-hidden">
                     <h3 class="text-white {{ $fontSize }} font-bold leading-tight">

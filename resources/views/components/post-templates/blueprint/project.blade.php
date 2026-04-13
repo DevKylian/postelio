@@ -42,7 +42,7 @@
     $tagTextCol = ($yiq > 180) ? '#1E293B' : '#FFFFFF';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" !!}] bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' !!}">
+<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
     
     {{-- Background Grid --}}
     <div class="absolute inset-0 opacity-10 pointer-events-none" 
@@ -57,29 +57,29 @@
             $slide0Alpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
             $slide0Style = (int)$slideIndex !== 0 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-6 grid grid-cols-2 gap-px bg-white/20" {!! $slide0Alpine !!} style="{{ $slide0Style !!}">
+        <div class="absolute inset-6 grid grid-cols-2 gap-px bg-white/20" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
             <div class="relative overflow-hidden bg-blue-900 border border-white/10">
                 @if($imageBeforeUrl)
-                    <img src="{{ $imageBeforeUrl !!}" class="absolute inset-0 w-full h-full object-cover">
+                    <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 @else
-                    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" !!}] bg-blue-900 border border-white/10 flex items-center justify-center">
+                    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-blue-900 border border-white/10 flex items-center justify-center">
                         <span class="text-white/20 text-[7px] font-black font-mono-technical uppercase">AVANT</span>
                     </div>
                 @endif
-                <div class="absolute top-2 left-2 px-3 py-1 rounded-full shadow-xl z-20" style="background-color: {{ $brandColor !!}">
-                    <p class="text-[9px] font-black font-mono-technical uppercase tracking-wider leading-none" style="color: {{ $tagTextCol !!}">Avant</p>
+                <div class="absolute top-2 left-2 px-3 py-1 rounded-full shadow-xl z-20" style="background-color: {{ $brandColor }}">
+                    <p class="text-[9px] font-black font-mono-technical uppercase tracking-wider leading-none" style="color: {{ $tagTextCol }}">Avant</p>
                 </div>
             </div>
             <div class="relative overflow-hidden bg-blue-900 border border-white/10">
                 @if($imageAfterUrl)
-                    <img src="{{ $imageAfterUrl !!}" class="absolute inset-0 w-full h-full object-cover">
+                    <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 @else
-                    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" !!}] bg-blue-900 border border-white/10 flex items-center justify-center">
+                    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-blue-900 border border-white/10 flex items-center justify-center">
                         <span class="text-white/20 text-[7px] font-black font-mono-technical uppercase tracking-widest">APRÈS</span>
                     </div>
                 @endif
-                <div class="absolute top-2 right-2 px-3 py-1 rounded-full shadow-xl z-20" style="background-color: {{ $brandColor !!}">
-                    <p class="text-[9px] font-black font-mono-technical uppercase tracking-wider leading-none" style="color: {{ $tagTextCol !!}">Après</p>
+                <div class="absolute top-2 right-2 px-3 py-1 rounded-full shadow-xl z-20" style="background-color: {{ $brandColor }}">
+                    <p class="text-[9px] font-black font-mono-technical uppercase tracking-wider leading-none" style="color: {{ $tagTextCol }}">Après</p>
                 </div>
             </div>
         </div>
@@ -90,11 +90,11 @@
             $slide1Alpine = $slideIndex === null ? "x-show=\"current === 1\" style=\"display: none;\"" : '';
             $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-6 bg-slate-950 border-2 border-white/20" {!! $slide1Alpine !!} style="{{ $slide1Style !!}">
+        <div class="absolute inset-6 bg-slate-950 border-2 border-white/20" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
             @if($imageBeforeUrl)
-                <img src="{{ $imageBeforeUrl !!}" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute top-2 left-2 px-5 py-2 rounded-full shadow-2xl z-20" style="background-color: {{ $brandColor !!}">
-                    <p class="text-xs font-black font-mono-technical uppercase tracking-[0.2em] leading-none" style="color: {{ $tagTextCol !!}">Avant</p>
+                <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute top-2 left-2 px-5 py-2 rounded-full shadow-2xl z-20" style="background-color: {{ $brandColor }}">
+                    <p class="text-xs font-black font-mono-technical uppercase tracking-[0.2em] leading-none" style="color: {{ $tagTextCol }}">Avant</p>
                 </div>
             @endif
         </div>
@@ -105,11 +105,11 @@
             $slide2Alpine = $slideIndex === null ? "x-show=\"current === 2\" style=\"display: none;\"" : '';
             $slide2Style = (int)$slideIndex !== 2 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-6 bg-slate-900 border-2 border-white/20" {!! $slide2Alpine !!} style="{{ $slide2Style !!}">
+        <div class="absolute inset-6 bg-slate-900 border-2 border-white/20" {!! $slide2Alpine !!} style="{{ $slide2Style }}">
             @if($imageAfterUrl)
-                <img src="{{ $imageAfterUrl !!}" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute top-2 right-2 px-5 py-2 rounded-full shadow-2xl z-20" style="background-color: {{ $brandColor !!}">
-                    <p class="text-xs font-black font-mono-technical uppercase tracking-[0.2em] leading-none" style="color: {{ $tagTextCol !!}">Après</p>
+                <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                <div class="absolute top-2 right-2 px-5 py-2 rounded-full shadow-2xl z-20" style="background-color: {{ $brandColor }}">
+                    <p class="text-xs font-black font-mono-technical uppercase tracking-[0.2em] leading-none" style="color: {{ $tagTextCol }}">Après</p>
                 </div>
             @endif
         </div>
@@ -121,7 +121,7 @@
             $slide3Style = (int)$slideIndex !== 3 && $slideIndex !== null ? 'display: none;' : '';
         @endphp
         @if($hasContactInfo)
-        <div class="absolute inset-6" {!! $slide3Alpine !!} style="{{ $slide3Style !!}">
+        <div class="absolute inset-6" {!! $slide3Alpine !!} style="{{ $slide3Style }}">
             <x-post-templates.contact-slide 
                 :brand-color="$brandColor" 
                 :company-label="$companyLabel"
@@ -147,7 +147,7 @@
             <div class="absolute top-10 right-10 bg-white text-[#0047AB] text-[10px] font-black font-mono-technical px-3 py-1.5 shadow-xl z-30" x-text="(current + 1) + ' / ' + total"></div>
         @elseif($slideIndex !== null && !$exporting)
              <div class="absolute top-10 right-10 bg-white text-[#0047AB] text-[10px] font-black font-mono-technical px-3 py-1.5 shadow-xl z-30">
-                {{ (int)$slideIndex + 1 !!} / {{ $total !!}
+                {{ (int)$slideIndex + 1 }} / {{ $total }}
             </div>
         @endif
 
@@ -173,18 +173,18 @@
         @endphp
         <div class="flex flex-col max-w-[300px]">
             <div class="flex items-center gap-2 mb-1">
-                <span class="text-[#0047AB] {{ $cFontSize !!} font-black font-mono-technical tracking-widest uppercase truncate">{{ $companyLabel !!}</span>
+                <span class="text-[#0047AB] {{ $cFontSize }} font-black font-mono-technical tracking-widest uppercase truncate">{{ $companyLabel }}</span>
                 <div class="flex items-center gap-1 overflow-hidden">
                     @if($trade)
-                        <span class="px-1 py-0.5 rounded-sm bg-blue-50 text-[#0047AB]/60 text-[6px] font-black font-mono-technical uppercase border border-[#0047AB]/10 whitespace-nowrap">{{ $trade !!}</span>
+                        <span class="px-1 py-0.5 rounded-sm bg-blue-50 text-[#0047AB]/60 text-[6px] font-black font-mono-technical uppercase border border-[#0047AB]/10 whitespace-nowrap">{{ $trade }}</span>
                     @endif
                     @if($city)
-                        <span class="px-1 py-0.5 rounded-sm bg-blue-50 text-[#0047AB]/60 text-[6px] font-black font-mono-technical uppercase border border-[#0047AB]/10 whitespace-nowrap">{{ $city !!}</span>
+                        <span class="px-1 py-0.5 rounded-sm bg-blue-50 text-[#0047AB]/60 text-[6px] font-black font-mono-technical uppercase border border-[#0047AB]/10 whitespace-nowrap">{{ $city }}</span>
                     @endif
                 </div>
             </div>
             <div class="max-h-[40px] overflow-hidden">
-                <span class="text-[#0047AB] {{ $tFontSize !!} font-black font-mono-technical tracking-tighter uppercase leading-tight">{{ $text !!}</span>
+                <span class="text-[#0047AB] {{ $tFontSize }} font-black font-mono-technical tracking-tighter uppercase leading-tight">{{ $text }}</span>
             </div>
         </div>
         <div class="flex items-center gap-6">
@@ -192,13 +192,13 @@
              <div class="flex gap-1.5">
                  @for($i=0; $i<$total; $i++)
                     <div class="w-2 h-2 rounded-full transition-all" 
-                         @if($preview) :class="current === {{ $i !!} ? 'bg-[#0047AB]' : 'bg-blue-100'"
-                         @else class="{{ (int)($slideIndex ?? 0) === $i ? 'bg-[#0047AB]' : 'bg-blue-100' !!}" @endif>
+                         @if($preview) :class="current === {{ $i }} ? 'bg-[#0047AB]' : 'bg-blue-100'"
+                         @else class="{{ (int)($slideIndex ?? 0) === $i ? 'bg-[#0047AB]' : 'bg-blue-100' }}" @endif>
                     </div>
                  @endfor
              </div>
              <div class="w-8 h-8 rounded-full border-2 border-[#0047AB] flex items-center justify-center p-1">
-                  <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" !!}] rounded-full" style="background-color: {{ $brandColor !!}"></div>
+                  <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] rounded-full" style="background-color: {{ $brandColor }}"></div>
              </div>
         </div>
     </div>

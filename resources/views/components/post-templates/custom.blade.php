@@ -126,7 +126,7 @@
                 elseif ($len > 120) $fSize = 'text-sm';
             @endphp
             <div class="absolute inset-x-6 top-10 z-10">
-                <div class="backdrop-blur-xl p-6 rounded-3xl border shadow-xl text-center" style="background: {{ $brandColor }}; border-color: rgba(255,255,255,0.1)">
+                <div class="backdrop-blur-xl p-6 rounded-3xl border shadow-xl text-center" style="background: {{ $brandColor !!}; border-color: rgba(255,255,255,0.1)">
                      <h3 class="font-black uppercase tracking-tighter text-2xl leading-none" style="color: {{ $brandTextColor }}">{{ $name }}</h3>
                 </div>
             </div>

@@ -54,9 +54,9 @@
                     <h3 class="text-gray-900 text-xl font-black font-montserrat leading-tight mb-6 uppercase">CONSEIL D'EXPERT</h3>
                     @php
                         $len = mb_strlen($text);
-                        $fontSize = 'text-sm';
-                        if ($len > 250) $fontSize = 'text-[9px]';
-                        elseif ($len > 120) $fontSize = 'text-xs';
+                        $fontSize = 'sm:text-sm text-xs';
+                        if ($len > 250) $fontSize = 'sm:text-[9px] text-[7px]';
+                        elseif ($len > 120) $fontSize = 'sm:text-xs text-[10px]';
                     @endphp
                     <div class="max-h-[160px] overflow-hidden">
                         <p class="text-gray-900 {{ $fontSize }} font-black font-mono-technical leading-normal uppercase bg-gray-50 p-4 border-2 border-dashed border-gray-800">
@@ -69,7 +69,7 @@
 
         <div class="h-20 px-10 bg-gray-900 flex flex-col justify-center gap-1 z-20">
              <div class="flex items-center justify-between">
-                 <span class="text-white text-[10px] font-black font-montserrat uppercase tracking-widest truncate max-w-[250px]">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel }}</span>
+                 <span class="text-white text-[10px] font-black font-montserrat uppercase tracking-widest truncate max-w-[250px]">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                  <div class="w-10 h-3 shrink-0" style="background-color: {{ $brandColor }}"></div>
              </div>
              <div class="flex items-center gap-1.5 overflow-hidden">

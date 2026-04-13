@@ -60,13 +60,13 @@
             @php
                 $displayText = $text ?: 'LIFESTYLE';
                 $len = mb_strlen($displayText);
-                $fontSize = 'text-[12px]';
-                if ($len > 25) $fontSize = 'text-[9px]';
-                elseif ($len > 18) $fontSize = 'text-[10px]';
+                $fontSize = 'sm:text-[12px] text-[10px]';
+                if ($len > 25) $fontSize = 'sm:text-[9px] text-[7px]';
+                elseif ($len > 18) $fontSize = 'sm:text-[10px] text-[8px]';
             @endphp
             <div class="flex flex-col max-w-[220px] overflow-hidden">
                  <span class="text-gray-900 {{ $fontSize }} font-black uppercase tracking-[0.1em] font-montserrat leading-tight truncate">{{ $displayText }}</span>
-                 <span class="text-gray-900/40 text-[8px] font-black uppercase font-mono-technical mt-0.5 mb-1 truncate">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel }}</span>
+                 <span class="text-gray-900/40 text-[8px] font-black uppercase font-mono-technical mt-0.5 mb-1 truncate">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                  <div class="flex items-center gap-1 overflow-hidden shrink-0">
                     @if($trade)
                         <span class="px-1 py-0.5 rounded-sm bg-gray-900/5 text-gray-900/60 text-[5px] font-black uppercase tracking-wider border border-gray-900/10 whitespace-nowrap">{{ $trade }}</span>

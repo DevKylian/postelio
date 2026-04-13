@@ -268,18 +268,14 @@ $switchTab = function ($tab) {
                     </div>
 
                     {{-- Dynamic Color Pickers --}}
-                    <div class="flex items-center gap-4 bg-white p-2.5 rounded-2xl shadow-sm ring-1 ring-gray-100 animate-fade-in">
+                    <div class="flex items-center gap-4 bg-white p-2.5 rounded-2xl shadow-sm ring-1 ring-gray-100 animate-fade-in text-left">
                         <div class="flex items-center gap-4 px-3 border-r border-gray-100">
                             <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 whitespace-nowrap">Couleur Principale</label>
-                            <div class="relative group">
-                                <input type="color" wire:model.live="brandColor" class="w-8 h-8 rounded-lg overflow-hidden cursor-pointer bg-transparent border-0 p-0 shadow-sm transition-transform group-hover:scale-110">
-                            </div>
+                            <x-custom-color-picker wire:model.live="brandColor" />
                         </div>
                         <div class="flex items-center gap-4 px-3">
                             <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 whitespace-nowrap">Couleur Bandeaux</label>
-                            <div class="relative group">
-                                <input type="color" wire:model.live="accentColor" class="w-8 h-8 rounded-lg overflow-hidden cursor-pointer bg-transparent border-0 p-0 shadow-sm transition-transform group-hover:scale-110">
-                            </div>
+                            <x-custom-color-picker wire:model.live="accentColor" />
                         </div>
                     </div>
                 </div>

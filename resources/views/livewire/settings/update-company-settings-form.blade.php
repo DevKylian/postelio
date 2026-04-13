@@ -178,38 +178,20 @@ $updateCompanySettings = function () {
 
         <!-- Couleur de marque -->
         <div>
-            <x-input-label for="brand_color" value="Couleur de marque" />
-            <div class="mt-1 flex items-center gap-3">
-                <input wire:model="brand_color"
-                       id="brand_color"
-                       name="brand_color"
-                       type="color"
-                       class="h-10 w-16 cursor-pointer rounded-lg border border-gray-300 p-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-copper" />
-                <x-text-input wire:model="brand_color"
-                              type="text"
-                              class="w-36 uppercase"
-                              placeholder="#F59E0B" />
+            <x-input-label for="brand_color" :value="__('Couleur principale')" />
+            <div class="mt-1">
+                <x-custom-color-picker wire:model.live="brand_color" id="brand_color" />
             </div>
-            <p class="mt-1 text-xs text-gray-500">Utilisée comme couleur principale dans vos visuels.</p>
-            <x-input-error class="mt-2" :messages="$errors->get('brand_color')" />
+            <x-input-error :messages="$errors->get('brand_color')" class="mt-2" />
         </div>
 
         <!-- Couleur des bandeaux -->
         <div>
-            <x-input-label for="secondary_color" value="Couleur des bandeaux" />
-            <div class="mt-1 flex items-center gap-3">
-                <input wire:model="secondary_color"
-                       id="secondary_color"
-                       name="secondary_color"
-                       type="color"
-                       class="h-10 w-16 cursor-pointer rounded-lg border border-gray-300 p-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-copper" />
-                <x-text-input wire:model="secondary_color"
-                              type="text"
-                              class="w-36 uppercase"
-                              placeholder="#0F172A" />
+            <x-input-label for="secondary_color" :value="__('Couleur des bandeaux')" />
+            <div class="mt-1">
+                <x-custom-color-picker wire:model.live="secondary_color" id="secondary_color" />
             </div>
-            <p class="mt-1 text-xs text-gray-500">Utilisée pour les bandeaux et cartes de vos visuels.</p>
-            <x-input-error class="mt-2" :messages="$errors->get('secondary_color')" />
+            <x-input-error :messages="$errors->get('secondary_color')" class="mt-2" />
         </div>
 
         <!-- Objectif hebdomadaire de posts -->

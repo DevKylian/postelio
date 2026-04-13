@@ -523,7 +523,8 @@
         line-height: 1.6;
         font-style: italic;
         width: 100%;
-        max-width: 380px
+        max-width: 380px;
+        min-height: 160px;
       }
 
       .md-types {
@@ -1682,7 +1683,7 @@
                 </template>
               </div>
 
-              <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left min-h-[110px] flex items-center">
+              <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left min-h-[160px] flex items-center">
                 <p class="text-midnight font-medium leading-relaxed text-sm"
                   x-text="isPlaying ? displayedText : 'Salut ! On vient de finir cette superbe rénovation de cuisine à Lyon. Le résultat est top, regardez l\'avant-après !'">
                 </p>

@@ -1,5 +1,7 @@
 import './bootstrap';
 import './onboarding-tour';
+import iro from '@jaames/iro';
+window.iro = iro;
 
 /**
  * City autocomplete Alpine.js component.
@@ -127,6 +129,50 @@ window.cityAutocomplete = function cityAutocomplete(initialCity, wireCity, wireP
         handleBlur() {
             setTimeout(() => this.close(), 200);
         },
+    };
+};
+
+/**
+ * Premium Spectrum Color Picker Alpine Component.
+ * Integrates with iro.js for a high-end, cross-device experience.
+ */
+window.spectrumColorPicker = function(initialColor) {
+    return {
+        internalColor: initialColor || '#F59E0B',
+        picker: null,
+        
+        initPicker(el) {
+            if (this.picker || !el) return;
+
+            this.picker = new window.iro.ColorPicker(el, {
+                width: 220,
+                color: this.internalColor || '#F59E0B',
+                borderWidth: 2,
+                borderColor: "#fff",
+                layout: [
+                    { 
+                        component: window.iro.ui.Wheel,
+                        options: { wheelAngle: 0, wheelDirection: 'anticlockwise' }
+                    },
+                    { 
+                        component: window.iro.ui.Slider,
+                        options: { sliderType: 'value' }
+                    },
+                ]
+            });
+
+            this.picker.on('color:change', (color) => {
+                this.internalColor = color.hexString;
+            });
+
+            this.$watch('internalColor', (value) => {
+                if (!value) return;
+                const hex = String(value);
+                if (this.picker && this.picker.color.hexString.toLowerCase() !== hex.toLowerCase()) {
+                    this.picker.color.set(hex);
+                }
+            });
+        }
     };
 };
 

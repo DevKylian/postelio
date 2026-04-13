@@ -73,7 +73,60 @@
     @endphp
 
     <div class="py-8 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto space-y-8">
+        <div class="max-w-7xl mx-auto space-y-6">
+
+            {{-- ── Welcome contextuel ── --}}
+            <div class="glass-panel-dark rounded-3xl p-6 relative overflow-hidden shadow-2xl shadow-midnight/20">
+                <div class="absolute -top-12 -right-12 w-48 h-48 bg-copper/10 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
+                <div class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <p class="text-white/50 text-xs font-semibold uppercase tracking-wider mb-1">Content de vous revoir,</p>
+                        <h3 class="text-white font-bold text-2xl tracking-tight">{{ explode(' ', $user->name)[0] }} 👋</h3>
+                    </div>
+                    @php
+                        $weeklyGoalCtx = $company?->weekly_posts_goal ?? 3;
+                        $remaining_this_week = max(0, $weeklyGoalCtx - $thisWeek);
+                    @endphp
+                    <div class="flex flex-col sm:items-end gap-2">
+                        @if($totalPosts === 0)
+                            <p class="text-white/60 text-sm leading-relaxed max-w-xs sm:text-right">
+                                Votre premier post est à 10 secondes. Lancez-vous, c'est gratuit.
+                            </p>
+                            <a href="{{ route('generate-post') }}" wire:navigate class="inline-flex items-center gap-2 text-sm font-bold text-copper hover:text-amber-400 transition-all hover:translate-x-1">
+                                Créer maintenant
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                            </a>
+                        @elseif($thisWeek >= $weeklyGoalCtx)
+                            <div class="bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-2">
+                                <p class="text-green-400 text-sm font-bold leading-relaxed">
+                                    🎉 Objectif hebdo atteint !
+                                </p>
+                            </div>
+                        @elseif($remaining_this_week === 1)
+                            <div class="flex flex-col sm:items-end">
+                                <p class="text-white/80 text-sm font-medium">
+                                    Plus qu'un seul post !
+                                </p>
+                                <a href="{{ route('generate-post') }}" wire:navigate class="mt-1 inline-flex items-center gap-2 text-sm font-bold text-copper hover:text-amber-400 transition-all hover:translate-x-1">
+                                    Générer maintenant
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            </div>
+                        @else
+                            <div class="flex flex-col sm:items-end">
+                                <p class="text-white/80 text-sm font-medium">
+                                    <span class="text-copper">{{ $remaining_this_week }} posts</span> pour atteindre l'objectif.
+                                </p>
+                                <a href="{{ route('generate-post') }}" wire:navigate class="mt-1 inline-flex items-center gap-2 text-sm font-bold text-copper hover:text-amber-400 transition-all hover:translate-x-1">
+                                    Générer un post
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
 
             {{-- ── Onboarding Banner ── --}}
             @if (!$onboardingComplete)
@@ -300,52 +353,6 @@
                     </div>
                 </div>
 
-                {{-- Quick Actions (1/3) --}}
-                <div class="space-y-4">
-                    {{-- Welcome contextuel --}}
-                    <div class="glass-panel-dark rounded-2xl p-5 relative overflow-hidden">
-                        <div class="absolute -top-6 -right-6 w-24 h-24 bg-copper/10 rounded-full blur-2xl"></div>
-                        <div class="absolute -bottom-6 -left-6 w-20 h-20 bg-white/5 rounded-full blur-xl"></div>
-                        <div class="relative">
-                            <p class="text-white/50 text-xs font-medium mb-1">Bonjour,</p>
-                            <h3 class="text-white font-bold text-lg leading-tight mb-3">{{ explode(' ', $user->name)[0] }} 👋</h3>
-                            @php
-                                $weeklyGoalCtx = $company?->weekly_posts_goal ?? 3;
-                                $remaining_this_week = max(0, $weeklyGoalCtx - $thisWeek);
-                            @endphp
-                            @if($totalPosts === 0)
-                                <p class="text-white/60 text-xs leading-relaxed">
-                                    Votre premier post est à 10 secondes. Lancez-vous, c'est gratuit.
-                                </p>
-                                <a href="{{ route('generate-post') }}" wire:navigate class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-copper hover:text-amber-400 transition-colors">
-                                    Créer maintenant
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                                </a>
-                            @elseif($thisWeek >= $weeklyGoalCtx)
-                                <p class="text-white/60 text-xs leading-relaxed">
-                                    🎉 Objectif hebdo atteint ! Vous êtes à <span class="text-white font-semibold">{{ $thisMonth }} posts</span> ce mois-ci.
-                                </p>
-                            @elseif($remaining_this_week === 1)
-                                <p class="text-white/60 text-xs leading-relaxed">
-                                    Plus qu'<span class="text-copper font-semibold">1 post</span> pour atteindre votre objectif de la semaine.
-                                </p>
-                                <a href="{{ route('generate-post') }}" wire:navigate class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-copper hover:text-amber-400 transition-colors">
-                                    Générer maintenant
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                                </a>
-                            @else
-                                <p class="text-white/60 text-xs leading-relaxed">
-                                    <span class="text-copper font-semibold">{{ $remaining_this_week }} posts</span> restants pour atteindre votre objectif de la semaine.
-                                </p>
-                                <a href="{{ route('generate-post') }}" wire:navigate class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-copper hover:text-amber-400 transition-colors">
-                                    Générer un post
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-
-                </div>
 
             </div>
 

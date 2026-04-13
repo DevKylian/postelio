@@ -371,7 +371,7 @@ $complete = function () {
                         {{-- Couleur de marque --}}
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-3">Couleur de marque</label>
-                            <div class="flex flex-wrap gap-2.5 mb-3">
+                            <div class="flex items-center flex-wrap gap-2.5 mb-3">
                                 @foreach($presetColors as $color)
                                     <button wire:click="$set('brand_color', '{{ $color }}')"
                                             type="button"
@@ -381,19 +381,7 @@ $complete = function () {
                                             style="background-color: {{ $color }}">
                                     </button>
                                 @endforeach
-                                <label class="w-9 h-9 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-gray-400 transition-colors relative overflow-hidden" title="Couleur personnalisée">
-                                    <span class="text-gray-400 text-lg leading-none">+</span>
-                                    <input wire:model.live="brand_color" type="color" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
-                                </label>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-lg border border-gray-200 shadow-sm transition-all duration-200 flex-shrink-0"
-                                     style="background-color: {{ $brand_color }}"></div>
-                                <input wire:model.live="brand_color"
-                                       type="text"
-                                       placeholder="#F59E0B"
-                                       class="w-32 px-3 py-2 rounded-lg border-2 border-gray-200 bg-gray-50 text-slate-800 text-sm font-mono uppercase
-                                              focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200" />
+                                <x-custom-color-picker wire:model.live="brand_color" />
                             </div>
                             @error('brand_color')
                                 <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $message }}</p>

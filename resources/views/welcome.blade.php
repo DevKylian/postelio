@@ -1880,18 +1880,24 @@
               }
 
               ctx.save();
-              ctx.globalAlpha = p.alpha;
-              ctx.shadowBlur  = p.r * 6 + 4;
-              ctx.shadowColor = p.color;
-              ctx.fillStyle   = p.color;
+              ctx.fillStyle = p.color;
+              
+              // Outer glow (faked with opacity for performance)
+              ctx.globalAlpha = p.alpha * 0.2;
               ctx.beginPath();
-              ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+              ctx.arc(p.x, p.y, p.r * 3.5, 0, Math.PI * 2);
               ctx.fill();
-              // Bright core
-              ctx.globalAlpha = p.alpha * 0.7;
-              ctx.shadowBlur  = p.r * 14;
+              
+              // Mid glow
+              ctx.globalAlpha = p.alpha * 0.5;
               ctx.beginPath();
-              ctx.arc(p.x, p.y, p.r * 0.45, 0, Math.PI * 2);
+              ctx.arc(p.x, p.y, p.r * 1.5, 0, Math.PI * 2);
+              ctx.fill();
+
+              // Bright core
+              ctx.globalAlpha = p.alpha;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.r * 0.6, 0, Math.PI * 2);
               ctx.fill();
               ctx.restore();
             }

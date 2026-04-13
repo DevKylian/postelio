@@ -428,16 +428,32 @@ class Calendar extends Component
      */
     private function cancelQueuedJobs(int $postId, ?string $platform = null): void
     {
-        $query = DB::table('jobs')
-            ->whereNull('reserved_at')
-            ->where('payload', 'LIKE', '%"postId";i:' . $postId . ';%');
+        $rawJobs = DB::table('jobs')->whereNull('reserved_at')->get();
+        $idsToDelete = [];
 
-        if ($platform === 'instagram') {
-            $query->where('payload', 'LIKE', '%PublishToInstagramJob%');
-        } elseif ($platform === 'facebook') {
-            $query->where('payload', 'LIKE', '%PublishToFacebookJob%');
+        foreach ($rawJobs as $raw) {
+            $payload = json_decode($raw->payload, true);
+            $displayName = $payload['displayName'] ?? '';
+            $command = $payload['data']['command'] ?? '';
+
+            // Check platform type
+            if ($platform === 'instagram' && !str_contains($displayName, 'PublishToInstagramJob')) continue;
+            if ($platform === 'facebook' && !str_contains($displayName, 'PublishToFacebookJob')) continue;
+            if ($platform === null && !str_contains($displayName, 'PublishTo')) continue;
+
+            // Extract postId from serialized command
+            $foundPostId = null;
+            if (preg_match('/"postId";i:(\d+);/', $command, $matches)) {
+                $foundPostId = (int) $matches[1];
+            }
+
+            if ($foundPostId === $postId) {
+                $idsToDelete[] = $raw->id;
+            }
         }
 
-        $query->delete();
+        if (!empty($idsToDelete)) {
+            DB::table('jobs')->whereIn('id', $idsToDelete)->delete();
+        }
     }
 }

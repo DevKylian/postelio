@@ -54,7 +54,7 @@ document.addEventListener('alpine:init', () => {
             if (this.steps.length > 0 && config.autoStart && !localStorage.getItem('postelio_tour_' + this.name)) {
                 setTimeout(() => {
                     this.start();
-                }, 1000);
+                }, 300);
             }
             
             // Re-position on resize
@@ -65,11 +65,17 @@ document.addEventListener('alpine:init', () => {
 
         start() {
             if (this.steps.length === 0) return;
-            if (localStorage.getItem('postelio_tour_' + this.name)) return;
+            // Removed localStorage check here to allow start() to be called manually if not active
+            if (this.active) return;
             
             this.active = true;
             this.stepIndex = 0;
             this._positionStep();
+        },
+
+        replay() {
+            localStorage.removeItem('postelio_tour_' + this.name);
+            this.start();
         },
 
         _positionStep() {
@@ -89,9 +95,9 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.scrollIntoView({ behavior: 'auto', block: 'center' });
 
-            setTimeout(() => {
+            const update = () => {
                 const rect = el.getBoundingClientRect();
                 const style = window.getComputedStyle(el);
                 const isSidebar = step.target === '#sidebar';
@@ -127,7 +133,13 @@ document.addEventListener('alpine:init', () => {
                     if (top + cardH > window.innerHeight - 16) top = window.innerHeight - cardH - 16;
                     this._cardStyle = `top:${top}px;left:${left}px;transform:none;opacity:1`;
                 }
-            }, 400);
+            };
+
+            // Calculate immediately
+            update();
+            
+            // Recalculate once after a tiny frame to be sure if rendering was happening
+            requestAnimationFrame(update);
         },
 
         next() {
@@ -146,6 +158,7 @@ document.addEventListener('alpine:init', () => {
         finish() {
             this.active = false;
             localStorage.setItem('postelio_tour_' + this.name, 'done');
+            window.dispatchEvent(new CustomEvent('tour:finished', { detail: { name: this.name } }));
         },
 
         skip() {

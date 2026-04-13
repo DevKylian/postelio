@@ -174,7 +174,7 @@
                 <div class="px-4 py-3 flex items-center gap-3">
                     {{-- Title --}}
                     <div class="flex-1 min-w-0 flex items-center h-full">
-                        <h3 class="font-black {{ $tFontSize }} leading-tight tracking-tight line-clamp-2 font-display" style="color: {{ $accentTextColor }}">{{ $text }}</h3>
+                        <h3 class="font-black {{ $tFontSize }} leading-tight tracking-tight whitespace-normal font-display" style="color: {{ $accentTextColor }}">{{ $text }}</h3>
                     </div>
                     {{-- Divider --}}
                     <div class="w-px self-stretch bg-white/10 shrink-0"></div>
@@ -185,9 +185,12 @@
                         @else
                             <div class="w-3.5 h-3.5 rounded-full" style="background-color: {{ $brandColor }}"></div>
                         @endif
-                        <p class="font-black tracking-[0.15em] text-[6px] uppercase text-center leading-none line-clamp-2 font-montserrat" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                        @php
+                            $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                        @endphp
+                        <p class="font-black tracking-[0.15em] text-[6px] uppercase text-center whitespace-normal font-montserrat" style="color: {{ $accentTextColor }}bf">{!! $wrappedLabel !!}</p>
                         @if($trade)
-                            <span class="px-2 h-4 inline-flex items-center justify-center rounded text-[5px] font-black uppercase tracking-wide border whitespace-nowrap leading-none font-montserrat" style="{{ $tagStyle }}">{{ $trade }}</span>
+                            <span class="px-2 h-4 inline-flex items-center justify-center rounded text-[5px] font-black uppercase tracking-wide border whitespace-nowrap font-montserrat" style="{{ $tagStyle }}">{{ $trade }}</span>
                         @endif
                     </div>
                 </div>

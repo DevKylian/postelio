@@ -71,7 +71,7 @@
                 <div class="flex items-center justify-between border-t border-white/10 pt-4 gap-2">
                     <span class="text-white/80 font-bold text-sm truncate flex-1 shrink-0">{{ $customerName }}</span>
                     <div class="flex flex-col items-end min-w-0">
-                        <span class="text-white/40 text-[9px] font-bold uppercase tracking-widest truncate mb-1 text-right w-full">{{ $companyLabel }}</span>
+                        <span class="text-white/40 text-[9px] font-bold uppercase tracking-widest truncate mb-1 text-right w-full">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                         <div class="flex items-center gap-1 overflow-hidden">
                             @if($trade)
                                 <span class="px-1 py-0.5 rounded-md bg-white/5 text-white/30 text-[5px] font-bold uppercase tracking-wider border border-white/5 whitespace-nowrap">{{ $trade }}</span>

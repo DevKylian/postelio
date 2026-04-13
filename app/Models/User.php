@@ -41,6 +41,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_quota_reset_at',
         'newsletter_opt_in',
         'retention_offer_used_at',
+        'last_login_at',
+        'last_active_at',
     ];
 
     /**
@@ -73,6 +75,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'used_credits' => 'integer',
             'newsletter_opt_in' => 'boolean',
             'retention_offer_used_at' => 'datetime',
+            'last_login_at' => 'datetime',
+            'last_active_at' => 'datetime',
         ];
     }
 
@@ -259,5 +263,24 @@ class User extends Authenticatable implements MustVerifyEmail
         );
 
         Mail::to($this)->send(new WelcomeMail($this, $verificationUrl));
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\CustomResetPasswordNotification($token));
+    }
+
+    /**
+     * Determine if the user has been active in the last 5 minutes.
+     */
+    public function isOnline(): bool
+    {
+        return $this->last_active_at && $this->last_active_at->greaterThan(now()->subMinutes(5));
     }
 }

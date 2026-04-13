@@ -48,31 +48,31 @@
 
         @if($currentStep === 1)
             <x-onboarding-tour wire:key="tour-gen_step1" name="gen_step1" :steps="[
-                ['target' => null, 'icon' => '🎨', 'title' => 'Nouveau Post', 'desc' => 'Prêt à briller ? On commence par choisir le gabarit idéal.'],
-                ['target' => '#tour-gen-stepper', 'icon' => '🚩', 'title' => 'Ton parcours', 'desc' => 'Le processus se fait en 4 étapes simples. Tu es à l\'étape 1.'],
-                ['target' => '#tour-gen-templates', 'icon' => '📂', 'title' => 'Choisis un modèle', 'desc' => 'Avis client, Avant/Après, Conseil utile... Sélectionne celui qui correspond à ton besoin.'],
-                ['target' => '#tour-gen-next', 'icon' => '➡️', 'title' => 'Passe à la suite', 'desc' => 'Une fois ton modèle choisi, clique sur Continuer pour passer au brief vocal !'],
+                ['target' => null, 'icon' => '🎨', 'title' => 'Nouveau Post', 'desc' => 'Prêts à briller ? On commence par choisir le gabarit idéal.'],
+                ['target' => '#tour-gen-stepper', 'icon' => '🚩', 'title' => 'Votre parcours', 'desc' => 'Le processus se fait en 4 étapes simples. Vous êtes à l\'étape 1.'],
+                ['target' => '#tour-gen-templates', 'icon' => '📂', 'title' => 'Choisissez un modèle', 'desc' => 'Avis client, Avant/Après, Conseil utile... Sélectionnez celui qui correspond à votre besoin.'],
+                ['target' => '#tour-gen-next', 'icon' => '➡️', 'title' => 'Passez à la suite', 'desc' => 'Une fois votre modèle choisi, cliquez sur Continuer pour passer au brief vocal !'],
             ]" />
         @endif
 
         @if($currentStep === 2)
             <x-onboarding-tour wire:key="tour-gen_step2" name="gen_step2" :steps="[
-                ['target' => '#tour-gen-brief', 'icon' => '🎙️', 'title' => 'Le Brief', 'desc' => 'C\'est ici que la magie opère. Enregistre un mémo vocal ou écris quelques mots.'],
-                ['target' => '#tour-gen-brief', 'icon' => '💡', 'title' => 'Précision', 'desc' => 'Plus tu donnes de détails sur tes travaux (lieu, matériaux, satisfaction client), plus Postelio sera percutant.'],
+                ['target' => '#tour-gen-brief', 'icon' => '🎙️', 'title' => 'Le Brief', 'desc' => 'C\'est ici que la magie opère. Enregistrez un mémo vocal ou écrivez quelques mots.'],
+                ['target' => '#tour-gen-brief', 'icon' => '💡', 'title' => 'Précision', 'desc' => 'Plus vous donnez de détails sur vos travaux (lieu, matériaux, satisfaction client), plus Postelio sera percutant.'],
             ]" />
         @endif
 
         @if($currentStep === 3)
             <x-onboarding-tour wire:key="tour-gen_step3" name="gen_step3" :steps="[
-                ['target' => '#tour-gen-design', 'icon' => '✨', 'title' => 'Design & Style', 'desc' => 'Choisis l\'ambiance visuelle (Classique, Glassmorphism, etc.) et ajoute tes photos.'],
-                ['target' => '#tour-gen-design', 'icon' => '🖼️', 'title' => 'Photos', 'desc' => 'Uploade tes plus beaux clichés de chantier pour illustrer ton post.'],
+                ['target' => '#tour-gen-design', 'icon' => '📐', 'title' => 'Format du post', 'desc' => 'Choisissez le format idéal pour votre publication : Carré ou Portrait (4:5).'],
+                ['target' => '#tour-gen-design', 'icon' => '🖼️', 'title' => 'Photos', 'desc' => 'Uploadez vos plus beaux clichés de chantier pour illustrer votre post.'],
             ]" />
         @endif
 
         @if($currentStep === 4)
             <x-onboarding-tour wire:key="tour-gen_step4" name="gen_step4" :steps="[
-                ['target' => '#tour-gen-platforms', 'icon' => '📱', 'title' => 'Réseaux Sociaux', 'desc' => 'Sélectionne où tu souhaites diffuser ton post : Instagram, Facebook ou les deux !'],
-                ['target' => '#tour-gen-schedule', 'icon' => '⏰', 'title' => 'Planification', 'desc' => 'Tu peux publier immédiatement ou programmer ton post pour le moment idéal.'],
+                ['target' => '#tour-gen-platforms', 'icon' => '📱', 'title' => 'Réseaux Sociaux', 'desc' => 'Sélectionnez où vous souhaitez diffuser votre post : Instagram, Facebook ou les deux !'],
+                ['target' => '#tour-gen-schedule', 'icon' => '⏰', 'title' => 'Planification', 'desc' => 'Vous pouvez publier immédiatement ou programmer votre post pour le moment idéal.'],
                 ['target' => '#tour-gen-submit', 'icon' => '🚀', 'title' => 'Lancement !', 'desc' => 'C\'est fini. Cliquez sur le bouton pour lancer la génération de vos versions.'],
             ]" />
         @endif
@@ -1832,6 +1832,7 @@
             </div>
         </div>
     @endif
+    <x-tour-help-button :name="'gen_step' . $currentStep" />
 </div>
 
 @script

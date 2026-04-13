@@ -152,7 +152,10 @@
                         @else
                             <div class="w-3 h-3 rounded-full shrink-0" style="background-color: {{ $brandColor }}"></div>
                         @endif
-                        <p class="font-black tracking-[0.18em] text-[7px] uppercase truncate leading-none" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                        @php
+                            $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                        @endphp
+                        <p class="font-black tracking-[0.18em] text-[7px] uppercase whitespace-normal leading-tight" style="color: {{ $accentTextColor }}bf">{!! $wrappedLabel !!}</p>
                     </div>
                     {{-- Right: tags --}}
                     <div class="flex items-center gap-1.5 shrink-0">

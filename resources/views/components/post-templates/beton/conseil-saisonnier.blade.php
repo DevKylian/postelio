@@ -28,7 +28,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#D1D5DB] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" !!}] bg-[#D1D5DB] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' !!}">
     {{-- Concrete Texture --}}
     <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" style="background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');"></div>
     
@@ -38,9 +38,9 @@
         $slide0Alpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
         $slide0Style = (int)$slideIndex !== 0 && $slideIndex !== null ? 'display: none;' : '';
     @endphp
-    <div class="absolute inset-0 flex flex-col" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
+    <div class="absolute inset-0 flex flex-col" {!! $slide0Alpine !!} style="{{ $slide0Style !!}">
         <div class="flex-1 flex flex-col items-center justify-center p-12 relative z-10 w-full">
-            <div class="bg-white border-2 border-gray-900 p-10 rounded-2xl shadow-[15px_15px_0px_0px_{{ $brandColor }}33] w-full max-w-[420px] relative">
+            <div class="bg-white border-2 border-gray-900 p-10 rounded-2xl shadow-[15px_15px_0px_0px_{{ $brandColor !!}33] w-full max-w-[420px] relative">
                 <div class="absolute -top-6 left-10 bg-gray-900 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-xl">DOSSIER TECHNIQUE</div>
                 
                 @php
@@ -50,8 +50,8 @@
                 @endphp
                 
                 <div class="max-h-[160px] overflow-hidden">
-                    <p class="text-gray-900/60 {{ $fontSize }} font-bold font-montserrat leading-relaxed uppercase bg-gray-50 p-6 rounded-xl border border-gray-200">
-                        {{ $text }}
+                    <p class="text-gray-900/60 {{ $fontSize !!} font-bold font-montserrat leading-relaxed uppercase bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        {{ $text !!}
                     </p>
                 </div>
             </div>
@@ -59,15 +59,15 @@
 
         <div class="h-20 px-10 bg-gray-900 flex flex-col justify-center gap-1 z-20">
              <div class="flex items-center justify-between">
-                  <span class="text-white text-[10px] font-black font-montserrat uppercase tracking-widest truncate max-w-[250px]">{{ $companyLabel }}</span>
-                  <div class="w-12 h-1 rounded-full opacity-30 shrink-0" style="background-color: {{ $brandColor }}"></div>
+                  <span class="text-white text-[10px] font-black font-montserrat uppercase tracking-widest truncate max-w-[250px]">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
+                  <div class="w-12 h-1 rounded-full opacity-30 shrink-0" style="background-color: {{ $brandColor !!}"></div>
              </div>
              <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)
-                    <span class="px-1.5 py-0.5 rounded-sm bg-white/5 text-white/50 text-[6px] font-black uppercase tracking-wider border border-white/10 whitespace-nowrap font-mono-technical">{{ $trade }}</span>
+                    <span class="px-1.5 py-0.5 rounded-sm bg-white/5 text-white/50 text-[6px] font-black uppercase tracking-wider border border-white/10 whitespace-nowrap font-mono-technical">{{ $trade !!}</span>
                 @endif
                 @if($city)
-                    <span class="px-1.5 py-0.5 rounded-sm bg-white/5 text-white/50 text-[6px] font-black uppercase tracking-wider border border-white/10 whitespace-nowrap font-mono-technical">{{ $city }}</span>
+                    <span class="px-1.5 py-0.5 rounded-sm bg-white/5 text-white/50 text-[6px] font-black uppercase tracking-wider border border-white/10 whitespace-nowrap font-mono-technical">{{ $city !!}</span>
                 @endif
              </div>
         </div>
@@ -80,7 +80,7 @@
         $slide1Style = (int)$slideIndex !== 1 && $slideIndex !== null ? 'display: none;' : '';
     @endphp
     @if($hasContactInfo)
-    <div class="absolute inset-0 p-8" {!! $slide1Alpine !!} style="{{ $slide1Style }}">
+    <div class="absolute inset-0 p-8" {!! $slide1Alpine !!} style="{{ $slide1Style !!}">
         <x-post-templates.contact-slide 
             :brand-color="$brandColor" 
             :company-label="$companyLabel"

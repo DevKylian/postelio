@@ -115,7 +115,7 @@
         @if($showFooter)
          <div {!! $footerAlpine !!} class="absolute bottom-0 inset-x-0 py-2.5 px-10 bg-white border-t-4 border-gray-900 flex flex-col gap-1 z-30 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] min-h-16">
               <div class="flex items-center justify-between">
-                   <span class="text-gray-900 text-xs font-black font-montserrat uppercase tracking-[0.2em] truncate max-w-[200px]">{{ $companyLabel }}</span>
+                   <span class="text-gray-900 text-xs font-black font-montserrat uppercase tracking-[0.2em] whitespace-normal leading-tight">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                    <div class="flex items-center gap-4">
                         @if($total > 1 && !$exporting)
                          <div class="text-gray-900/20 text-[10px] font-black" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>

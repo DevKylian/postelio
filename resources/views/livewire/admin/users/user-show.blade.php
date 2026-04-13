@@ -75,11 +75,31 @@
                             @endif
                         </div>
                         <div class="min-w-0">
-                            <h4 class="font-black text-xl text-midnight truncate">{{ $user->name }}</h4>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-black text-xl text-midnight truncate">{{ $user->name }}</h4>
+                                @if($user->isOnline())
+                                    <span class="flex h-2 w-2 rounded-full bg-green-500 ring-4 ring-green-50"></span>
+                                    <span class="text-[9px] font-black text-green-600 uppercase tracking-widest">En ligne</span>
+                                @endif
+                            </div>
                             <p class="text-sm text-gray-400 font-medium truncate">{{ $user->email }}</p>
-                            <div class="mt-2 text-[10px] font-bold text-gray-400 flex items-center gap-2">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                Inscrit en {{ $user->created_at->translatedFormat('F Y') }}
+                            <div class="mt-2 space-y-1">
+                                <div class="text-[10px] font-bold text-gray-400 flex items-center gap-2">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    Inscrit en {{ $user->created_at->translatedFormat('F Y') }}
+                                </div>
+                                @if($user->last_login_at)
+                                    <div class="text-[9px] font-bold text-gray-400 flex items-center gap-2">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                                        Dernière connexion : {{ $user->last_login_at->diffForHumans() }}
+                                    </div>
+                                @endif
+                                @if($user->last_active_at && !$user->isOnline())
+                                    <div class="text-[9px] font-bold text-gray-400 flex items-center gap-2">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                        Vu il y a : {{ $user->last_active_at->diffForHumans() }}
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

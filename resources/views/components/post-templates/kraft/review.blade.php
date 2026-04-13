@@ -74,7 +74,7 @@
         {{-- Bottom Branding --}}
         <div class="h-20 px-10 bg-gray-900 flex flex-col justify-center gap-1 z-20">
              <div class="flex items-center justify-between">
-                 <span class="text-white text-xs font-black font-mono-technical uppercase tracking-[0.3em] truncate max-w-[250px]">{{ $companyLabel }}</span>
+                 <span class="text-white text-xs font-black font-mono-technical uppercase tracking-[0.3em] truncate max-w-[250px]">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel }}</span>
                  <div class="flex gap-1.5 shrink-0">
                       <div class="w-2.5 h-2.5" style="background-color: {{ $brandColor }}"></div>
                       <div class="w-2.5 h-2.5 bg-white/20"></div>

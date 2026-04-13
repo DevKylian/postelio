@@ -169,7 +169,7 @@
         @endphp
         <div class="flex flex-col min-w-0 flex-1">
             <div class="flex items-center gap-2 mb-1">
-                <span class="text-white/70 {{ $cFontSize }} font-bold uppercase tracking-[0.2em] font-montserrat truncate">{{ $companyLabel }}</span>
+                <span class="text-white/70 {{ $cFontSize }} font-bold uppercase tracking-[0.2em] font-montserrat truncate">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                 <div class="flex items-center gap-1.5 overflow-hidden">
                     @if($trade)
                         <span class="px-1.5 py-0.5 rounded-md bg-white/5 text-white/30 text-[6px] font-black uppercase tracking-wider border border-white/5">{{ $trade }}</span>

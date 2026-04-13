@@ -71,9 +71,14 @@
             <div class="backdrop-blur-xl bg-white/80 rounded-2xl p-4 shadow-2xl border border-white/20 flex flex-col items-center">
                 <div class="flex items-center gap-2 mb-2">
                     @if ($logoUrl)
-                        <img src="{{ $logoUrl }}" alt="Logo" class="h-4 w-4 object-contain rounded opacity-80">
+                        <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
+                    @else
+                        <div class="w-3 h-3 rounded-full shrink-0" style="background-color: {{ $brandColor }}"></div>
                     @endif
-                    <p class="text-slate-900/60 font-bold tracking-[0.2em] text-[9px] font-montserrat uppercase truncate leading-none">{{ $companyLabel }}</p>
+                    @php
+                        $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                    @endphp
+                    <p class="font-black tracking-[0.18em] text-[7px] uppercase whitespace-normal leading-tight" style="color: {{ $accentTextColor }}bf">{!! $wrappedLabel !!}</p>
                 </div>
                 
                 <div class="flex items-center gap-2">

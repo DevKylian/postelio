@@ -12,6 +12,7 @@
         autoStart: @js($autoStart)
      })"
      @if(isset($attributes['wire:key'])) wire:key="{{ $attributes['wire:key'] }}" @endif
+     x-on:replay-tour.window="if($event.detail.name === name) replay()"
      x-show="typeof active !== 'undefined' && active && steps.length > 0"
      x-cloak
      class="relative z-[9999]">

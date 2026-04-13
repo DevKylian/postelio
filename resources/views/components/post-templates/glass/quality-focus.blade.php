@@ -76,7 +76,7 @@
                     elseif ($tLen > 25) $tFontSize = 'text-sm';
                 @endphp
                 <div class="flex items-center gap-2 mb-1">
-                    <span class="{{ $cFontSize }} font-black text-white/50 uppercase tracking-[0.4em] font-montserrat truncate">{{ $companyLabel }}</span>
+                    <span class="{{ $cFontSize }} font-black text-white/50 uppercase tracking-[0.4em] font-montserrat truncate">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                     <div class="flex items-center gap-1 overflow-hidden">
                         @if($trade)
                             <span class="px-1 py-0.5 rounded-md bg-white/5 text-white/30 text-[5px] font-bold uppercase tracking-wider border border-white/5 whitespace-nowrap">{{ $trade }}</span>

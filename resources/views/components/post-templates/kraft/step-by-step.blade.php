@@ -127,7 +127,7 @@
         @if($showFooter)
         <div {!! $footerAlpine !!} class="absolute inset-x-0 bottom-0 py-2.5 px-10 bg-gray-900 flex flex-col gap-1 border-t-4 z-30 min-h-16" style="border-color: {{ $brandColor }}">
              <div class="flex items-center justify-between">
-                 <span class="text-white text-[10px] font-black font-mono-technical uppercase tracking-widest italic truncate max-w-[200px]">{{ $companyLabel }}</span>
+                 <span class="text-white text-[10px] font-black font-mono-technical uppercase tracking-widest italic whitespace-normal leading-tight">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel }}</span>
                  <div class="flex items-center gap-2 shrink-0">
                       @for($i=0; $i<$total; $i++)
                         <div class="w-6 h-1 transition-all duration-300" 

@@ -44,9 +44,7 @@
         $brandTextColor = $getContrastColor($brandColor);
         $accentTextColor = $getContrastColor($accentColor);
         
-        $name = $company->name;
-        $words = explode(' ', $name);
-        $companyLabel = count($words) > 1 ? ($words[0] . ' ' . $words[1]) : $name;
+        $companyLabel = $company->name;
         
         $logoUrl = $company->logo_path ? asset(Storage::url($company->logo_path)) : null;
         

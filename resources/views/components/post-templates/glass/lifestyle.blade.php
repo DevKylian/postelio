@@ -63,7 +63,7 @@
             <div class="absolute inset-x-4 top-[10px] bottom-[10px] flex flex-col items-center justify-center text-center overflow-hidden">
                 <h3 class="text-white {{ $fontSize }} font-black uppercase tracking-widest font-montserrat leading-tight max-w-[220px] mb-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ $displayText }}</h3>
                 <div class="flex flex-col items-center gap-1">
-                    <p class="text-white/60 text-[9px] font-bold uppercase tracking-[0.2em] truncate max-w-[180px]">{{ $companyLabel }}</p>
+                    <p class="text-white/60 text-[7px] font-bold uppercase tracking-[0.15em] truncate max-w-[200px]">{{ $companyLabel }}</p>
                     <div class="flex items-center gap-1 overflow-hidden">
                         @if($trade)
                             <span class="px-1 py-0.5 rounded-md bg-white/5 text-white/30 text-[5px] font-bold uppercase tracking-wider border border-white/5 whitespace-nowrap">{{ $trade }}</span>

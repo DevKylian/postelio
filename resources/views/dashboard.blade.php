@@ -53,7 +53,6 @@
         $hasInstagram = $company && $company->instagram_connected;
         $hasFacebook  = $company && $company->facebook_connected;
         $hasPost      = $totalPosts > 0;
-        $onboardingComplete = $hasCompany && $hasInstagram && $hasFacebook && $hasPost;
 
         // Month-over-month trend
         $trend = $lastMonth > 0 ? round((($thisMonth - $lastMonth) / $lastMonth) * 100) : null;
@@ -316,7 +315,7 @@
                             @endphp
                             @if($totalPosts === 0)
                                 <p class="text-white/60 text-xs leading-relaxed">
-                                    Ton premier post est à 10 secondes. Lance-toi, c'est gratuit.
+                                    Votre premier post est à 10 secondes. Lancez-vous, c'est gratuit.
                                 </p>
                                 <a href="{{ route('generate-post') }}" wire:navigate class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-copper hover:text-amber-400 transition-colors">
                                     Créer maintenant
@@ -324,11 +323,11 @@
                                 </a>
                             @elseif($thisWeek >= $weeklyGoalCtx)
                                 <p class="text-white/60 text-xs leading-relaxed">
-                                    🎉 Objectif hebdo atteint ! Tu es à <span class="text-white font-semibold">{{ $thisMonth }} posts</span> ce mois-ci.
+                                    🎉 Objectif hebdo atteint ! Vous êtes à <span class="text-white font-semibold">{{ $thisMonth }} posts</span> ce mois-ci.
                                 </p>
                             @elseif($remaining_this_week === 1)
                                 <p class="text-white/60 text-xs leading-relaxed">
-                                    Plus qu'<span class="text-copper font-semibold">1 post</span> pour atteindre ton objectif de la semaine.
+                                    Plus qu'<span class="text-copper font-semibold">1 post</span> pour atteindre votre objectif de la semaine.
                                 </p>
                                 <a href="{{ route('generate-post') }}" wire:navigate class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-copper hover:text-amber-400 transition-colors">
                                     Générer maintenant
@@ -336,7 +335,7 @@
                                 </a>
                             @else
                                 <p class="text-white/60 text-xs leading-relaxed">
-                                    <span class="text-copper font-semibold">{{ $remaining_this_week }} posts</span> restants pour atteindre ton objectif de la semaine.
+                                    <span class="text-copper font-semibold">{{ $remaining_this_week }} posts</span> restants pour atteindre votre objectif de la semaine.
                                 </p>
                                 <a href="{{ route('generate-post') }}" wire:navigate class="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-copper hover:text-amber-400 transition-colors">
                                     Générer un post
@@ -360,17 +359,17 @@
         'can_connect_social' => $user->getPermission('can_connect_social', false),
     ];
     $tourSteps = [
-        ['target' => null, 'icon' => '👋', 'title' => 'Bienvenue sur Postelio !', 'desc' => 'En deux minutes, je te montre comment tirer le meilleur de l\'outil. Prêt ?'],
-        ['target' => '#sidebar', 'icon' => '🗺️', 'title' => 'Menu de navigation', 'desc' => 'Retrouve ici tous tes outils : calendrier, statistiques, et paramètres de compte.', 'position' => 'right'],
-        ['target' => '#tour-generate', 'icon' => '✨', 'title' => 'Génère un post', 'desc' => 'En un clic, crée un post professionnel adapté à ton activité. Postelio rédige et publie même pour toi avec l\'offre Pro.', 'perm' => 'can_generate_posts'],
-        ['target' => '#tour-stats', 'icon' => '📊', 'title' => 'Tes statistiques', 'desc' => 'Suis tes posts créés ce mois, cette semaine et l\'état de tes réseaux sociaux en un coup d\'œil.'],
-        ['target' => '#tour-posts', 'icon' => '🖼️', 'title' => 'Tes créations', 'desc' => 'Retrouve ici tous tes posts générés. Visualise-les, télécharge-les, ou crée-en de nouveaux.', 'position' => 'top'],
-        ['target' => '#tour-quota', 'icon' => '⚡', 'title' => 'Ton quota mensuel', 'desc' => 'Surveille le nombre de générations restantes. Le compteur se remet à zéro chaque mois.', 'position' => 'top'],
-        ['target' => '#tour-instagram', 'icon' => '📱', 'title' => 'Connecte tes réseaux', 'desc' => 'Lie Instagram et Facebook pour suivre l\'état de ta connexion directement depuis le tableau de bord.', 'perm' => 'can_connect_social'],
-        ['target' => null, 'icon' => '🎉', 'title' => 'Tu es prêt !', 'desc' => 'Tu connais l\'essentiel. Maintenant, génère ton premier post et fais briller ton activité !'],
+        ['target' => null, 'icon' => '👋', 'title' => 'Bienvenue sur Postelio !', 'desc' => 'En deux minutes, je vous montre comment tirer le meilleur de l\'outil. Prêts ?'],
+        ['target' => '#sidebar', 'icon' => '📂', 'title' => 'Menu de navigation', 'desc' => 'Retrouvez ici tous vos outils : calendrier, statistiques, et paramètres de compte.', 'position' => 'right'],
+        ['target' => '#tour-generate', 'icon' => '✨', 'title' => 'Générez un post', 'desc' => 'En un clic, créez un post professionnel adapté à votre activité. Postelio rédige et publie même pour vous avec l\'offre Pro.', 'perm' => 'can_generate_posts'],
+        ['target' => '#tour-stats', 'icon' => '📊', 'title' => 'Vos statistiques', 'desc' => 'Suivez vos posts créés ce mois, cette semaine et l\'état de vos réseaux sociaux en un coup d\'œil.'],
+        ['target' => '#tour-posts', 'icon' => '📝', 'title' => 'Vos créations', 'desc' => 'Retrouvez ici tous vos posts générés. Visualisez-les, téléchargez-les, ou créez-en de nouveaux.', 'position' => 'top'],
+        ['target' => '#tour-quota', 'icon' => '⚡', 'title' => 'Votre quota mensuel', 'desc' => 'Surveillez le nombre de générations restantes. Le compteur se remet à zéro chaque mois.', 'position' => 'top'],
+        ['target' => '#tour-instagram', 'icon' => '📷', 'title' => 'Connectez vos réseaux', 'desc' => 'Liez Instagram et Facebook pour suivre l\'état de votre connexion directement depuis le tableau de bord.', 'perm' => 'can_connect_social'],
+        ['target' => null, 'icon' => '🎉', 'title' => 'Vous êtes prêts !', 'desc' => 'Vous connaissez l\'essentiel. Maintenant, générez votre premier post et faites briller votre activité !'],
     ];
     @endphp
     <x-onboarding-tour wire:key="tour-dashboard" name="dashboard_v2" :steps="$tourSteps" :perms="$tourPerms" />
-
+    <x-tour-help-button name="dashboard_v2" />
 
 </x-app-layout>

@@ -176,7 +176,10 @@
                 @if($logoUrl)
                     <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
                 @endif
-                <p class="font-black tracking-[0.18em] text-[7px] uppercase truncate leading-none" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                @php
+                    $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                @endphp
+                <p class="font-black tracking-[0.18em] text-[7px] uppercase whitespace-normal leading-tight" style="color: {{ $accentTextColor }}bf">{!! $wrappedLabel !!}</p>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
                 @if($trade)

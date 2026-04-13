@@ -68,7 +68,7 @@
         </div>
 
         <div class="px-8 py-3 backdrop-blur-md bg-white/5 border-t border-white/10 flex flex-col gap-1 items-start">
-            <span class="text-white/50 text-[8px] font-black uppercase tracking-[0.3em] font-montserrat truncate pr-4">{{ $companyLabel }}</span>
+            <span class="text-white/50 text-[8px] font-black uppercase tracking-[0.3em] font-montserrat truncate pr-4">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
             <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)
                     <span class="px-1.5 py-0.5 rounded-md bg-white/5 text-white/30 text-[5px] font-bold uppercase tracking-wider border border-white/5 whitespace-nowrap">{{ $trade }}</span>

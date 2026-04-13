@@ -138,13 +138,18 @@
                         </div>
                         <div class="flex items-center gap-1.5">
                             @if ($logoUrl)
-                                <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-90 brightness-0 {{ $brandTextColor === '#FFFFFF' ? 'invert' : '' }}">
+                                <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
+                            @else
+                                <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: {{ $brandColor }}"></div>
                             @endif
-                            <p class="font-black tracking-[0.2em] text-[7px] uppercase truncate leading-none" style="color: {{ $brandTextColor }}">{{ $companyLabel }}</p>
+                            @php
+                                $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                            @endphp
+                            <p class="font-black tracking-[0.15em] text-[6px] uppercase whitespace-normal leading-tight" style="color: {{ $brandTextColor }}bf">{!! $wrappedLabel !!}</p>
                         </div>
                     </div>
                 </div>
-                @endif
+            @endif
 
                 <div class="flex items-center justify-center gap-2 mt-4">
                     @if($trade)

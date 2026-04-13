@@ -133,7 +133,7 @@
                                 Postelio — La vitrine digitale des artisans passionnés
                             </p>
                             <p style="margin: 0; font-size: 12px; color: #CBD5E1; font-weight: 400;">
-                                Vous recevez cet email car vous avez accepté de recevoir nos actualités.<br>
+                                Cet e-mail a été envoyé avec ❤️ depuis Postelio.<br>
                                 <a href="{{ $unsubscribeUrl }}" style="color: #CBD5E1; text-decoration: underline;">Se désabonner</a>
                             </p>
                         </td>

@@ -112,7 +112,10 @@
         <div {!! $footerAlpine !!} class="absolute inset-x-0 bottom-0 h-20 backdrop-blur-2xl bg-slate-900/60 border-t border-white/10 px-8 flex items-center justify-between z-30">
          <div class="flex flex-col">
              <div class="flex items-center gap-2 mb-1">
-                 <span class="text-white/70 text-[8px] font-black uppercase tracking-[0.4em] font-montserrat truncate max-w-[150px]">{{ $companyLabel }}</span>
+                 @php
+                     $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                 @endphp
+                 <span class="text-white/70 text-[8px] font-black uppercase tracking-[0.4em] font-montserrat whitespace-normal leading-tight">{!! $wrappedLabel !!}</span>
                  <div class="flex items-center gap-1 overflow-hidden">
                     @if($trade)
                         <span class="px-1 py-0.5 rounded-md bg-white/5 text-white/30 text-[5px] font-bold uppercase tracking-wider border border-white/5 whitespace-nowrap">{{ $trade }}</span>

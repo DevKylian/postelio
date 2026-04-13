@@ -362,7 +362,7 @@ $complete = function () {
                 <div>
                     <div class="mb-6">
                         <h1 class="text-2xl font-bold text-slate-800">Identité visuelle</h1>
-                        <p class="text-gray-500 mt-1 text-sm">Choisissez votre couleur pour personnaliser vos visuels. Votre logo sera récupéré depuis votre compte Instagram.</p>
+                        <p class="text-gray-500 mt-1 text-sm">Choisissez votre couleur pour personnaliser vos visuels.</p>
                     </div>
 
                     <div class="space-y-6">
@@ -382,13 +382,13 @@ $complete = function () {
                                 @endforeach
                                 <label class="w-9 h-9 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-gray-400 transition-colors relative overflow-hidden" title="Couleur personnalisée">
                                     <span class="text-gray-400 text-lg leading-none">+</span>
-                                    <input wire:model="brand_color" type="color" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
+                                    <input wire:model.live="brand_color" type="color" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
                                 </label>
                             </div>
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 rounded-lg border border-gray-200 shadow-sm transition-all duration-200 flex-shrink-0"
                                      style="background-color: {{ $brand_color }}"></div>
-                                <input wire:model="brand_color"
+                                <input wire:model.live="brand_color"
                                        type="text"
                                        placeholder="#F59E0B"
                                        class="w-32 px-3 py-2 rounded-lg border-2 border-gray-200 bg-gray-50 text-slate-800 text-sm font-mono uppercase
@@ -855,7 +855,7 @@ $complete = function () {
                             <p class="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-2.5">Ce qui vous attend</p>
                             <ul class="space-y-2">
                                 @foreach([
-                                    'Créez votre premier post depuis un mémo vocal',
+                                    'Créez votre premier post depuis un mémo vocal ou par écrit',
                                     'Des templates professionnels pour votre activité',
                                     'Publication directe sur Instagram',
                                     'Calendrier éditorial pour organiser vos posts',

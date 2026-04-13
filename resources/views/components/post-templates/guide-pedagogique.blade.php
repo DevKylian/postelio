@@ -151,11 +151,14 @@
             <div class="backdrop-blur-xl rounded-3xl px-4 py-3.5 shadow-2xl border border-white/10 flex flex-col items-center"
                  style="background-color: {{ $accentColor }}d9;">
                 <div class="flex items-center gap-2 mb-2.5">
-                    @if ($logoUrl)
-                        <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
-                    @endif
-                    <p class="font-black tracking-[0.2em] text-[7px] uppercase truncate leading-none" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
-                </div>
+                    @if($logoUrl)
+                    <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
+                @endif
+                @php
+                    $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                @endphp
+                <p class="font-black tracking-[0.18em] text-[7px] uppercase whitespace-normal leading-tight" style="color: {{ $accentTextColor }}bf">{!! $wrappedLabel !!}</p>
+            </div>
                 
                 <div class="flex items-center gap-1.5 overflow-hidden">
                     @php

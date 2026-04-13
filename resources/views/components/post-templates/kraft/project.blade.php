@@ -159,7 +159,7 @@
         <div class="flex flex-col max-w-[240px]">
             <span class="text-gray-900/60 text-[8px] font-black uppercase tracking-[0.3em] font-mono-technical leading-none mb-1">PROJET RÉALISÉ PAR</span>
             <div class="flex items-center gap-2 mb-1">
-                <span class="text-gray-900 {{ $cFontSize }} font-black uppercase tracking-tighter leading-none font-montserrat truncate">{{ $companyLabel }}</span>
+                <span class="text-gray-900 {{ $cFontSize }} font-black uppercase tracking-tighter leading-none font-montserrat truncate">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel }}</span>
             </div>
             <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)

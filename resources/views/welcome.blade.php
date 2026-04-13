@@ -350,18 +350,19 @@
       }
 
       @keyframes navPillEntry {
-        0% { opacity: 0; transform: scale(0.85); }
-        100% { opacity: 1; transform: scale(1); }
+        0% { opacity: 0; transform: scale(0.85); filter: blur(10px); }
+        100% { opacity: 1; transform: scale(1); filter: blur(0); }
       }
 
       .nav-entry-stagger {
         opacity: 0;
         transform: scale(0.95);
+        filter: blur(4px);
         animation: navItemDepthIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
       }
 
       @keyframes navItemDepthIn {
-        to { opacity: 1; transform: scale(1); }
+        to { opacity: 1; transform: scale(1); filter: blur(0); }
       }
 
       .nav-btn-pop {

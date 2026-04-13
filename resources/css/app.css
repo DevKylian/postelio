@@ -392,10 +392,12 @@
 @keyframes blur-in {
     0% {
         opacity: 0;
+        filter: blur(30px);
         transform: scale(1.25);
     }
     100% {
         opacity: 1;
+        filter: blur(0);
         transform: scale(1);
     }
 }

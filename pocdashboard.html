@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postelio - Simulateur SaaS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Hide number input arrows */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* Custom Scrollbar for sidebar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-[#fdfbf9] text-slate-900 font-sans relative">
+    <!-- Subtle warm gradient background -->
+    <div
+        class="fixed inset-0 bg-[radial-gradient(ellipse_at_top_left,_#ffedd5_0%,_transparent_50%)] -z-10 pointer-events-none">
+    </div>
+
+    <div class="p-4 md:p-8 max-w-6xl mx-auto space-y-8">
+
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                        <div class="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                    <span class="font-bold text-slate-800 tracking-wide">Postelio</span>
+                </div>
+                <h1 class="text-2xl font-bold text-slate-900">Simulateur de revenus</h1>
+                <p class="text-slate-500 text-sm mt-1">Estimez vos revenus nets après URSSAF, serveurs et frais Stripe.
+                </p>
+            </div>
+
+            <button id="btn-toggle"
+                class="flex items-center gap-3 bg-white px-5 py-2.5 rounded-full shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
+                <span id="toggle-brut-text" class="text-sm font-semibold text-orange-500">Brut</span>
+                <i data-lucide="toggle-left" id="icon-brut" class="w-6 h-6 text-slate-300"></i>
+                <i data-lucide="toggle-right" id="icon-net" class="w-6 h-6 text-orange-500 hidden"></i>
+                <span id="toggle-net-text" class="text-sm font-semibold text-slate-400">Net</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Left Sidebar: Inputs -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h2 class="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
+                        <div
+                            class="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-500">
+                            1</div>
+                        Clients Actuels
+                    </h2>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Basic (19€/mois)</label>
+                            <input type="number" min="0" id="in-basicMo"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all" />
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Pro (29€/mois)</label>
+                            <input type="number" min="0" id="in-proMo"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all" />
+                        </div>
+                        <div class="pt-3 border-t border-slate-100">
+                            <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Basic Annuel
+                                (180€/an)</label>
+                            <input type="number" min="0" id="in-basicYr"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all" />
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Pro Annuel
+                                (280€/an)</label>
+                            <input type="number" min="0" id="in-proYr"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h2 class="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
+                        <div
+                            class="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-500">
+                            2</div>
+                        Réductions & Gratuits
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Gratuits (100% off)</label>
+                            <input type="number" min="0" id="in-free"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all" />
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Basic (-50% =
+                                9.5€/m)</label>
+                            <input type="number" min="0" id="in-basicHalf"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all" />
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Pro (-50% =
+                                14.5€/m)</label>
+                            <input type="number" min="0" id="in-proHalf"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h2 class="text-sm font-bold text-slate-800 mb-5 flex items-center gap-2">
+                        <div
+                            class="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-500">
+                            3</div>
+                        Croissance / mois
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Nouveaux Basic
+                                (19€/m)</label>
+                            <input type="number" min="0" id="in-growthBasicMo"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all" />
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Nouveaux Pro
+                                (29€/m)</label>
+                            <input type="number" min="0" id="in-growthProMo"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all" />
+                        </div>
+                        <div class="pt-3 border-t border-slate-100">
+                            <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Nouveaux Basic
+                                (180€/an)</label>
+                            <input type="number" min="0" id="in-growthBasicYr"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all" />
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-500 mb-1.5 block">Nouveaux Pro
+                                (280€/an)</label>
+                            <input type="number" min="0" id="in-growthProYr"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Main Content -->
+            <div class="lg:col-span-8 space-y-6">
+
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                        <div class="text-slate-500 text-sm font-semibold mb-2 uppercase tracking-wide"
+                            id="kpi-mrr-label">MRR Brut</div>
+                        <div class="text-4xl font-bold text-slate-900" id="kpi-mrr">0 €</div>
+                        <div class="text-sm text-slate-400 mt-2" id="kpi-mrr-desc">Avant impôts & coûts</div>
+                    </div>
+
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                        <div class="text-slate-500 text-sm font-semibold mb-2 uppercase tracking-wide">Clients Actifs
+                        </div>
+                        <div class="text-4xl font-bold text-slate-900" id="kpi-clients">0</div>
+                        <div class="text-sm text-slate-400 mt-2" id="kpi-paying">Dont 0 payants</div>
+                    </div>
+
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                        <div class="text-slate-500 text-sm font-semibold mb-2 uppercase tracking-wide">Coûts Mensuels
+                        </div>
+                        <div class="text-3xl font-bold text-slate-900" id="kpi-costs">0 €</div>
+                        <div class="text-xs text-slate-500 mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                            <span class="flex items-center gap-1.5"><i data-lucide="zap"
+                                    class="w-3.5 h-3.5 text-slate-400"></i> Zernio: <span id="kpi-zernio"
+                                    class="font-medium text-slate-700">0</span>€</span>
+                            <span class="flex items-center gap-1.5"><i data-lucide="server"
+                                    class="w-3.5 h-3.5 text-slate-400"></i> VPS: <span id="kpi-vps"
+                                    class="font-medium text-slate-700">8</span>€</span>
+                            <span class="flex items-center gap-1.5"><i data-lucide="credit-card"
+                                    class="w-3.5 h-3.5 text-slate-400"></i> Stripe: <span id="kpi-stripe"
+                                    class="font-medium text-slate-700">0</span>€</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                        <div class="text-slate-500 text-sm font-semibold mb-2 uppercase tracking-wide">URSSAF (21.2%)
+                        </div>
+                        <div class="text-3xl font-bold text-slate-900" id="kpi-taxes">0 €</div>
+                        <div class="text-sm text-slate-400 mt-2">Prévisionnel ce mois</div>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-slate-800">Projection sur 36 mois</h2>
+                        <div class="flex items-center gap-4 text-sm">
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-orange-500"></div>
+                                <span class="text-slate-600 font-medium">Basic</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-slate-800"></div>
+                                <span class="text-slate-600 font-medium">Pro</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="h-[350px] w-full">
+                        <canvas id="myChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Milestones -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div id="ms-goal-box" class="p-6 rounded-2xl border bg-slate-50 border-slate-200">
+                        <div class="text-sm font-semibold mb-2 text-slate-600 uppercase tracking-wide">Objectif 1500€
+                            Net / mois</div>
+                        <div>
+                            <div id="ms-goal-title" class="text-2xl font-bold text-slate-700">Non atteint sur 3 ans
+                            </div>
+                            <div id="ms-goal-desc" class="text-slate-500 text-sm mt-1">Augmentez votre croissance
+                                mensuelle pour atteindre l'objectif.</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <div class="text-sm font-semibold mb-2 text-slate-600 uppercase tracking-wide">Projection à 1 an
+                            (Mois 12)</div>
+                        <div id="ms-proj-net" class="text-2xl font-bold text-slate-900">0 € Net</div>
+                        <div id="ms-proj-brut" class="text-slate-500 text-sm mt-1">Soit 0 € Brut avec 0 clients.</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Constants
+        const TAX_RATE = 0.212;
+        const GOAL_NET = 1500;
+
+        // Stripe Fee Calculation: 1.5% + 0.25€
+        const stripeFeeMo = (amount) => (amount * 0.015) + 0.25;
+        // For yearly, the fee is paid once, so we amortize it over 12 months for the monthly dashboard
+        const stripeFeeYr = (amount) => ((amount * 0.015) + 0.25) / 12;
+
+        // Default State
+        const defaultInputs = {
+            basicMo: 5, proMo: 2, basicYr: 1, proYr: 0,
+            free: 1, basicHalf: 0, proHalf: 0,
+            growthBasicMo: 2, growthProMo: 1, growthBasicYr: 0, growthProYr: 0
+        };
+
+        // Load State from LocalStorage
+        let inputs = JSON.parse(localStorage.getItem('saas_inputs')) || defaultInputs;
+        let isNet = JSON.parse(localStorage.getItem('saas_isNet')) || false;
+
+        // Chart Instance
+        let chartInstance = null;
+
+        // Format Currency
+        const formatCurrency = (val) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val);
+
+        // DOM Elements
+        const inputKeys = Object.keys(defaultInputs);
+        const btnToggle = document.getElementById('btn-toggle');
+        const iconBrut = document.getElementById('icon-brut');
+        const iconNet = document.getElementById('icon-net');
+        const toggleBrutText = document.getElementById('toggle-brut-text');
+        const toggleNetText = document.getElementById('toggle-net-text');
+
+        // Initialize Inputs
+        inputKeys.forEach(key => {
+            const el = document.getElementById(`in-${key}`);
+            if (el) {
+                el.value = inputs[key];
+                el.addEventListener('input', (e) => {
+                    inputs[key] = parseInt(e.target.value) || 0;
+                    localStorage.setItem('saas_inputs', JSON.stringify(inputs));
+                    updateUI();
+                });
+            }
+        });
+
+        // Toggle Event
+        btnToggle.addEventListener('click', () => {
+            isNet = !isNet;
+            localStorage.setItem('saas_isNet', JSON.stringify(isNet));
+            updateUI();
+        });
+
+        function initChart() {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            stacked: true,
+                            ticks: { font: { family: 'Inter, sans-serif' } }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9', borderDash: [4, 4] },
+                            border: { display: false },
+                            stacked: true,
+                            ticks: {
+                                font: { family: 'Inter, sans-serif' },
+                                callback: function (value) { return value + '€'; }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            padding: 12,
+                            boxPadding: 6,
+                            usePointStyle: true,
+                            titleFont: { family: 'Inter, sans-serif', size: 13 },
+                            bodyFont: { family: 'Inter, sans-serif', size: 13 },
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) label += formatCurrency(context.parsed.y);
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateUI() {
+            // Toggle UI
+            if (isNet) {
+                iconBrut.classList.add('hidden');
+                iconNet.classList.remove('hidden');
+                toggleBrutText.classList.replace('text-orange-500', 'text-slate-400');
+                toggleNetText.classList.replace('text-slate-400', 'text-orange-500');
+                document.getElementById('kpi-mrr-label').textContent = 'MRR Net';
+                document.getElementById('kpi-mrr-desc').textContent = 'Après URSSAF & Coûts';
+            } else {
+                iconBrut.classList.remove('hidden');
+                iconNet.classList.add('hidden');
+                toggleBrutText.classList.replace('text-slate-400', 'text-orange-500');
+                toggleNetText.classList.replace('text-orange-500', 'text-slate-400');
+                document.getElementById('kpi-mrr-label').textContent = 'MRR Brut';
+                document.getElementById('kpi-mrr-desc').textContent = 'Avant impôts & coûts';
+            }
+
+            // Calculations: Current State
+            const totalPaying = inputs.basicMo + inputs.proMo + inputs.basicYr + inputs.proYr + inputs.basicHalf + inputs.proHalf;
+            const totalClients = totalPaying + inputs.free;
+
+            const revBasicMo = inputs.basicMo * 19;
+            const revProMo = inputs.proMo * 29;
+            const revBasicYr = inputs.basicYr * (180 / 12);
+            const revProYr = inputs.proYr * (280 / 12);
+            const revBasicHalf = inputs.basicHalf * 9.5;
+            const revProHalf = inputs.proHalf * 14.5;
+
+            const mrrBrut = revBasicMo + revProMo + revBasicYr + revProYr + revBasicHalf + revProHalf;
+
+            // Zernio Costs
+            let zernioCost = 0;
+            if (totalClients > 0) {
+                if (totalClients <= 10) zernioCost = 19;
+                else if (totalClients <= 50) zernioCost = 50;
+                else zernioCost = 99;
+            }
+
+            // Stripe Costs (1.5% + 0.25€)
+            const stripeCosts =
+                (inputs.basicMo * stripeFeeMo(19)) +
+                (inputs.proMo * stripeFeeMo(29)) +
+                (inputs.basicYr * stripeFeeYr(180)) +
+                (inputs.proYr * stripeFeeYr(280)) +
+                (inputs.basicHalf * stripeFeeMo(9.5)) +
+                (inputs.proHalf * stripeFeeMo(14.5));
+
+            const vpsCost = 8;
+            const totalCosts = zernioCost + vpsCost + stripeCosts;
+            const taxes = mrrBrut * TAX_RATE;
+            const mrrNet = mrrBrut - taxes - totalCosts;
+
+            // Update KPIs
+            document.getElementById('kpi-mrr').textContent = formatCurrency(isNet ? mrrNet : mrrBrut);
+            document.getElementById('kpi-clients').textContent = totalClients;
+            document.getElementById('kpi-paying').textContent = `Dont ${totalPaying} payants`;
+            document.getElementById('kpi-costs').textContent = formatCurrency(totalCosts);
+            document.getElementById('kpi-zernio').textContent = zernioCost;
+            document.getElementById('kpi-vps').textContent = vpsCost;
+            document.getElementById('kpi-stripe').textContent = stripeCosts.toFixed(2);
+            document.getElementById('kpi-taxes').textContent = formatCurrency(taxes);
+
+            // Calculations: Projections
+            const labels = [];
+            const dataBasic = [];
+            const dataPro = [];
+            const dataNet = [];
+
+            let currentInputs = { ...inputs };
+            let monthHitGoal = -1;
+            let month12Data = null;
+
+            for (let i = 0; i <= 36; i++) {
+                const tPaying = currentInputs.basicMo + currentInputs.proMo + currentInputs.basicYr + currentInputs.proYr + currentInputs.basicHalf + currentInputs.proHalf;
+                const tClients = tPaying + currentInputs.free;
+
+                const rBasicMo = currentInputs.basicMo * 19;
+                const rProMo = currentInputs.proMo * 29;
+                const rBasicYr = currentInputs.basicYr * (180 / 12);
+                const rProYr = currentInputs.proYr * (280 / 12);
+                const rBasicHalf = currentInputs.basicHalf * 9.5;
+                const rProHalf = currentInputs.proHalf * 14.5;
+
+                const mBrut = rBasicMo + rProMo + rBasicYr + rProYr + rBasicHalf + rProHalf;
+
+                let zCost = 0;
+                if (tClients > 0) {
+                    if (tClients <= 10) zCost = 19;
+                    else if (tClients <= 50) zCost = 50;
+                    else zCost = 99;
+                }
+
+                const tStripeCosts =
+                    (currentInputs.basicMo * stripeFeeMo(19)) +
+                    (currentInputs.proMo * stripeFeeMo(29)) +
+                    (currentInputs.basicYr * stripeFeeYr(180)) +
+                    (currentInputs.proYr * stripeFeeYr(280)) +
+                    (currentInputs.basicHalf * stripeFeeMo(9.5)) +
+                    (currentInputs.proHalf * stripeFeeMo(14.5));
+
+                const tCosts = zCost + 8 + tStripeCosts;
+                const mNet = mBrut - (mBrut * TAX_RATE) - tCosts;
+
+                if (mNet >= GOAL_NET && monthHitGoal === -1) {
+                    monthHitGoal = i;
+                }
+
+                if (i === 12) {
+                    month12Data = { mrrNet: mNet, mrrBrut: mBrut, totalClients: tClients };
+                }
+
+                labels.push(i === 0 ? 'Auj.' : `M+${i}`);
+                dataBasic.push(Math.round(rBasicMo + rBasicYr + rBasicHalf));
+                dataPro.push(Math.round(rProMo + rProYr + rProHalf));
+                dataNet.push(Math.round(mNet));
+
+                // Grow clients for next month
+                currentInputs.basicMo += inputs.growthBasicMo;
+                currentInputs.proMo += inputs.growthProMo;
+                currentInputs.basicYr += inputs.growthBasicYr;
+                currentInputs.proYr += inputs.growthProYr;
+            }
+
+            // Update Chart
+            // Average cost estimation for the goal line
+            const avgStripeCostPerUser = stripeFeeMo(24); // rough average
+            const estimatedUsersForGoal = 100; // rough estimate
+            const estimatedCostsForGoal = 99 + 8 + (estimatedUsersForGoal * avgStripeCostPerUser);
+            const goalBrutEquivalent = (GOAL_NET + estimatedCostsForGoal) / (1 - TAX_RATE);
+            const chartGoalValue = isNet ? GOAL_NET : goalBrutEquivalent;
+            const dataGoal = Array(37).fill(chartGoalValue);
+
+            chartInstance.data.labels = labels;
+
+            if (isNet) {
+                chartInstance.data.datasets = [
+                    { label: 'Net dans la poche', data: dataNet, backgroundColor: '#f97316', borderRadius: 4, stack: 'Stack 0' },
+                    { label: 'Objectif 1500€ Net', data: dataGoal, type: 'line', borderColor: '#10b981', borderDash: [4, 4], pointRadius: 0, fill: false, borderWidth: 2 }
+                ];
+            } else {
+                chartInstance.data.datasets = [
+                    { label: 'Revenu Basic', data: dataBasic, backgroundColor: '#f97316', stack: 'Stack 0' },
+                    { label: 'Revenu Pro', data: dataPro, backgroundColor: '#1e293b', borderRadius: { topLeft: 4, topRight: 4 }, stack: 'Stack 0' },
+                    { label: 'Objectif 1500€ Net', data: dataGoal, type: 'line', borderColor: '#10b981', borderDash: [4, 4], pointRadius: 0, fill: false, borderWidth: 2 }
+                ];
+            }
+            chartInstance.update();
+
+            // Update Milestones
+            const msBox = document.getElementById('ms-goal-box');
+            const msTitle = document.getElementById('ms-goal-title');
+            const msDesc = document.getElementById('ms-goal-desc');
+            const totalGrowth = inputs.growthBasicMo + inputs.growthProMo + inputs.growthBasicYr + inputs.growthProYr;
+
+            msBox.className = "p-6 rounded-2xl border " + (
+                monthHitGoal === 0 ? "bg-emerald-50 border-emerald-200" :
+                    monthHitGoal > 0 ? "bg-orange-50 border-orange-200" :
+                        "bg-white border-slate-200 shadow-sm"
+            );
+
+            if (monthHitGoal === 0) {
+                msTitle.className = "text-2xl font-bold text-emerald-700";
+                msTitle.textContent = "Objectif Atteint ! 🎉";
+                msDesc.className = "text-emerald-600 text-sm mt-1";
+                msDesc.textContent = "Vous générez déjà plus de 1500€ net.";
+            } else if (monthHitGoal > 0) {
+                msTitle.className = "text-2xl font-bold text-orange-600";
+                msTitle.textContent = `Mois ${monthHitGoal}`;
+                msDesc.className = "text-orange-700 text-sm mt-1";
+                msDesc.textContent = `À ce rythme (+${totalGrowth} clients/mois), vous atteindrez l'objectif dans ${monthHitGoal} mois.`;
+            } else {
+                msTitle.className = "text-2xl font-bold text-slate-700";
+                msTitle.textContent = "Non atteint sur 3 ans";
+                msDesc.className = "text-slate-500 text-sm mt-1";
+                msDesc.textContent = "Augmentez votre croissance mensuelle pour atteindre l'objectif.";
+            }
+
+            if (month12Data) {
+                document.getElementById('ms-proj-net').textContent = `${formatCurrency(month12Data.mrrNet)} Net`;
+                document.getElementById('ms-proj-brut').textContent = `Soit ${formatCurrency(month12Data.mrrBrut)} Brut avec ${Math.round(month12Data.totalClients)} clients.`;
+            }
+        }
+
+        // Init
+        initChart();
+        updateUI();
+
+    </script>
+</body>
+
+</html>

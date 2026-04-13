@@ -111,6 +111,7 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
         Route::get('/admin/guides', \App\Livewire\Admin\Guide\GuideManager::class)->name('admin.guides.index');
         Route::get('/admin/guides/all-leads', \App\Livewire\Admin\Guide\GuideAllLeads::class)->name('admin.guides.all-leads');
         Route::get('/admin/guides/{guide}/leads', \App\Livewire\Admin\Guide\GuideLeads::class)->name('admin.guides.leads');
+        Route::get('/admin/simulation', \App\Livewire\Admin\RevenueSimulator::class)->name('admin.simulation');
         Route::get('/admin/activity', \App\Livewire\Admin\ActivityStream::class)->name('admin.activity');
         Route::get('/admin/queue', \App\Livewire\Admin\QueueMonitor::class)->name('admin.queue');
     });

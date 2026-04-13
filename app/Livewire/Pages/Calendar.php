@@ -126,13 +126,21 @@ class Calendar extends Component
         }
 
         $post->platforms = $platforms;
+        
+        // Si on active des plateformes sur un post déjà planifié dans le futur, 
+        // on s'assure qu'il est en statut 'completed' (prêt pour publication)
+        if (count($platforms) > 0 && $post->scheduled_at && $post->scheduled_at->isFuture()) {
+            $post->status = Post::STATUS_COMPLETED;
+            $this->selectedPost['status'] = Post::STATUS_COMPLETED;
+        }
+        
         $post->save();
 
         // Refresh state
         $this->selectedPost['platforms'] = $platforms;
 
         // Redispatch if scheduled in future
-        if ($post->scheduled_at && $post->scheduled_at->isFuture()) {
+        if (count($platforms) > 0 && $post->scheduled_at && $post->scheduled_at->isFuture()) {
             $this->dispatchPublishJobs($post, $post->scheduled_at);
         }
 
@@ -217,19 +225,17 @@ class Calendar extends Component
             return;
         }
 
-        // Mémoriser si le post était déjà explicitement schedulé avant le drag
-        // (≠ affiché via created_at). On ne redispatch un job que si oui.
-        $wasExplicitlyScheduled = $post->scheduled_at !== null;
-
         $post->scheduled_at = $datetime;
-        $post->save();
-
-        // Redispatch uniquement si :
-        // 1. Le post était déjà dans un cycle de planification (had scheduled_at)
-        // 2. La nouvelle date est dans le futur
-        if ($wasExplicitlyScheduled && $datetime->isFuture()) {
+        
+        // Si déplacé dans le futur avec des plateformes actives
+        // -> on le marque comme prêt (completed) et on met en queue
+        $platforms = $post->platforms ?? [];
+        if ($datetime->isFuture() && count($platforms) > 0) {
+            $post->status = Post::STATUS_COMPLETED;
             $this->dispatchPublishJobs($post, $datetime);
         }
+        
+        $post->save();
     }
 
     /**

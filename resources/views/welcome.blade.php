@@ -11,7 +11,6 @@
 @endphp
 <!DOCTYPE html>
 <html lang="fr" class="scroll-smooth">
-  <!-- test deploy -->
 
 <head>
   <meta charset="utf-8">

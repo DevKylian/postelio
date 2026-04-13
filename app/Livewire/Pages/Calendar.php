@@ -139,9 +139,9 @@ class Calendar extends Component
         // Refresh state
         $this->selectedPost['platforms'] = $platforms;
 
-        // Redispatch if scheduled in future
-        if (count($platforms) > 0 && $post->scheduled_at && $post->scheduled_at->isFuture()) {
-            $this->dispatchPublishJobs($post, $post->scheduled_at);
+        // Redispatch uniquement pour la plateforme qu'on vient d'ajouter
+        if (in_array($platform, $platforms) && $post->scheduled_at && $post->scheduled_at->isFuture()) {
+            $this->dispatchPublishJobs($post, $post->scheduled_at, $platform);
         }
 
         $this->dispatch('calendar-move-blocked', message: 'Platformes mises à jour.');
@@ -242,7 +242,7 @@ class Calendar extends Component
      * Dispatch publish jobs for all connected platforms.
      * The previously queued job will self-cancel on scheduled_at mismatch.
      */
-    private function dispatchPublishJobs(Post $post, Carbon $datetime): void
+    private function dispatchPublishJobs(Post $post, Carbon $datetime, ?string $onlyPlatform = null): void
     {
         $company   = $post->company;
         $platforms = $post->platforms ?? [];
@@ -255,13 +255,17 @@ class Calendar extends Component
         $scheduledAtStr = $datetime->toDateTimeString();
 
         if (in_array('instagram', $platforms) && $company->instagram_connected) {
-            $job = PublishToInstagramJob::dispatch($post->id, $scheduledAtStr);
-            if ($delay) $job->delay($delay);
+            if ($onlyPlatform === null || $onlyPlatform === 'instagram') {
+                $job = PublishToInstagramJob::dispatch($post->id, $scheduledAtStr);
+                if ($delay) $job->delay($delay);
+            }
         }
 
         if (in_array('facebook', $platforms) && $company->facebook_connected) {
-            $job = PublishToFacebookJob::dispatch($post->id, $scheduledAtStr);
-            if ($delay) $job->delay($delay);
+            if ($onlyPlatform === null || $onlyPlatform === 'facebook') {
+                $job = PublishToFacebookJob::dispatch($post->id, $scheduledAtStr);
+                if ($delay) $job->delay($delay);
+            }
         }
     }
 

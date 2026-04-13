@@ -27,6 +27,7 @@
             this.draggingOver   = null;
         },
         showToast(msg) {
+            if (!msg || msg.trim?.() === '') return;
             this.toastMsg = msg;
             clearTimeout(this.toastTimer);
             this.toastTimer = setTimeout(() => this.toastMsg = null, 3500);
@@ -56,7 +57,7 @@
     }"
     x-init="initChoice()"
     @click.window="openPopover = null"
-    @calendar-move-blocked.window="showToast($event.detail.message)"
+    @calendar-move-blocked.window="if($event.detail.message) showToast($event.detail.message)"
     class="relative"
 >
 

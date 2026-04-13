@@ -50,7 +50,7 @@ $selectTrade = function (string $trade) {
 $nextStep = function () {
     if ($this->step === 2) {
         $this->validate([
-            'name'  => ['required', 'string', 'min:2', 'max:255'],
+            'name'  => ['required', 'string', 'min:2', 'max:15'],
             'city'  => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:255'],
@@ -85,7 +85,7 @@ $setBioAudioPath = function (string $path) {
 
 $complete = function () {
     $this->validate([
-        'name'        => ['required', 'string', 'min:2', 'max:255'],
+        'name'        => ['required', 'string', 'min:2', 'max:15'],
         'city'        => ['required', 'string', 'max:255'],
         'phone'       => ['nullable', 'string', 'max:30'],
         'email'       => ['nullable', 'email', 'max:255'],
@@ -250,6 +250,7 @@ $complete = function () {
                                    type="text"
                                    placeholder="Ex : Dupont Plomberie"
                                    autofocus
+                                   maxlength="15"
                                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm
                                           focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200" />
                             @error('name')
@@ -857,7 +858,7 @@ $complete = function () {
                                 @foreach([
                                     'Créez votre premier post depuis un mémo vocal ou par écrit',
                                     'Des templates professionnels pour votre activité',
-                                    'Publication directe sur Instagram',
+                                    'Publication directe sur Instagram (pro)',
                                     'Calendrier éditorial pour organiser vos posts',
                                 ] as $item)
                                     <li class="flex items-start gap-2 text-xs text-amber-800">

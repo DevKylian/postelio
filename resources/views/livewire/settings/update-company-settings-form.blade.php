@@ -22,7 +22,7 @@ state([
 
 $updateCompanySettings = function () {
     $this->validate([
-        'name'              => ['required', 'string', 'max:255'],
+        'name'              => ['required', 'string', 'max:15'],
         'city'              => ['nullable', 'string', 'max:255'],
         'phone'             => ['nullable', 'string', 'max:30'],
         'email'             => ['nullable', 'email', 'max:255'],
@@ -98,6 +98,7 @@ $updateCompanySettings = function () {
                           type="text"
                           class="mt-1 block w-full"
                           required
+                          maxlength="15"
                           autocomplete="organization" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>

@@ -128,6 +128,8 @@ return [
     'uploaded' => "Le fichier :attribute n'a pu être téléversé.",
     'url' => "Le format de l'URL de :attribute n'est pas valide.",
     'uuid' => 'Le champ :attribute doit être un UUID valide.',
+    'lowercase' => 'Le champ :attribute doit être en minuscules.',
+    'uppercase' => 'Le champ :attribute doit être en majuscules.',
 
     /*
     |--------------------------------------------------------------------------

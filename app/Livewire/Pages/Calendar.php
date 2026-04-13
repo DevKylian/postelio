@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\PublishToInstagramJob;
 use App\Jobs\PublishToFacebookJob;
+use Illuminate\Support\Facades\DB;
 
 class Calendar extends Component
 {
@@ -134,6 +135,11 @@ class Calendar extends Component
             $this->selectedPost['status'] = Post::STATUS_COMPLETED;
         }
         
+        // Si on retire une plateforme -> on nettoie physiquement la queue
+        if (!in_array($platform, $platforms)) {
+            $this->cancelQueuedJobs($post->id, $platform);
+        }
+
         $post->save();
 
         // Refresh state
@@ -183,6 +189,9 @@ class Calendar extends Component
         $post->scheduled_at = $datetime;
         $post->save();
 
+        // Nettoyage de la queue avant de renvoyer les nouveaux jobs
+        $this->cancelQueuedJobs($post->id);
+
         // ── Redispatch du job si le post est prévu pour publication auto ────────
         // Le job existant en queue se detecra lui-même (mismatch scheduled_at)
         // et s'annulera automatiquement.
@@ -231,6 +240,7 @@ class Calendar extends Component
         // -> on le marque comme prêt (completed) et on met en queue
         $platforms = $post->platforms ?? [];
         if ($datetime->isFuture() && count($platforms) > 0) {
+            $this->cancelQueuedJobs($post->id); // On vide l'ancienne date
             $post->status = Post::STATUS_COMPLETED;
             $this->dispatchPublishJobs($post, $datetime);
         }
@@ -410,5 +420,24 @@ class Calendar extends Component
         }
 
         return null;
+    }
+
+    /**
+     * Physiquement supprimer les jobs de la table 'jobs' pour ce post.
+     * Permet de garder le Queue Monitor propre.
+     */
+    private function cancelQueuedJobs(int $postId, ?string $platform = null): void
+    {
+        $query = DB::table('jobs')
+            ->whereNull('reserved_at')
+            ->where('payload', 'LIKE', '%"postId";i:' . $postId . ';%');
+
+        if ($platform === 'instagram') {
+            $query->where('payload', 'LIKE', '%PublishToInstagramJob%');
+        } elseif ($platform === 'facebook') {
+            $query->where('payload', 'LIKE', '%PublishToFacebookJob%');
+        }
+
+        $query->delete();
     }
 }

@@ -60,6 +60,19 @@ return [
             'report' => false,
         ],
 
+        'r2' => [
+            'driver' => 's3',
+            'key' => env('BACKUP_R2_ACCESS_KEY_ID'),
+            'secret' => env('BACKUP_R2_SECRET_ACCESS_KEY'),
+            'region' => env('BACKUP_R2_REGION', 'auto'),
+            'bucket' => env('BACKUP_R2_BUCKET'),
+            'url' => env('BACKUP_R2_URL'),
+            'endpoint' => env('BACKUP_R2_ENDPOINT'),
+            'use_path_style_endpoint' => true,
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*

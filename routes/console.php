@@ -18,7 +18,12 @@ Schedule::call(function () {
         ->whereHas('company', fn ($q) => $q->whereNotNull('instagram_access_token'))
         ->each(function (Post $post) {
             PublishToInstagramJob::dispatch($post->id);
-            // Effacer scheduled_at pour éviter un double-dispatch lors du prochain tick
             $post->update(['scheduled_at' => null]);
         });
 })->everyMinute()->name('publish-scheduled-posts')->withoutOverlapping();
+
+// Sauvegardes de la base de données (2 fois par jour)
+Schedule::command('backup:run --only-db')->twiceDaily(3, 15)->name('db-backup');
+
+// Nettoyage des vieux backups (1 fois par jour)
+Schedule::command('backup:clean')->dailyAt('03:30')->name('backup-cleanup');

@@ -123,13 +123,16 @@
   <!-- Background Decoration -->
   <div class="fixed inset-0 overflow-hidden pointer-events-none">
     <div
-      class="absolute -top-[10%] -left-[10%] w-[800px] h-[800px] bg-amber-200/40 rounded-full blur-[120px] opacity-40">
+      class="absolute -top-[10%] -left-[10%] w-[800px] h-[800px] rounded-full opacity-40 pointer-events-none"
+      style="background: radial-gradient(50% 50% at 50% 50%, rgba(253,230,138,0.4) 0%, transparent 100%);">
     </div>
     <div
-      class="absolute top-[40%] -right-[15%] w-[700px] h-[700px] bg-orange-200/20 rounded-full blur-[100px] opacity-30">
+      class="absolute top-[40%] -right-[15%] w-[700px] h-[700px] rounded-full opacity-30 pointer-events-none"
+      style="background: radial-gradient(50% 50% at 50% 50%, rgba(254,215,170,0.2) 0%, transparent 100%);">
     </div>
     <div
-      class="absolute -bottom-[20%] left-[20%] w-[600px] h-[600px] bg-amber-100/30 rounded-full blur-[100px] opacity-20">
+      class="absolute -bottom-[20%] left-[20%] w-[600px] h-[600px] rounded-full opacity-20 pointer-events-none"
+      style="background: radial-gradient(50% 50% at 50% 50%, rgba(254,243,199,0.3) 0%, transparent 100%);">
     </div>
   </div>
 
@@ -347,19 +350,18 @@
       }
 
       @keyframes navPillEntry {
-        0% { opacity: 0; transform: scale(0.85); filter: blur(10px); }
-        100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        0% { opacity: 0; transform: scale(0.85); }
+        100% { opacity: 1; transform: scale(1); }
       }
 
       .nav-entry-stagger {
         opacity: 0;
         transform: scale(0.95);
-        filter: blur(4px);
         animation: navItemDepthIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
       }
 
       @keyframes navItemDepthIn {
-        to { opacity: 1; transform: scale(1); filter: blur(0); }
+        to { opacity: 1; transform: scale(1); }
       }
 
       .nav-btn-pop {
@@ -1137,7 +1139,7 @@
           <!-- Glow + particules : Équilibré et sans coupure entre sections -->
           <div class="absolute pointer-events-none" style="inset: -220px; z-index: 5;">
             {{-- Halo équilibré (dégradé diffus) --}}
-            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.13) 45%, transparent 75%); filter: blur(45px);"></div>
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.13) 45%, transparent 75%);"></div>
             <canvas id="hero-dust" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
           </div>
           
@@ -1692,7 +1694,8 @@
             class="flex-1 relative w-full max-w-[340px] mx-auto lg:max-w-none lg:mx-0 flex justify-center mt-12 lg:mt-0"
             x-intersect.once="$el.classList.add('reveal-right')">
             <div
-              class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[130%] bg-gradient-to-tr from-amber-200/50 to-blue-200/40 blur-[80px] rounded-full pointer-events-none z-0">
+              class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] pointer-events-none z-0"
+              style="background: radial-gradient(circle at 50% 50%, rgba(253,230,138,0.5) 0%, rgba(191,219,254,0.3) 35%, transparent 60%);">
             </div>
 
             <div
@@ -1915,7 +1918,7 @@
 
     <!-- Templates Showcase -->
     <section id="gabarits" class="py-28 relative">
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-copper/5 blur-[140px] rounded-full pointer-events-none"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none" style="background: radial-gradient(50% 50% at 50% 50%, rgba(217,119,6,0.05) 0%, transparent 100%);"></div>
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center max-w-3xl mx-auto mb-16" x-intersect.once="$el.classList.add('reveal-up')">
@@ -2227,10 +2230,10 @@
     <!-- Pourquoi ça marche -->
     <section id="benefices" class="py-24 bg-slate-900 text-white relative">
       <div
-        class="absolute top-0 right-0 w-[500px] h-[500px] bg-copper/10 blur-[100px] rounded-full pointer-events-none">
+        class="absolute top-0 right-0 w-[500px] h-[500px] rounded-full pointer-events-none" style="background: radial-gradient(50% 50% at 50% 50%, rgba(217,119,6,0.1) 0%, transparent 100%);">
       </div>
       <div
-        class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none">
+        class="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full pointer-events-none" style="background: radial-gradient(50% 50% at 50% 50%, rgba(59,130,246,0.1) 0%, transparent 100%);">
       </div>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center max-w-3xl mx-auto mb-16" x-intersect.once="$el.classList.add('reveal-up')">
@@ -2356,7 +2359,7 @@
     <!-- CTAs -->
     <section class="py-32 text-center px-4 relative">
       <div
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-300/10 blur-[120px] rounded-full pointer-events-none">
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none" style="background: radial-gradient(50% 50% at 50% 50%, rgba(252,211,77,0.1) 0%, transparent 100%);">
       </div>
       <div class="max-w-4xl mx-auto relative z-10" x-intersect.once="$el.classList.add('reveal-up')">
         <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Rentrez chez vous,

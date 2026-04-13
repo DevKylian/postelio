@@ -216,7 +216,12 @@
                     
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
-                            <span class="w-2 h-2 rounded-full {{ $isS ? 'bg-amber-400' : 'bg-copper' }}"></span>
+                            @php
+                                $dotColor = 'bg-copper';
+                                if ($post['status'] === 'published') $dotColor = 'bg-emerald-500';
+                                elseif ($isS) $dotColor = 'bg-amber-400';
+                            @endphp
+                            <span class="w-2 h-2 rounded-full {{ $dotColor }}"></span>
                             <span class="text-[10px] font-bold uppercase tracking-widest text-gray-300">
                                 {{ ucfirst(str_replace('_', ' ', $post['template'])) }}
                             </span>
@@ -299,23 +304,34 @@
                         : ucfirst(str_replace('_', ' ', $post['template']));
                 @endphp
                 <div
-                    draggable="true"
+                    @if($post['status'] !== 'published') draggable="true" @endif
                     @dragstart="dragStart({{ $post['id'] }})"
                     @dragend="dragEnd()"
                     wire:key="chip-{{ $post['id'] }}"
-                    class="group flex items-center gap-1.5 px-2 py-1.5 rounded-lg cursor-grab active:cursor-grabbing select-none transition-all flex-shrink-0
-                        {{ $isScheduled
-                            ? 'bg-amber-50 hover:bg-amber-100 border border-amber-200'
-                            : 'bg-copper/8 hover:bg-copper/15 border border-copper/20' }}
+                    class="group flex items-center gap-1.5 px-2 py-1.5 rounded-lg select-none transition-all flex-shrink-0
+                        {{ $post['status'] !== 'published' ? 'cursor-grab active:cursor-grabbing' : 'cursor-default' }}
+                        @if($post['status'] === 'published')
+                            bg-emerald-50 border border-emerald-100
+                        @elseif($isScheduled)
+                            bg-amber-50 hover:bg-amber-100 border border-amber-200
+                        @else
+                            bg-copper/8 hover:bg-copper/15 border border-copper/20
+                        @endif
                         hover:shadow-sm"
                     :class="draggingPostId === {{ $post['id'] }} ? 'opacity-40 scale-95' : 'opacity-100'"
                 >
                     {{-- Bouton de clic vers modal --}}
                     <button wire:click="openPost({{ $post['id'] }})" class="flex items-center gap-1.5 flex-1 text-left min-w-0" title="{{ $post['caption'] ?? $post['template'] }}">
-                        <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $isScheduled ? 'bg-amber-400' : 'bg-copper' }}"></span>
+                        @php
+                            $bulletColor = 'bg-copper';
+                            $timeColor   = 'text-copper';
+                            if ($post['status'] === 'published') { $bulletColor = 'bg-emerald-500'; $timeColor = 'text-emerald-600'; }
+                            elseif ($isScheduled) { $bulletColor = 'bg-amber-400'; $timeColor = 'text-amber-600'; }
+                        @endphp
+                        <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $bulletColor }}"></span>
                         <span class="flex-1 min-w-0 flex items-center gap-1 leading-none">
                             @if($showTime)
-                                <span class="text-[10px] font-bold {{ $isScheduled ? 'text-amber-600' : 'text-copper' }} shrink-0">{{ $post['time'] }}</span>
+                                <span class="text-[10px] font-bold {{ $timeColor }} shrink-0">{{ $post['time'] }}</span>
                                 <span class="text-[10px] text-gray-400 shrink-0">·</span>
                             @endif
                             <span class="text-[10px] font-medium text-gray-600 truncate">{{ $label }}</span>
@@ -323,6 +339,7 @@
                     </button>
 
                     {{-- Drag "gripper" --}}
+                    @if($post['status'] !== 'published')
                     <span class="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-300 cursor-grab">
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                             <circle cx="7" cy="6" r="1.2"/><circle cx="13" cy="6" r="1.2"/>
@@ -330,6 +347,7 @@
                             <circle cx="7" cy="14" r="1.2"/><circle cx="13" cy="14" r="1.2"/>
                         </svg>
                     </span>
+                    @endif
                 </div>
                 @endforeach
 
@@ -445,15 +463,27 @@
                                 : ucfirst(str_replace('_', ' ', $post['template']));
                         @endphp
                         <button
-                            draggable="true"
+                            @if($post['status'] !== 'published') draggable="true" @endif
                             @dragstart="dragStart({{ $post['id'] }})"
                             @dragend="dragEnd()"
                             wire:click.stop="openPost({{ $post['id'] }})"
-                    class="flex items-center gap-1 px-1.5 py-1 rounded-md w-full text-left cursor-pointer transition-all select-none
-                        {{ $isSc ? 'bg-amber-50 border border-amber-200 hover:bg-amber-100' : 'bg-copper/8 border border-copper/20 hover:bg-copper/15' }}"
+                    class="flex items-center gap-1 px-1.5 py-1 rounded-md w-full text-left transition-all select-none
+                        {{ $post['status'] !== 'published' ? 'cursor-pointer' : 'cursor-default' }}
+                        @if($post['status'] === 'published')
+                            bg-emerald-50 border border-emerald-100
+                        @elseif($isSc)
+                            bg-amber-50 border border-amber-200 hover:bg-amber-100
+                        @else
+                            bg-copper/8 border border-copper/20 hover:bg-copper/15
+                        @endif"
                     :class="draggingPostId === {{ $post['id'] }} ? 'opacity-40' : ''"
                 >
-                    <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $isSc ? 'bg-amber-400' : 'bg-copper' }}"></span>
+                    @php
+                        $mBullet = 'bg-copper';
+                        if ($post['status'] === 'published') $mBullet = 'bg-emerald-500';
+                        elseif ($isSc) $mBullet = 'bg-amber-400';
+                    @endphp
+                    <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $mBullet }}"></span>
                     <span class="text-[10px] font-medium text-gray-600 truncate">{{ $chipL }}</span>
                 </button>
                 @endforeach
@@ -599,14 +629,26 @@
     {{-- ══════════ MODAL DÉTAIL ══════════ --}}
     @if($selectedPost)
     <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-         x-data
-         x-init="setTimeout(() => { let m = $el.querySelector('[data-modal]'); if(m) m.classList.remove('translate-y-4','opacity-0'); }, 10)">
+         wire:key="modal-container-{{ $selectedPostId }}"
+         x-data="{ show: false }"
+         x-init="setTimeout(() => show = true, 10)">
 
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" wire:click="closePost"></div>
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" 
+             wire:click="closePost"
+             wire:key="modal-backdrop-{{ $selectedPostId }}"
+             x-show="show"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100">
+        </div>
 
         <div data-modal
-             class="relative bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full max-w-md overflow-hidden
-                    transform translate-y-4 opacity-0 transition-all duration-250">
+             wire:key="modal-content-{{ $selectedPostId }}"
+             x-show="show"
+             x-transition:enter="transition ease-out duration-250"
+             x-transition:enter-start="translate-y-4 opacity-0"
+             x-transition:enter-end="translate-y-0 opacity-100"
+             class="relative bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transition-all duration-250">
 
             {{-- Thumbnail compact --}}
             @if($selectedPost['thumbnail'])
@@ -809,11 +851,19 @@
                     wire:click="openPost({{ $post['id'] }})"
                     @click="openPopover = null"
                     class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg w-full text-left transition-colors
-                        {{ $isS ? 'bg-amber-50 hover:bg-amber-100' : 'bg-copper/5 hover:bg-copper/10' }}"
+                        @if($post['status'] === 'published') bg-emerald-50 hover:bg-emerald-100
+                        @elseif($isS) bg-amber-50 hover:bg-amber-100
+                        @else bg-copper/5 hover:bg-copper/10 @endif"
                 >
-                    <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $isS ? 'bg-amber-400' : 'bg-copper' }}"></span>
+                    @php
+                        $popBullet = 'bg-copper';
+                        $popTime   = 'text-copper';
+                        if ($post['status'] === 'published') { $popBullet = 'bg-emerald-500'; $popTime = 'text-emerald-600'; }
+                        elseif ($isS) { $popBullet = 'bg-amber-400'; $popTime = 'text-amber-600'; }
+                    @endphp
+                    <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $popBullet }}"></span>
                     @if($post['time'] !== '00:00')
-                        <span class="text-[10px] font-bold {{ $isS ? 'text-amber-600' : 'text-copper' }} shrink-0">{{ $post['time'] }}</span>
+                        <span class="text-[10px] font-bold {{ $popTime }} shrink-0">{{ $post['time'] }}</span>
                         <span class="text-gray-300 text-[10px] shrink-0">·</span>
                     @endif
                     <span class="text-[10px] font-medium text-gray-600 truncate">{{ $lbl }}</span>
@@ -836,14 +886,21 @@
                     {{ $day }} {{ \Carbon\Carbon::create($year, $month, $day)->locale('fr')->isoFormat('MMMM') }}
                 </p>
                 @foreach($dayPosts as $post)
-                @php $isSc = $post['scheduled']; @endphp
+                @php $isSc = ($post['status'] !== 'completed' && $post['status'] !== 'published') || ($post['scheduled'] ?? false); @endphp
                 <button
                     wire:click="openPost({{ $post['id'] }})"
                     @click="openPopover = null"
                     class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg w-full text-left transition-colors
-                        {{ $isSc ? 'bg-amber-50 hover:bg-amber-100' : 'bg-copper/5 hover:bg-copper/10' }}"
+                        @if($post['status'] === 'published') bg-emerald-50 hover:bg-emerald-100
+                        @elseif($post['status'] === 'review_pending' || ($post['scheduled'] ?? false)) bg-amber-50 hover:bg-amber-100
+                        @else bg-copper/5 hover:bg-copper/10 @endif"
                 >
-                    <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $isSc ? 'bg-amber-400' : 'bg-copper' }}"></span>
+                    @php
+                        $mPopBullet = 'bg-copper';
+                        if ($post['status'] === 'published') $mPopBullet = 'bg-emerald-500';
+                        elseif ($post['status'] === 'review_pending' || ($post['scheduled'] ?? false)) $mPopBullet = 'bg-amber-400';
+                    @endphp
+                    <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $mPopBullet }}"></span>
                     <span class="text-[10px] font-medium text-gray-600 truncate">
                         {{ $post['caption'] ? \Illuminate\Support\Str::limit($post['caption'], 28) : ucfirst(str_replace('_', ' ', $post['template'])) }}
                     </span>

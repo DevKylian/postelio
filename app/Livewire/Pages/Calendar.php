@@ -205,9 +205,14 @@ class Calendar extends Component
             $currentDate->minute,
         );
 
+        // ── Guard: post déjà publié ───────────────────────────────────────────
+        if ($post->status === Post::STATUS_PUBLISHED) {
+            $this->dispatch('calendar-move-blocked', message: 'Impossible de déplacer un post déjà publié.');
+            return;
+        }
+
         // ── Guard: drop sur une date passée ────────────────────────────────────
-        // On autorise uniquement les posts déjà publiés (déplacement historique).
-        if ($datetime->isPast() && $post->status !== 'published') {
+        if ($datetime->isPast()) {
             $this->dispatch('calendar-move-blocked', message: 'Impossible de planifier dans le passé.');
             return;
         }
@@ -358,7 +363,7 @@ class Calendar extends Component
     private function fetchPosts(Carbon $start, Carbon $end)
     {
         return Post::where('user_id', Auth::id())
-            ->whereIn('status', ['completed', 'review_pending'])
+            ->whereIn('status', [Post::STATUS_COMPLETED, Post::STATUS_REVIEW_PENDING, Post::STATUS_PUBLISHED])
             ->where(function ($q) use ($start, $end) {
                 $q->whereBetween('scheduled_at', [$start, $end])
                   ->orWhere(function ($q2) use ($start, $end) {
@@ -381,6 +386,7 @@ class Calendar extends Component
             'thumbnail' => $this->getThumbnail($post),
             'caption'   => $post->caption,
             'time'      => $date->format('H:i'),
+            'status'    => $post->status,
         ];
     }
 

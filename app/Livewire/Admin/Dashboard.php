@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Post;
 use App\Services\ZernioService;
+use App\Services\OpenAIMonitorService;
 use Carbon\Carbon;
 use Laravel\Cashier\Subscription;
 use App\Models\User;
@@ -69,6 +70,13 @@ class Dashboard extends Component
             Log::error('Admin dashboard: failed to fetch Zernio usage stats', ['error' => $e->getMessage()]);
         }
 
+        $openaiStats = null;
+        try {
+            $openaiStats = app(OpenAIMonitorService::class)->getMonthlyUsage();
+        } catch (\Exception $e) {
+            Log::error('Admin dashboard: failed to fetch OpenAI usage stats', ['error' => $e->getMessage()]);
+        }
+
         return view('livewire.admin.dashboard', compact(
             'totalUsers',
             'totalPosts',
@@ -78,7 +86,8 @@ class Dashboard extends Component
             'recentPosts',
             'zernioStats',
             'zernioRenewalDate',
-            'zernioDaysUntilRenewal'
+            'zernioDaysUntilRenewal',
+            'openaiStats'
         ));
     }
 }

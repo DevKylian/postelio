@@ -62,82 +62,96 @@
                 </div>
             </div>
 
-            <!-- Zernio API Quota -->
-            @if($zernioStats)
-            @php
-                $uploadsUsed    = $zernioStats['usage']['uploads']  ?? 0;
-                $uploadsLimit   = $zernioStats['limits']['uploads'] ?? 1;
-                $uploadsPercent = min(100, round(($uploadsUsed / max(1, $uploadsLimit)) * 100));
-                $uploadsBar     = $uploadsPercent >= 90 ? 'bg-rose-500' : ($uploadsPercent >= 70 ? 'bg-amber-400' : 'bg-emerald-500');
-                $uploadsBadge   = $uploadsPercent >= 90 ? 'text-rose-600 bg-rose-50 border-rose-100' : ($uploadsPercent >= 70 ? 'text-amber-600 bg-amber-50 border-amber-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100');
+            <!-- Monitoring APIs -->
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                <!-- Zernio API Quota -->
+                @if($zernioStats)
+                @php
+                    $uploadsUsed    = $zernioStats['usage']['uploads']  ?? 0;
+                    $uploadsLimit   = $zernioStats['limits']['uploads'] ?? 1;
+                    $uploadsPercent = min(100, round(($uploadsUsed / max(1, $uploadsLimit)) * 100));
+                    $uploadsBar     = $uploadsPercent >= 90 ? 'bg-rose-500' : ($uploadsPercent >= 70 ? 'bg-amber-400' : 'bg-emerald-500');
+                    $uploadsBadge   = $uploadsPercent >= 90 ? 'text-rose-600 bg-rose-50 border-rose-100' : ($uploadsPercent >= 70 ? 'text-amber-600 bg-amber-50 border-amber-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100');
 
-                $profilesUsed    = $zernioStats['usage']['profiles']  ?? 0;
-                $profilesLimit   = $zernioStats['limits']['profiles'] ?? 1;
-                $profilesPercent = min(100, round(($profilesUsed / max(1, $profilesLimit)) * 100));
-                $profilesBar     = $profilesPercent >= 90 ? 'bg-rose-500' : ($profilesPercent >= 70 ? 'bg-amber-400' : 'bg-emerald-500');
-                $profilesBadge   = $profilesPercent >= 90 ? 'text-rose-600 bg-rose-50 border-rose-100' : ($profilesPercent >= 70 ? 'text-amber-600 bg-amber-50 border-amber-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100');
-
-                $lastReset = isset($zernioStats['usage']['lastReset'])
-                    ? \Carbon\Carbon::parse($zernioStats['usage']['lastReset'])->isoFormat('D MMMM YYYY')
-                    : null;
-            @endphp
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 flex flex-wrap items-center gap-x-6 gap-y-3">
-                {{-- Identity --}}
-                <div class="flex items-center gap-2.5 shrink-0">
-                    <div class="w-8 h-8 rounded-lg bg-copper/10 text-copper flex items-center justify-center">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    $profilesUsed    = $zernioStats['usage']['profiles']  ?? 0;
+                    $profilesLimit   = $zernioStats['limits']['profiles'] ?? 1;
+                    $profilesPercent = min(100, round(($profilesUsed / max(1, $profilesLimit)) * 100));
+                    $profilesBar     = $profilesPercent >= 90 ? 'bg-rose-500' : ($profilesPercent >= 70 ? 'bg-amber-400' : 'bg-emerald-500');
+                    $profilesBadge   = $profilesPercent >= 90 ? 'text-rose-600 bg-rose-50 border-rose-100' : ($profilesPercent >= 70 ? 'text-amber-600 bg-amber-50 border-amber-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100');
+                @endphp
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 flex flex-wrap items-center gap-x-6 gap-y-4">
+                    <div class="flex items-center gap-3 shrink-0">
+                        <div class="w-10 h-10 rounded-xl bg-copper/10 text-copper flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-midnight leading-tight">Zernio · {{ $zernioStats['planName'] ?? '—' }}</p>
+                            @if($zernioDaysUntilRenewal !== null)
+                            <p class="text-[10px] {{ $zernioDaysUntilRenewal <= 5 ? 'text-rose-500' : 'text-gray-400' }}">
+                                renouvellement {{ $zernioDaysUntilRenewal }}j
+                            </p>
+                            @endif
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-xs font-bold text-midnight leading-tight">Zernio · Plan {{ $zernioStats['planName'] ?? '—' }}</p>
-                        @if($zernioDaysUntilRenewal !== null)
-                        <p class="text-[10px] {{ $zernioDaysUntilRenewal <= 5 ? 'text-rose-500' : 'text-gray-400' }}">
-                            renouvellement {{ $zernioRenewalDate }} <span class="font-semibold">({{ $zernioDaysUntilRenewal }}j)</span>
-                        </p>
-                        @endif
+
+                    <div class="hidden sm:block w-px h-8 bg-gray-100 shrink-0"></div>
+
+                    <div class="flex flex-wrap sm:flex-nowrap items-center gap-x-6 gap-y-4 flex-1">
+                        <div class="flex-1 min-w-[140px]">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Posts</span>
+                                <span class="text-[11px] font-bold {{ $uploadsBadge }} px-2 py-0.5 rounded-full border shadow-sm">{{ $uploadsUsed }} / {{ $uploadsLimit }}</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full {{ $uploadsBar }} transition-all duration-500 rounded-full" style="width: {{ $uploadsPercent }}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 min-w-[120px]">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Profils</span>
+                                <span class="text-[11px] font-bold {{ $profilesBadge }} px-2 py-0.5 rounded-full border shadow-sm">{{ $profilesUsed }} / {{ $profilesLimit }}</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full {{ $profilesBar }} transition-all duration-500 rounded-full" style="width: {{ $profilesPercent }}%"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                @endif
 
-                <div class="w-px h-8 bg-gray-100 hidden sm:block shrink-0"></div>
-
-                {{-- Publications --}}
-                <div class="flex items-center gap-3 min-w-[180px] flex-1">
-                    <div class="flex-1">
-                        <div class="flex items-center justify-between mb-1">
-                            <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Publications</span>
-                            <span class="text-[11px] font-bold border px-1.5 py-px rounded-full {{ $uploadsBadge }}">{{ $uploadsUsed }} / {{ $uploadsLimit }}</span>
+                <!-- OpenAI Consumption -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 flex flex-wrap items-center gap-x-6 gap-y-4">
+                    <div class="flex items-center gap-3 shrink-0">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                         </div>
-                        <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div class="h-full {{ $uploadsBar }} rounded-full" style="width: {{ $uploadsPercent }}%"></div>
+                        <div>
+                            <p class="text-xs font-bold text-midnight leading-tight">OpenAI · Facturation</p>
+                            <p class="text-[10px] text-gray-400">estimation mois en cours</p>
                         </div>
                     </div>
-                </div>
 
-                {{-- Profils --}}
-                <div class="flex items-center gap-3 min-w-[160px] flex-1">
-                    <div class="flex-1">
-                        <div class="flex items-center justify-between mb-1">
-                            <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Profils</span>
-                            <span class="text-[11px] font-bold border px-1.5 py-px rounded-full {{ $profilesBadge }}">{{ $profilesUsed }} / {{ $profilesLimit }}</span>
+                    <div class="hidden sm:block w-px h-8 bg-gray-100 shrink-0"></div>
+
+                    @if($openaiStats && isset($openaiStats['total_usd']))
+                        <div class="flex items-center justify-between gap-4 flex-1 min-w-[150px]">
+                            <div class="flex items-baseline gap-1">
+                                <p class="text-2xl font-black text-midnight tracking-tight">{{ number_format($openaiStats['total_usd'], 2) }}</p>
+                                <span class="text-sm font-bold text-gray-300">$</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] font-bold bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-lg border border-emerald-100 uppercase tracking-wider shadow-sm">Temps Réel</span>
+                            </div>
                         </div>
-                        <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div class="h-full {{ $profilesBar }} rounded-full" style="width: {{ $profilesPercent }}%"></div>
+                    @else
+                        <div class="flex items-center gap-2 text-rose-500">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                             <span class="text-xs font-medium">Monitoring indisponible</span>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
-            @elseif(config('services.zernio.api_key'))
-            <div class="bg-white rounded-2xl border border-rose-100 shadow-sm p-5 flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div>
-                    <p class="text-sm font-semibold text-midnight">Zernio API indisponible</p>
-                    <p class="text-xs text-gray-400">Impossible de joindre l'API. Vérifiez la clé et la connectivité.</p>
-                </div>
-            </div>
-            @endif
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Post Generation Toggle -->

@@ -418,15 +418,21 @@ class InstagramPostGenerator extends Component
                     'data'     => $slideData,
                 ])->render();
 
-                    $png = Browsershot::html($html)
+                    $instance = Browsershot::html($html)
                         ->windowSize(360, $frameH)
                         ->deviceScaleFactor(3)
                         ->clip(0, 0, 360, $frameH)
                         ->noSandbox()
                         ->waitUntilNetworkIdle()
                         ->delay(500)
-                        ->timeout(60)
-                        ->screenshot();
+                        ->timeout(60);
+
+                    $chromePath = env('BROWSERSHOT_CHROME_PATH');
+                    if ($chromePath) {
+                        $instance->setChromePath($chromePath);
+                    }
+
+                    $png = $instance->screenshot();
 
                     $zip->addFromString('slide-' . ($i + 1) . '.png', $png);
                 }
@@ -448,15 +454,21 @@ class InstagramPostGenerator extends Component
                 'data'     => $data,
             ])->render();
 
-            $png = Browsershot::html($html)
+            $instance = Browsershot::html($html)
                 ->windowSize(360, $frameH)
                 ->deviceScaleFactor(3)
                 ->clip(0, 0, 360, $frameH)
                 ->noSandbox()
                 ->waitUntilNetworkIdle()
                 ->delay(500)
-                ->timeout(60)
-                ->screenshot();
+                ->timeout(60);
+
+            $chromePath = env('BROWSERSHOT_CHROME_PATH');
+            if ($chromePath) {
+                $instance->setChromePath($chromePath);
+            }
+
+            $png = $instance->screenshot();
 
             $filename = 'postelio-instagram-' . $this->template . '-' . now()->format('Ymd-His') . '.png';
             return response()->streamDownload(fn() => print($png), $filename, ['Content-Type' => 'image/png']);

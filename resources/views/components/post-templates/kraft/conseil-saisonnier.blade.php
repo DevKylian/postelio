@@ -29,7 +29,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Kraft Texture Overlay --}}
     <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
     
@@ -45,7 +45,7 @@
             {{-- Technical Memo Box --}}
             <div class="bg-white border-4 border-gray-900 p-10 shadow-[20px_20px_0px_0px_rgba(15,23,42,0.1)] w-full max-w-[400px] relative">
                 <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 bg-[#BC9A7E] border-4 border-gray-900 rounded-full flex items-center justify-center shadow-xl p-4">
-                     <svg class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <svg class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
                      </svg>
                 </div>
@@ -115,3 +115,4 @@
         </div>
     @endif
 </div>
+

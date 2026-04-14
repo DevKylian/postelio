@@ -35,14 +35,20 @@ class ImageGeneratorService
         $width = 360;
         $height = ($aspectRatio === '4:5') ? 450 : 360;
 
-        return \Spatie\Browsershot\Browsershot::html($html)
+        $instance = \Spatie\Browsershot\Browsershot::html($html)
             ->windowSize($width, $height)
             ->deviceScaleFactor(4)
             ->clip(0, 0, $width, $height)
-            ->format('png')
             ->noSandbox()
             ->waitUntilNetworkIdle()
             ->timeout(90);
+
+        $chromePath = env('BROWSERSHOT_CHROME_PATH');
+        if ($chromePath) {
+            $instance->setChromePath($chromePath);
+        }
+
+        return $instance;
     }
 
     private function generateCarouselViaBrowsershot(Post $post): array

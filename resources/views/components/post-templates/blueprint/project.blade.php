@@ -42,7 +42,7 @@
     $tagTextCol = ($yiq > 180) ? '#1E293B' : '#FFFFFF';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
     
     {{-- Background Grid --}}
     <div class="absolute inset-0 opacity-10 pointer-events-none" 
@@ -62,7 +62,7 @@
                 @if($imageBeforeUrl)
                     <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 @else
-                    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-blue-900 border border-white/10 flex items-center justify-center">
+                    <div class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-blue-900 border border-white/10 flex items-center justify-center">
                         <span class="text-white/20 text-[7px] font-black font-mono-technical uppercase">AVANT</span>
                     </div>
                 @endif
@@ -74,7 +74,7 @@
                 @if($imageAfterUrl)
                     <img src="{{ $imageAfterUrl }}" class="absolute inset-0 w-full h-full object-cover">
                 @else
-                    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-blue-900 border border-white/10 flex items-center justify-center">
+                    <div class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-blue-900 border border-white/10 flex items-center justify-center">
                         <span class="text-white/20 text-[7px] font-black font-mono-technical uppercase tracking-widest">APRÈS</span>
                     </div>
                 @endif
@@ -198,9 +198,10 @@
                  @endfor
              </div>
              <div class="w-8 h-8 rounded-full border-2 border-[#0047AB] flex items-center justify-center p-1">
-                  <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] rounded-full" style="background-color: {{ $brandColor }}"></div>
+                  <div class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} rounded-full" style="background-color: {{ $brandColor }}"></div>
              </div>
         </div>
     </div>
     @endif
 </div>
+

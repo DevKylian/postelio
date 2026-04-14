@@ -33,7 +33,22 @@
             font-display: swap;
         }
     </style>
-    @vite(['resources/css/app.css'])
+    @if(isset($exporting) && $exporting)
+        <style>
+            @php
+                try {
+                    echo \Illuminate\Support\Facades\Vite::content('resources/css/app.css');
+                } catch (\Throwable $e) {
+                    // Fallback handled via @vite below if needed, 
+                    // or we just let it be empty and use @vite
+                }
+            @endphp
+        </style>
+        {{-- If the above failed or we want to ensure assets resolve via network if possible --}}
+        @vite(['resources/css/app.css'])
+    @else
+        @vite(['resources/css/app.css'])
+    @endif
     <style>
         body {
             margin: 0;

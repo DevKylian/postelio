@@ -59,7 +59,7 @@
                     // Background layer: fill entire canvas then blur heavily
                     $bg = $mgr->read($fullPath);
                     $bg->cover($cW, $cH);
-                    $bg->blur(80);
+                    $bg->blur(95);
 
                     // Foreground layer: landscape photo scaled to fill canvas width exactly,
                     // height proportional → stays landscape, centred vertically
@@ -210,10 +210,25 @@
 
         // Template specific data
         if ($template === 'project') {
+            // Detect landscape orientation (EXIF-aware) on the before photo
+            $photosLandscape = false;
+            if ($post->image_before_path) {
+                $fp = storage_path('app/public/' . $post->image_before_path);
+                if (file_exists($fp)) {
+                    try {
+                        $chk = (new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver()))->read($fp);
+                        $photosLandscape = $chk->width() > $chk->height();
+                    } catch (\Throwable $e) {}
+                }
+            }
             $props = array_merge($commonProps, [
-                'imageBeforeUrl' => $applyBlurPadding($post->image_before_path),
-                'imageAfterUrl'  => $applyBlurPadding($post->image_after_path),
-                'text' => $rawText ?: 'TRANSFORMATION',
+                'imageBeforeUrl'    => $applyBlurPadding($post->image_before_path),
+                'imageAfterUrl'     => $applyBlurPadding($post->image_after_path),
+                // Raw (un-padded) URLs for slide 0 landscape top/bottom split
+                'imageBeforeRawUrl' => $post->image_before_path ? asset(\Illuminate\Support\Facades\Storage::url($post->image_before_path)) : null,
+                'imageAfterRawUrl'  => $post->image_after_path  ? asset(\Illuminate\Support\Facades\Storage::url($post->image_after_path))  : null,
+                'photosLandscape'   => $photosLandscape,
+                'text'              => $rawText ?: 'TRANSFORMATION',
             ]);
         } elseif ($template === 'review') {
             $props = array_merge($commonProps, [
@@ -305,6 +320,9 @@
             :image-url="$props['imageUrl'] ?? null"
             :image-before-url="$props['imageBeforeUrl'] ?? null"
             :image-after-url="$props['imageAfterUrl'] ?? null"
+            :image-before-raw-url="$props['imageBeforeRawUrl'] ?? null"
+            :image-after-raw-url="$props['imageAfterRawUrl'] ?? null"
+            :photos-landscape="$props['photosLandscape'] ?? false"
             :title="$props['title'] ?? null"
             :slides="$props['slides'] ?? null"
             :slide-contents="$props['slideContents'] ?? null"

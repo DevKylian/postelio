@@ -3,6 +3,9 @@
     'companyLabel' => 'Votre Société',
     'imageBeforeUrl' => null,
     'imageAfterUrl' => null,
+    'imageBeforeRawUrl' => null,
+    'imageAfterRawUrl' => null,
+    'photosLandscape' => false,
     'text' => 'TRANSFORMATION',
     'logoUrl' => null,
     'phone' => null,
@@ -61,7 +64,38 @@
             $slide0Alpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
             $slide0Style = !$isSlide0 ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-0 flex" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
+        {{-- Slide 0: layout depends on photo orientation --}}
+        <div class="absolute inset-0 {{ $photosLandscape ? 'flex flex-col' : 'flex' }}" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
+
+            @if($photosLandscape)
+            {{-- LANDSCAPE: Avant on top, Après on bottom --}}
+            <div class="h-1/2 relative overflow-hidden border-b border-white/30 bg-gray-300">
+                @if ($imageBeforeRawUrl)
+                    <img src="{{ $imageBeforeRawUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                    <div class="absolute top-3 left-4 px-3 h-6 inline-flex items-center justify-center rounded-full shadow-lg z-20 border" style="{{ $badgeStyle }}">
+                        <p class="text-[9px] font-black uppercase tracking-[0.2em] leading-none">Avant</p>
+                    </div>
+                @else
+                    <div class="w-full h-full flex items-center justify-center">
+                        <p class="text-[9px] font-bold uppercase tracking-widest" style="color: {{ $brandColor }}">Avant</p>
+                    </div>
+                @endif
+            </div>
+            <div class="h-1/2 relative overflow-hidden bg-gray-400">
+                @if ($imageAfterRawUrl)
+                    <img src="{{ $imageAfterRawUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                    <div class="absolute top-3 right-4 px-3 h-6 inline-flex items-center justify-center rounded-full shadow-lg z-20 border" style="{{ $badgeStyle }}">
+                        <p class="text-[9px] font-black uppercase tracking-[0.2em] leading-none">Après</p>
+                    </div>
+                @else
+                    <div class="w-full h-full flex items-center justify-center">
+                        <p class="text-[9px] font-bold uppercase tracking-widest" style="color: {{ $brandColor }}">Après</p>
+                    </div>
+                @endif
+            </div>
+
+            @else
+            {{-- PORTRAIT: left / right split (original layout) --}}
             <div class="w-1/2 relative overflow-hidden border-r border-white/20 bg-gray-300 flex items-center justify-center">
                 @if ($imageBeforeUrl)
                     <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
@@ -88,6 +122,8 @@
                     </div>
                 @endif
             </div>
+            @endif
+
         </div>
 
         {{-- Slide 1: Full Avant --}}

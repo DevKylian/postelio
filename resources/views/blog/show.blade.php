@@ -214,31 +214,31 @@
 
                 {{-- Navigation Intra-Article Minimaliste --}}
                 @if($next || $previous)
-                <div class="mt-20 pt-8 border-t border-slate-100 flex flex-col sm:flex-row gap-8 justify-between">
+                <div class="mt-20 pt-10 border-t border-slate-100 flex flex-col sm:flex-row gap-10 justify-between">
                     @if($previous)
-                    <div class="flex-1 max-w-[45%]">
+                    <div class="flex-1 sm:max-w-[45%]">
                         <a href="{{ route('blog.show', $previous->slug) }}" class="group block">
                             <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-3 flex items-center gap-2 group-hover:text-copper transition-colors">
                                 <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                                 Précédent
                             </span>
-                            <span class="text-sm font-medium text-slate-500 group-hover:text-midnight transition-colors line-clamp-2">
+                            <span class="text-sm sm:text-base font-medium text-slate-500 group-hover:text-midnight transition-colors line-clamp-2">
                                 {{ $previous->title }}
                             </span>
                         </a>
                     </div>
                     @else
-                    <div class="flex-1"></div>
+                    <div class="flex-1 hidden sm:block"></div>
                     @endif
 
                     @if($next)
-                    <div class="flex-1 max-w-[45%] text-right">
+                    <div class="flex-1 sm:max-w-[45%] text-left sm:text-right">
                         <a href="{{ route('blog.show', $next->slug) }}" class="group block">
-                            <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-3 flex items-center gap-2 justify-end group-hover:text-copper transition-colors">
+                            <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-3 flex items-center gap-2 justify-start sm:justify-end group-hover:text-copper transition-colors">
                                 Suivant
                                 <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                             </span>
-                            <span class="text-sm font-medium text-slate-500 group-hover:text-midnight transition-colors line-clamp-2">
+                            <span class="text-sm sm:text-base font-medium text-slate-500 group-hover:text-midnight transition-colors line-clamp-2">
                                 {{ $next->title }}
                             </span>
                         </a>

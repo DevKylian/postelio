@@ -8,7 +8,47 @@
         $canvasHeight = ($aspectRatio === '4:5') ? 450 : 360;
     @endphp
     <meta name="viewport" content="width={{ $canvasWidth }}, initial-scale=1">
-    @vite(['resources/css/app.css'])
+    {{-- Local Montserrat fonts: Chrome loads these from the app server instantly,
+         bypassing the Google Fonts network round-trips that slow down each render. --}}
+    <style>
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('{{ asset('fonts/Montserrat-Black.ttf') }}') format('truetype');
+            font-weight: 900;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('{{ asset('fonts/Montserrat-Bold.ttf') }}') format('truetype');
+            font-weight: 700 800;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('{{ asset('fonts/Montserrat-Regular.ttf') }}') format('truetype');
+            font-weight: 300 400 500 600;
+            font-style: normal;
+            font-display: swap;
+        }
+    </style>
+    @if(isset($exporting) && $exporting)
+        <style>
+            @php
+                try {
+                    echo \Illuminate\Support\Facades\Vite::content('resources/css/app.css');
+                } catch (\Throwable $e) {
+                    // Fallback handled via @vite below if needed, 
+                    // or we just let it be empty and use @vite
+                }
+            @endphp
+        </style>
+        {{-- If the above failed or we want to ensure assets resolve via network if possible --}}
+        @vite(['resources/css/app.css'])
+    @else
+        @vite(['resources/css/app.css'])
+    @endif
     <style>
         body {
             margin: 0;
@@ -25,7 +65,69 @@
     <div class="font-montserrat" style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; overflow: hidden; position: relative;">
     @php
         use Illuminate\Support\Facades\Storage;
-        
+
+        // Helper: detect landscape photos and apply blur-padding (blurred background + centered image)
+        // Returns the URL to use in templates: original if portrait/square, padded version if landscape.
+        // Padded files are cached alongside the original with a _blurpad.jpg suffix.
+        $applyBlurPadding = function (?string $storagePath) use ($aspectRatio): ?string {
+            if (!$storagePath) return null;
+            $fullPath = storage_path('app/public/' . $storagePath);
+            if (!file_exists($fullPath)) {
+                return asset(\Illuminate\Support\Facades\Storage::url($storagePath));
+            }
+
+            $paddedRel  = preg_replace('/\.([^.]+)$/', '_blurpad.jpg', $storagePath);
+            $paddedFull = storage_path('app/public/' . $paddedRel);
+
+            if (!file_exists($paddedFull)) {
+                try {
+                    $cW  = 1080;
+                    $cH  = ($aspectRatio === '4:5') ? 1350 : 1080;
+                    $mgr = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+
+                    // Use Intervention to read dimensions with EXIF auto-correction
+                    $probe = $mgr->read($fullPath);
+                    $origW = $probe->width();
+                    $origH = $probe->height();
+                    unset($probe);
+
+                    // Portrait or square: no blur padding needed
+                    if ($origW <= $origH) {
+                        return asset(\Illuminate\Support\Facades\Storage::url($storagePath));
+                    }
+
+                    // Background layer: fill canvas, then downscale → blur → upscale.
+                    // Downscale to 1/2 only: 2× upscale artifacts are invisible with
+                    // bilinear resampling. A final blur(2) removes any residual edge.
+                    // 1/5 caused visible 5×5 blocks; 1/2 is block-free with ~12× speedup.
+                    $bg = $mgr->read($fullPath);
+                    $bg->cover($cW, $cH);
+                    $bg->resize((int)round($cW / 2), (int)round($cH / 2));
+                    $bg->blur(30);
+                    $bg->resize($cW, $cH);
+                    $bg->blur(2); // Smooth any residual 2×2 grid artifact
+
+                    // Foreground layer: landscape photo scaled to fill canvas width exactly,
+                    // height proportional → stays landscape, centred vertically
+                    $fgH = (int)round($origH * $cW / $origW);
+                    $fg  = $mgr->read($fullPath);
+                    $fg->resize($cW, $fgH);
+
+                    // Place centred (x=0 since foreground fills full width)
+                    $bg->place($fg, 'top-left', 0, (int)(($cH - $fgH) / 2));
+
+                    if (!is_dir(dirname($paddedFull))) {
+                        mkdir(dirname($paddedFull), 0755, true);
+                    }
+                    $bg->toJpeg(90)->save($paddedFull);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning('[BlurPadding] Failed for ' . $storagePath . ': ' . $e->getMessage());
+                    return asset(\Illuminate\Support\Facades\Storage::url($storagePath));
+                }
+            }
+            return asset(\Illuminate\Support\Facades\Storage::url($paddedRel));
+        };
+
         $company = $post->company;
         $brandColor = $company->brand_color ?? '#F59E0B';
         $accentColor = $company->secondary_color ?? '#0F172A';
@@ -131,6 +233,7 @@
             'city' => $post->template_options['company_city'] ?? $company->city,
             'visualStyle' => $visualStyle,
             'exporting' => true,
+            'aspectRatio' => $aspectRatio,
         ];
 
         // Prepare specialized data early for count calculation
@@ -145,7 +248,7 @@
             if(!empty($post->image_path)) {
                 array_unshift($photos, $post->image_path);
             }
-            $slides = empty($photos) ? [null, null, null] : array_map(fn($p) => asset(Storage::url($p)), $photos);
+            $slides = empty($photos) ? [null, null, null] : array_map(fn($p) => $p ? $applyBlurPadding($p) : null, $photos);
             
             if ($template === 'step_by_step' && count($slides) >= 1 && $slides[0] !== null) {
                 array_unshift($slides, null); // Cover slide
@@ -154,10 +257,25 @@
 
         // Template specific data
         if ($template === 'project') {
+            // Detect landscape orientation (EXIF-aware) on the before photo
+            $photosLandscape = false;
+            if ($post->image_before_path) {
+                $fp = storage_path('app/public/' . $post->image_before_path);
+                if (file_exists($fp)) {
+                    try {
+                        $chk = (new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver()))->read($fp);
+                        $photosLandscape = $chk->width() > $chk->height();
+                    } catch (\Throwable $e) {}
+                }
+            }
             $props = array_merge($commonProps, [
-                'imageBeforeUrl' => $post->image_before_path ? asset(Storage::url($post->image_before_path)) : null,
-                'imageAfterUrl' => $post->image_after_path ? asset(Storage::url($post->image_after_path)) : null,
-                'text' => $rawText ?: 'TRANSFORMATION',
+                'imageBeforeUrl'    => $applyBlurPadding($post->image_before_path),
+                'imageAfterUrl'     => $applyBlurPadding($post->image_after_path),
+                // Raw (un-padded) URLs for slide 0 landscape top/bottom split
+                'imageBeforeRawUrl' => $post->image_before_path ? asset(\Illuminate\Support\Facades\Storage::url($post->image_before_path)) : null,
+                'imageAfterRawUrl'  => $post->image_after_path  ? asset(\Illuminate\Support\Facades\Storage::url($post->image_after_path))  : null,
+                'photosLandscape'   => $photosLandscape,
+                'text'              => $rawText ?: 'TRANSFORMATION',
             ]);
         } elseif ($template === 'review') {
             $props = array_merge($commonProps, [
@@ -175,7 +293,7 @@
                 'answer' => $faqAnswer,
             ]);
         } elseif (in_array($template, ['lifestyle', 'quality_focus'])) {
-            $imgUrl = $post->image_path ? asset(Storage::url($post->image_path)) : ($post->image_before_path ? asset(Storage::url($post->image_before_path)) : null);
+            $imgUrl = $applyBlurPadding($post->image_path ?: $post->image_before_path);
             $props = array_merge($commonProps, [
                 'imageUrl' => $imgUrl,
                 'text' => $rawText,
@@ -232,6 +350,7 @@
             :visual-style="$visualStyle"
             :accent-color="$props['accentColor']"
             :accent-text-color="$props['accentTextColor']"
+            :aspect-ratio="$aspectRatio"
             :exporting="true"
         />
 
@@ -249,6 +368,9 @@
             :image-url="$props['imageUrl'] ?? null"
             :image-before-url="$props['imageBeforeUrl'] ?? null"
             :image-after-url="$props['imageAfterUrl'] ?? null"
+            :image-before-raw-url="$props['imageBeforeRawUrl'] ?? null"
+            :image-after-raw-url="$props['imageAfterRawUrl'] ?? null"
+            :photos-landscape="$props['photosLandscape'] ?? false"
             :title="$props['title'] ?? null"
             :slides="$props['slides'] ?? null"
             :slide-contents="$props['slideContents'] ?? null"
@@ -261,6 +383,7 @@
             :brand-text-color="$brandTextColor"
             :accent-color="$props['accentColor'] ?? $accentColor"
             :accent-text-color="$props['accentTextColor'] ?? $accentTextColor"
+            :aspect-ratio="$props['aspectRatio'] ?? $aspectRatio"
             :exporting="$props['exporting'] ?? false"
         />
     @else

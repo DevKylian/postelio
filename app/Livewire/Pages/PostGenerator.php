@@ -53,6 +53,7 @@ class PostGenerator extends Component
     public $aspectRatio     = '4:5';      // 1:1 | 4:5 (default 4:5)
     public bool $isFeatureDisabled = false;
     public int $currentStep = 1;
+    public ?string $photoOrientationWarning = null;
 
     // Carousel templates
     const CAROUSEL_TEMPLATES  = ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq'];
@@ -138,6 +139,39 @@ class PostGenerator extends Component
         }
         
         return array_merge($allowed, ['custom']);
+    }
+
+    public function updatedImageBefore(): void
+    {
+        $this->checkPhotoOrientationMismatch();
+    }
+
+    public function updatedImageAfter(): void
+    {
+        $this->checkPhotoOrientationMismatch();
+    }
+
+    private function checkPhotoOrientationMismatch(): void
+    {
+        $this->photoOrientationWarning = null;
+
+        if ($this->template !== 'project' || !$this->imageBefore || !$this->imageAfter) {
+            return;
+        }
+
+        $isLandscape = function ($upload): bool {
+            try {
+                $mgr = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $img = $mgr->read($upload->getRealPath());
+                return $img->width() > $img->height();
+            } catch (\Throwable $e) {
+                return false;
+            }
+        };
+
+        if ($isLandscape($this->imageBefore) !== $isLandscape($this->imageAfter)) {
+            $this->photoOrientationWarning = 'Les deux photos doivent avoir la même orientation : toutes les deux en portrait ou toutes les deux en paysage. Mixte non supporté.';
+        }
     }
 
     public function updatedAudio()

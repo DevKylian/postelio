@@ -14,6 +14,7 @@
     'accentColor'    => '#0F172A',
     'accentTextColor' => '#FFFFFF',
     'exporting'      => false,
+    'aspectRatio'    => '4:5',
 ])
 
 @if($preview)
@@ -63,7 +64,7 @@
     $fontSize = 'sm:text-xl text-lg';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] relative overflow-hidden flex flex-col {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: #F8FAFC;">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} relative overflow-hidden flex flex-col {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: #F8FAFC;">
 
 
 
@@ -179,3 +180,4 @@
         <div class="absolute top-[72px] right-5 z-30 px-2.5 py-1 rounded-full text-[9px] font-black border" style="background-color: {{ $brandColor }}20; border-color: {{ $brandColor }}40; color: {{ $brandColor }}" x-text="(current + 1) + ' / ' + total"></div>
     @endif
 </div>
+

@@ -33,7 +33,7 @@
 @endphp
 
 {{-- Square container — all positions in % so it scales to any parent size --}}
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] bg-[#0047AB] relative overflow-hidden font-montserrat {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-white/10 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#0047AB] relative overflow-hidden font-montserrat {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-white/10 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
 
     {{-- Grid background --}}
     <div style="position: absolute; inset: 0; opacity: 0.1; pointer-events: none; background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 8.3% 8.3%;"></div>
@@ -116,3 +116,4 @@
         </div>
     @endif
 </div>
+

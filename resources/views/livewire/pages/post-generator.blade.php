@@ -1020,6 +1020,12 @@
                         <p class="text-xs text-gray-400 mt-0.5">
                             {{ $template === 'project' ? 'Uploadez les deux photos pour le split Avant / Après.' : 'Uploadez la photo principale du post.' }}
                         </p>
+                        @if(in_array($template, ['project', 'lifestyle']))
+                        <div class="flex items-center gap-1.5 mt-1.5">
+                            <svg class="w-3 h-3 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2" stroke-width="2"/></svg>
+                            <span class="text-[11px] text-blue-500 font-medium">{{ $template === 'project' ? 'Photos portrait attendues' : 'Photo portrait attendue' }} — les paysages sont adaptés automatiquement.</span>
+                        </div>
+                        @endif
                     </div>
                 </div>
 
@@ -1089,6 +1095,18 @@
                         @endif
 
                     </div>
+
+                    @if($photoOrientationWarning)
+                    <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 mt-2">
+                        <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <div>
+                            <p class="text-xs font-bold text-amber-800">Orientations incompatibles</p>
+                            <p class="text-xs text-amber-700 mt-0.5">{{ $photoOrientationWarning }}</p>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
             @endif
@@ -1102,6 +1120,12 @@
                         <div>
                             <h3 class="font-semibold text-midnight text-base">Photos du chantier</h3>
                             <p class="text-xs text-gray-400 mt-0.5">La 1ère photo sera la couverture du carrousel.</p>
+                            @if($template === 'chantier_detail')
+                            <div class="flex items-center gap-1.5 mt-1.5">
+                                <svg class="w-3 h-3 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                <span class="text-[11px] text-emerald-600 font-medium">Photos portrait et paysage acceptées.</span>
+                            </div>
+                            @endif
                         </div>
                         <span class="text-xs font-bold text-copper bg-copper/10 px-2.5 py-1 rounded-full">2 à 5 photos</span>
                     </div>

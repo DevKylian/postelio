@@ -67,7 +67,7 @@
     $currentStyle = $styles[$visualStyle] ?? $styles['dark_branded'];
 @endphp
 
-<div class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] bg-gray-50 relative overflow-hidden font-montserrat {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}"
+<div class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-gray-50 relative overflow-hidden font-montserrat {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}"
      style="background-color: {{ $currentStyle['bg'] }}">
 
     {{-- Ambient glows --}}
@@ -322,3 +322,4 @@
             </div>
         @endif
 </div>
+

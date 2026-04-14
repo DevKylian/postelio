@@ -1111,7 +1111,7 @@
                             @if($template === 'chantier_detail')
                             <div class="flex items-center gap-1.5 mt-1.5">
                                 <svg class="w-3 h-3 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                <span class="text-[11px] text-emerald-600 font-medium">Portrait et paysage acceptés — les paysages sont adaptés automatiquement.</span>
+                                <span class="text-[11px] text-emerald-600 font-medium">Photos portrait et paysage acceptées.</span>
                             </div>
                             @endif
                         </div>

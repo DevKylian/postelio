@@ -59,7 +59,7 @@
                     // Background layer: fill entire canvas then blur heavily
                     $bg = $mgr->read($fullPath);
                     $bg->cover($cW, $cH);
-                    $bg->blur(30);
+                    $bg->blur(80);
 
                     // Foreground layer: landscape photo scaled to fill canvas width exactly,
                     // height proportional → stays landscape, centred vertically

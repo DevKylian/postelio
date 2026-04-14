@@ -25,7 +25,59 @@
     <div class="font-montserrat" style="width: {{ $canvasWidth }}px; height: {{ $canvasHeight }}px; overflow: hidden; position: relative;">
     @php
         use Illuminate\Support\Facades\Storage;
-        
+
+        // Helper: detect landscape photos and apply blur-padding (blurred background + centered image)
+        // Returns the URL to use in templates: original if portrait/square, padded version if landscape.
+        // Padded files are cached alongside the original with a _blurpad.jpg suffix.
+        $applyBlurPadding = function (?string $storagePath) use ($aspectRatio): ?string {
+            if (!$storagePath) return null;
+            $fullPath = storage_path('app/public/' . $storagePath);
+            if (!file_exists($fullPath)) {
+                return asset(\Illuminate\Support\Facades\Storage::url($storagePath));
+            }
+            $info = @getimagesize($fullPath);
+            if (!$info) {
+                return asset(\Illuminate\Support\Facades\Storage::url($storagePath));
+            }
+            [$origW, $origH] = $info;
+            // Portrait or square → no transformation needed
+            if ($origW <= $origH) {
+                return asset(\Illuminate\Support\Facades\Storage::url($storagePath));
+            }
+            // Landscape → create blur-padded version cached alongside the original
+            $paddedRel  = preg_replace('/\.([^.]+)$/', '_blurpad.jpg', $storagePath);
+            $paddedFull = storage_path('app/public/' . $paddedRel);
+            if (!file_exists($paddedFull)) {
+                try {
+                    $cW  = 1080;
+                    $cH  = ($aspectRatio === '4:5') ? 1350 : 1080;
+                    $mgr = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                    // Background: cover canvas at full size then blur
+                    $bg = $mgr->read($fullPath);
+                    $bg->cover($cW, $cH);
+                    $bg->blur(30);
+                    // Foreground: scale original to fit inside canvas (object-contain)
+                    $fg = $mgr->read($fullPath);
+                    $fg->scale($cW, $cH);
+                    // Place foreground centred on blurred background
+                    $bg->place(
+                        $fg,
+                        'top-left',
+                        (int)(($cW - $fg->width())  / 2),
+                        (int)(($cH - $fg->height()) / 2)
+                    );
+                    if (!is_dir(dirname($paddedFull))) {
+                        mkdir(dirname($paddedFull), 0755, true);
+                    }
+                    $bg->toJpeg(90)->save($paddedFull);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning('[BlurPadding] Failed for ' . $storagePath . ': ' . $e->getMessage());
+                    return asset(\Illuminate\Support\Facades\Storage::url($storagePath));
+                }
+            }
+            return asset(\Illuminate\Support\Facades\Storage::url($paddedRel));
+        };
+
         $company = $post->company;
         $brandColor = $company->brand_color ?? '#F59E0B';
         $accentColor = $company->secondary_color ?? '#0F172A';
@@ -145,7 +197,7 @@
             if(!empty($post->image_path)) {
                 array_unshift($photos, $post->image_path);
             }
-            $slides = empty($photos) ? [null, null, null] : array_map(fn($p) => asset(Storage::url($p)), $photos);
+            $slides = empty($photos) ? [null, null, null] : array_map(fn($p) => $p ? $applyBlurPadding($p) : null, $photos);
             
             if ($template === 'step_by_step' && count($slides) >= 1 && $slides[0] !== null) {
                 array_unshift($slides, null); // Cover slide
@@ -155,8 +207,8 @@
         // Template specific data
         if ($template === 'project') {
             $props = array_merge($commonProps, [
-                'imageBeforeUrl' => $post->image_before_path ? asset(Storage::url($post->image_before_path)) : null,
-                'imageAfterUrl' => $post->image_after_path ? asset(Storage::url($post->image_after_path)) : null,
+                'imageBeforeUrl' => $applyBlurPadding($post->image_before_path),
+                'imageAfterUrl'  => $applyBlurPadding($post->image_after_path),
                 'text' => $rawText ?: 'TRANSFORMATION',
             ]);
         } elseif ($template === 'review') {
@@ -175,7 +227,7 @@
                 'answer' => $faqAnswer,
             ]);
         } elseif (in_array($template, ['lifestyle', 'quality_focus'])) {
-            $imgUrl = $post->image_path ? asset(Storage::url($post->image_path)) : ($post->image_before_path ? asset(Storage::url($post->image_before_path)) : null);
+            $imgUrl = $applyBlurPadding($post->image_path ?: $post->image_before_path);
             $props = array_merge($commonProps, [
                 'imageUrl' => $imgUrl,
                 'text' => $rawText,

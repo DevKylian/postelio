@@ -218,6 +218,7 @@
             'city' => $post->template_options['company_city'] ?? $company->city,
             'visualStyle' => $visualStyle,
             'exporting' => true,
+            'aspectRatio' => $aspectRatio,
         ];
 
         // Prepare specialized data early for count calculation
@@ -334,6 +335,7 @@
             :visual-style="$visualStyle"
             :accent-color="$props['accentColor']"
             :accent-text-color="$props['accentTextColor']"
+            :aspect-ratio="$aspectRatio"
             :exporting="true"
         />
 
@@ -366,6 +368,7 @@
             :brand-text-color="$brandTextColor"
             :accent-color="$props['accentColor'] ?? $accentColor"
             :accent-text-color="$props['accentTextColor'] ?? $accentTextColor"
+            :aspect-ratio="$props['aspectRatio'] ?? $aspectRatio"
             :exporting="$props['exporting'] ?? false"
         />
     @else

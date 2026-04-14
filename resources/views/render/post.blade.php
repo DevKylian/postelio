@@ -8,6 +8,31 @@
         $canvasHeight = ($aspectRatio === '4:5') ? 450 : 360;
     @endphp
     <meta name="viewport" content="width={{ $canvasWidth }}, initial-scale=1">
+    {{-- Local Montserrat fonts: Chrome loads these from the app server instantly,
+         bypassing the Google Fonts network round-trips that slow down each render. --}}
+    <style>
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('{{ asset('fonts/Montserrat-Black.ttf') }}') format('truetype');
+            font-weight: 900;
+            font-style: normal;
+            font-display: block;
+        }
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('{{ asset('fonts/Montserrat-Bold.ttf') }}') format('truetype');
+            font-weight: 700 800;
+            font-style: normal;
+            font-display: block;
+        }
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('{{ asset('fonts/Montserrat-Regular.ttf') }}') format('truetype');
+            font-weight: 300 400 500 600;
+            font-style: normal;
+            font-display: block;
+        }
+    </style>
     @vite(['resources/css/app.css'])
     <style>
         body {
@@ -56,10 +81,14 @@
                         return asset(\Illuminate\Support\Facades\Storage::url($storagePath));
                     }
 
-                    // Background layer: fill entire canvas then blur heavily
+                    // Background layer: fill canvas, then downscale → blur → upscale
+                    // This produces a natural bokeh-like result vs. many passes on a full-res image,
+                    // and is ~25× faster (working on 1/5 of the pixels).
                     $bg = $mgr->read($fullPath);
                     $bg->cover($cW, $cH);
-                    $bg->blur(95);
+                    $bg->resize((int)round($cW / 5), (int)round($cH / 5));
+                    $bg->blur(20);
+                    $bg->resize($cW, $cH);
 
                     // Foreground layer: landscape photo scaled to fill canvas width exactly,
                     // height proportional → stays landscape, centred vertically

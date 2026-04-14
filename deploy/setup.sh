@@ -437,7 +437,10 @@ WantedBy=multi-user.target
 EOF
 
 # --- Scheduler (cron toutes les minutes) ------------------------------------
-(crontab -u deploy -l 2>/dev/null; echo "* * * * * cd ${APP_DIR} && ${PHP} artisan schedule:run >> ${LOG_DIR}/scheduler.log 2>&1") | crontab -u deploy -
+# On utilise grep -v pour supprimer l'ancienne tâche et éviter les doublons
+CRON_JOB="* * * * * cd ${APP_DIR} && ${PHP} artisan schedule:run >> ${LOG_DIR}/scheduler.log 2>&1"
+(crontab -u deploy -l 2>/dev/null | grep -v "artisan schedule:run" ; echo "$CRON_JOB") | crontab -u deploy -
+log "Tâche Cron configurée (doublons nettoyés)."
 
 # --- Webhook Server ----------------------------------------------------------
 cat > /etc/systemd/system/postelio-webhook.service << EOF
@@ -609,6 +612,11 @@ cd "\$APP_DIR" || fail "Impossible d'accéder à \$APP_DIR"
 git remote set-url origin "https://\${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git"
 
 # --- Vérification Droits / Permissions ---------------------------------------
+log "Ajustement des permissions storage/cache..."
+mkdir -p "$APP_DIR/storage/app/backup-temp"
+sudo chown -R deploy:www-data "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+
 if [ ! -w "\$APP_DIR/.git" ]; then
     log "ERREUR : L'utilisateur \$(whoami) n'a pas les droits d'écriture sur \$APP_DIR/.git"
     fail "Permissions insuffisantes (échec .git writable)"

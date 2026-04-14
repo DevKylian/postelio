@@ -50,6 +50,11 @@ GITHUB_TOKEN="$(cat /etc/postelio-github-token)"
 git remote set-url origin "https://${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git"
 
 # --- Vérification Droits / Permissions ---------------------------------------
+log "Ajustement des permissions storage/cache..."
+mkdir -p "$APP_DIR/storage/app/backup-temp"
+sudo chown -R deploy:www-data "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+
 if [ ! -w "${APP_DIR}/.git" ]; then
     log "ERREUR : L'utilisateur $(whoami) n'a pas les droits d'écriture sur .git"
     fail "Permissions insuffisantes (échec .git writable)"

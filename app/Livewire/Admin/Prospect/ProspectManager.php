@@ -6,6 +6,7 @@ use App\Models\InstagramProspect;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 
 class ProspectManager extends Component
 {
@@ -14,6 +15,12 @@ class ProspectManager extends Component
     #[Layout('layouts.app')]
     public $newAccountName = '';
     public $newProfileUrl = '';
+
+    #[On('scripts-updated')]
+    public function refresh()
+    {
+        // Triggers re-render
+    }
 
     public function rules()
     {

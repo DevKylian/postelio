@@ -22,6 +22,19 @@
                 </div>
             @endif
 
+            <!-- Sales Scripts (Modular & Copyable) -->
+            <div x-data="{ open: false }">
+                <button @click="open = !open" class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest hover:text-copper transition-colors mb-4">
+                    <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                    Bibliothèque de Scripts & Séquences
+                    <span class="bg-slate-100 px-2 py-0.5 rounded text-[10px]">{{ \App\Models\SalesScript::count() }}</span>
+                </button>
+                
+                <div x-show="open" x-collapse style="display: none;">
+                    <livewire:admin.prospect.script-manager />
+                </div>
+            </div>
+
             <!-- KPI Stats -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm flex flex-col justify-center">

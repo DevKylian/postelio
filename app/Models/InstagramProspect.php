@@ -28,6 +28,12 @@ class InstagramProspect extends Model
 
     public static function getScripts(): array
     {
+        $dbScripts = SalesScript::all()->pluck('name', 'id')->toArray();
+        if (!empty($dbScripts)) {
+            return $dbScripts;
+        }
+
+        // Fallback for legacy
         $scripts = [];
         for ($i = 1; $i <= 10; $i++) {
             $scripts[$i] = "Script $i";

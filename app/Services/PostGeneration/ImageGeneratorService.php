@@ -42,13 +42,7 @@ class ImageGeneratorService
             ->format('png')
             ->noSandbox()
             ->waitUntilNetworkIdle()
-            ->timeout(90)
-            ->addChromiumArguments([
-                // Block Google Fonts domains so those @import requests fail immediately
-                // instead of timing out — the local @font-face declarations in the render
-                // view provide Montserrat without any external network round-trip.
-                '--host-resolver-rules=MAP fonts.googleapis.com 127.0.0.1,MAP fonts.gstatic.com 127.0.0.1',
-            ]);
+            ->timeout(90);
     }
 
     private function generateCarouselViaBrowsershot(Post $post): array

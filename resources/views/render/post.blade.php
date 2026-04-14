@@ -16,21 +16,21 @@
             src: url('{{ asset('fonts/Montserrat-Black.ttf') }}') format('truetype');
             font-weight: 900;
             font-style: normal;
-            font-display: block;
+            font-display: swap;
         }
         @font-face {
             font-family: 'Montserrat';
             src: url('{{ asset('fonts/Montserrat-Bold.ttf') }}') format('truetype');
             font-weight: 700 800;
             font-style: normal;
-            font-display: block;
+            font-display: swap;
         }
         @font-face {
             font-family: 'Montserrat';
             src: url('{{ asset('fonts/Montserrat-Regular.ttf') }}') format('truetype');
             font-weight: 300 400 500 600;
             font-style: normal;
-            font-display: block;
+            font-display: swap;
         }
     </style>
     @vite(['resources/css/app.css'])

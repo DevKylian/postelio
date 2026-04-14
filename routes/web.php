@@ -143,11 +143,13 @@ Route::get('/newsletter/unsubscribe/{user}', [\App\Http\Controllers\NewsletterCo
 
 Route::get('/render/post/{post}', [\App\Http\Controllers\RenderPostController::class, 'show'])->name('render.post');
 
-// Dynamic Sitemap
 Route::get('/sitemap.xml', function () {
-    $posts = \App\Models\BlogPost::published()->latest()->get();
+    $publishedPosts = \App\Models\BlogPost::published()->latest()->get();
+    $publishedGuides = \App\Models\FreeGuide::published()->latest()->get();
+    
     return response()->view('sitemap', [
-        'posts' => $posts
+        'posts' => $publishedPosts,
+        'guides' => $publishedGuides,
     ])->header('Content-Type', 'text/xml');
 })->name('sitemap');
 

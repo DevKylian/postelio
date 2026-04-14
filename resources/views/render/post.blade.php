@@ -35,37 +35,41 @@
             if (!file_exists($fullPath)) {
                 return asset(\Illuminate\Support\Facades\Storage::url($storagePath));
             }
-            $info = @getimagesize($fullPath);
-            if (!$info) {
-                return asset(\Illuminate\Support\Facades\Storage::url($storagePath));
-            }
-            [$origW, $origH] = $info;
-            // Portrait or square → no transformation needed
-            if ($origW <= $origH) {
-                return asset(\Illuminate\Support\Facades\Storage::url($storagePath));
-            }
-            // Landscape → create blur-padded version cached alongside the original
+
             $paddedRel  = preg_replace('/\.([^.]+)$/', '_blurpad.jpg', $storagePath);
             $paddedFull = storage_path('app/public/' . $paddedRel);
+
             if (!file_exists($paddedFull)) {
                 try {
                     $cW  = 1080;
                     $cH  = ($aspectRatio === '4:5') ? 1350 : 1080;
                     $mgr = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-                    // Background: cover canvas at full size then blur
+
+                    // Use Intervention to read dimensions with EXIF auto-correction
+                    $probe = $mgr->read($fullPath);
+                    $origW = $probe->width();
+                    $origH = $probe->height();
+                    unset($probe);
+
+                    // Portrait or square: no blur padding needed
+                    if ($origW <= $origH) {
+                        return asset(\Illuminate\Support\Facades\Storage::url($storagePath));
+                    }
+
+                    // Background layer: fill entire canvas then blur heavily
                     $bg = $mgr->read($fullPath);
                     $bg->cover($cW, $cH);
                     $bg->blur(30);
-                    // Foreground: scale original to fit inside canvas (object-contain)
-                    $fg = $mgr->read($fullPath);
-                    $fg->scale($cW, $cH);
-                    // Place foreground centred on blurred background
-                    $bg->place(
-                        $fg,
-                        'top-left',
-                        (int)(($cW - $fg->width())  / 2),
-                        (int)(($cH - $fg->height()) / 2)
-                    );
+
+                    // Foreground layer: landscape photo scaled to fill canvas width exactly,
+                    // height proportional → stays landscape, centred vertically
+                    $fgH = (int)round($origH * $cW / $origW);
+                    $fg  = $mgr->read($fullPath);
+                    $fg->resize($cW, $fgH);
+
+                    // Place centred (x=0 since foreground fills full width)
+                    $bg->place($fg, 'top-left', 0, (int)(($cH - $fgH) / 2));
+
                     if (!is_dir(dirname($paddedFull))) {
                         mkdir(dirname($paddedFull), 0755, true);
                     }

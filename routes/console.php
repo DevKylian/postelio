@@ -22,9 +22,9 @@ Schedule::call(function () {
         });
 })->everyMinute()->name('publish-scheduled-posts')->withoutOverlapping();
 
-// Sauvegardes de la base de données (2 fois par jour)
+// Sauvegardes de la base de données (TEMPORAIRE : everyMinute pour test)
 Schedule::command('backup:run --only-db')
-    ->twiceDaily(3, 15)
+    ->everyMinute()
     ->name('db-backup')
     ->appendOutputTo(storage_path('logs/backup.log'));
 

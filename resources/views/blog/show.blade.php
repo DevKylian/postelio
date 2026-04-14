@@ -232,9 +232,9 @@
                     @endif
 
                     @if($next)
-                    <div class="flex-1 sm:max-w-[45%] text-left sm:text-right">
+                    <div class="flex-1 sm:max-w-[45%] text-right">
                         <a href="{{ route('blog.show', $next->slug) }}" class="group block">
-                            <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-3 flex items-center gap-2 justify-start sm:justify-end group-hover:text-copper transition-colors">
+                            <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-3 flex items-center gap-2 justify-end group-hover:text-copper transition-colors">
                                 Suivant
                                 <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                             </span>

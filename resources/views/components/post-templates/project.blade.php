@@ -68,8 +68,9 @@
         <div class="absolute inset-0 {{ $photosLandscape ? 'flex flex-col' : 'flex' }}" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
 
             @if($photosLandscape)
-            {{-- LANDSCAPE: Avant on top, Après on bottom --}}
-            <div class="h-1/2 relative overflow-hidden border-b border-white/30 bg-gray-300">
+            {{-- LANDSCAPE: Avant top 40%, Après middle 40%, blurred footer 20%.
+                 The brand card is ~20% tall at the bottom; photos stay above it. --}}
+            <div class="h-2/5 relative overflow-hidden border-b border-white/30 bg-gray-300 shrink-0">
                 @if ($imageBeforeRawUrl)
                     <img src="{{ $imageBeforeRawUrl }}" class="absolute inset-0 w-full h-full object-cover">
                     <div class="absolute top-3 left-4 px-3 h-6 inline-flex items-center justify-center rounded-full shadow-lg z-20 border" style="{{ $badgeStyle }}">
@@ -81,7 +82,7 @@
                     </div>
                 @endif
             </div>
-            <div class="h-1/2 relative overflow-hidden bg-gray-400">
+            <div class="h-2/5 relative overflow-hidden bg-gray-400 shrink-0">
                 @if ($imageAfterRawUrl)
                     <img src="{{ $imageAfterRawUrl }}" class="absolute inset-0 w-full h-full object-cover">
                     <div class="absolute top-3 right-4 px-3 h-6 inline-flex items-center justify-center rounded-full shadow-lg z-20 border" style="{{ $badgeStyle }}">
@@ -91,6 +92,16 @@
                     <div class="w-full h-full flex items-center justify-center">
                         <p class="text-[9px] font-bold uppercase tracking-widest" style="color: {{ $brandColor }}">Après</p>
                     </div>
+                @endif
+            </div>
+            {{-- Blurred footer zone: fills the remaining ~20% behind the brand card --}}
+            <div class="flex-1 relative overflow-hidden">
+                @php $blurSrc = $imageAfterRawUrl ?? $imageBeforeRawUrl; @endphp
+                @if ($blurSrc)
+                    <img src="{{ $blurSrc }}" class="absolute inset-0 w-full h-full object-cover" style="filter: blur(14px); transform: scale(1.15);">
+                    <div class="absolute inset-0" style="background: rgba(0,0,0,0.30)"></div>
+                @else
+                    <div class="absolute inset-0 bg-gray-800"></div>
                 @endif
             </div>
 

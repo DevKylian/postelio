@@ -165,6 +165,25 @@ class ScriptManager extends Component
         $this->loadScripts();
     }
 
+    public function deleteNode(int $scriptId, string $nodeId): void
+    {
+        $script = SalesScript::findOrFail($scriptId);
+        $flow   = $script->flow;
+
+        // Find the parent node that has a branch pointing to this node
+        foreach ($flow['nodes'] as $parentId => $parentNode) {
+            foreach ($parentNode['branches'] as $branchIndex => $branch) {
+                if ($branch['next'] === $nodeId) {
+                    $this->deleteNodeTree($flow, $nodeId);
+                    array_splice($flow['nodes'][$parentId]['branches'], $branchIndex, 1);
+                    $script->update(['flow' => $flow]);
+                    $this->loadScripts();
+                    return;
+                }
+            }
+        }
+    }
+
     public function deleteBranch(int $scriptId, string $nodeId, int $branchIndex): void
     {
         $script   = SalesScript::findOrFail($scriptId);

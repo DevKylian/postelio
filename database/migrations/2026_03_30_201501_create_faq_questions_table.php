@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('faq_questions')) {
+            return;
+        }
+
         Schema::create('faq_questions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('faq_category_id')->constrained()->cascadeOnDelete();
@@ -30,7 +34,7 @@ return new class extends Migration
 
     private function seedInitialData()
     {
-        $this->call(HelpCenterSeeder::class);
+        // Seeder call removed — run seeders separately with `php artisan db:seed`
     }
 
     /**

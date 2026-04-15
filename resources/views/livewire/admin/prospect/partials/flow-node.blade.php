@@ -1,44 +1,60 @@
 @php
-    $node  = $nodes[$nodeId] ?? null;
-    $depth = $depth ?? 0;
+    $node   = $nodes[$nodeId] ?? null;
+    $depth  = $depth ?? 0;
     $isRoot = $depth === 0;
 
     $branchMeta = [
         'reply'    => [
-            'bg'     => 'bg-emerald-50',
-            'border' => 'border-emerald-200',
-            'text'   => 'text-emerald-700',
-            'dot'    => 'bg-emerald-400',
-            'line'   => 'border-emerald-200',
-            'btn'    => 'hover:bg-emerald-100',
-            'icon'   => '💬',
+            'cardBg'   => 'bg-emerald-50/60',
+            'cardBorder'=> 'border-emerald-200',
+            'headBg'   => 'bg-emerald-100/80',
+            'headText' => 'text-emerald-800',
+            'headBorder'=> 'border-emerald-200',
+            'dot'      => 'bg-emerald-400',
+            'addBg'    => 'bg-emerald-50',
+            'addText'  => 'text-emerald-700',
+            'addBorder'=> 'border-emerald-200',
+            'addHover' => 'hover:bg-emerald-100',
+            'icon'     => '💬',
         ],
         'no_reply' => [
-            'bg'     => 'bg-amber-50',
-            'border' => 'border-amber-200',
-            'text'   => 'text-amber-700',
-            'dot'    => 'bg-amber-400',
-            'line'   => 'border-amber-200',
-            'btn'    => 'hover:bg-amber-100',
-            'icon'   => '⏰',
+            'cardBg'   => 'bg-amber-50/60',
+            'cardBorder'=> 'border-amber-200',
+            'headBg'   => 'bg-amber-100/80',
+            'headText' => 'text-amber-800',
+            'headBorder'=> 'border-amber-200',
+            'dot'      => 'bg-amber-400',
+            'addBg'    => 'bg-amber-50',
+            'addText'  => 'text-amber-700',
+            'addBorder'=> 'border-amber-200',
+            'addHover' => 'hover:bg-amber-100',
+            'icon'     => '⏰',
         ],
         'positive' => [
-            'bg'     => 'bg-blue-50',
-            'border' => 'border-blue-200',
-            'text'   => 'text-blue-700',
-            'dot'    => 'bg-blue-400',
-            'line'   => 'border-blue-200',
-            'btn'    => 'hover:bg-blue-100',
-            'icon'   => '👍',
+            'cardBg'   => 'bg-blue-50/60',
+            'cardBorder'=> 'border-blue-200',
+            'headBg'   => 'bg-blue-100/80',
+            'headText' => 'text-blue-800',
+            'headBorder'=> 'border-blue-200',
+            'dot'      => 'bg-blue-400',
+            'addBg'    => 'bg-blue-50',
+            'addText'  => 'text-blue-700',
+            'addBorder'=> 'border-blue-200',
+            'addHover' => 'hover:bg-blue-100',
+            'icon'     => '👍',
         ],
         'negative' => [
-            'bg'     => 'bg-rose-50',
-            'border' => 'border-rose-200',
-            'text'   => 'text-rose-700',
-            'dot'    => 'bg-rose-400',
-            'line'   => 'border-rose-200',
-            'btn'    => 'hover:bg-rose-100',
-            'icon'   => '👎',
+            'cardBg'   => 'bg-rose-50/60',
+            'cardBorder'=> 'border-rose-200',
+            'headBg'   => 'bg-rose-100/80',
+            'headText' => 'text-rose-800',
+            'headBorder'=> 'border-rose-200',
+            'dot'      => 'bg-rose-400',
+            'addBg'    => 'bg-rose-50',
+            'addText'  => 'text-rose-700',
+            'addBorder'=> 'border-rose-200',
+            'addHover' => 'hover:bg-rose-100',
+            'icon'     => '👎',
         ],
     ];
 
@@ -49,23 +65,28 @@
         'negative' => 'Réponse négative',
     ];
 
-    $allConditions    = ['reply', 'no_reply', 'positive', 'negative'];
-    $usedConditions   = !empty($node['branches']) ? array_column($node['branches'], 'condition') : [];
-    $availConditions  = array_values(array_diff($allConditions, $usedConditions));
+    $allConditions   = ['reply', 'no_reply', 'positive', 'negative'];
+    $usedConditions  = !empty($node['branches']) ? array_column($node['branches'], 'condition') : [];
+    $availConditions = array_values(array_diff($allConditions, $usedConditions));
+
+    // Unique Alpine key per node (safe for JS identifier)
+    $alpineKey = 'cp' . preg_replace('/[^a-z0-9]/i', '_', $nodeId);
 @endphp
 
 @if($node && $depth < 12)
 <div class="flow-node-wrap">
 
-    {{-- ─── NODE CARD ─────────────────────────────────── --}}
-    <div class="relative bg-white rounded-2xl shadow-sm border-2 overflow-hidden
-                {{ $isRoot ? 'border-midnight/20 shadow-card' : 'border-slate-200' }}
-                transition-shadow hover:shadow-card-hover">
+    {{-- ╔══════════════════════════════════════╗
+         ║  NODE CARD                           ║
+         ╚══════════════════════════════════════╝ --}}
+    <div class="bg-white rounded-2xl border-2 overflow-hidden shadow-sm
+                {{ $isRoot ? 'border-midnight/20' : 'border-slate-200' }}">
 
-        {{-- Card header bar --}}
+        {{-- Header bar --}}
         <div class="flex items-center gap-2 px-4 py-2.5 border-b border-slate-100
-                    {{ $isRoot ? 'bg-midnight/[0.04]' : 'bg-slate-50/60' }}">
+                    {{ $isRoot ? 'bg-midnight/[0.05]' : 'bg-slate-50' }}">
 
+            {{-- Icon + label --}}
             <div class="w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center
                         {{ $isRoot ? 'bg-midnight text-white' : 'bg-slate-200 text-slate-500' }}">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,54 +96,60 @@
             </div>
 
             <span class="text-[10px] font-black uppercase tracking-widest
-                         {{ $isRoot ? 'text-midnight/50' : 'text-slate-400' }}">
+                         {{ $isRoot ? 'text-midnight/60' : 'text-slate-400' }}">
                 {{ $isRoot ? '🚀 Message initial' : '✉️ Message' }}
             </span>
 
-            {{-- Delete node button (non-root only) --}}
-            @if(!$isRoot)
-            <button
-                wire:click="deleteNode({{ $scriptId }}, '{{ $nodeId }}')"
-                wire:confirm="Supprimer ce message et tous ses enfants ?"
-                class="w-7 h-7 flex items-center justify-center rounded-lg ml-auto
-                       text-slate-300 hover:text-rose-400 hover:bg-rose-50 transition-all"
-                title="Supprimer ce message"
-            >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
-            </button>
-            @endif
+            {{-- Step badge --}}
+            <span class="text-[9px] font-bold text-slate-300 bg-slate-100
+                         px-2 py-0.5 rounded-full tabular-nums">
+                Étape {{ $depth + 1 }}
+            </span>
 
-            {{-- Copy button --}}
-            <div x-data="{ cp{{ str_replace('-','_',$nodeId) }}: false }" class="{{ $isRoot ? 'ml-auto' : '' }}">
+            <div class="ml-auto flex items-center gap-1">
+                {{-- Delete node (non-root only) --}}
+                @if(!$isRoot)
                 <button
-                    @click="
-                        const ta = $el.closest('.flow-node-wrap').querySelector('textarea');
-                        navigator.clipboard.writeText(ta ? ta.value : '');
-                        cp{{ str_replace('-','_',$nodeId) }} = true;
-                        setTimeout(() => cp{{ str_replace('-','_',$nodeId) }} = false, 2000);
-                    "
-                    :class="cp{{ str_replace('-','_',$nodeId) }}
-                        ? 'bg-green-500 text-white'
-                        : 'text-slate-300 hover:text-copper hover:bg-amber-50'"
-                    class="w-7 h-7 flex items-center justify-center rounded-lg transition-all"
-                    title="Copier le message"
+                    wire:click="deleteNode({{ $scriptId }}, '{{ $nodeId }}')"
+                    wire:confirm="Supprimer ce message et tous ses enfants ?"
+                    class="w-7 h-7 flex items-center justify-center rounded-lg
+                           text-slate-300 hover:text-rose-400 hover:bg-rose-50 transition-all"
+                    title="Supprimer ce message"
                 >
-                    <svg x-show="!cp{{ str_replace('-','_',$nodeId) }}" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                    <svg x-show="cp{{ str_replace('-','_',$nodeId) }}" x-cloak class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                     </svg>
                 </button>
+                @endif
+
+                {{-- Copy --}}
+                <div x-data="{ {{ $alpineKey }}: false }">
+                    <button
+                        @click="
+                            const ta = $el.closest('.flow-node-wrap').querySelector('textarea');
+                            navigator.clipboard.writeText(ta ? ta.value : '');
+                            {{ $alpineKey }} = true;
+                            setTimeout(() => {{ $alpineKey }} = false, 2000);
+                        "
+                        :class="{{ $alpineKey }} ? 'bg-green-500 text-white' : 'text-slate-300 hover:text-copper hover:bg-amber-50'"
+                        class="w-7 h-7 flex items-center justify-center rounded-lg transition-all"
+                        title="Copier le message"
+                    >
+                        <svg x-show="!{{ $alpineKey }}" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        <svg x-show="{{ $alpineKey }}" x-cloak class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
         {{-- Textarea --}}
-        <div class="p-3.5">
+        <div class="p-4">
             <textarea
                 onblur="@this.updateNodeContent({{ $scriptId }}, '{{ $nodeId }}', this.value)"
                 rows="4"
@@ -133,57 +160,78 @@
         </div>
     </div>
 
-    {{-- ─── BRANCHES & ADD BUTTONS ────────────────────── --}}
+    {{-- ╔══════════════════════════════════════╗
+         ║  BRANCHES                            ║
+         ╚══════════════════════════════════════╝ --}}
     @if(!empty($node['branches']) || !empty($availConditions))
-    <div class="mt-1 pl-4">
+    <div class="mt-2">
 
-        {{-- Vertical connector line --}}
-        <div class="h-5 w-px bg-slate-200 ml-1 mb-0"></div>
-
-        {{-- Existing branches --}}
-        @foreach($node['branches'] as $branchIndex => $branch)
-            @php $bm = $branchMeta[$branch['condition']] ?? $branchMeta['reply']; @endphp
-            <div class="mb-6">
-                {{-- Branch label row --}}
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-3 h-3 rounded-full {{ $bm['dot'] }} ring-2 ring-white shadow-sm flex-shrink-0"></div>
-                    <span class="{{ $bm['bg'] }} {{ $bm['text'] }} {{ $bm['border'] }} border
-                                 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-                        {{ $bm['icon'] }} {{ $branch['label'] }}
-                    </span>
-                    <button
-                        wire:click="deleteBranch({{ $scriptId }}, '{{ $nodeId }}', {{ $branchIndex }})"
-                        wire:confirm="Supprimer cette branche et tous ses messages ?"
-                        class="w-5 h-5 flex items-center justify-center rounded-full ml-auto flex-shrink-0
-                               text-slate-200 hover:text-rose-400 hover:bg-rose-50 transition-all"
-                        title="Supprimer cette branche"
-                    >
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-
-                {{-- Child node (recursive) --}}
-                <div class="pl-4 border-l-2 {{ $bm['line'] }} ml-1">
-                    @include('livewire.admin.prospect.partials.flow-node', [
-                        'nodeId'   => $branch['next'],
-                        'nodes'    => $nodes,
-                        'scriptId' => $scriptId,
-                        'depth'    => $depth + 1,
-                    ])
-                </div>
+        {{-- ── "Selon la réponse" divider ───────── --}}
+        @if(!empty($node['branches']))
+        <div class="flex items-center gap-3 my-4">
+            <div class="flex-1 h-px bg-slate-200"></div>
+            <div class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest
+                        text-slate-400 bg-slate-100 px-3 py-1.5 rounded-full flex-shrink-0">
+                <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                </svg>
+                Selon la réponse
             </div>
-        @endforeach
+            <div class="flex-1 h-px bg-slate-200"></div>
+        </div>
+        @endif
 
-        {{-- Add branch buttons --}}
+        {{-- ── Branch cards ─────────────────────── --}}
+        <div class="space-y-3">
+            @foreach($node['branches'] as $branchIndex => $branch)
+                @php $bm = $branchMeta[$branch['condition']] ?? $branchMeta['reply']; @endphp
+
+                <div class="{{ $bm['cardBg'] }} {{ $bm['cardBorder'] }} border-2 rounded-2xl overflow-hidden">
+
+                    {{-- Branch header --}}
+                    <div class="{{ $bm['headBg'] }} {{ $bm['headBorder'] }} border-b
+                                flex items-center gap-2 px-4 py-2.5">
+                        <div class="w-2.5 h-2.5 rounded-full {{ $bm['dot'] }} flex-shrink-0"></div>
+                        <span class="{{ $bm['headText'] }} text-[10px] font-black uppercase tracking-wider">
+                            {{ $bm['icon'] }} {{ $branch['label'] }}
+                        </span>
+                        <button
+                            wire:click="deleteBranch({{ $scriptId }}, '{{ $nodeId }}', {{ $branchIndex }})"
+                            wire:confirm="Supprimer cette branche et tous ses messages ?"
+                            class="ml-auto w-5 h-5 flex items-center justify-center rounded-full
+                                   {{ $bm['headText'] }} opacity-40 hover:opacity-100
+                                   hover:bg-rose-100 hover:text-rose-500 transition-all"
+                            title="Supprimer cette branche"
+                        >
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    {{-- Child node (recursive) --}}
+                    <div class="p-3">
+                        @include('livewire.admin.prospect.partials.flow-node', [
+                            'nodeId'   => $branch['next'],
+                            'nodes'    => $nodes,
+                            'scriptId' => $scriptId,
+                            'depth'    => $depth + 1,
+                        ])
+                    </div>
+
+                </div>
+            @endforeach
+        </div>
+
+        {{-- ── Add branch buttons ────────────────── --}}
         @if(!empty($availConditions))
-            <div class="flex flex-wrap gap-2 mt-1 pb-1">
+            <div class="flex flex-wrap gap-2 mt-3">
                 @foreach($availConditions as $condition)
                     @php $bm = $branchMeta[$condition]; @endphp
                     <button
                         wire:click="addBranch({{ $scriptId }}, '{{ $nodeId }}', '{{ $condition }}')"
-                        class="{{ $bm['bg'] }} {{ $bm['text'] }} {{ $bm['border'] }} {{ $bm['btn'] }}
+                        class="{{ $bm['addBg'] }} {{ $bm['addText'] }} {{ $bm['addBorder'] }} {{ $bm['addHover'] }}
                                border px-3 py-1.5 rounded-full text-[10px] font-bold
                                flex items-center gap-1.5 transition-all"
                     >
@@ -195,6 +243,7 @@
                 @endforeach
             </div>
         @endif
+
     </div>
     @endif
 

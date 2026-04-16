@@ -553,7 +553,7 @@ class ContentRefinerService
 
         try {
             $response = OpenAI::chat()->create([
-                'model'       => 'gpt-4o',
+                'model'       => 'gpt-4o-mini',
                 'messages'    => [['role' => 'user', 'content' => $prompt]],
                 'max_tokens'  => 800,
                 'temperature' => 0,
@@ -614,7 +614,7 @@ IMPORTANT : Ne sors RIEN d'autre que du JSON. Sois précis sur les catégories."
         try {
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Calling OpenAI for extraction...');
             $response = OpenAI::chat()->create([
-                'model' => 'gpt-4o',
+                'model' => 'gpt-4o-mini',
                 'messages' => [
                     ['role' => 'system', 'content' => $prompt],
                     ['role' => 'user', 'content' => "Transcript : " . $transcript],

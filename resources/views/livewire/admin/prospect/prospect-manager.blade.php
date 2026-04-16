@@ -23,7 +23,7 @@
             @endif
 
             <!-- Sales Scripts (Modular & Copyable) -->
-            <div x-data="{ open: false }">
+            <div x-data="{ open: true }">
                 <button @click="open = !open" class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest hover:text-copper transition-colors mb-4">
                     <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                     Bibliothèque de Scripts & Séquences
@@ -31,7 +31,7 @@
                 </button>
                 
                 <div x-show="open" x-collapse style="display: none;">
-                    <livewire:admin.prospect.script-manager />
+                    <livewire:admin.prospect.script-flow-manager />
                 </div>
             </div>
 

@@ -2512,12 +2512,16 @@
 
           {{-- Offre Basic --}}
           <div
-            class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 reveal-d1"
+            class="group flex flex-col h-full relative rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1 reveal-d1 shadow-xl shadow-copper/10 hover:shadow-2xl hover:shadow-copper/30"
+            style="border: 2px solid transparent; background-image: linear-gradient(white, white), linear-gradient(to bottom right, #f97316, #fbbf24); background-origin: border-box; background-clip: padding-box, border-box;"
             x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="absolute top-0 right-0 bg-gradient-to-r from-copper to-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
+              Meilleure offre
+            </div>
             <div class="p-8 flex flex-col flex-grow">
               <div class="mb-8">
                 <div
-                  class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-blue-50 border border-blue-100 shadow-sm">
+                  class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-amber-50 border border-amber-100 shadow-sm">
                   <span class="text-2xl">🚀</span>
                 </div>
                 <div class="flex items-center gap-2 mb-1">
@@ -2613,7 +2617,7 @@
             x-intersect.once="$el.classList.add('reveal-up')">
 
             <div
-              class="absolute top-0 right-0 bg-gradient-to-r from-slate-600 to-slate-700 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
+              class="absolute top-0 right-0 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10" style="background: #0F172A;">
               Bientôt disponible
             </div>
 

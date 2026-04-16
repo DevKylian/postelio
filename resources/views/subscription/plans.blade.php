@@ -70,7 +70,7 @@
                 @foreach($plans as $key => $plan)
                     @php
                         $isCurrent = ($currentPlan === $key) || (!$currentPlan && $key === 'free');
-                        $isPopular = $key === 'pro';
+                        $isPopular = $key === 'basic';
                         $isFree = $key === 'free';
                         $isComingSoon = !empty($plan['coming_soon']);
                     @endphp
@@ -83,7 +83,7 @@
 
                         {{-- Labels --}}
                         @if($isComingSoon)
-                            <div class="absolute top-0 right-0 bg-gradient-to-r from-slate-600 to-slate-700 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
+                            <div class="absolute top-0 right-0 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10" style="background: #0F172A;">
                                 Bientôt disponible
                             </div>
                         @elseif($isPopular)

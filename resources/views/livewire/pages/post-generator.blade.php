@@ -1668,9 +1668,7 @@
                             <div class="flex items-center gap-2.5">
                                 <div class="w-8 h-8 rounded-full overflow-hidden shrink-0"
                                      style="box-shadow: 0 0 0 1.5px #fff, 0 0 0 3px {{ $brandColor }}">
-                                    @if($igProfilePicture)
-                                        <img src="{{ $igProfilePicture }}" alt="Profil" class="w-full h-full object-cover">
-                                    @elseif($hasLogo)
+                                    @if($hasLogo)
                                         <img src="{{ Storage::url($company->logo_path) }}" alt="Logo" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-white font-bold text-xs"

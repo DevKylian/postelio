@@ -759,22 +759,6 @@ class PostGenerator extends Component
         $igConnected      = $company?->instagram_connected ?? false;
         $fbConnected      = $company?->facebook_connected ?? false;
 
-        // Rafraîchit la photo de profil depuis l'API Instagram :
-        // - systématiquement quand le preview est affiché (les URLs CDN IG expirent)
-        // - une fois au premier passage si elle n'est pas encore enregistrée
-        if ($company?->instagram_connected && ($this->status === 'review_pending' || !$igProfilePicture)) {
-            try {
-                $stats = app(\App\Services\InstagramService::class)
-                    ->getAccountStats($company->instagram_access_token, $company->instagram_business_account_id);
-                if (!empty($stats['profile_picture_url'])) {
-                    $company->update(['instagram_profile_picture_url' => $stats['profile_picture_url']]);
-                    $igProfilePicture = $stats['profile_picture_url'];
-                }
-            } catch (\Throwable) {
-                // Non-critique : on affiche le logo entreprise en fallback
-            }
-        }
-
         $user         = Auth::user();
         $variantCount = $user->postVariantsCount();
 

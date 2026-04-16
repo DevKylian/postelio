@@ -85,7 +85,16 @@
                     </div>
                     <div class="w-full sm:w-1/2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">URL Profil (Optionnel)</label>
-                        <input type="url" wire:model="newProfileUrl" class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-copper focus:ring-copper sm:text-sm" placeholder="https://instagram.com/...">
+                        <input type="url" wire:model="newProfileUrl"
+                            x-on:paste="
+                                const text = $event.clipboardData.getData('text');
+                                const match = text.match(/instagram\.com\/([^/?#\s]+)/);
+                                const reserved = ['p','reel','reels','stories','explore','accounts','tv','direct'];
+                                if (match && match[1] && !reserved.includes(match[1])) {
+                                    $wire.set('newAccountName', match[1]);
+                                }
+                            "
+                            class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-copper focus:ring-copper sm:text-sm" placeholder="https://instagram.com/...">
                         @error('newProfileUrl') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                     </div>
                     <div class="w-full sm:w-auto">

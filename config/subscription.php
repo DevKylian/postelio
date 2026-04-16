@@ -25,10 +25,10 @@ return [
                 'Création' => [
                     ['name' => 'Jusqu\'à <b>2 publications</b> par mois', 'enabled' => true],
                     ['name' => '<b>1 proposition de texte</b> au choix par publication', 'enabled' => true],
-                    ['name' => 'Gabarits de posts <b>standards</b>', 'enabled' => true],
-                    ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => false],
                     ['name' => 'Génération de publications <b>images</b>', 'enabled' => true],
                     ['name' => 'Génération de publications <b>vidéos</b>', 'enabled' => false],
+                    ['name' => 'Gabarits de posts <b>standards</b>', 'enabled' => true],
+                    ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => false],
                 ],
                 'Diffusion' => [
                     ['name' => 'Publication <b>directe</b> sur vos réseaux sociaux', 'enabled' => false],
@@ -56,9 +56,9 @@ return [
                 'Création' => [
                     ['name' => 'Jusqu\'à <b>15 publications</b> par mois', 'enabled' => true],
                     ['name' => '<b>2 propositions de texte</b> au choix par publication', 'enabled' => true],
-                    ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => true],
                     ['name' => 'Génération de publications <b>images</b>', 'enabled' => true],
                     ['name' => 'Génération de publications <b>vidéos</b>', 'enabled' => false],
+                    ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => true],
                 ],
                 'Diffusion' => [
                     ['name' => 'Publication <b>directe</b> sur vos réseaux sociaux', 'enabled' => true],
@@ -85,9 +85,9 @@ return [
                 'Création' => [
                     ['name' => 'Jusqu\'à <b>30 publications</b> par mois', 'enabled' => true],
                     ['name' => '<b>3 propositions de texte</b> au choix par publication', 'enabled' => true],
-                    ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => true],
                     ['name' => 'Génération de publications <b>images</b>', 'enabled' => true],
                     ['name' => 'Génération de publications <b>vidéos</b> <span class="text-copper font-bold">(bientôt)</span>', 'enabled' => true],
+                    ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => true],
                 ],
                 'Diffusion' => [
                     ['name' => 'Publication <b>directe</b> sur vos réseaux sociaux', 'enabled' => true],

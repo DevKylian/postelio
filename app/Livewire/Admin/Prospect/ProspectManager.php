@@ -18,13 +18,21 @@ class ProspectManager extends Component
     public function rules()
     {
         return [
-            'newAccountName' => 'required|string|max:255',
+            'newAccountName' => 'required|string|max:255|unique:instagram_prospects,account_name',
             'newProfileUrl' => 'nullable|url|max:255',
+        ];
+    }
+
+    protected function messages()
+    {
+        return [
+            'newAccountName.unique' => 'Ce compte est déjà dans la liste.',
         ];
     }
 
     public function addProspect()
     {
+        $this->newAccountName = strtolower(trim($this->newAccountName));
         $this->validate();
 
         InstagramProspect::create([

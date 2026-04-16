@@ -211,7 +211,73 @@
                     @endphp
                     {!! $parsedContent !!}
                 </div>
+
+                {{-- Navigation Intra-Article Minimaliste --}}
+                @if($next || $previous)
+                <div class="mt-20 pt-10 border-t border-slate-100 flex flex-col sm:flex-row gap-10 justify-between">
+                    @if($previous)
+                    <div class="flex-1 sm:max-w-[45%]">
+                        <a href="{{ route('blog.show', $previous->slug) }}" class="group block">
+                            <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-3 flex items-center gap-2 group-hover:text-copper transition-colors">
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                                Précédent
+                            </span>
+                            <span class="text-sm sm:text-base font-medium text-slate-500 group-hover:text-midnight transition-colors line-clamp-2">
+                                {{ $previous->title }}
+                            </span>
+                        </a>
+                    </div>
+                    @else
+                    <div class="flex-1 hidden sm:block"></div>
+                    @endif
+
+                    @if($next)
+                    <div class="flex-1 sm:max-w-[45%] text-right">
+                        <a href="{{ route('blog.show', $next->slug) }}" class="group block">
+                            <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-3 flex items-center gap-2 justify-end group-hover:text-copper transition-colors">
+                                Suivant
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                            </span>
+                            <span class="text-sm sm:text-base font-medium text-slate-500 group-hover:text-midnight transition-colors line-clamp-2">
+                                {{ $next->title }}
+                            </span>
+                        </a>
+                    </div>
+                    @endif
+                </div>
+                @endif
             </article>
+
+            {{-- Ressource : Version Dark Premium (Impact & Visibilité) --}}
+            @if($latestGuide)
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
+                <div class="bg-midnight rounded-3xl border-l-4 border-copper p-8 sm:p-12 relative overflow-hidden shadow-2xl shadow-midnight/20">
+                    {{-- Subtle Background Glow --}}
+                    <div class="absolute -right-20 -top-20 w-64 h-64 bg-copper/10 rounded-full blur-[100px]"></div>
+                    
+                    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+                        <div class="flex-1 text-center md:text-left">
+                            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 text-copper text-[10px] font-bold uppercase tracking-widest mb-6 border border-white/10">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V6a2 2 0 10-2 2h2zm0 0H7a3 3 0 00-3 3v8a3 3 0 003 3h10a3 3 0 003-3v-8a3 3 0 00-3-3h-5z"/></svg>
+                                Guide Expert Offert
+                            </span>
+                            <h4 class="text-xl sm:text-2xl font-display font-bold text-white mb-4 leading-tight">
+                                {{ $latestGuide->title }}
+                            </h4>
+                            <p class="text-slate-400 text-sm sm:text-base font-light leading-relaxed max-w-xl">
+                                {{ $latestGuide->sous_titre ?: "On a préparé cette ressource exclusive pour vous aider à passer à l'étape supérieure. Accès libre pour la communauté Postelio." }}
+                            </p>
+                        </div>
+                        <div class="flex-shrink-0 w-full md:w-auto">
+                            <a href="{{ route('guides.show', $latestGuide->slug) }}" class="inline-flex items-center justify-center gap-3 w-full md:w-auto px-10 py-5 bg-copper text-white font-bold text-xs uppercase tracking-widest rounded-2xl hover:bg-amber-600 transition-all shadow-xl shadow-copper/20 hover:-translate-y-0.5 active:scale-95 whitespace-nowrap">
+                                Télécharger le guide
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
 
             {{-- Share & CTA --}}
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
@@ -271,6 +337,7 @@
         </main>
 
         {{-- Footer --}}
+        {{-- Footer Restauré (Version de base) --}}
         <footer class="bg-white/60 backdrop-blur-md border-t border-slate-100 py-12 relative z-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="text-xs font-light text-slate-400">

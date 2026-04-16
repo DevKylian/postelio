@@ -29,7 +29,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-gray-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-gray-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
     
     {{-- Slide 0: Conseil --}}
     @php
@@ -55,10 +55,10 @@
                 <span class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] block mb-2 font-montserrat">Conseil de saison</span>
                 @php
                     $len = mb_strlen($text);
-                    $fontSize = 'text-base';
-                    if ($len > 150) $fontSize = 'text-[10px]';
-                    elseif ($len > 80) $fontSize = 'text-xs';
-                    elseif ($len > 40) $fontSize = 'text-sm';
+                    $fontSize = 'sm:text-base text-sm';
+                    if ($len > 150) $fontSize = 'sm:text-[10px] text-[8px]';
+                    elseif ($len > 80) $fontSize = 'sm:text-xs text-[10px]';
+                    elseif ($len > 40) $fontSize = 'sm:text-sm text-xs';
                 @endphp
                 <div class="max-h-[160px] overflow-hidden">
                     <p class="text-white {{ $fontSize }} font-bold leading-relaxed">
@@ -69,7 +69,7 @@
         </div>
 
         <div class="absolute bottom-6 left-1/2 -ml-28 w-56 py-2 px-3 border border-white/10 rounded-2xl bg-white/5 backdrop-blur-md flex flex-col items-center justify-center gap-1">
-            <span class="text-white/50 text-[8px] font-black uppercase tracking-[0.3em] font-montserrat truncate w-full text-center">{{ $companyLabel }}</span>
+            <span class="text-white/50 text-[8px] font-black uppercase tracking-[0.3em] font-montserrat truncate w-full text-center">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
             <div class="flex items-center gap-1 overflow-hidden">
                 @if($trade)
                     <span class="px-1 py-0.5 rounded-md bg-white/5 text-white/30 text-[5px] font-bold uppercase tracking-wider border border-white/5 whitespace-nowrap">{{ $trade }}</span>
@@ -113,3 +113,4 @@
         </div>
     @endif
 </div>
+

@@ -8,25 +8,38 @@ use function Livewire\Volt\{state};
 state([
     'name'              => fn () => auth()->user()->company?->name ?? '',
     'city'              => fn () => auth()->user()->company?->city ?? '',
+    'postal_code'       => fn () => auth()->user()->company?->postal_code ?? '',
+    'city_context'      => fn () => auth()->user()->company?->city_context ?? '',
+    'nearby_cities'     => fn () => auth()->user()->company?->nearby_cities ?? [],
     'phone'             => fn () => auth()->user()->company?->phone ?? '',
     'email'             => fn () => auth()->user()->company?->email ?? '',
     'website'           => fn () => auth()->user()->company?->website ?? '',
     'brand_color'       => fn () => auth()->user()->company?->brand_color ?? '#F59E0B',
     'secondary_color'   => fn () => auth()->user()->company?->secondary_color ?? '#0F172A',
     'weekly_posts_goal' => fn () => auth()->user()->company?->weekly_posts_goal ?? 3,
+    'bio_text'          => fn () => auth()->user()->company?->bio_text ?? '',
 ]);
 
 $updateCompanySettings = function () {
     $this->validate([
-        'name'              => ['required', 'string', 'max:255'],
+        'name'              => ['required', 'string', 'max:15'],
         'city'              => ['nullable', 'string', 'max:255'],
         'phone'             => ['nullable', 'string', 'max:30'],
         'email'             => ['nullable', 'email', 'max:255'],
-        'website'           => ['nullable', 'url', 'max:255'],
+        'website'           => ['nullable', 'string', 'max:255', 'regex:/\..+/'],
         'brand_color'       => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         'secondary_color'   => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         'weekly_posts_goal' => ['required', 'integer', 'min:0', 'max:7'],
+        'bio_text'          => ['nullable', 'string', 'max:2000'],
+    ], [
+        'website.regex' => 'Le site internet doit être au format domaine.fr (contenir un point).',
     ]);
+
+    if ($this->website) {
+        $this->website = preg_replace('#^https?://#', '', $this->website);
+        $this->website = preg_replace('#^www\.#', '', $this->website);
+        $this->website = rtrim($this->website, '/');
+    }
 
     $user = Auth::user();
     $company = $user->company;
@@ -34,12 +47,16 @@ $updateCompanySettings = function () {
     $data = [
         'name'              => $this->name,
         'city'              => $this->city,
+        'postal_code'       => $this->postal_code ?: null,
+        'city_context'      => $this->city_context ?: null,
+        'nearby_cities'     => !empty($this->nearby_cities) ? $this->nearby_cities : null,
         'phone'             => $this->phone,
         'email'             => $this->email,
         'website'           => $this->website,
         'brand_color'       => $this->brand_color,
         'secondary_color'   => $this->secondary_color,
         'weekly_posts_goal' => $this->weekly_posts_goal,
+        'bio_text'          => $this->bio_text,
     ];
 
     if ($company) {
@@ -52,12 +69,16 @@ $updateCompanySettings = function () {
 
     $this->name              = $user->company->name;
     $this->city              = $user->company->city ?? '';
+    $this->postal_code       = $user->company->postal_code ?? '';
+    $this->city_context      = $user->company->city_context ?? '';
+    $this->nearby_cities     = $user->company->nearby_cities ?? [];
     $this->phone             = $user->company->phone ?? '';
     $this->email             = $user->company->email ?? '';
     $this->website           = $user->company->website ?? '';
     $this->brand_color       = $user->company->brand_color;
     $this->secondary_color   = $user->company->secondary_color ?? '#0F172A';
     $this->weekly_posts_goal = $user->company->weekly_posts_goal;
+    $this->bio_text          = $user->company->bio_text ?? '';
 
     $this->dispatch('company-updated');
 };
@@ -65,14 +86,6 @@ $updateCompanySettings = function () {
 ?>
 
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            Paramètres de la société
-        </h2>
-        <p class="mt-1 text-sm text-gray-600">
-            Ces informations apparaissent sur vos posts générés.
-        </p>
-    </header>
 
     <form wire:submit="updateCompanySettings" class="mt-6 space-y-6">
 
@@ -85,6 +98,7 @@ $updateCompanySettings = function () {
                           type="text"
                           class="mt-1 block w-full"
                           required
+                          maxlength="15"
                           autocomplete="organization" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
@@ -92,12 +106,20 @@ $updateCompanySettings = function () {
         <!-- Ville -->
         <div>
             <x-input-label for="city" value="Ville" />
-            <x-text-input wire:model="city"
-                          id="city"
-                          name="city"
-                          type="text"
-                          class="mt-1 block w-full"
-                          autocomplete="address-level2" />
+            <x-city-autocomplete
+                wire-city="city"
+                wire-postal="postal_code"
+                wire-context="city_context"
+                wire-nearby="nearby_cities"
+                :current-city="$city"
+                placeholder="Ex : Lyon, Bordeaux, Marseille..."
+                input-class="mt-1 block w-full border-gray-200 focus:border-copper focus:ring-2 focus:ring-copper/20 rounded-xl shadow-sm transition-all duration-200 text-midnight placeholder:text-gray-300 text-sm"
+            />
+            @if($city && $postal_code)
+                <p class="mt-1 text-xs text-green-600 font-medium">{{ $city }} ({{ $postal_code }})</p>
+            @elseif($city && !$postal_code)
+                <p class="mt-1 text-xs text-amber-600">Tapez votre ville et sélectionnez une suggestion pour enregistrer le code postal.</p>
+            @endif
             <x-input-error class="mt-2" :messages="$errors->get('city')" />
         </div>
 
@@ -133,46 +155,43 @@ $updateCompanySettings = function () {
             <x-text-input wire:model="website"
                           id="website"
                           name="website"
-                          type="url"
+                          type="text"
                           class="mt-1 block w-full"
-                          placeholder="https://www.mon-entreprise.fr" />
+                          placeholder="mon-entreprise.fr" />
             <x-input-error class="mt-2" :messages="$errors->get('website')" />
+        </div>
+
+        <!-- Description de l'activité -->
+        <div>
+            <x-input-label for="bio_text" value="Description de votre activité" />
+            <textarea wire:model="bio_text"
+                      id="bio_text"
+                      name="bio_text"
+                      rows="4"
+                      class="mt-1 block w-full border-gray-200 focus:border-copper focus:ring-2 focus:ring-copper/20 rounded-xl shadow-sm transition-all duration-200 text-midnight placeholder:text-gray-300 text-sm"
+                      placeholder="Décrivez votre activité en quelques phrases. Ces informations aident Postelio à personnaliser vos posts."></textarea>
+            <p class="mt-1 text-xs text-gray-500">
+                Ces informations aident Postelio à mieux comprendre ce que vous faites pour personnaliser vos posts.
+            </p>
+            <x-input-error class="mt-2" :messages="$errors->get('bio_text')" />
         </div>
 
         <!-- Couleur de marque -->
         <div>
-            <x-input-label for="brand_color" value="Couleur de marque" />
-            <div class="mt-1 flex items-center gap-3">
-                <input wire:model="brand_color"
-                       id="brand_color"
-                       name="brand_color"
-                       type="color"
-                       class="h-10 w-16 cursor-pointer rounded-lg border border-gray-300 p-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-copper" />
-                <x-text-input wire:model="brand_color"
-                              type="text"
-                              class="w-36 uppercase"
-                              placeholder="#F59E0B" />
+            <x-input-label for="brand_color" :value="__('Couleur principale')" />
+            <div class="mt-1">
+                <x-custom-color-picker wire:model.live="brand_color" id="brand_color" />
             </div>
-            <p class="mt-1 text-xs text-gray-500">Utilisée comme couleur principale dans vos visuels.</p>
-            <x-input-error class="mt-2" :messages="$errors->get('brand_color')" />
+            <x-input-error :messages="$errors->get('brand_color')" class="mt-2" />
         </div>
 
         <!-- Couleur des bandeaux -->
         <div>
-            <x-input-label for="secondary_color" value="Couleur des bandeaux" />
-            <div class="mt-1 flex items-center gap-3">
-                <input wire:model="secondary_color"
-                       id="secondary_color"
-                       name="secondary_color"
-                       type="color"
-                       class="h-10 w-16 cursor-pointer rounded-lg border border-gray-300 p-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-copper" />
-                <x-text-input wire:model="secondary_color"
-                              type="text"
-                              class="w-36 uppercase"
-                              placeholder="#0F172A" />
+            <x-input-label for="secondary_color" :value="__('Couleur des bandeaux')" />
+            <div class="mt-1">
+                <x-custom-color-picker wire:model.live="secondary_color" id="secondary_color" />
             </div>
-            <p class="mt-1 text-xs text-gray-500">Utilisée pour les bandeaux et cartes de vos visuels.</p>
-            <x-input-error class="mt-2" :messages="$errors->get('secondary_color')" />
+            <x-input-error :messages="$errors->get('secondary_color')" class="mt-2" />
         </div>
 
         <!-- Objectif hebdomadaire de posts -->
@@ -221,11 +240,11 @@ $updateCompanySettings = function () {
         </div>
 
         <div class="flex items-center justify-end gap-4">
-            <x-primary-button>Enregistrer</x-primary-button>
-
-            <x-action-message class="me-3" on="company-updated">
+            <x-action-message on="company-updated">
                 Paramètres enregistrés.
             </x-action-message>
+
+            <x-primary-button>Enregistrer</x-primary-button>
         </div>
 
     </form>

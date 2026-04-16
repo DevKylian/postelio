@@ -29,7 +29,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Kraft Texture Overlay --}}
     <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
     
@@ -57,10 +57,7 @@
                 </div>
 
                 @php
-                    $len = mb_strlen($text);
-                    $fontSize = 'text-2xl';
-                    if ($len > 80) $fontSize = 'text-base';
-                    elseif ($len > 40) $fontSize = 'text-lg';
+                    $fontSize = 'sm:text-xl text-lg';
                 @endphp
                 <div class="max-h-[160px] overflow-hidden">
                     <h3 class="text-gray-900 {{ $fontSize }} font-black font-montserrat leading-[1.1] mb-8 uppercase italic underline decoration-[6px] underline-offset-8 text-center" style="text-decoration-color: {{ $brandColor }}">
@@ -71,7 +68,7 @@
         </div>
 
         <div class="h-20 px-10 bg-gray-900 flex flex-col justify-center gap-1 border-t-4 border-white/10 z-20">
-            <span class="text-white text-xs font-black uppercase font-mono-technical tracking-[0.3em] truncate w-full">{{ $companyLabel }}</span>
+            <span class="text-white text-xs font-black uppercase font-mono-technical tracking-[0.3em] truncate w-full">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
             <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)
                     <span class="px-1.5 py-0.5 rounded-sm bg-white/5 text-white/40 text-[6px] font-black uppercase tracking-wider border border-white/10 whitespace-nowrap font-mono-technical">{{ $trade }}</span>
@@ -122,3 +119,4 @@
         </div>
     @endif
 </div>
+

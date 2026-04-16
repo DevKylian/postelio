@@ -50,6 +50,11 @@ GITHUB_TOKEN="$(cat /etc/postelio-github-token)"
 git remote set-url origin "https://${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git"
 
 # --- Vérification Droits / Permissions ---------------------------------------
+log "Ajustement des permissions storage/cache..."
+mkdir -p "$APP_DIR/storage/app/backup-temp"
+sudo chown -R deploy:www-data "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+
 if [ ! -w "${APP_DIR}/.git" ]; then
     log "ERREUR : L'utilisateur $(whoami) n'a pas les droits d'écriture sur .git"
     fail "Permissions insuffisantes (échec .git writable)"
@@ -85,6 +90,10 @@ if [ -n "$MISSING_EXTS" ]; then
     fail "Déploiement avorté : extensions manquantes."
 fi
 
+# --- Mode maintenance -------------------------------------------------------
+log "Mode maintenance ON (pré-rendu activé pour éviter l'erreur 500)..."
+$PHP artisan down --render="errors.503" --retry=60
+
 # --- PHP dependencies -------------------------------------------------------
 log "composer install..."
 if ! composer install --no-dev --optimize-autoloader --no-interaction --quiet 2>&1; then
@@ -98,7 +107,12 @@ FRONTEND_REGEX="(resources/|lang/|app/View/|app/Livewire/|package|vite\.config|t
 log "Vérification des changements frontend..."
 # On utilise une sous-shell et || true pour ne pas crash le script si grep ne trouve rien
 FRONTEND_FILES=$(git diff "${PREV_COMMIT}" "${NEW_COMMIT}" --name-only 2>/dev/null | grep -E "$FRONTEND_REGEX" || true)
-FRONTEND_CHANGED=$(echo "$FRONTEND_FILES" | grep -v '^$' | wc -l)
+
+if [ -z "$FRONTEND_FILES" ]; then
+    FRONTEND_CHANGED=0
+else
+    FRONTEND_CHANGED=$(echo "$FRONTEND_FILES" | wc -l)
+fi
 
 # On force aussi si le dossier build est manquant
 if [ ! -d "public/build" ]; then
@@ -135,9 +149,7 @@ else
 fi
 
 
-# --- Mode maintenance -------------------------------------------------------
-log "Mode maintenance ON..."
-$PHP artisan down --retry=60
+# --- Mode maintenance a déjà été activé plus haut ---
 
 # --- Sauvegarde BDD ---------------------------------------------------------
 log "Sauvegarde base de données..."

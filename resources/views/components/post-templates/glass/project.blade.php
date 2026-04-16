@@ -42,7 +42,7 @@
     $tagTextCol = ($yiq > 180) ? '#1E293B' : '#FFFFFF';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-gray-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/20 group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-gray-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/20 group-hover:-translate-y-2' : '' }}">
     
     <div class="flex-1 flex min-h-0 relative">
         {{-- Slide 0: Glass Split --}}
@@ -169,7 +169,7 @@
         @endphp
         <div class="flex flex-col min-w-0 flex-1">
             <div class="flex items-center gap-2 mb-1">
-                <span class="text-white/70 {{ $cFontSize }} font-bold uppercase tracking-[0.2em] font-montserrat truncate">{{ $companyLabel }}</span>
+                <span class="text-white/70 {{ $cFontSize }} font-bold uppercase tracking-[0.2em] font-montserrat truncate">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                 <div class="flex items-center gap-1.5 overflow-hidden">
                     @if($trade)
                         <span class="px-1.5 py-0.5 rounded-md bg-white/5 text-white/30 text-[6px] font-black uppercase tracking-wider border border-white/5">{{ $trade }}</span>
@@ -188,3 +188,4 @@
     <div class="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-[80px] opacity-20 pointer-events-none" style="background-color: {{ $brandColor }}"></div>
     <div class="absolute -bottom-24 -left-24 w-48 h-48 rounded-full blur-[80px] opacity-10 pointer-events-none" style="background-color: {{ $brandColor }}"></div>
 </div>
+

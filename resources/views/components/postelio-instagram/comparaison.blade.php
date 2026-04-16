@@ -5,12 +5,14 @@
         'Posts amateurs ou inexistants',
         'Zéro stratégie de contenu',
         'Clients qui ne vous trouvent pas',
+        'Résultats aléatoires',
     ],
     'col_avec'      => [
         '2 minutes par post, point final',
         'Visuels pro au branding artisan',
         'Contenu cohérent et régulier',
         'Visibilité = nouveaux clients',
+        'Résultats mesurables',
     ],
 ])
 
@@ -20,10 +22,15 @@
     position: relative; overflow: hidden;
     font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
 ">
-    {{-- Top bar with headline --}}
+    {{-- Top bar with headline — fixed 84px height so border-bottom aligns
+         exactly with where the two columns start (top: 84px).
+         Previously used padding-only height which varied with font rendering
+         in Browsershot vs browser, causing the bar to appear shifted up. --}}
     <div style="
         position: absolute; top: 0; left: 0; right: 0;
-        padding: 32px 24px 24px 24px;
+        height: 84px;
+        display: flex; align-items: center; justify-content: center;
+        padding: 0 24px;
         border-bottom: 1px solid rgba(255,255,255,0.06);
     ">
         <h2 style="
@@ -51,15 +58,15 @@
                 display: flex; align-items: center; gap: 6px;
                 margin-bottom: 6px;
             ">
-                <div style="width: 16px; height: 16px; border-radius: 4px; background: rgba(239,68,68,0.2); display: flex; align-items: center; justify-content: center;">
-                    <svg style="width: 9px; height: 9px;" fill="none" stroke="#F87171" stroke-width="2.5" viewBox="0 0 24 24">
+                <div style="width: 16px; height: 16px; border-radius: 4px; background: rgba(239,68,68,0.2); position: relative; flex-shrink: 0;">
+                    <svg style="width: 9px; height: 9px; display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" fill="none" stroke="#F87171" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </div>
                 <span style="color: #F87171; font-size: 9px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;">Sans Postelio</span>
             </div>
 
-            @foreach(array_slice((array)$col_sans, 0, 4) as $item)
+            @foreach(array_slice((array)$col_sans, 0, 5) as $item)
             <div style="display: flex; align-items: flex-start; gap: 8px;">
                 <div style="width: 3px; height: 3px; border-radius: 50%; background: rgba(239,68,68,0.5); flex-shrink: 0; margin-top: 5px;"></div>
                 <span style="
@@ -81,15 +88,15 @@
                 display: flex; align-items: center; gap: 6px;
                 margin-bottom: 6px;
             ">
-                <div style="width: 16px; height: 16px; border-radius: 4px; background: rgba(245,158,11,0.25); display: flex; align-items: center; justify-content: center;">
-                    <svg style="width: 9px; height: 9px;" fill="none" stroke="#F59E0B" stroke-width="2.5" viewBox="0 0 24 24">
+                <div style="width: 16px; height: 16px; border-radius: 4px; background: rgba(245,158,11,0.25); position: relative; flex-shrink: 0;">
+                    <svg style="width: 9px; height: 9px; display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" fill="none" stroke="#F59E0B" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                     </svg>
                 </div>
                 <span style="color: #F59E0B; font-size: 9px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;">Avec Postelio</span>
             </div>
 
-            @foreach(array_slice((array)$col_avec, 0, 4) as $item)
+            @foreach(array_slice((array)$col_avec, 0, 5) as $item)
             <div style="display: flex; align-items: flex-start; gap: 8px;">
                 <div style="width: 3px; height: 3px; border-radius: 50%; background: #F59E0B; flex-shrink: 0; margin-top: 5px;"></div>
                 <span style="

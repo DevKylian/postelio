@@ -34,12 +34,34 @@ class BlogController extends Controller
             session()->put($sessionKey, true);
         }
 
+        // Article précédent/suivant pour le maillage interne
+        $previous = BlogPost::published()
+            ->where('published_at', '<', $post->published_at)
+            ->orderByDesc('published_at')
+            ->first();
+
+        $next = BlogPost::published()
+            ->where('published_at', '>', $post->published_at)
+            ->orderBy('published_at')
+            ->first();
+
+        // Articles similaires
         $related = BlogPost::published()
             ->where('id', '!=', $post->id)
             ->orderByDesc('published_at')
             ->limit(3)
             ->get();
 
-        return view('blog.show', compact('post', 'related'));
+        // Articles pour le footer du blog (exclure l'article actuel)
+        $latestPosts = BlogPost::published()
+            ->where('id', '!=', $post->id)
+            ->orderByDesc('published_at')
+            ->limit(5)
+            ->get();
+
+        // Dernier guide pour le maillage croisé
+        $latestGuide = \App\Models\FreeGuide::published()->latest()->first();
+
+        return view('blog.show', compact('post', 'related', 'previous', 'next', 'latestPosts', 'latestGuide'));
     }
 }

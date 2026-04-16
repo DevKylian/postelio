@@ -24,6 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             \App\Http\Middleware\EnsureNotBanned::class,
+            \App\Http\Middleware\AuditLogMiddleware::class,
+            \App\Http\Middleware\UpdateUserActivity::class,
         ]);
         $middleware->alias([
             'onboarding' => \App\Http\Middleware\EnsureOnboardingCompleted::class,

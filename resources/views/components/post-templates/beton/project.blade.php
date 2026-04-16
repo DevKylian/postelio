@@ -42,7 +42,7 @@
     $tagTextCol = ($yiq > 180) ? '#1E293B' : '#FFFFFF';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#D1D5DB] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#D1D5DB] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Concrete Texture --}}
     <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" style="background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');"></div>
     
@@ -158,7 +158,10 @@
          @endphp
          <div class="flex flex-col max-w-[200px]">
              <span class="text-gray-900/40 text-[9px] font-black uppercase tracking-widest leading-none mb-1">PROJET RÉALISÉ PAR</span>
-             <span class="text-gray-900 {{ $cFontSize }} font-black uppercase tracking-tighter leading-tight font-montserrat truncate mb-1">{{ $companyLabel }}</span>
+             @php
+                $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+             @endphp
+             <span class="text-gray-900 {{ $cFontSize }} font-black uppercase tracking-tighter leading-tight font-montserrat mb-1">{!! $wrappedLabel !!}</span>
              <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)
                     <span class="px-1.5 py-0.5 rounded-sm bg-gray-900/5 text-gray-900/50 text-[6px] font-black uppercase tracking-wider border border-gray-900/10 whitespace-nowrap">{{ $trade }}</span>
@@ -185,3 +188,4 @@
     </div>
     @endif
 </div>
+

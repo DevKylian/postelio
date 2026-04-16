@@ -31,7 +31,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Kraft Texture Overlay --}}
     <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
     
@@ -45,14 +45,14 @@
         <div class="flex-1 relative flex items-center justify-center p-16">
             <div class="relative w-full h-full border-[6px] border-neutral-900 p-4 bg-white shadow-2xl -rotate-1">
                 @if($imageUrl)
-                    <img src="{{ $imageUrl }}" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] object-contain">
+                    <img src="{{ $imageUrl }}" class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} object-contain">
                 @else
-                    <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] object-cover grayscale-[0.1]">
+                    <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600" class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} object-cover grayscale-[0.1]">
                 @endif
                 
                 @php
                     $dlen = mb_strlen($text ?: 'DÉTAIL TECHNIQUE');
-                    $fontSize = 'text-[10px]';
+                    $fontSize = 'sm:text-[10px] text-[8px]';
                     if ($dlen > 30) $fontSize = 'text-[7px]';
                     elseif ($dlen > 20) $fontSize = 'text-[8px]';
                 @endphp
@@ -64,7 +64,7 @@
 
         <div class="h-20 px-10 bg-gray-900 flex flex-col justify-center gap-1 z-20">
              <div class="flex items-center justify-between">
-                 <span class="text-white text-[11px] font-black uppercase tracking-[0.2em] font-montserrat truncate max-w-[200px]">{{ $companyLabel }}</span>
+                 <span class="text-white text-[11px] font-black uppercase tracking-[0.2em] font-montserrat whitespace-normal leading-tight">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                  <div class="flex items-center gap-4 shrink-0">
                       <div class="w-10 h-1.5" style="background-color: {{ $brandColor }}"></div>
                  </div>
@@ -112,3 +112,4 @@
         </div>
     @endif
 </div>
+

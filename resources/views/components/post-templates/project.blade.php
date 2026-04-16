@@ -3,6 +3,9 @@
     'companyLabel' => 'Votre Société',
     'imageBeforeUrl' => null,
     'imageAfterUrl' => null,
+    'imageBeforeRawUrl' => null,
+    'imageAfterRawUrl' => null,
+    'photosLandscape' => false,
     'text' => 'TRANSFORMATION',
     'logoUrl' => null,
     'phone' => null,
@@ -16,6 +19,7 @@
     'accentColor' => '#0F172A',
     'accentTextColor' => '#FFFFFF',
     'exporting' => false,
+    'aspectRatio' => '4:5',
 ])
 
 @if($preview)
@@ -51,7 +55,7 @@
     $badgeStyle = "background-color: $badgeBg; border-color: rgba(255,255,255,0.3); color: $badgeTextCol;";
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] bg-white flex flex-col relative overflow-hidden font-montserrat {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-white flex flex-col relative overflow-hidden font-montserrat {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
     
     <div class="flex-1 relative min-h-0 bg-gray-100">
         
@@ -61,7 +65,49 @@
             $slide0Alpine = $slideIndex === null ? "x-show=\"current === 0\"" : '';
             $slide0Style = !$isSlide0 ? 'display: none;' : '';
         @endphp
-        <div class="absolute inset-0 flex" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
+        {{-- Slide 0: layout depends on photo orientation --}}
+        <div class="absolute inset-0 {{ $photosLandscape ? 'flex flex-col' : 'flex' }}" {!! $slide0Alpine !!} style="{{ $slide0Style }}">
+
+            @if($photosLandscape)
+            {{-- LANDSCAPE: Avant top 40%, Après middle 40%, blurred footer 20%.
+                 The brand card is ~20% tall at the bottom; photos stay above it. --}}
+            <div class="h-2/5 relative overflow-hidden border-b border-white/30 bg-gray-300 shrink-0">
+                @if ($imageBeforeRawUrl)
+                    <img src="{{ $imageBeforeRawUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                    <div class="absolute top-3 left-4 px-3 h-6 inline-flex items-center justify-center rounded-full shadow-lg z-20 border" style="{{ $badgeStyle }}">
+                        <p class="text-[9px] font-black uppercase tracking-[0.2em] leading-none">Avant</p>
+                    </div>
+                @else
+                    <div class="w-full h-full flex items-center justify-center">
+                        <p class="text-[9px] font-bold uppercase tracking-widest" style="color: {{ $brandColor }}">Avant</p>
+                    </div>
+                @endif
+            </div>
+            <div class="h-2/5 relative overflow-hidden bg-gray-400 shrink-0">
+                @if ($imageAfterRawUrl)
+                    <img src="{{ $imageAfterRawUrl }}" class="absolute inset-0 w-full h-full object-cover">
+                    <div class="absolute top-3 right-4 px-3 h-6 inline-flex items-center justify-center rounded-full shadow-lg z-20 border" style="{{ $badgeStyle }}">
+                        <p class="text-[9px] font-black uppercase tracking-[0.2em] leading-none">Après</p>
+                    </div>
+                @else
+                    <div class="w-full h-full flex items-center justify-center">
+                        <p class="text-[9px] font-bold uppercase tracking-widest" style="color: {{ $brandColor }}">Après</p>
+                    </div>
+                @endif
+            </div>
+            {{-- Blurred footer zone: fills the remaining ~20% behind the brand card --}}
+            <div class="flex-1 relative overflow-hidden">
+                @php $blurSrc = $imageAfterRawUrl ?? $imageBeforeRawUrl; @endphp
+                @if ($blurSrc)
+                    <img src="{{ $blurSrc }}" class="absolute inset-0 w-full h-full object-cover" style="filter: blur(14px); transform: scale(1.15);">
+                    <div class="absolute inset-0" style="background: rgba(0,0,0,0.30)"></div>
+                @else
+                    <div class="absolute inset-0 bg-gray-800"></div>
+                @endif
+            </div>
+
+            @else
+            {{-- PORTRAIT: left / right split (original layout) --}}
             <div class="w-1/2 relative overflow-hidden border-r border-white/20 bg-gray-300 flex items-center justify-center">
                 @if ($imageBeforeUrl)
                     <img src="{{ $imageBeforeUrl }}" class="absolute inset-0 w-full h-full object-cover">
@@ -88,6 +134,8 @@
                     </div>
                 @endif
             </div>
+            @endif
+
         </div>
 
         {{-- Slide 1: Full Avant --}}
@@ -174,7 +222,7 @@
                 <div class="px-4 py-3 flex items-center gap-3">
                     {{-- Title --}}
                     <div class="flex-1 min-w-0 flex items-center h-full">
-                        <h3 class="font-black {{ $tFontSize }} leading-tight tracking-tight line-clamp-2 font-display" style="color: {{ $accentTextColor }}">{{ $text }}</h3>
+                        <h3 class="font-black {{ $tFontSize }} leading-tight tracking-tight whitespace-normal font-display" style="color: {{ $accentTextColor }}">{{ $text }}</h3>
                     </div>
                     {{-- Divider --}}
                     <div class="w-px self-stretch bg-white/10 shrink-0"></div>
@@ -185,9 +233,12 @@
                         @else
                             <div class="w-3.5 h-3.5 rounded-full" style="background-color: {{ $brandColor }}"></div>
                         @endif
-                        <p class="font-black tracking-[0.15em] text-[6px] uppercase text-center leading-none line-clamp-2 font-montserrat" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                        @php
+                            $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                        @endphp
+                        <p class="font-black tracking-[0.15em] text-[6px] uppercase text-center whitespace-normal font-montserrat" style="color: {{ $accentTextColor }}bf">{!! $wrappedLabel !!}</p>
                         @if($trade)
-                            <span class="px-2 h-4 inline-flex items-center justify-center rounded text-[5px] font-black uppercase tracking-wide border whitespace-nowrap leading-none font-montserrat" style="{{ $tagStyle }}">{{ $trade }}</span>
+                            <span class="px-2 h-4 inline-flex items-center justify-center rounded text-[5px] font-black uppercase tracking-wide border whitespace-nowrap font-montserrat" style="{{ $tagStyle }}">{{ $trade }}</span>
                         @endif
                     </div>
                 </div>
@@ -214,3 +265,4 @@
 
     </div>
 </div>
+

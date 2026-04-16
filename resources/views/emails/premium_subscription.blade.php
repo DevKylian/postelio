@@ -153,6 +153,9 @@
                             <p style="margin: 0 0 8px; font-size: 13px; color: #94A3B8; font-weight: 400;">
                                 Postelio — La vitrine digitale des artisans passionnés
                             </p>
+                            <p style="margin: 0; font-size: 12px; color: #CBD5E1; font-weight: 400;">
+                                Cet e-mail a été envoyé avec ❤️ depuis Postelio.
+                            </p>
                         </td>
                     </tr>
 

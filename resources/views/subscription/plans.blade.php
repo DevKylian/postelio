@@ -70,8 +70,9 @@
                 @foreach($plans as $key => $plan)
                     @php
                         $isCurrent = ($currentPlan === $key) || (!$currentPlan && $key === 'free');
-                        $isPopular = $key === 'pro';
+                        $isPopular = $key === 'basic';
                         $isFree = $key === 'free';
+                        $isComingSoon = !empty($plan['coming_soon']);
                     @endphp
 
                     <div class="group flex flex-col h-full relative bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1 {{ $isPopular ? 'shadow-xl shadow-copper/10 hover:shadow-2xl hover:shadow-copper/30 z-0' : 'border border-slate-200/60 shadow-md hover:shadow-xl' }}"
@@ -81,7 +82,11 @@
                     >
 
                         {{-- Labels --}}
-                        @if($isPopular)
+                        @if($isComingSoon)
+                            <div class="absolute top-0 right-0 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10" style="background: #0F172A;">
+                                Bientôt disponible
+                            </div>
+                        @elseif($isPopular)
                             <div class="absolute top-0 right-0 bg-gradient-to-r from-copper to-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
                                 Meilleure Offre
                             </div>
@@ -93,7 +98,17 @@
 
                         <div class="p-8 flex flex-col flex-grow">
                             {{-- Header --}}
-                            <div class="mb-8">
+                        @php
+                            $monthlyOriginal = $plan['price'];
+                            $yearlyMonthlyOriginal = $plan['yearly_price'] > 0 ? round($plan['yearly_price'] / 12) : 0;
+                            $monthlyDiscounted = $promo['active'] && !$isFree ? round($monthlyOriginal * (1 - $promo['discount'] / 100)) : null;
+                            $yearlyDiscounted  = $promo['active'] && !$isFree && $yearlyMonthlyOriginal > 0 ? round($yearlyMonthlyOriginal * (1 - $promo['discount'] / 100)) : null;
+                            
+                            $monthlySaved = $monthlyOriginal - $monthlyDiscounted;
+                            $yearlyTotalSaved = ($monthlyOriginal * 12) - ($yearlyDiscounted * 12);
+                            $yearlyTotalBilled = $yearlyDiscounted !== null ? ($yearlyDiscounted * 12) : $plan['yearly_price'];
+                        @endphp
+                        <div class="mb-8">
                                     <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-sm {{ $isFree ? 'bg-slate-50 border border-slate-100' : ($isPopular ? 'bg-amber-50 border border-amber-100' : 'bg-blue-50 border border-blue-100') }}">
                                         @if($isFree)
                                             <span class="text-2xl">⚡</span>
@@ -103,18 +118,39 @@
                                             <span class="text-2xl">🚀</span>
                                         @endif
                                     </div>
-                                <h3 class="text-xl font-bold text-midnight">{{ $plan['name'] }}</h3>
-                                <div class="mt-4 flex items-baseline gap-1">
-                                    <span class="text-4xl font-black text-midnight tracking-tighter" x-text="billingPeriod === 'yearly' ? '{{ $plan['yearly_price'] > 0 ? number_format($plan['yearly_price'] / 12, 0, ',', '.') : 0 }}€' : '{{ number_format($plan['price'], 0, ',', '.') }}€'">{{ number_format($plan['price'], 0, ',', '.') }}€</span>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="text-xl font-bold text-midnight">{{ $plan['name'] }}</h3>
+                                    @if($promo['active'] && !$isFree)
+                                        <span class="text-[10px] font-black uppercase tracking-widest bg-gradient-to-r from-copper to-amber-500 text-white shadow-md shadow-copper/20 px-2.5 py-0.5 rounded-full ring-2 ring-white/50 relative overflow-hidden group">
+                                            <span class="absolute inset-0 bg-white/20 translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-500"></span>
+                                            -{{ $promo['discount'] }}%
+                                        </span>
+                                    @endif
+                                </div>
+                                <div class="mt-4 flex items-baseline gap-2">
+                                    @if($monthlyDiscounted !== null)
+                                        <span class="text-4xl font-black text-copper tracking-tighter"
+                                            x-text="billingPeriod === 'yearly' ? '{{ $yearlyDiscounted }}€' : '{{ $monthlyDiscounted }}€'">{{ $monthlyDiscounted }}€</span>
+                                        <span class="text-lg font-bold text-slate-300 line-through"
+                                            x-text="billingPeriod === 'yearly' ? '{{ $yearlyMonthlyOriginal }}€' : '{{ $monthlyOriginal }}€'">{{ $monthlyOriginal }}€</span>
+                                    @else
+                                        <span class="text-4xl font-black text-midnight tracking-tighter"
+                                            x-text="billingPeriod === 'yearly' ? '{{ $yearlyMonthlyOriginal > 0 ? $yearlyMonthlyOriginal : 0 }}€' : '{{ $monthlyOriginal }}€'">{{ $monthlyOriginal }}€</span>
+                                    @endif
                                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest" x-show="!{{ $isFree ? 'true' : 'false' }}">/ mois</span>
                                 </div>
+                                
+                                @if($monthlyDiscounted !== null)
+                                    <div class="mt-1 flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100/50 px-2 py-0.5 rounded-lg w-fit">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                        <span>Économisez <span x-text="billingPeriod === 'yearly' ? '{{ $yearlyTotalSaved }}€ / an' : '{{ $monthlySaved }}€ / mois'">{{ $monthlySaved }}€ / mois</span></span>
+                                    </div>
+                                @endif
+
                                 @if(!$isFree && $plan['price'] > 0 && $plan['yearly_price'] > 0)
                                     <template x-if="billingPeriod === 'yearly'">
-                                        <p class="text-xs text-gray-400 mt-1">soit {{ number_format($plan['yearly_price'], 0, ',', '.') }}€ facturé par an</p>
+                                        <p class="text-xs text-gray-400 mt-1">soit {{ number_format($yearlyTotalBilled, 0, ',', '.') }}€ facturé par an</p>
                                     </template>
-                                @endif
-                                @if(isset($plan['old_price']) && $plan['old_price'] > 0)
-                                    <p class="text-[11px] font-bold text-gray-400 line-through mt-0.5">{{ number_format($plan['old_price'], 2, ',', '') }}&euro;</p>
                                 @endif
                             </div>
 
@@ -122,32 +158,46 @@
                             <div class="h-px bg-slate-50 mb-8"></div>
 
                             {{-- Features --}}
-                            <ul class="space-y-4 mb-10 flex-grow">
-                                @foreach($plan['features'] as $feature)
-                                    <li class="flex items-start gap-3">
-                                        <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
-                                            <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </div>
-                                        <span class="text-xs font-medium text-slate-600 leading-relaxed">{{ $feature }}</span>
-                                    </li>
+                            <div class="mb-10 flex-grow flex flex-col gap-6">
+                                @foreach($plan['features'] as $section => $features)
+                                    <div>
+                                        @if(!is_numeric($section))
+                                            <h4 class="text-[10px] font-bold text-midnight uppercase tracking-widest mb-3">{{ $section }}</h4>
+                                        @endif
+                                        <ul class="space-y-3">
+                                            @foreach($features as $feature)
+                                                @if($feature['enabled'])
+                                                    <li class="flex items-start gap-3">
+                                                        <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-copper/10 flex items-center justify-center">
+                                                            <svg class="w-2.5 h-2.5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        </div>
+                                                        <span class="text-xs font-medium text-slate-600 leading-relaxed">{!! $feature['name'] !!}</span>
+                                                    </li>
+                                                @else
+                                                    <li class="flex items-start gap-3 opacity-60">
+                                                        <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center">
+                                                            <svg class="w-2.5 h-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </div>
+                                                        <span class="text-xs font-medium text-slate-400 leading-relaxed line-through">{!! $feature['name'] !!}</span>
+                                                    </li>
+                                                @endif
+                                            @endforeach
+                                        </ul>
+                                    </div>
                                 @endforeach
-                                @foreach($plan['disabled_features'] ?? [] as $feature)
-                                    <li class="flex items-start gap-3 opacity-70">
-                                        <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center">
-                                            <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </div>
-                                        <span class="text-xs font-medium text-slate-500 leading-relaxed line-through">{{ $feature }}</span>
-                                    </li>
-                                @endforeach
-                            </ul>
+                            </div>
 
                             {{-- CTA --}}
                             <div class="mt-auto">
-                                @if($isCurrent)
+                                @if($isComingSoon)
+                                    <div class="w-full text-center py-4 px-6 rounded-2xl border border-slate-200 bg-slate-100 text-slate-400 font-bold text-xs uppercase tracking-widest cursor-not-allowed">
+                                        Bientôt disponible
+                                    </div>
+                                @elseif($isCurrent)
                                     <div class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-400 font-bold text-xs uppercase tracking-widest">
                                         Plan actuel
                                     </div>

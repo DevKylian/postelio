@@ -15,12 +15,13 @@
     'accentColor' => '#0F172A',
     'accentTextColor' => '#FFFFFF',
     'exporting' => false,
+    'aspectRatio' => '4:5',
 ])
 
 @if($preview)
     @php
         $customerName = ($customerName === 'Client' || empty($customerName)) ? 'Jean-Pierre D.' : $customerName;
-        $text = empty($text) ? '"Une expérience parfaite de A à Z. L\'équipe a su transformer notre vision en réalité avec un professionnalisme exemplaire. Les délais ont été respectés et les finitions sont impeccables. Nous recommandons vivement pour vos projets !"' : $text;
+        $text = empty($text) ? '"Une expérience parfaite. Équipe professionnelle, vision transformée en réalité avec un souci du détail exemplaire. Nous recommandons vivement !"' : $text;
         $phone = $phone ?? '01 23 45 67 89';
         $email = $email ?? 'contact@votre-artisan.fr';
         $website = $website ?? 'www.votre-artisan.fr';
@@ -35,7 +36,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] relative overflow-hidden flex flex-col justify-end font-montserrat {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} relative overflow-hidden flex flex-col justify-end font-montserrat {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
 
     {{-- Slide 0 --}}
     @php
@@ -96,10 +97,7 @@
 
         @php
             $len = mb_strlen($text);
-            $fontSize = 'text-2xl';
-            if ($len > 200) $fontSize = 'text-base';
-            elseif ($len > 120) $fontSize = 'text-lg';
-            elseif ($len > 60) $fontSize = 'text-xl';
+            $fontSize = 'sm:text-lg text-base';
         @endphp
         <div class="flex-1 flex items-center justify-center relative z-10 px-10 w-full min-h-0">
             {{-- Wrapper tightly bound to text width for better horizontal anchoring --}}
@@ -138,13 +136,18 @@
                         </div>
                         <div class="flex items-center gap-1.5">
                             @if ($logoUrl)
-                                <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-90 brightness-0 {{ $brandTextColor === '#FFFFFF' ? 'invert' : '' }}">
+                                <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
+                            @else
+                                <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: {{ $brandColor }}"></div>
                             @endif
-                            <p class="font-black tracking-[0.2em] text-[7px] uppercase truncate leading-none" style="color: {{ $brandTextColor }}">{{ $companyLabel }}</p>
+                            @php
+                                $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                            @endphp
+                            <p class="font-black tracking-[0.15em] text-[6px] uppercase whitespace-normal leading-tight" style="color: {{ $brandTextColor }}bf">{!! $wrappedLabel !!}</p>
                         </div>
                     </div>
                 </div>
-                @endif
+            @endif
 
                 <div class="flex items-center justify-center gap-2 mt-4">
                     @if($trade)
@@ -192,3 +195,4 @@
         </div>
     @endif
 </div>
+

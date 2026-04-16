@@ -32,7 +32,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-gray-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-gray-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
     
     <div class="absolute -top-10 -left-10 w-40 h-40 rounded-full blur-[80px] opacity-20" style="background-color: {{ $brandColor }}"></div>
 
@@ -111,7 +111,7 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
                  <div class="w-2 h-2 rounded-full" style="background-color: {{ $brandColor }}"></div>
-                 <span class="text-white/50 text-[10px] font-bold uppercase tracking-widest">{{ $companyLabel }}</span>
+                 <span class="text-white/50 text-[10px] font-bold uppercase tracking-widest">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
             </div>
             
             @if($preview || ($slideIndex !== null && (int)$slideIndex !== (int)($total - 1)))
@@ -146,3 +146,4 @@
         </div>
     @endif
 </div>
+

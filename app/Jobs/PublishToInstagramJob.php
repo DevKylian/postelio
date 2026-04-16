@@ -44,6 +44,13 @@ class PublishToInstagramJob implements ShouldQueue
             return;
         }
 
+        // Verification: Check if platforms still contains instagram
+        $platforms = $post->platforms ?? [];
+        if (!in_array('instagram', $platforms)) {
+            Log::info('Instagram: Skipping job, platform no longer selected for this post', ['post_id' => $this->postId]);
+            return;
+        }
+
         $company = $post->company;
 
         if (!$company) {

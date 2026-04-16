@@ -16,6 +16,7 @@
     'accentColor' => '#0F172A',
     'accentTextColor' => '#FFFFFF',
     'exporting' => false,
+    'aspectRatio' => '4:5',
 ])
 
 @php
@@ -38,7 +39,7 @@
     $inlineFontSize = $len > 25 ? '10px' : ($len > 18 ? '11px' : '13px');
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }} font-montserrat">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }} font-montserrat">
 
     {{-- Slide 0: Main Content --}}
     @php
@@ -62,7 +63,7 @@
                 </div>
                 <div class="absolute bottom-0 inset-x-0 h-[60px] bg-white border-t-2 border-[#0047AB] px-7 flex flex-col justify-center gap-0.5">
                     <div class="flex items-center justify-between">
-                        <span class="text-[#0047AB] font-black uppercase tracking-widest text-[10px] truncate font-mono">{{ $companyLabel }}</span>
+                        <span class="text-[#0047AB] font-black uppercase tracking-widest text-[7px] truncate font-mono">{{ $companyLabel }}</span>
                         <div class="w-2.5 h-2.5 rounded-full" style="background-color: {{ $brandColor }}; border: 1px solid rgba(0,71,171,0.2);"></div>
                     </div>
                     <div class="flex items-center gap-1.5 opacity-50">
@@ -82,7 +83,7 @@
                     <div class="flex flex-col max-w-[200px]">
                         <span class="text-slate-900 font-black uppercase tracking-tight leading-none truncate font-serif" style="font-size: {{ $inlineFontSize }}">{{ $text }}</span>
                         <div class="flex flex-col gap-0.5 mt-1.5 opacity-40">
-                             <span class="text-slate-900 text-[8px] font-black uppercase font-mono">{{ $companyLabel }}</span>
+                             <span class="text-gray-900/40 text-[6px] font-black uppercase font-mono-technical mt-0.5 mb-1 truncate">{{ $companyLabel }}</span>
                              <div class="flex items-center gap-1">
                                 @if($trade)<span class="text-slate-900 text-[6px] font-black uppercase border border-slate-900 px-1">{{ $trade }}</span>@endif
                                 @if($city)<span class="text-slate-900 text-[6px] font-black uppercase border border-slate-900 px-1">{{ $city }}</span>@endif
@@ -109,7 +110,7 @@
                 </div>
                 <div class="absolute bottom-0 inset-x-0 h-[60px] bg-black/30 px-7 flex flex-col justify-center gap-0.5">
                     <div class="flex items-center justify-between">
-                        <span class="text-white font-black uppercase tracking-widest text-[10px] opacity-80">{{ $companyLabel }}</span>
+                        <span class="text-white font-black uppercase tracking-widest text-[7px] opacity-80 truncate max-w-[150px]">{{ $companyLabel }}</span>
                         <div class="w-2.5 h-2.5 rounded-full" style="background-color: {{ $brandColor }}"></div>
                     </div>
                     <div class="flex items-center gap-1.5 opacity-40">
@@ -157,13 +158,13 @@
                         <div class="w-px self-stretch bg-white/10 shrink-0"></div>
 
                         {{-- Branding column --}}
-                        <div class="shrink-0 flex flex-col items-center gap-1.5 max-w-[72px]">
+                        <div class="shrink-0 flex flex-col items-center gap-1.5 max-w-[80px]">
                             @if ($logoUrl)
-                                <img src="{{ $logoUrl }}" alt="Logo" class="h-4 w-4 object-contain rounded opacity-80 brightness-0 invert">
+                                <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
                             @else
-                                <div class="w-4 h-4 rounded-full shrink-0" style="background-color: {{ $brandColor }}"></div>
+                                <div class="w-3 h-3 rounded-full shrink-0" style="background-color: {{ $brandColor }}"></div>
                             @endif
-                            <p class="font-black tracking-[0.15em] text-[6px] uppercase text-center leading-tight line-clamp-2 font-montserrat" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                            <p class="font-black tracking-[0.15em] text-[6px] uppercase text-center truncate w-full" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
                             @php
                                 $hex = str_replace('#', '', $brandColor);
                                 if(strlen($hex) == 3) {

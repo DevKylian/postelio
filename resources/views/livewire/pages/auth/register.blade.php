@@ -31,7 +31,12 @@ rules([
 ]);
 
 $register = function () {
-    $validated = $this->validate();
+    try {
+        $validated = $this->validate();
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        $this->dispatch('scroll-to-first-error');
+        throw $e;
+    }
 
     $validated['password'] = Hash::make($validated['password']);
 
@@ -47,7 +52,12 @@ $register = function () {
 };
 
 $redirectToGoogle = function () {
-    $this->validate(['terms' => 'accepted']);
+    try {
+        $this->validate(['terms' => 'accepted']);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        $this->dispatch('scroll-to-terms');
+        throw $e;
+    }
     
     session(['register_newsletter_opt_in' => $this->newsletter_opt_in]);
     
@@ -56,7 +66,8 @@ $redirectToGoogle = function () {
 
 ?>
 
-<div>
+<div x-on:scroll-to-terms.window="document.getElementById('terms').scrollIntoView({ behavior: 'smooth', block: 'center' })"
+     x-on:scroll-to-first-error.window="setTimeout(() => { document.querySelector('.text-red-600')?.scrollIntoView({ behavior: 'smooth', block: 'center' }) }, 100)">
     <div class="mb-10 text-left">
         <h1 class="text-3xl font-display font-bold text-midnight tracking-tight">Bienvenue sur Postelio</h1>
         <p class="text-slate-500 mt-2 font-light">Commencez à transformer vos chantiers en clients.</p>

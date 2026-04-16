@@ -84,7 +84,7 @@
                                                 </td>
                                                 <td style="padding-left: 12px; vertical-align: top;">
                                                     <div style="font-size: 15px; font-weight: 600; color: #1E293B; margin-bottom: 4px;">Dictez une note vocale</div>
-                                                    <div style="font-size: 14px; color: #64748B; font-weight: 400; line-height: 1.5;">Décrivez votre travail en quelques mots. L'IA rédige la publication pour vous.</div>
+                                                    <div style="font-size: 14px; color: #64748B; font-weight: 400; line-height: 1.5;">Décrivez votre travail en quelques mots. Postelio rédige la publication pour vous.</div>
                                                 </td>
                                             </tr>
                                         </table>
@@ -101,8 +101,8 @@
                                                     </div>
                                                 </td>
                                                 <td style="padding-left: 12px; vertical-align: top;">
-                                                    <div style="font-size: 15px; font-weight: 600; color: #1E293B; margin-bottom: 4px;">C'est publié automatiquement</div>
-                                                    <div style="font-size: 14px; color: #64748B; font-weight: 400; line-height: 1.5;">Votre post est directement publié sur Instagram et Facebook.</div>
+                                                    <div style="font-size: 15px; font-weight: 600; color: #1E293B; margin-bottom: 4px;">C'est publié automatiquement <span style="font-size: 10px; font-weight: 700; color: #D97706; background-color: #FEF3C7; padding: 2px 6px; border-radius: 4px; margin-left: 4px; vertical-align: middle;">PRO</span></div>
+                                                    <div style="font-size: 14px; color: #64748B; font-weight: 400; line-height: 1.5;">Votre post est directement publié sur vos réseaux sociaux professionnels.</div>
                                                 </td>
                                             </tr>
                                         </table>
@@ -128,7 +128,7 @@
                                 <tr>
                                     <td style="padding: 20px 24px; text-align: center;">
                                         <p style="margin: 0; font-size: 14px; color: #92400E; font-weight: 500;">
-                                            ✨ Votre plan gratuit est activé — 3 publications offertes chaque mois, sans carte bancaire.
+                                            ✨ Votre plan gratuit est activé — 2 publications offertes chaque mois, sans carte bancaire.
                                         </p>
                                     </td>
                                 </tr>
@@ -150,7 +150,7 @@
                                 Postelio — La vitrine digitale des artisans passionnés
                             </p>
                             <p style="margin: 0; font-size: 12px; color: #CBD5E1; font-weight: 400;">
-                                Vous recevez cet email car vous avez créé un compte sur Postelio.
+                                Cet e-mail a été envoyé avec ❤️ depuis Postelio.
                             </p>
                         </td>
                     </tr>

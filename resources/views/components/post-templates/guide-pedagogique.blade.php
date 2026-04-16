@@ -15,6 +15,7 @@
     'accentColor' => '#0F172A',
     'accentTextColor' => '#FFFFFF',
     'exporting' => false,
+    'aspectRatio' => '4:5',
 ])
 
 @if($preview)
@@ -39,7 +40,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-slate-50 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-slate-50 relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}">
 
         {{-- Background Sophistication --}}
         <div class="absolute inset-0 opacity-[0.05]" style="background-image: radial-gradient(circle at 2px 2px, #000 1px, transparent 0); background-size: 32px 32px;"></div>
@@ -151,11 +152,14 @@
             <div class="backdrop-blur-xl rounded-3xl px-4 py-3.5 shadow-2xl border border-white/10 flex flex-col items-center"
                  style="background-color: {{ $accentColor }}d9;">
                 <div class="flex items-center gap-2 mb-2.5">
-                    @if ($logoUrl)
-                        <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
-                    @endif
-                    <p class="font-black tracking-[0.2em] text-[7px] uppercase truncate leading-none" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
-                </div>
+                    @if($logoUrl)
+                    <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
+                @endif
+                @php
+                    $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                @endphp
+                <p class="font-black tracking-[0.18em] text-[7px] uppercase whitespace-normal leading-tight" style="color: {{ $accentTextColor }}bf">{!! $wrappedLabel !!}</p>
+            </div>
                 
                 <div class="flex items-center gap-1.5 overflow-hidden">
                     @php
@@ -206,3 +210,4 @@
             </div>
         @endif
     </div>
+

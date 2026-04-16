@@ -44,7 +44,7 @@
 @endphp
 
 <div {!! $alpineData !!} class="w-full relative">
-    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#BC9A7E] relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+    <div class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#BC9A7E] relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
         {{-- Kraft Texture Overlay --}}
         <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply z-20" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
 
@@ -59,11 +59,11 @@
             @endphp
             <div class="absolute inset-0" {!! $slideAlpine !!} style="{{ $slideStyle }}">
                 <div class="absolute inset-0 p-8">
-                    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] relative overflow-hidden border-4 border-gray-900 bg-gray-800 shadow-lg {{ $index % 2 == 0 ? '-rotate-1' : 'rotate-1' }}">
+                    <div class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} relative overflow-hidden border-4 border-gray-900 bg-gray-800 shadow-lg {{ $index % 2 == 0 ? '-rotate-1' : 'rotate-1' }}">
                         @if ($imageUrl)
-                            <img src="{{ $imageUrl }}" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] object-cover">
+                            <img src="{{ $imageUrl }}" class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} object-cover">
                         @else
-                            <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] flex items-center justify-center bg-gray-700">
+                            <div class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} flex items-center justify-center bg-gray-700">
                                 <p class="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em]">Photo {{ $index + 1 }}</p>
                             </div>
                         @endif
@@ -115,7 +115,7 @@
         @if($showFooter)
          <div {!! $footerAlpine !!} class="absolute bottom-0 inset-x-0 py-2.5 px-10 bg-white border-t-4 border-gray-900 flex flex-col gap-1 z-30 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] min-h-16">
               <div class="flex items-center justify-between">
-                   <span class="text-gray-900 text-xs font-black font-montserrat uppercase tracking-[0.2em] truncate max-w-[200px]">{{ $companyLabel }}</span>
+                   <span class="text-gray-900 text-xs font-black font-montserrat uppercase tracking-[0.2em] whitespace-normal leading-tight">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                    <div class="flex items-center gap-4">
                         @if($total > 1 && !$exporting)
                          <div class="text-gray-900/20 text-[10px] font-black" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
@@ -149,3 +149,4 @@
     </div>
 </div>
 </div>
+

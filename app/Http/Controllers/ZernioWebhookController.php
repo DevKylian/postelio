@@ -15,59 +15,73 @@ class ZernioWebhookController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $signature = $request->header('X-Late-Signature');
+        // Try both possible signature headers (Zernio vs legacy Late)
+        $signature = $request->header('X-Zernio-Signature') ?? $request->header('X-Late-Signature');
         $payload = $request->all();
         $rawPayload = $request->getContent();
-
-        Log::info('Zernio Webhook received', [
-            'event' => $payload['event'] ?? 'unknown',
-            'signature' => $signature ? 'present' : 'missing'
-        ]);
 
         // Verify signature if secret is configured
         $secret = config('services.zernio.webhook_secret');
         if ($secret && $signature) {
             $computedSignature = hash_hmac('sha256', $rawPayload, $secret);
             if (!hash_equals($computedSignature, $signature)) {
-                Log::warning('Zernio Webhook signature mismatch');
                 return response()->json(['error' => 'Invalid signature'], 401);
             }
         }
 
-        $event = $payload['event'] ?? null;
-        $data  = $payload['data'] ?? $payload; // User's example had top-level 'post'
+        $event = $payload['event'] ?? $payload['type'] ?? null;
+        $data  = $payload['data'] ?? $payload;
+
+        $result = ['status' => 'ok', 'event' => $event];
 
         switch ($event) {
             case 'post.published':
-                $this->handlePostPublished($data);
+            case 'post.sent':
+            case 'post.created':
+                $match = $this->handlePostPublished($data);
+                $result['matched'] = $match ? 'yes' : 'no';
+                $result['zernio_id'] = $data['post']['id'] ?? $data['post']['_id'] ?? $data['post_id'] ?? $data['id'] ?? $data['_id'] ?? 'not_found';
                 break;
 
             case 'post.failed':
-                $this->handlePostFailed($data);
+                $match = $this->handlePostFailed($data);
+                $result['matched'] = $match ? 'yes' : 'no';
                 break;
-
-            case 'account.connected':
-                $this->handleAccountConnected($data);
-                break;
-
-            case 'account.disconnected':
-                $this->handleAccountDisconnected($data);
-                break;
-
+            
             default:
-                Log::info('Zernio Webhook event ignored', ['event' => $event]);
+                $result['status'] = 'ignored';
                 break;
         }
 
-        return response()->json(['status' => 'ok']);
+        return response()->json($result);
     }
 
-    private function handlePostPublished(array $data)
+    private function handlePostPublished(array $data): bool
     {
-        $zernioPostId = $data['post']['id'] ?? $data['post']['_id'] ?? $data['_id'] ?? null;
-        if (!$zernioPostId) return;
+        // Try all possible nested or top-level ID fields
+        $zernioPostId = $data['post']['id'] ?? $data['post']['_id'] ?? $data['post_id'] ?? $data['id'] ?? $data['_id'] ?? null;
+        $ref = $data['ref'] ?? $data['post']['ref'] ?? $data['metadata']['ref'] ?? null;
 
-        $post = Post::where('zernio_id', $zernioPostId)->first();
+        if (!$zernioPostId && !$ref) {
+            return false;
+        }
+
+        // 1. Search by Ref (our internal ID)
+        $post = null;
+        if ($ref) {
+            $post = Post::find($ref);
+        }
+
+        // 2. Search in the new JSON array
+        if (!$post) {
+            $post = Post::whereJsonContains('zernio_ids', $zernioPostId)->first();
+        }
+
+        // 3. Fallback to the single string column
+        if (!$post) {
+            $post = Post::where('zernio_id', $zernioPostId)->first();
+        }
+
         if ($post) {
             $post->update(['status' => Post::STATUS_PUBLISHED]);
             
@@ -79,20 +93,35 @@ class ZernioWebhookController extends Controller
                 'data' => $data
             ]);
 
-            Log::info('Post status updated to published via Webhook', ['post_id' => $post->id, 'zernio_id' => $zernioPostId]);
+            return true;
         } else {
-            Log::warning('Zernio Post Published but not found in DB', ['zernio_id' => $zernioPostId]);
+            return false;
         }
     }
 
-    private function handlePostFailed(array $data)
+    private function handlePostFailed(array $data): bool
     {
-        $zernioPostId = $data['post']['id'] ?? $data['post']['_id'] ?? $data['_id'] ?? null;
-        $error = $data['error'] ?? 'Unknown error';
+        $zernioPostId = $data['post']['id'] ?? $data['post']['_id'] ?? $data['post_id'] ?? $data['id'] ?? $data['_id'] ?? null;
+        $ref = $data['ref'] ?? $data['post']['ref'] ?? $data['metadata']['ref'] ?? null;
+        $error = $data['error'] ?? $data['message'] ?? 'Unknown error';
         
-        if (!$zernioPostId) return;
+        if (!$zernioPostId && !$ref) {
+            return false;
+        }
 
-        $post = Post::where('zernio_id', $zernioPostId)->first();
+        $post = null;
+        if ($ref) {
+            $post = Post::find($ref);
+        }
+
+        if (!$post) {
+            $post = Post::whereJsonContains('zernio_ids', $zernioPostId)->first();
+        }
+
+        if (!$post) {
+            $post = Post::where('zernio_id', $zernioPostId)->first();
+        }
+
         if ($post) {
             $post->update(['status' => Post::STATUS_FAILED]);
 
@@ -100,12 +129,15 @@ class ZernioWebhookController extends Controller
                 'user_id' => $post->user_id,
                 'company_id' => $post->company_id,
                 'type' => 'post.failed',
-                'message' => "Échec de la publication : {$error}",
+                'message' => "La publication a échoué : " . $error,
                 'data' => $data
             ]);
 
             Log::error('Post status updated to failed via Webhook', ['post_id' => $post->id, 'zernio_id' => $zernioPostId, 'error' => $error]);
+            return true;
         }
+
+        return false;
     }
 
     private function handleAccountConnected(array $data)

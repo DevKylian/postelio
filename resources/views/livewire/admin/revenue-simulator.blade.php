@@ -55,6 +55,11 @@
                             </div>
                             <div>
                                 <label class="text-[9px] font-black text-gray-400 uppercase mb-1.5 block">Pro (49€)</label>
+                                <label class="text-[9px] font-black text-gray-400 uppercase mb-1.5 block">Basic (19€)</label>
+                                <input type="number" wire:model.live="simBasicMo" class="w-full bg-slate-50 border-transparent rounded-xl px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-bold focus:bg-white focus:ring-orange-500 focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-gray-400 uppercase mb-1.5 block">Pro (29€)</label>
                                 <input type="number" wire:model.live="simProMo" class="w-full bg-slate-50 border-transparent rounded-xl px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-bold focus:bg-white focus:ring-orange-500 focus:border-orange-500">
                             </div>
                         </div>
@@ -65,6 +70,11 @@
                             </div>
                             <div>
                                 <label class="text-[9px] font-black text-gray-400 uppercase mb-1.5 block">Pro An (468€)</label>
+                                <label class="text-[9px] font-black text-gray-400 uppercase mb-1.5 block">Basic An (180€)</label>
+                                <input type="number" wire:model.live="simBasicYr" class="w-full bg-slate-50 border-transparent rounded-xl px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-bold focus:bg-white focus:ring-orange-500 focus:border-orange-500">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-gray-400 uppercase mb-1.5 block">Pro An (280€)</label>
                                 <input type="number" wire:model.live="simProYr" class="w-full bg-slate-50 border-transparent rounded-xl px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm font-bold focus:bg-white focus:ring-orange-500 focus:border-orange-500">
                             </div>
                         </div>

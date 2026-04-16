@@ -16,6 +16,7 @@
     'accentColor'    => '#0F172A',
     'accentTextColor' => '#FFFFFF',
     'exporting'      => false,
+    'aspectRatio'    => '4:5',
 ])
 
 @if($preview)
@@ -74,7 +75,7 @@
     $aFont     = $aLen > 180 ? 'text-sm' : ($aLen > 100 ? 'text-base' : 'text-lg');
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? '4:5') === '4:5' ? '4/5' : '1/1' }}] relative overflow-hidden flex flex-col {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: #F8FAFC;">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} relative overflow-hidden flex flex-col {{ $preview ? 'rounded-2xl shadow-lg ring-1 ring-gray-200 transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: #F8FAFC;">
 
 
 
@@ -176,7 +177,10 @@
                 @if($logoUrl)
                     <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
                 @endif
-                <p class="font-black tracking-[0.18em] text-[7px] uppercase truncate leading-none" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                @php
+                    $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                @endphp
+                <p class="font-black tracking-[0.18em] text-[7px] uppercase whitespace-normal leading-tight" style="color: {{ $accentTextColor }}bf">{!! $wrappedLabel !!}</p>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
                 @if($trade)
@@ -203,3 +207,4 @@
         <div class="absolute top-[72px] right-5 z-30 px-2.5 py-1 rounded-full text-[9px] font-black" style="{{ $chipStyle }}" x-text="(current + 1) + ' / ' + total"></div>
     @endif
 </div>
+

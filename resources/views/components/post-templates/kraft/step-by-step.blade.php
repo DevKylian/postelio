@@ -41,7 +41,7 @@
 @endphp
 
 <div {!! $alpineData !!} class="w-full relative">
-    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#BC9A7E] relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+    <div class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#BC9A7E] relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
         {{-- Kraft Texture Overlay --}}
         <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply z-20" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
 
@@ -57,7 +57,7 @@
                 {{-- Show image if index > 0 (steps) or if it's the cover with image --}}
                 @if($imageUrl)
                     <div class="absolute inset-0">
-                        <img src="{{ $imageUrl }}" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] object-cover">
+                        <img src="{{ $imageUrl }}" class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} object-cover">
                         <div class="absolute inset-0 bg-gray-900/40"></div>
                     </div>
                 @endif
@@ -127,7 +127,7 @@
         @if($showFooter)
         <div {!! $footerAlpine !!} class="absolute inset-x-0 bottom-0 py-2.5 px-10 bg-gray-900 flex flex-col gap-1 border-t-4 z-30 min-h-16" style="border-color: {{ $brandColor }}">
              <div class="flex items-center justify-between">
-                 <span class="text-white text-[10px] font-black font-mono-technical uppercase tracking-widest italic truncate max-w-[200px]">{{ $companyLabel }}</span>
+                 <span class="text-white text-[10px] font-black font-mono-technical uppercase tracking-widest italic whitespace-normal leading-tight">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                  <div class="flex items-center gap-2 shrink-0">
                       @for($i=0; $i<$total; $i++)
                         <div class="w-6 h-1 transition-all duration-300" 
@@ -160,3 +160,4 @@
         @endif
     </div>
 </div>
+

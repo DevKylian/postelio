@@ -75,11 +75,31 @@
                             @endif
                         </div>
                         <div class="min-w-0">
-                            <h4 class="font-black text-xl text-midnight truncate">{{ $user->name }}</h4>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-black text-xl text-midnight truncate">{{ $user->name }}</h4>
+                                @if($user->isOnline())
+                                    <span class="flex h-2 w-2 rounded-full bg-green-500 ring-4 ring-green-50"></span>
+                                    <span class="text-[9px] font-black text-green-600 uppercase tracking-widest">En ligne</span>
+                                @endif
+                            </div>
                             <p class="text-sm text-gray-400 font-medium truncate">{{ $user->email }}</p>
-                            <div class="mt-2 text-[10px] font-bold text-gray-400 flex items-center gap-2">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                Inscrit en {{ $user->created_at->translatedFormat('F Y') }}
+                            <div class="mt-2 space-y-1">
+                                <div class="text-[10px] font-bold text-gray-400 flex items-center gap-2">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    Inscrit en {{ $user->created_at->translatedFormat('F Y') }}
+                                </div>
+                                @if($user->last_login_at)
+                                    <div class="text-[9px] font-bold text-gray-400 flex items-center gap-2">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                                        Dernière connexion : {{ $user->last_login_at->diffForHumans() }}
+                                    </div>
+                                @endif
+                                @if($user->last_active_at && !$user->isOnline())
+                                    <div class="text-[9px] font-bold text-gray-400 flex items-center gap-2">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                        Vu il y a : {{ $user->last_active_at->diffForHumans() }}
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -241,6 +261,57 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Activity Journey Section (Compact) -->
+            <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col max-h-[500px]">
+                <div class="px-6 py-4 border-b border-gray-50 flex items-center justify-between bg-gray-50/50 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-midnight text-white flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 class="text-[10px] font-black text-midnight uppercase tracking-widest">Activité Récente</h3>
+                    </div>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-2 sm:p-4 bg-gray-50/20">
+                    <div class="space-y-1">
+                        @forelse($activityLogs as $log)
+                            @php
+                                $dotColor = match($log->tag) {
+                                    'admin' => 'bg-indigo-500',
+                                    'auth'  => 'bg-rose-500',
+                                    'posts' => 'bg-emerald-500',
+                                    default => 'bg-gray-300'
+                                };
+                            @endphp
+                            <div class="flex items-center gap-3 px-3 py-2 rounded-xl border border-transparent hover:border-gray-100 hover:bg-white transition-all group">
+                                <div class="w-2 h-2 rounded-full {{ $dotColor }} shrink-0"></div>
+                                
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between gap-4">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span class="text-[9px] font-black uppercase text-gray-400 shrink-0">
+                                                {{ $log->tag }}
+                                            </span>
+                                            <span class="text-xs font-bold text-midnight truncate font-mono">
+                                                {{ Str::after($log->url, request()->getSchemeAndHttpHost()) ?: '/' }}
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center gap-2 shrink-0">
+                                            <span class="text-[9px] font-bold text-gray-300">{{ $log->created_at->format('H:i') }}</span>
+                                            <span class="text-[9px] font-mono text-gray-400 bg-gray-100 px-1 rounded">{{ $log->response_time }}ms</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="py-10 text-center">
+                                <p class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Aucune donnée</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
 
             <!-- Posts History -->
             <div>
@@ -289,6 +360,20 @@
 
                 <div class="mt-12">
                     {{ $posts->links() }}
+                </div>
+            </div>
+            <!-- Danger Zone -->
+            <div class="mt-20 pt-10 border-t border-gray-100">
+                <div class="bg-red-50/20 rounded-2xl border border-red-100 p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div>
+                        <h3 class="font-bold text-red-600">Supprimer le compte</h3>
+                        <p class="text-xs text-gray-500 mt-1">Action irréversible. Toutes les données seront effacées.</p>
+                    </div>
+                    <button wire:click="deleteUser" 
+                            wire:confirm="Supprimer définitivement l'utilisateur ?"
+                            class="px-5 py-2.5 bg-red-600 text-white text-xs font-bold rounded-xl hover:bg-red-700 transition-all active:scale-95">
+                        Supprimer
+                    </button>
                 </div>
             </div>
         </div>

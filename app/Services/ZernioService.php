@@ -94,6 +94,7 @@ class ZernioService
 
         $payload = [
             'content'    => $caption,
+            'ref'        => (string) $post->id,
             'publishNow' => true,
             'platforms'  => [
                 ['platform' => $platform, 'accountId' => $accountId]
@@ -131,22 +132,27 @@ class ZernioService
             }, $mediaUrls);
         }
 
-        Log::info("Sending Zernio post request", ['payload' => $payload]);
-
         $response = Http::withToken($this->apiKey)
             ->post("{$this->baseUrl}/posts", $payload);
 
         if (!$response->successful()) {
-            Log::error('Zernio publish failed', [
-                'status' => $response->status(),
-                'body'   => $response->body(),
-                'payload' => $payload,
-            ]);
             throw new \RuntimeException('Zernio publish failed: ' . $response->body());
         }
 
-        $zernioId = $response->json('post._id');
-        $post->update(['zernio_id' => $zernioId]);
+        $zernioId = $response->json('post.id') ?? $response->json('post._id') ?? $response->json('id') ?? $response->json('_id');
+        
+        if ($zernioId) {
+            $existingIds = $post->zernio_ids ?? [];
+            if (!is_array($existingIds)) $existingIds = [];
+            
+            if (!in_array($zernioId, $existingIds)) {
+                $existingIds[] = $zernioId;
+            }
+            
+            $post->zernio_id = $zernioId;
+            $post->zernio_ids = $existingIds;
+            $post->save();
+        }
 
         return $zernioId ?? '';
     }
@@ -181,6 +187,22 @@ class ZernioService
         }
 
         return $response->json();
+    }
+
+    /**
+     * Get a single post by its Zernio ID.
+     */
+    public function getZernioPost(string $zernioId): ?array
+    {
+        $response = Http::withToken($this->apiKey)
+            ->get("{$this->baseUrl}/posts/{$zernioId}");
+
+        if (!$response->successful()) {
+            Log::error('Zernio getZernioPost failed', ['id' => $zernioId, 'body' => $response->body()]);
+            return null;
+        }
+
+        return $response->json('post');
     }
 
     /**

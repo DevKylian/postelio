@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PostList extends Component
 {
@@ -161,10 +162,44 @@ class PostList extends Component
         }
     }
 
+    /**
+     * Synchronize post status from Zernio API if webhook was missed.
+     */
+    public function refreshStatus($postId)
+    {
+        $post = Post::where('id', $postId)->where('user_id', Auth::id())->first();
+
+        if (!$post || !$post->zernio_id) {
+            return;
+        }
+
+        try {
+            $zernio = app(\App\Services\ZernioService::class);
+            $zernioPost = $zernio->getZernioPost($post->zernio_id);
+
+            if ($zernioPost) {
+                // Try to find status at root or in nested post key
+                $zStatus = $zernioPost['status'] ?? $zernioPost['post']['status'] ?? null;
+                $zStatus = strtolower((string) $zStatus);
+                
+                if (in_array($zStatus, ['published', 'posted', 'success'])) {
+                    $post->status = Post::STATUS_PUBLISHED;
+                    $post->save();
+                    session()->flash('success', 'Statut mis à jour : le post est bien en ligne !');
+                } elseif (in_array($zStatus, ['failed', 'error'])) {
+                    $post->status = Post::STATUS_FAILED;
+                    $post->save();
+                }
+            }
+        } catch (\Throwable $e) {
+            // Silently fail in production
+        }
+    }
+
     public function render()
     {
         $posts = Post::where('user_id', Auth::id())
-            ->whereIn('status', ['pending', 'processing', 'review_pending', 'completed'])
+            ->whereIn('status', ['pending', 'processing', 'review_pending', 'completed', 'published'])
             ->latest()
             ->get();
 

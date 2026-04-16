@@ -16,7 +16,7 @@
 @if($preview)
     @php
         $customerName = 'Jean-Pierre D.';
-        $text = $text ?: 'Une expérience parfaite de A à Z. L\'équipe a su transformer notre vision en réalité avec un professionnalisme exemplaire. Les délais ont été respectés et les finitions sont impeccables. Nous recommandons vivement pour vos projets !';
+        $text = $text ?: 'Une expérience parfaite. Équipe professionnelle, vision transformée en réalité avec un souci du détail exemplaire. Nous recommandons !';
         $phone = $phone ?? '01 23 45 67 89';
         $email = $email ?? 'contact@votre-artisan.fr';
         $website = $website ?? 'www.votre-artisan.fr';
@@ -31,7 +31,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#0047AB] flex flex-col relative overflow-hidden {{ $preview ? 'rounded-xl shadow-2xl ring-2 ring-white/20 transition-all duration-500 group-hover:ring-white/40 group-hover:-translate-y-2' : '' }}">
     
     {{-- Grid background --}}
     <div class="absolute inset-0 opacity-10 pointer-events-none" 
@@ -57,10 +57,7 @@
 
             @php
                 $len = mb_strlen($text);
-                $fontSize = 'text-lg';
-                if ($len > 150) $fontSize = 'text-xs';
-                elseif ($len > 80) $fontSize = 'text-sm';
-                elseif ($len > 40) $fontSize = 'text-base';
+                $fontSize = 'sm:text-lg text-base';
             @endphp
 
             <div class="max-h-[220px] overflow-hidden">
@@ -120,3 +117,4 @@
         </div>
     @endif
 </div>
+

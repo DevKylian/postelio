@@ -41,7 +41,7 @@
 @endphp
 
 <div {!! $alpineData !!} class="w-full relative">
-    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#D1D5DB] relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+    <div class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#D1D5DB] relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
         {{-- Concrete Texture --}}
         <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay z-20" style="background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');"></div>
 
@@ -57,7 +57,7 @@
                 {{-- Show image if index > 0 (steps) or if it's the cover with image --}}
                 @if($imageUrl)
                     <div class="absolute inset-0">
-                        <img src="{{ $imageUrl }}" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] object-cover">
+                        <img src="{{ $imageUrl }}" class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} object-cover">
                         <div class="absolute inset-0 bg-gray-900/40"></div>
                     </div>
                 @endif
@@ -126,7 +126,7 @@
         @if($showFooter)
         <div {!! $footerAlpine !!} class="absolute inset-x-0 bottom-0 py-2.5 px-10 bg-gray-900 flex flex-col justify-center gap-1 border-t border-white/10 z-30 min-h-16">
              <div class="flex items-center justify-between">
-                 <span class="text-white text-[10px] font-black font-montserrat uppercase tracking-widest truncate max-w-[200px]">{{ $companyLabel }}</span>
+                 <span class="text-white text-[10px] font-black font-montserrat uppercase tracking-widest truncate max-w-[200px]">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                  <div class="flex gap-1.5 shrink-0">
                       @for($i=0; $i<$total; $i++)
                         <div class="w-2 h-2 rounded-full transition-all duration-300" 
@@ -159,3 +159,4 @@
         @endif
     </div>
 </div>
+

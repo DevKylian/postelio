@@ -86,13 +86,14 @@ class ContentRefinerService
 
         $prompt = $identity . "\n\n";
 
-        // ── 1. Global anti-hallucination rule ──
-        $prompt .= "RÈGLE FONDAMENTALE — Anti-invention (priorité absolue) :\n"
-            . "Utilise UNIQUEMENT les informations explicitement présentes dans la transcription fournie.\n"
-            . "N'invente jamais de noms, prénoms, chiffres, dates, réalisations ou détails absents du vocal.\n"
-            . "Si le mémo est court ou vague, génère un post court et sobre qui reste dans ce cadre — "
-            . "ne complète JAMAIS avec du contenu inventé pour le rendre plus complet.\n"
-            . "Adapte la longueur et la richesse de la légende à la richesse du mémo vocal : mémo court = légende courte.\n\n";
+        // ── 1. Global anti-hallucination & Industry Intelligence rule (LOCKED) ──
+        $prompt .= "RÈGLES ABSOLUES DE RÉDACTION - SOUS PEINE D'ÉCHEC :\n"
+            . "1. INTERDICTION DE NOM : Il est STRICTEMENT INTERDIT de mentionner le nom de l'entreprise dans le texte généré (Accroche, Corps, Bénéfices, Conclusion). N'écris JAMAIS le nom de l'entreprise. Utilise 'Nous', 'L'équipe' ou des verbes d'action neutres (rénover, installer, etc.).\n"
+            . "2. COHÉRENCE DES PRONOMS : Sois constant. Si le vocal dit 'Je', utilise le singulier. S'il dit 'On' ou 'Nous', utilise le pluriel.\n"
+            . "3. GABARIT 'CONSEIL' / DEVIS : Si le vocal parle d'un devis ou conseil, utilise : '📍 Conseil d'expert - Secteur de [Ville]'. INTERDICTION d'utiliser 'Intervention'.\n"
+            . "4. ANTI-HALLUCINATION : Ne cite que ce qui est réellement dans le vocal.\n"
+            . "5. CORRECTION PHONÉTIQUE : Corrige systématiquement le bois (chêne), le poêle, etc.\n"
+            . "6. LOGIQUE : Le texte doit être naturel et sans fautes de sens.\n\n";
 
         // ── 2. Format rules ──
         $prompt .= "RÈGLE DE FORMAT STRICTE :\n"
@@ -187,6 +188,7 @@ class ContentRefinerService
         $prompt .= "- Les champs image (image_text, title, slides) ne doivent JAMAIS contenir de hashtags, d'emojis ni de numéros d'étape.\n";
         $prompt .= "- Respecte EXACTEMENT les limites de caractères. COMPTE avant de répondre.\n";
         $prompt .= "- Chaque texte doit avoir du SENS seul — jamais une phrase coupée au milieu.\n";
+        $prompt .= $this->citySpellingReminder($options);
 
         if ($photoCount > 0 && $spec['type'] === 'carousel') {
              $prompt .= "- Nous avons {$photoCount} photos. Adapte le nombre de slides en conséquence.\n";
@@ -248,18 +250,18 @@ class ContentRefinerService
             return "N'ajoute aucun hashtag.";
         }
 
-        $city = $options['company_city'] ?? null;
-        $trade = $options['company_trade'] ?? null;
-        $locationTag = $city ? "#" . str_replace(' ', '', $city) : null;
-        $tradeTag = $trade ? "#" . str_replace([' ', '/'], '', $trade) : null;
+        $city       = $options['company_city']   ?? null;
+        $postalCode = $options['company_postal'] ?? null;
+        $locationTag = $city ? "#" . preg_replace('/[^a-zA-ZÀ-ÿ0-9]/u', '', $city) : null;
+        $locationHint = $locationTag
+            ? "Tu DOIS utiliser {$locationTag}" . ($postalCode ? " (code postal {$postalCode})" : "") . "."
+            : "Ajoute un hashtag de ville (ex: #Lannion).";
 
-        return "STRUCTURE DES HASHTAGS (Partie 7) : Ajoute exactement entre 5 et 8 hashtags maximum à la fin de la légende, séparés par une ligne vide. "
-            . "Trie-les par pertinence : "
-            . "1. Métier" . ($tradeTag ? " (priorité : {$tradeTag})" : "") . " "
-            . "> 2. Action spécifique "
-            . "> 3. Matériau/Technique "
-            . "> 4. Ville/Secteur OBLIGATOIRE : " . ($locationTag ? "Tu DOIS utiliser {$locationTag}." : "Ajoute un hashtag de ville (ex: #Lannion).") . " "
-            . "> 5. #Postelio (indispensable à la fin).";
+        return "STRUCTURE DES HASHTAGS (Partie 7) : Ajoute entre 5 et 8 hashtags maximum à la fin.\n"
+            . "- Priorité 1 : Le type de travaux RÉEL décris dans le vocal (ex: #plomberie si le vocal parle de fuite, même si l'artisan est électricien).\n"
+            . "- Priorité 2 : Action ou matériau spécifique cité.\n"
+            . "- Priorité 3 : Ville/Secteur OBLIGATOIRE : " . $locationHint . "\n"
+            . "- Priorité 4 : #Postelio (indispensable à la fin).";
     }
 
     /**
@@ -270,32 +272,34 @@ class ContentRefinerService
         $phone = $options['company_phone'] ?? null;
         $email = $options['company_email'] ?? null;
         
-        $ctaPart = "6. L'Appel à l'action (Le CTA de conversion) : Une phrase d'invitation au contact.";
+        $ctaPart = "6. L'Appel à l'action (Le CTA de conversion) : Utilise OBLIGATOIREMENT cette phrase : \"📩 Un projet en tête ? Contactez-nous en message privé.\"";
         if ($phone || $email) {
-            $ctaPart .= " Ajoute obligatoirement les coordonnées suivantes sur une nouvelle ligne :";
+            $ctaPart .= " Ajoute également les coordonnées suivantes sur une nouvelle ligne :";
             if ($phone) $ctaPart .= "\n📞 {$phone}";
             if ($email) $ctaPart .= "\n📧 {$email}";
         } else {
             $ctaPart .= " Ne mets AUCUNE coordonnée (ni téléphone, ni email) si elles ne sont pas fournies dans le contexte.";
         }
 
-        $city = $options['company_city'] ?? null;
-        $locationPart = "2. La Localisation (Le SEO Local) : Une simple mention de la ville ou du secteur pour attirer l'algorithme local d'Instagram.";
-        if ($city) {
-            $locationPart .= " Applique IMPÉRATIVEMENT la phrase suivante en utilisant la ville de l'identité ci-dessus : 📍 Intervention sur le secteur de {$city}.";
-        } else {
-            $locationPart .= " (ex: 📍 Intervention sur le secteur de [Ville]).";
-        }
+        $city       = $options['company_city']   ?? null;
+        $postalCode = $options['company_postal'] ?? null;
+        $cityLabel  = $city ? $city . ($postalCode ? " ({$postalCode})" : "") : "[Ville]";
+
+        $locationPart = "2. La Localisation (Le SEO Local) : Une mention de la ville ou du secteur.\n"
+            . "RÈGLE ABSOLUE : S'il s'agit d'un devis, d'un conseil ou d'une erreur, il est FORMELLEMENT INTERDIT d'utiliser le mot 'Intervention'. Tu DOIS commencer par '📍 Conseil d'expert - Secteur de {$cityLabel}'. Pour un chantier fini, utilise '📍 Intervention sur le secteur de {$cityLabel}'.";
 
         $clientName = $options['clientName'] ?? null;
         $clientPart = $clientName ? " (mentionne le client : {$clientName})" : "";
 
         return "\nSTRUCTURE OBLIGATOIRE DE LA LÉGENDE (Respecte ces 7 points dans l'ordre, séparés par \\n\\n dans le JSON, c'est CRUCIAL) :\n"
-            . "1. L'Accroche visuelle (Le Hook) : Un émoji lié au métier + une phrase courte annonçant la fin du projet ou le type de réalisation{$clientPart}.\n"
+            . "1. L'Accroche visuelle (Le Hook) : Un émoji LIÉ AUX TRAVAUX RÉELS + une phrase courte annonçant la réalisation{$clientPart}.\n"
+            . "RÈGLE D'OR : N'utilise JAMAIS le nom de l'entreprise ici.\n"
+            . "Attention : si les travaux décrits ne correspondent pas au métier habituel de l'artisan, utilise l'émoji des travaux (ex: n'utilise pas 🔌 si le vocal parle de changer un robinet).\n"
             . "{$locationPart}\n"
             . "3. Le Contexte et la Technique (Le Corps du texte) : Un court paragraphe (2-3 phrases) qui explique ce qui a été fait, les matériaux ou marques utilisés, la spécificité technique. Intègre ici les éléments clés du mémo vocal.\n"
             . "4. Les Bénéfices pour le client (La Preuve de valeur) : Une courte phrase d'introduction puis une liste à puces de 3 ou 4 points (avec des emojis ✔️ ou 🔹). Traduis la technique en avantages concrets pour le client final. INTERDIT d'utiliser des étoiles ⭐ pour la liste.\n"
-            . "5. La Conclusion humaine (La Fierté) : Une phrase chaleureuse sur le résultat final ou la satisfaction du client (ex: \"Une superbe transformation pour moderniser cette pièce de vie ! 👌\"). Ne rajoute AUCUN émoji décoratif supplémentaire.\n"
+            . "5. La Conclusion humaine (La Fierté) : Une phrase chaleureuse unique et SPECIFIQUE au contenu du vocal.\n"
+            . "RÈGLE ABSOLUE : Bannis définitivement la phrase générique 'Nous sommes fiers de...' ou 'moderniser cette pièce de vie'. Rédige une conclusion qui reflète l'expertise ou le résultat réel du vocal. Respecte strictement la règle de cohérence Je/Nous définie au début.\n"
             . "{$ctaPart}\n"
             . "7. Le Bloc de Hashtags : Ajoute OBLIGATOIREMENT le bloc de hashtags juste après une ligne vide. Ne l'oublie JAMAIS. Voir la consigne de hashtags ci-dessous.\n";
     }
@@ -312,12 +316,13 @@ class ContentRefinerService
         $hashtagInstruction = $this->hashtagInstruction($includeHashtags, $options);
         $extraNote = $customNote ? " Note de l'artisan : {$customNote}." : '';
 
-        $noHallucinateGlobal = "RÈGLE FONDAMENTALE — Anti-invention (priorité absolue) :\n"
-            . "Utilise UNIQUEMENT les informations explicitement présentes dans la transcription fournie.\n"
-            . "N'invente jamais de noms, prénoms, chiffres, dates, réalisations ou détails absents du vocal.\n"
-            . "Si le mémo est court ou vague, génère un post court et sobre qui reste dans ce cadre — "
-            . "ne complète JAMAIS avec du contenu inventé pour le rendre plus complet.\n"
-            . "Adapte la longueur et la richesse de la légende à la richesse du mémo vocal : mémo court = légende courte.\n\n";
+        $noHallucinateGlobal = "RÈGLES ABSOLUES DE RÉDACTION - SOUS PEINE D'ÉCHEC :\n"
+            . "1. COHÉRENCE DES PRONOMS : Il est STRICTEMENT INTERDIT de mélanger le 'Je' et le 'Nous'. Si l'artisan dit 'Je', tout le texte généré DOIT être au singulier. S'il dit 'On' ou 'Nous', tout doit être au pluriel.\n"
+            . "2. GABARIT 'ERREUR À ÉVITER' / DEVIS : Si la note vocale parle d'un devis, d'un conseil ou d'un constat, il est FORMELLEMENT INTERDIT d'utiliser le mot 'Intervention'. Tu DOIS commencer par '📍 Conseil d'expert - Secteur de [Ville]'.\n"
+            . "3. ANTI-INVENTION : Rédige le post en te basant STRICTEMENT sur le vocal. N'invente aucune prestation absente.\n"
+            . "4. CORRECTION PHONÉTIQUE : Corrige systématiquement les homophones (ex: 'chêne' pas 'chaîne', 'poêle' pas 'poil').\n"
+            . "5. NOM D'ENTREPRISE (NOM PROPRE) : Le nom de l'entreprise (voir 'IDENTITÉ') est un NOM PROPRE. Il est STRICTEMENT INTERDIT de l'utiliser comme un verbe (ex: NE DIS JAMAIS 'quand vous [Nom] votre cuisine' ou 'nous allons [Nom]...'). Si mentionné, il doit être SUJET (ex: 'L'équipe de [Nom]...').\n"
+            . "6. LOGIQUE ET SENS : Le texte doit avoir un sens réel et professionnel. Ne produis pas de phrases absurdes.\n\n";
 
         $noMarkdownPrefix = "RÈGLE DE FORMAT STRICTE :\n"
             . "- Jamais de Markdown : aucun **, aucun *, aucun _, aucun #. Instagram n'en supporte pas.\n"
@@ -361,7 +366,8 @@ class ContentRefinerService
 
         $prompt .= "\n\n" . $this->captionStructureInstruction($options);
         $prompt .= "\n\n" . $this->hashtagInstruction($includeHashtags, $options);
-        
+        $prompt .= $this->citySpellingReminder($options);
+
         $prompt .= "\n\nRÉPONDS UNIQUEMENT PAR CE JSON :\n";
         $prompt .= "{\n  \"caption\": \"La légende suivant STRICTEMENT la structure ci-dessus.\",\n  \"image_text\": \"Titre accrocheur ({$imgConstraint})\"\n}";
 
@@ -483,6 +489,98 @@ class ContentRefinerService
         return $zones[$template][$field] ?? null;
     }
 
+    /**
+     * Correct phonetically deformed city names in a Whisper transcript.
+     *
+     * Whisper sometimes produces heavily distorted renderings of French commune names
+     * (e.g. "saint neon maille" instead of "Sainte-Néomaye"). A dedicated, minimal
+     * GPT-4o call with the official commune list resolves this reliably before the
+     * main post-generation prompt runs.
+     *
+     * Only called when the company has nearby_cities stored (i.e. city was selected
+     * via the autocomplete). Returns the transcript unchanged on any error.
+     */
+    /**
+     * Correct phonetically deformed city names in a Whisper transcript.
+     *
+     * Always runs when a base city is known. If the stored nearby_cities list is empty,
+     * it fetches the communes server-side from the French geo API (cached 24h) using
+     * the postal code — so it works even if the user never clicked the autocomplete.
+     *
+     * @param string      $baseCity     Company's home city (e.g. "Niort")
+     * @param array       $nearbyCities Pre-stored list e.g. ["Sainte-Néomaye (79260)", ...]
+     * @param string|null $postalCode   Used to fetch nearby cities when list is empty
+     */
+    public function correctCityNamesInTranscript(
+        string $transcript,
+        string $baseCity,
+        array $nearbyCities = [],
+        ?string $postalCode = null
+    ): string {
+        // If nearby cities not stored yet, fetch them server-side (cached 24h)
+        if (empty($nearbyCities) && $postalCode) {
+            $nearbyCities = TranscriptionService::fetchNearbyCities($baseCity, $postalCode);
+        }
+
+        // Build commune list for the prompt (names only, no postal codes)
+        $names = array_map(
+            fn($c) => preg_replace('/\s*\(\d+\)$/', '', $c),
+            array_slice($nearbyCities, 0, 60)
+        );
+        $communeList = !empty($names) ? implode(', ', $names) : null;
+
+        $listSection = $communeList
+            ? "Communes officielles dans un rayon de 35 km autour de {$baseCity} :\n{$communeList}\n\n"
+            : "L'artisan est basé à {$baseCity}.\n\n";
+
+        $prompt = "Tu es un correcteur orthographique spécialisé dans les noms de communes françaises.\n\n"
+            . "La transcription automatique Whisper ci-dessous peut contenir des noms de communes "
+            . "phonétiquement déformés ou mal découpés.\n"
+            . "Exemples typiques d'erreurs Whisper :\n"
+            . "- 'saint neon maille' → Sainte-Néomaye\n"
+            . "- 'chiré' → Échiré\n"
+            . "- 'aifre' → Aiffres\n"
+            . "- 'peros' → Perros-Guirec\n\n"
+            . $listSection
+            . "TÂCHE : Identifie dans la transcription tout mot ou groupe de mots qui correspond "
+            . "phonétiquement à une commune française réelle" . ($communeList ? " de la liste ci-dessus" : " du secteur de {$baseCity}") . ", "
+            . "et remplace-le par le nom officiel exact.\n"
+            . "Ne modifie RIEN d'autre dans le texte.\n"
+            . "Si aucun nom de commune n'est déformé, retourne le texte identique.\n\n"
+            . "Transcription :\n"
+            . $transcript . "\n\n"
+            . "Réponds UNIQUEMENT avec la transcription corrigée, sans explication.";
+
+        try {
+            $response = OpenAI::chat()->create([
+                'model'       => 'gpt-4o-mini',
+                'messages'    => [['role' => 'user', 'content' => $prompt]],
+                'max_tokens'  => 800,
+                'temperature' => 0,
+            ]);
+
+            $corrected = trim($response->choices[0]->message->content);
+
+            // Safety: if GPT returns something suspiciously short, keep original
+            if (mb_strlen($corrected) < mb_strlen($transcript) * 0.5) {
+                \Illuminate\Support\Facades\Log::warning('[CityCorrection] Response too short, keeping original');
+                return $transcript;
+            }
+
+            if ($corrected !== $transcript) {
+                \Illuminate\Support\Facades\Log::info('[CityCorrection] Corrected transcript', [
+                    'before' => $transcript,
+                    'after'  => $corrected,
+                ]);
+            }
+
+            return $corrected;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('[CityCorrection] Failed: ' . $e->getMessage());
+            return $transcript;
+        }
+    }
+
     public function extractFields(string $transcript): array
     {
         \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] ContentRefinerService::extractFields started');
@@ -516,7 +614,7 @@ IMPORTANT : Ne sors RIEN d'autre que du JSON. Sois précis sur les catégories."
         try {
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Calling OpenAI for extraction...');
             $response = OpenAI::chat()->create([
-                'model' => 'gpt-4o',
+                'model' => 'gpt-4o-mini',
                 'messages' => [
                     ['role' => 'system', 'content' => $prompt],
                     ['role' => 'user', 'content' => "Transcript : " . $transcript],
@@ -544,21 +642,93 @@ IMPORTANT : Ne sors RIEN d'autre que du JSON. Sois précis sur les catégories."
      */
     private function identityInstruction(array $options): string
     {
-        $name = $options['company_name'] ?? 'Inconnu';
-        $city = $options['company_city'] ?? 'France';
-        $trade = $options['company_trade'] ?? 'Artisan';
-        $phone = $options['company_phone'] ?? null;
-        $email = $options['company_email'] ?? null;
+        $name        = $options['company_name']    ?? 'Inconnu';
+        $city        = $options['company_city']    ?? 'France';
+        $postalCode  = $options['company_postal']  ?? null;
+        $context     = $options['company_context'] ?? null; // "79, Deux-Sèvres, Nouvelle-Aquitaine"
+        $nearbyCities = $options['company_nearby'] ?? [];   // ["Sainte-Néomaye (79260)", "Aiffres (79230)", ...]
+        $trade       = $options['company_trade']   ?? 'Artisan';
+        $phone       = $options['company_phone']   ?? null;
+        $email       = $options['company_email']   ?? null;
 
-        $str = "═══ IDENTITÉ DE L'ARTISAN (CRITIQUE) ═══\n"
+        // Build a rich location string: "Niort (79000) — Deux-Sèvres, Nouvelle-Aquitaine"
+        $locationStr = $city;
+        if ($postalCode) {
+            $locationStr .= " ({$postalCode})";
+        }
+        if ($context) {
+            // context is "79, Deux-Sèvres, Nouvelle-Aquitaine" — strip the dept number prefix
+            $contextParts = array_map('trim', explode(',', $context, 2));
+            $locationStr .= " — " . ($contextParts[1] ?? $context);
+        }
+
+        $str = "═══ IDENTITÉ (CONTEXTE UNIQUEMENT) ═══\n"
             . "- ENTREPRISE : {$name}\n"
-            . "- VILLE/SECTEUR : {$city}\n"
+            . "  (INTERDICTION FORMELLE : Ne mentionne JAMAIS ce nom dans le texte généré. Il sert uniquement à ta métadonnée.)\n"
+            . "- VILLE/SECTEUR : {$locationStr}\n"
             . "- MÉTIER : {$trade}";
-        
+
         if ($phone) $str .= "\n- TÉLÉPHONE : {$phone}";
         if ($email) $str .= "\n- EMAIL : {$email}";
 
+        // Geographic context: provide the real list of nearby communes so the AI can
+        // resolve phonetic/approximated city names from Whisper transcriptions.
+        $str .= "\n\n═══ GÉOGRAPHIE — COMMUNES DU SECTEUR (CRITIQUE) ═══\n"
+            . "L'artisan est basé à {$locationStr}.\n";
+
+        if (!empty($nearbyCities)) {
+            $communeList = implode(', ', array_slice($nearbyCities, 0, 50));
+            $str .= "Communes dans un rayon de 35 km (liste officielle issue de l'API gouvernementale) :\n"
+                . $communeList . "\n\n"
+                . "RÈGLE ABSOLUE — Orthographe des villes :\n"
+                . "Quand le vocal mentionne une commune sous une forme phonétique ou approximative "
+                . "(erreur de transcription Whisper), tu DOIS chercher dans la liste ci-dessus la correspondance "
+                . "la plus plausible et utiliser UNIQUEMENT le nom officiel exact.\n"
+                . "Exemples de correction attendus :\n"
+                . "- 'saint-néomai' ou 'saint néomé' → Sainte-Néomaye\n"
+                . "- 'aifre' → Aiffres\n"
+                . "- 'chiré' → Échiré\n"
+                . "N'écris JAMAIS une orthographe phonétique ou inventée d'une ville. "
+                . "Si aucune commune proche ne correspond, utilise {$city} par défaut.";
+        } else {
+            $str .= "RÈGLE ABSOLUE — Orthographe des villes :\n"
+                . "N'écris JAMAIS une orthographe phonétique ou inventée d'une ville. "
+                . "Utilise toujours le nom officiel français exact tel qu'il apparaît "
+                . "sur les panneaux routiers ou sur La Poste.";
+        }
+
         return $str;
+    }
+
+    /**
+     * Returns a final reminder about city name spelling, placed at the very end of the prompt
+     * so the LLM sees it last (highest recency weight). Repeats the core rule concisely.
+     */
+    private function citySpellingReminder(array $options): string
+    {
+        $nearbyCities = $options['company_nearby'] ?? [];
+        $baseCity     = $options['company_city']   ?? null;
+
+        if (empty($nearbyCities) && !$baseCity) {
+            return '';
+        }
+
+        $reminder = "\n- ORTHOGRAPHE DES VILLES (priorité maximale) : Si la transcription contient un nom de "
+            . "commune mal orthographié ou phonétique (erreur Whisper), corrige-le impérativement avec le nom officiel exact.";
+
+        if (!empty($nearbyCities)) {
+            // Show a compact sample of nearby city names (without postal codes) to make matching easier
+            $names = array_map(fn($c) => preg_replace('/\s*\(\d+\)$/', '', $c), array_slice($nearbyCities, 0, 40));
+            $reminder .= " Communes officielles du secteur : " . implode(', ', $names) . ".";
+        }
+
+        if ($baseCity) {
+            $reminder .= " Si aucune commune proche ne correspond, utilise « {$baseCity} » par défaut.";
+        }
+
+        $reminder .= " Ne jamais écrire une orthographe phonétique dans le post final.\n";
+
+        return $reminder;
     }
 
     private function toneInstruction(string $tone): string

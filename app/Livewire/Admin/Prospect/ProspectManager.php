@@ -6,6 +6,7 @@ use App\Models\InstagramProspect;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 
 class ProspectManager extends Component
 {
@@ -14,6 +15,12 @@ class ProspectManager extends Component
     #[Layout('layouts.app')]
     public $newAccountName = '';
     public $newProfileUrl = '';
+
+    #[On('scripts-updated')]
+    public function refresh()
+    {
+        // Triggers re-render
+    }
 
     public function rules()
     {
@@ -63,6 +70,13 @@ class ProspectManager extends Component
         $prospect->notes = $notes;
         $prospect->save();
     }
+
+    public function updateScript($prospectId, $scriptVersion)
+    {
+        $prospect = InstagramProspect::findOrFail($prospectId);
+        $prospect->script_version = $scriptVersion ?: null;
+        $prospect->save();
+    }
     
     public function deleteProspect($prospectId)
     {
@@ -96,6 +110,7 @@ class ProspectManager extends Component
 
         $prospects = $query->orderBy('last_action_date', 'desc')->paginate(20);
         $statuses = InstagramProspect::getStatuses();
+        $scripts  = InstagramProspect::getScripts();
 
         $stats = [
             'responded' => InstagramProspect::where('status', InstagramProspect::STATUS_RESPONDED)->count(),
@@ -104,10 +119,19 @@ class ProspectManager extends Component
             'actions_todo' => InstagramProspect::where($actionsTodoClosure)->count(),
         ];
 
+        // Per-script breakdown: total DMs sent & responses
+        $scriptStats = InstagramProspect::whereNotNull('script_version')
+            ->selectRaw('script_version, count(*) as total, sum(status = ?) as responded', [InstagramProspect::STATUS_RESPONDED])
+            ->groupBy('script_version')
+            ->orderBy('script_version')
+            ->get();
+
         return view('livewire.admin.prospect.prospect-manager', [
-            'prospects' => $prospects,
-            'statuses' => $statuses,
-            'stats' => $stats,
+            'prospects'   => $prospects,
+            'statuses'    => $statuses,
+            'scripts'     => $scripts,
+            'stats'       => $stats,
+            'scriptStats' => $scriptStats,
         ]);
     }
 }

@@ -44,7 +44,7 @@
 @endphp
 
 <div {!! $alpineData !!} class="w-full relative">
-    <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-gray-900 flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
+    <div class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-gray-900 flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
         
         @foreach($slides as $index => $imageUrl)
             @php
@@ -112,7 +112,10 @@
         <div {!! $footerAlpine !!} class="absolute inset-x-0 bottom-0 h-20 backdrop-blur-2xl bg-slate-900/60 border-t border-white/10 px-8 flex items-center justify-between z-30">
          <div class="flex flex-col">
              <div class="flex items-center gap-2 mb-1">
-                 <span class="text-white/70 text-[8px] font-black uppercase tracking-[0.4em] font-montserrat truncate max-w-[150px]">{{ $companyLabel }}</span>
+                 @php
+                     $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                 @endphp
+                 <span class="text-white/70 text-[8px] font-black uppercase tracking-[0.4em] font-montserrat whitespace-normal leading-tight">{!! $wrappedLabel !!}</span>
                  <div class="flex items-center gap-1 overflow-hidden">
                     @if($trade)
                         <span class="px-1 py-0.5 rounded-md bg-white/5 text-white/30 text-[5px] font-bold uppercase tracking-wider border border-white/5 whitespace-nowrap">{{ $trade }}</span>
@@ -144,3 +147,4 @@
         @endif
     </div>
 </div>
+

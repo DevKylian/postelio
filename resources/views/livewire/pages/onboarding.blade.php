@@ -13,6 +13,9 @@ state([
     'trade'             => '',
     'name'              => '',
     'city'              => '',
+    'postal_code'       => '',
+    'city_context'      => '',
+    'nearby_cities'     => [],
     'phone'             => '',
     'email'             => '',
     'website'           => '',
@@ -47,12 +50,20 @@ $selectTrade = function (string $trade) {
 $nextStep = function () {
     if ($this->step === 2) {
         $this->validate([
-            'name'  => ['required', 'string', 'min:2', 'max:255'],
+            'name'  => ['required', 'string', 'min:2', 'max:15'],
             'city'  => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:30'],
             'email' => ['nullable', 'email', 'max:255'],
-            'website' => ['nullable', 'url', 'max:255'],
+            'website' => ['nullable', 'string', 'max:255', 'regex:/\..+/'],
+        ], [
+            'website.regex' => 'Le site internet doit être au format domaine.fr (contenir un point).',
         ]);
+        
+        if ($this->website) {
+            $this->website = preg_replace('#^https?://#', '', $this->website);
+            $this->website = preg_replace('#^www\.#', '', $this->website);
+            $this->website = rtrim($this->website, '/');
+        }
     }
 
     if ($this->step === 3) {
@@ -74,13 +85,21 @@ $setBioAudioPath = function (string $path) {
 
 $complete = function () {
     $this->validate([
-        'name'        => ['required', 'string', 'min:2', 'max:255'],
+        'name'        => ['required', 'string', 'min:2', 'max:15'],
         'city'        => ['required', 'string', 'max:255'],
         'phone'       => ['nullable', 'string', 'max:30'],
         'email'       => ['nullable', 'email', 'max:255'],
-        'website'     => ['nullable', 'url', 'max:255'],
+        'website'     => ['nullable', 'string', 'max:255', 'regex:/\..+/'],
         'brand_color' => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+    ], [
+        'website.regex' => 'Le site internet doit être au format domaine.fr (contenir un point).',
     ]);
+
+    if ($this->website) {
+        $this->website = preg_replace('#^https?://#', '', $this->website);
+        $this->website = preg_replace('#^www\.#', '', $this->website);
+        $this->website = rtrim($this->website, '/');
+    }
 
     $user    = Auth::user();
     $company = $user->company;
@@ -88,6 +107,9 @@ $complete = function () {
     $data = [
         'name'              => $this->name,
         'city'              => $this->city,
+        'postal_code'       => $this->postal_code ?: null,
+        'city_context'      => $this->city_context ?: null,
+        'nearby_cities'     => !empty($this->nearby_cities) ? $this->nearby_cities : null,
         'phone'             => $this->phone,
         'email'             => $this->email,
         'website'           => $this->website,
@@ -228,6 +250,7 @@ $complete = function () {
                                    type="text"
                                    placeholder="Ex : Dupont Plomberie"
                                    autofocus
+                                   maxlength="15"
                                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm
                                           focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200" />
                             @error('name')
@@ -239,11 +262,19 @@ $complete = function () {
                             <label class="block text-sm font-semibold text-gray-700 mb-1.5">
                                 Ville <span class="text-amber-400">*</span>
                             </label>
-                            <input wire:model="city"
-                                   type="text"
-                                   placeholder="Ex : Lyon"
-                                   class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm
-                                          focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200" />
+                            <x-city-autocomplete
+                                wire-city="city"
+                                wire-postal="postal_code"
+                                wire-context="city_context"
+                                wire-nearby="nearby_cities"
+                                :current-city="$city"
+                                placeholder="Ex : Lyon, Bordeaux, Marseille..."
+                                :required="true"
+                                input-class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200"
+                            />
+                            @if($city && $postal_code)
+                                <p class="mt-1.5 text-xs text-green-600 font-medium">{{ $city }} — {{ $postal_code }}</p>
+                            @endif
                             @error('city')
                                 <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $message }}</p>
                             @enderror
@@ -283,8 +314,8 @@ $complete = function () {
                                 Site internet (optionnel)
                             </label>
                             <input wire:model="website"
-                                   type="url"
-                                   placeholder="Ex : https://www.mon-entreprise.fr"
+                                   type="text"
+                                   placeholder="Ex : mon-entreprise.fr"
                                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 font-medium text-sm
                                           focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200" />
                             @error('website')
@@ -332,7 +363,7 @@ $complete = function () {
                 <div>
                     <div class="mb-6">
                         <h1 class="text-2xl font-bold text-slate-800">Identité visuelle</h1>
-                        <p class="text-gray-500 mt-1 text-sm">Choisissez votre couleur pour personnaliser vos visuels. Votre logo sera récupéré depuis votre compte Instagram.</p>
+                        <p class="text-gray-500 mt-1 text-sm">Choisissez votre couleur pour personnaliser vos visuels.</p>
                     </div>
 
                     <div class="space-y-6">
@@ -340,7 +371,7 @@ $complete = function () {
                         {{-- Couleur de marque --}}
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-3">Couleur de marque</label>
-                            <div class="flex flex-wrap gap-2.5 mb-3">
+                            <div class="flex items-center flex-wrap gap-2.5 mb-3">
                                 @foreach($presetColors as $color)
                                     <button wire:click="$set('brand_color', '{{ $color }}')"
                                             type="button"
@@ -350,19 +381,7 @@ $complete = function () {
                                             style="background-color: {{ $color }}">
                                     </button>
                                 @endforeach
-                                <label class="w-9 h-9 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-gray-400 transition-colors relative overflow-hidden" title="Couleur personnalisée">
-                                    <span class="text-gray-400 text-lg leading-none">+</span>
-                                    <input wire:model="brand_color" type="color" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
-                                </label>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-lg border border-gray-200 shadow-sm transition-all duration-200 flex-shrink-0"
-                                     style="background-color: {{ $brand_color }}"></div>
-                                <input wire:model="brand_color"
-                                       type="text"
-                                       placeholder="#F59E0B"
-                                       class="w-32 px-3 py-2 rounded-lg border-2 border-gray-200 bg-gray-50 text-slate-800 text-sm font-mono uppercase
-                                              focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200" />
+                                <x-custom-color-picker wire:model.live="brand_color" />
                             </div>
                             @error('brand_color')
                                 <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $message }}</p>
@@ -593,7 +612,7 @@ $complete = function () {
                 >
                     <div class="mb-6">
                         <h1 class="text-2xl font-bold text-slate-800">Présentez-vous</h1>
-                        <p class="text-gray-500 mt-1 text-sm">Cette présentation permettra à l'IA de mieux personnaliser vos posts. Parlez de vous, vos services, votre zone d'intervention…</p>
+                        <p class="text-gray-500 mt-1 text-sm">Cette présentation permettra à Postelio de mieux personnaliser vos posts. Parlez de vous, vos services, votre zone d'intervention…</p>
                     </div>
 
                     {{-- Mode toggle --}}
@@ -702,7 +721,7 @@ $complete = function () {
                             class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-slate-800 placeholder-gray-400 text-sm leading-relaxed resize-none
                                    focus:outline-none focus:border-amber-400 focus:bg-white transition-all duration-200"
                         ></textarea>
-                        <p class="mt-2 text-xs text-gray-400">Plus vous êtes précis, plus l'IA personnalisera vos posts.</p>
+                        <p class="mt-2 text-xs text-gray-400">Plus vous êtes précis, plus Postelio pourra personnaliser vos posts.</p>
                     </div>
 
                     {{-- Skip link --}}
@@ -825,9 +844,9 @@ $complete = function () {
                             <p class="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-2.5">Ce qui vous attend</p>
                             <ul class="space-y-2">
                                 @foreach([
-                                    'Créez votre premier post depuis un mémo vocal',
+                                    'Créez votre premier post depuis un mémo vocal ou par écrit',
                                     'Des templates professionnels pour votre activité',
-                                    'Publication directe sur Instagram',
+                                    'Publication directe sur Instagram (pro)',
                                     'Calendrier éditorial pour organiser vos posts',
                                 ] as $item)
                                     <li class="flex items-start gap-2 text-xs text-amber-800">

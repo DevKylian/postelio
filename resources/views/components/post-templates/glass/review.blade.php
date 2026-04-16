@@ -16,7 +16,7 @@
 @if($preview)
     @php
         $customerName = 'Jean-Pierre D.';
-        $text = $text ?: 'Une expérience parfaite de A à Z. L\'équipe a su transformer notre vision en réalité avec un professionnalisme exemplaire. Les délais ont été respectés et les finitions sont impeccables. Nous recommandons vivement pour vos projets !';
+        $text = $text ?: 'Une expérience parfaite. Équipe professionnelle, vision transformée en réalité avec un souci du détail exemplaire. Nous recommandons !';
         $phone = $phone ?? '01 23 45 67 89';
         $email = $email ?? 'contact@votre-artisan.fr';
         $website = $website ?? 'www.votre-artisan.fr';
@@ -31,7 +31,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-gray-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-gray-900 flex flex-col relative overflow-hidden {{ $preview ? 'rounded-3xl shadow-2xl ring-1 ring-white/10 transition-all duration-500 group-hover:shadow-copper/30 group-hover:-translate-y-2' : '' }}">
     
     {{-- Slide 0: Review Content --}}
     @php
@@ -56,11 +56,8 @@
                 </div>
 
                 @php
-                    $len = mb_strlen($text);
-                    $fontSize = 'text-lg';
-                    if ($len > 150) $fontSize = 'text-xs';
-                    elseif ($len > 80) $fontSize = 'text-sm';
-                    elseif ($len > 40) $fontSize = 'text-base';
+                $len = mb_strlen($text);
+                $fontSize = 'sm:text-lg text-base';
                 @endphp
                 <div class="max-h-[220px] overflow-hidden">
                     <p class="text-white {{ $fontSize }} font-medium leading-relaxed italic mb-6 text-center">
@@ -71,7 +68,7 @@
                 <div class="flex items-center justify-between border-t border-white/10 pt-4 gap-2">
                     <span class="text-white/80 font-bold text-sm truncate flex-1 shrink-0">{{ $customerName }}</span>
                     <div class="flex flex-col items-end min-w-0">
-                        <span class="text-white/40 text-[9px] font-bold uppercase tracking-widest truncate mb-1 text-right w-full">{{ $companyLabel }}</span>
+                        <span class="text-white/40 text-[9px] font-bold uppercase tracking-widest truncate mb-1 text-right w-full">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                         <div class="flex items-center gap-1 overflow-hidden">
                             @if($trade)
                                 <span class="px-1 py-0.5 rounded-md bg-white/5 text-white/30 text-[5px] font-bold uppercase tracking-wider border border-white/5 whitespace-nowrap">{{ $trade }}</span>
@@ -121,3 +118,4 @@
         </div>
     @endif
 </div>
+

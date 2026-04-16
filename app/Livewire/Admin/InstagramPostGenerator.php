@@ -150,8 +150,8 @@ class InstagramPostGenerator extends Component
         $this->items = ['', '', '', ''];
         $this->question = $this->question_teaser = $this->question_tag = '';
         $this->comparaison_headline = '';
-        $this->col_sans = ['', '', '', ''];
-        $this->col_avec = ['', '', '', ''];
+        $this->col_sans = ['', '', '', '', ''];
+        $this->col_avec = ['', '', '', '', ''];
         $this->avantapres_tag = $this->avantapres_headline = '';
         $this->appmockup_tag = $this->appmockup_headline = $this->appmockup_subheadline = '';
         $this->feature_tag = $this->feature_name = $this->feature_description = $this->feature_cta = '';
@@ -196,7 +196,7 @@ class InstagramPostGenerator extends Component
     {
         $this->validate([
             'topic'    => 'required|min:3',
-            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog,feature-app',
+            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog,feature-app,story-article-blog,story-temoignage',
             'tone'     => 'required|in:professionnel,accessible,dynamique,inspirant',
         ]);
 
@@ -315,7 +315,7 @@ class InstagramPostGenerator extends Component
                 'cta'         => $this->cta,
                 'url'         => $this->url,
             ],
-            'temoignage' => [
+            'temoignage', 'story-temoignage' => [
                 'quote'      => $this->quote,
                 'author'     => $this->author,
                 'profession' => $this->profession,
@@ -363,7 +363,7 @@ class InstagramPostGenerator extends Component
                 'headline' => $this->hero_headline,
                 'body'     => $this->hero_body,
             ],
-            'article-blog' => [
+            'article-blog', 'story-article-blog' => [
                 'tag'     => $this->article_blog_tag,
                 'title'   => $this->article_blog_title,
                 'excerpt' => $this->article_blog_excerpt,
@@ -402,9 +402,12 @@ class InstagramPostGenerator extends Component
                     throw new \RuntimeException("Impossible de créer le fichier ZIP.");
                 }
 
+            $isStory  = str_starts_with($this->template, 'story-');
+            $frameH   = $isStory ? 640 : 450;
+
             foreach ($this->slides as $i => $slide) {
                 $slideData = $this->prepareSlideData($slide, $i);
-                
+
                 // Embed images if relevant
                 if ($this->uploadImage1) $slideData['image1_b64'] = $this->fileToDataUri($this->uploadImage1);
                 if ($this->uploadImage2) $slideData['image2_b64'] = $this->fileToDataUri($this->uploadImage2);
@@ -415,15 +418,21 @@ class InstagramPostGenerator extends Component
                     'data'     => $slideData,
                 ])->render();
 
-                    $png = Browsershot::html($html)
-                        ->windowSize(360, 450)
+                    $instance = Browsershot::html($html)
+                        ->windowSize(360, $frameH)
                         ->deviceScaleFactor(3)
-                        ->clip(0, 0, 360, 450)
+                        ->clip(0, 0, 360, $frameH)
                         ->noSandbox()
                         ->waitUntilNetworkIdle()
                         ->delay(500)
-                        ->timeout(60)
-                        ->screenshot();
+                        ->timeout(60);
+
+                    $chromePath = env('BROWSERSHOT_CHROME_PATH');
+                    if ($chromePath) {
+                        $instance->setChromePath($chromePath);
+                    }
+
+                    $png = $instance->screenshot();
 
                     $zip->addFromString('slide-' . ($i + 1) . '.png', $png);
                 }
@@ -433,6 +442,9 @@ class InstagramPostGenerator extends Component
             }
 
             // Case 2: Single Slide (Regular)
+            $isStory = str_starts_with($this->template, 'story-');
+            $frameH  = $isStory ? 640 : 450;
+
             $data = $this->buildDataArray();
             if ($this->uploadImage1) $data['image1_b64'] = $this->fileToDataUri($this->uploadImage1);
             if ($this->uploadImage2) $data['image2_b64'] = $this->fileToDataUri($this->uploadImage2);
@@ -442,15 +454,21 @@ class InstagramPostGenerator extends Component
                 'data'     => $data,
             ])->render();
 
-            $png = Browsershot::html($html)
-                ->windowSize(360, 450)
+            $instance = Browsershot::html($html)
+                ->windowSize(360, $frameH)
                 ->deviceScaleFactor(3)
-                ->clip(0, 0, 360, 450)
+                ->clip(0, 0, 360, $frameH)
                 ->noSandbox()
                 ->waitUntilNetworkIdle()
                 ->delay(500)
-                ->timeout(60)
-                ->screenshot();
+                ->timeout(60);
+
+            $chromePath = env('BROWSERSHOT_CHROME_PATH');
+            if ($chromePath) {
+                $instance->setChromePath($chromePath);
+            }
+
+            $png = $instance->screenshot();
 
             $filename = 'postelio-instagram-' . $this->template . '-' . now()->format('Ymd-His') . '.png';
             return response()->streamDownload(fn() => print($png), $filename, ['Content-Type' => 'image/png']);
@@ -506,8 +524,8 @@ class InstagramPostGenerator extends Component
             ],
             'comparaison' => [
                 'headline' => $title, 
-                'col_sans' => !empty($slide['col_sans']) ? $slide['col_sans'] : ['Ancien système', 'Perte de temps', 'Compliqué'],
-                'col_avec' => !empty($slide['col_avec']) ? $slide['col_avec'] : ['Postelio AI', 'Gain de temps', 'Intuitif'],
+                'col_sans' => !empty($slide['col_sans']) ? $slide['col_sans'] : ['Ancien système', 'Perte de temps', 'Compliqué', 'Pas de visibilité', 'Résultats aléatoires'],
+                'col_avec' => !empty($slide['col_avec']) ? $slide['col_avec'] : ['Postelio AI', 'Gain de temps', 'Intuitif', 'Visibilité accrue', 'Résultats mesurables'],
             ],
             'avantapres' => [
                 'tag' => $tag, 'headline' => $title,
@@ -546,6 +564,13 @@ class InstagramPostGenerator extends Component
         
         $this->caption = $this->normalizeCaption($rawCaption);
 
+        // Story templates never support carousel – flatten to first slide if AI ignores the rule
+        if (str_starts_with($this->template, 'story-') && isset($data['slides']) && is_array($data['slides'])) {
+            $first = $data['slides'][0] ?? [];
+            $data = array_merge($first, ['instagram_caption' => $rawCaption ?: ($first['instagram_caption'] ?? '')]);
+            unset($data['slides']);
+        }
+
         // Handle Carousel (Multi-Slide) response
         if (isset($data['slides']) && is_array($data['slides'])) {
             $this->slides = $data['slides'];
@@ -566,7 +591,7 @@ class InstagramPostGenerator extends Component
                 'conseil'     => $this->fillConseil($data),
                 'stats'       => $this->fillStats($data),
                 'cta'         => $this->fillCta($data),
-                'temoignage'  => $this->fillTemoignage($data),
+                'temoignage', 'story-temoignage' => $this->fillTemoignage($data),
                 'avantages'   => $this->fillAvantages($data),
                 'question'    => $this->fillQuestion($data),
                 'comparaison' => $this->fillComparaison($data),
@@ -574,7 +599,7 @@ class InstagramPostGenerator extends Component
                 'appmockup'   => $this->fillAppmockup($data),
                 'educatif'    => $this->fillEducatif($data),
                 'hero'        => $this->fillHero($data),
-                'article-blog' => $this->fillArticleBlog($data),
+                'article-blog', 'story-article-blog' => $this->fillArticleBlog($data),
                 'feature-app'  => $this->fillFeatureApp($data),
             };
         }
@@ -704,7 +729,7 @@ class InstagramPostGenerator extends Component
 
     private function fillTemoignage(array $d): void
     {
-        $this->quote      = $d['quote']      ?? '';
+        $this->quote      = $d['quote'] ?? $d['body'] ?? $d['title'] ?? '';
         $this->author     = $d['author']     ?? 'Marc D.';
         $this->profession = $d['profession'] ?? 'Artisan';
         $this->stars      = (int) ($d['stars'] ?? 5);
@@ -729,8 +754,8 @@ class InstagramPostGenerator extends Component
     private function fillComparaison(array $d): void
     {
         $this->comparaison_headline = $d['headline'] ?? 'La différence est réelle.';
-        $this->col_sans             = array_slice((array) ($d['col_sans'] ?? []), 0, 4);
-        $this->col_avec             = array_slice((array) ($d['col_avec'] ?? []), 0, 4);
+        $this->col_sans             = array_slice((array) ($d['col_sans'] ?? []), 0, 5);
+        $this->col_avec             = array_slice((array) ($d['col_avec'] ?? []), 0, 5);
     }
 
     private function fillAvantapres(array $d): void
@@ -911,7 +936,7 @@ class InstagramPostGenerator extends Component
                 PROMPT,
             'comparaison' => <<<PROMPT
                 Post "Comparaison". IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
-                Structure JSON : { "title": "...", "col_sans": ["Point 1", "Point 2", "Point 3"], "col_avec": ["Avantage 1", "Avantage 2", "Avantage 3"], "instagram_caption": "..." }
+                Structure JSON : { "title": "...", "col_sans": ["Point 1", "Point 2", "Point 3", "Point 4", "Point 5"], "col_avec": ["Avantage 1", "Avantage 2", "Avantage 3", "Avantage 4", "Avantage 5"], "instagram_caption": "..." }
                 PROMPT,
             'stats' => <<<PROMPT
                 Post "Stats". IMAGE UNIQUE (Interdit : Pas de carrousel).
@@ -937,6 +962,12 @@ class InstagramPostGenerator extends Component
             'temoignage' => <<<PROMPT
                 Post "Avis". IMAGE UNIQUE (Interdit : Pas de carrousel).
                 JSON : { "quote": "...", "author": "...", "profession": "...", "stars": 5, "instagram_caption": "..." }
+                PROMPT,
+            'story-temoignage' => <<<PROMPT
+                Story Instagram "Avis client" (format 9:16 portrait). IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
+                Objectif : mettre en valeur un témoignage client percutant en story Instagram.
+                JSON : { "quote": "Citation courte et impactante (50-120 car. max)", "author": "Prénom N.", "profession": "Métier — Ville", "stars": 5, "instagram_caption": "..." }
+                RÈGLE : La citation doit être courte, émotionnelle et crédible. Pas de jargon marketing.
                 PROMPT,
             'question' => <<<PROMPT
                 Post "Question". IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
@@ -974,6 +1005,19 @@ class InstagramPostGenerator extends Component
                 }
                 RÈGLE : Le titre doit rester fidèle à l'article. L'extrait doit créer de la curiosité sans être vague.
                 PROMPT,
+            'story-article-blog' => <<<PROMPT
+                Story Instagram "Annonce d'article de blog" (format 9:16 portrait). IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
+                Objectif : capter l'attention en 2 secondes et donner envie de swipe up / lien en bio.
+                JSON : {
+                    "tag": "NOUVEL ARTICLE",
+                    "title": "Titre percutant (max 55 car., direct et fort)",
+                    "excerpt": "Accroche ultra-courte (15-25 mots max) qui intrigue sans révéler la conclusion",
+                    "cta": "Lire l'article",
+                    "url": "postelio.fr/blog",
+                    "instagram_caption": "Caption courte avec emoji, lien en bio, 2-3 hashtags"
+                }
+                RÈGLE : Le titre doit être encore plus court et percutant que pour un post classique. L'extrait est facultatif mais très efficace.
+                PROMPT,
             'feature-app' => <<<PROMPT
                 Post "Mise en avant d'une fonctionnalité Postelio". IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
                 Objectif : présenter UNE fonctionnalité précise de Postelio avec son bénéfice concret pour l'artisan.
@@ -1004,7 +1048,7 @@ class InstagramPostGenerator extends Component
             Règles de STRUCTURE (CRITICAL) :
             - Réponds UNIQUEMENT en JSON valide.
             - POLITIQUES DE SLIDES :
-                - SI stats, cta, temoignage, question, avantapres, appmockup, comparaison, educatif, feature-app : INTERDIT DE FAIRE UN CARROUSEL. Réponds avec un seul objet JSON simple à la racine.
+                - SI stats, cta, temoignage, question, avantapres, appmockup, comparaison, educatif, feature-app, article-blog, story-article-blog, story-temoignage : INTERDIT DE FAIRE UN CARROUSEL. Réponds avec un seul objet JSON simple à la racine.
                 - SI conseil, annonce, avantages : CARROUSEL AUTORISÉ (tableau "slides": [ ... ]).
             - "title" : Titre principal (4-8 mots). OBLIGATOIRE.
             - "body" : Texte descriptif (15-25 mots).
@@ -1015,7 +1059,7 @@ class InstagramPostGenerator extends Component
             - AÉRE TON TEXTE DE MANIÈRE EXTRÊME (CRITICAL) : Utilise systématiquement la séquence de caractères \\n\\n (double antislash n) entre CHAQUE idée. 
             - NE METS JAMAIS de vrais sauts de ligne physiques à l'intérieur des valeurs du JSON.
             - Chaque point d'une liste doit être sur sa propre ligne (en utilisant \\n).
-            - SI Comparaison : Les listes "col_sans" et "col_avec" doivent avoir EXACTEMENT 3 ou 4 points percutants.
+            - SI Comparaison : Les listes "col_sans" et "col_avec" doivent avoir EXACTEMENT 5 points percutants.
             - "instagram_caption" (CRITICAL) : Toujours présent à la racine du JSON.
                 STRUCTURE OBLIGATOIRE avec la séquence \\n\\n entre chaque bloc :
 

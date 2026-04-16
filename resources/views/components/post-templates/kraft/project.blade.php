@@ -42,7 +42,7 @@
     $tagTextCol = ($yiq > 180) ? '#1E293B' : '#FFFFFF';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Kraft Texture Overlay --}}
     <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
     
@@ -159,7 +159,7 @@
         <div class="flex flex-col max-w-[240px]">
             <span class="text-gray-900/60 text-[8px] font-black uppercase tracking-[0.3em] font-mono-technical leading-none mb-1">PROJET RÉALISÉ PAR</span>
             <div class="flex items-center gap-2 mb-1">
-                <span class="text-gray-900 {{ $cFontSize }} font-black uppercase tracking-tighter leading-none font-montserrat truncate">{{ $companyLabel }}</span>
+                <span class="text-gray-900 {{ $cFontSize }} font-black uppercase tracking-tighter leading-none font-montserrat truncate">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
             </div>
             <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)
@@ -190,3 +190,4 @@
     {{-- Industrial Tape Effect --}}
     <div class="absolute bottom-10 left-1/2 -translate-x-1/2 w-32 h-8 bg-orange-600/20 backdrop-blur-sm -rotate-2 border-x-4 border-dashed border-orange-600/40 pointer-events-none opacity-50"></div>
 </div>
+

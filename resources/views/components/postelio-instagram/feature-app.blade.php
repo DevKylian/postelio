@@ -1,8 +1,8 @@
 @props([
     'image_url'           => null,
     'feature_tag'         => 'FONCTIONNALITÉ',
-    'feature_name'        => 'Générateur de Posts IA',
-    'feature_description' => 'Publiez des visuels professionnels en 30 secondes, sans compétences en design.',
+    'feature_name'        => 'Générateur de Posts',
+    'feature_description' => 'Publiez des visuels professionnels en 10 secondes, sans compétences en design.',
     'feature_cta'         => 'Essayer gratuitement',
 ])
 

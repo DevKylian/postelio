@@ -44,6 +44,13 @@ class PublishToFacebookJob implements ShouldQueue
             return;
         }
 
+        // Verification: Check if platforms still contains facebook
+        $platforms = $post->platforms ?? [];
+        if (!in_array('facebook', $platforms)) {
+            Log::info('Facebook: Skipping job, platform no longer selected for this post', ['post_id' => $this->postId]);
+            return;
+        }
+
         $company = $post->company;
 
         if (!$company || !$company->facebook_connected) {

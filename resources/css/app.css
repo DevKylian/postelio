@@ -468,3 +468,56 @@ button [wire\:loading], a [wire\:loading] { @apply inline-flex items-center; }
     box-shadow: 0 32px 64px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.02);
     transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16,1,0.3,1);
 }
+
+/* ── Confetti Burst (Global) ────────────────────────────────── */
+.md-c {
+    position: absolute;
+    width: 8px;
+    height: 16px;
+    border-radius: 4px;
+    opacity: 0;
+    left: 50%;
+    top: 50%;
+    margin-left: -4px;
+    margin-top: -8px;
+    z-index: 99;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.md-c.burst {
+    animation: mdCBurst 2.5s ease-in-out forwards;
+}
+
+@keyframes mdCBurst {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(0);
+    }
+    40% {
+        opacity: 1;
+        transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(1.5);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(var(--tx)*1.2), calc(var(--ty) + 400px)) rotate(calc(var(--rot) + 400deg)) scale(1);
+    }
+}
+
+.md-c-1 { background: #ef4444; --tx: -180px; --ty: -220px; --rot: 120deg; }
+.md-c-2 { background: #f59e0b; --tx: 180px; --ty: -240px; --rot: 240deg; animation-delay: 0.05s; }
+.md-c-3 { background: #10b981; --tx: -120px; --ty: -280px; --rot: 400deg; }
+.md-c-4 { background: #3b82f6; --tx: 120px; --ty: -250px; --rot: 180deg; animation-delay: 0.02s; }
+.md-c-5 { background: #a855f7; --tx: -220px; --ty: -100px; --rot: 310deg; }
+.md-c-6 { background: #ef4444; --tx: 220px; --ty: -80px; --rot: 90deg; animation-delay: 0.08s; }
+.md-c-7 { background: #f59e0b; --tx: -150px; --ty: -150px; --rot: 420deg; }
+.md-c-8 { background: #10b981; --tx: 150px; --ty: -150px; --rot: 270deg; animation-delay: 0.04s; }
+.md-c-9 { background: #3b82f6; --tx: -80px; --ty: -320px; --rot: 200deg; }
+.md-c-10 { background: #a855f7; --tx: 80px; --ty: -320px; --rot: 250deg; animation-delay: 0.06s; }
+.md-c-11 { background: #ef4444; --tx: -250px; --ty: -180px; --rot: 150deg; animation-delay: 0.02s; }
+.md-c-12 { background: #f59e0b; --tx: 260px; --ty: -160px; --rot: 320deg; animation-delay: 0.09s; }
+.md-c-13 { background: #10b981; --tx: -100px; --ty: -380px; --rot: 410deg; animation-delay: 0.05s; }
+.md-c-14 { background: #3b82f6; --tx: 140px; --ty: -360px; --rot: 130deg; animation-delay: 0.11s; }
+.md-c-15 { background: #a855f7; --tx: -190px; --ty: -290px; --rot: 340deg; animation-delay: 0.07s; }
+.md-c-16 { background: #ef4444; --tx: 210px; --ty: -260px; --rot: 110deg; animation-delay: 0.03s; }
+.md-c-17 { background: #f59e0b; --tx: -50px; --ty: -220px; --rot: 460deg; animation-delay: 0.06s; }
+.md-c-18 { background: #10b981; --tx: 40px; --ty: -250px; --rot: 210deg; animation-delay: 0.04s; }

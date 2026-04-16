@@ -14,6 +14,7 @@
     'accentColor' => '#0F172A',
     'accentTextColor' => '#FFFFFF',
     'exporting' => false,
+    'aspectRatio' => '4:5',
 ])
 
 @if($preview)
@@ -33,7 +34,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: {{ $accentColor }};">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} relative overflow-hidden {{ $preview ? 'rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-2xl group-hover:-translate-y-2' : '' }}" style="background-color: {{ $accentColor }};">
 
     {{-- Ambient glows (Sophisticated) --}}
     <div class="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-[100px] pointer-events-none opacity-30" style="background: radial-gradient(circle, {{ $brandColor }}, transparent 70%)"></div>
@@ -57,9 +58,9 @@
 
             @php
                 $len = mb_strlen($text);
-                $fontSize = 'text-2xl';
-                if ($len > 150) $fontSize = 'text-lg';
-                elseif ($len > 80) $fontSize = 'text-xl';
+                $fontSize = 'sm:text-2xl text-xl';
+                if ($len > 150) $fontSize = 'sm:text-lg text-base';
+                elseif ($len > 80) $fontSize = 'sm:text-xl text-lg';
             @endphp
             <div class="max-h-[180px] overflow-hidden">
                 <p class="text-white font-black {{ $fontSize }} leading-tight font-montserrat tracking-tight">{!! nl2br(e($text)) !!}</p>
@@ -84,7 +85,10 @@
                     @if ($logoUrl)
                         <img src="{{ $logoUrl }}" alt="Logo" class="h-3 w-3 object-contain rounded opacity-80 shrink-0 {{ $accentTextColor === '#FFFFFF' ? 'brightness-0 invert' : '' }}">
                     @endif
-                    <p class="font-black tracking-[0.2em] text-[7px] uppercase truncate leading-none" style="color: {{ $accentTextColor }}bf">{{ $companyLabel }}</p>
+                    @php
+                        $wrappedLabel = mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel;
+                    @endphp
+                    <p class="font-black tracking-[0.18em] text-[7px] uppercase whitespace-normal" style="color: {{ $accentTextColor }}bf">{!! $wrappedLabel !!}</p>
                 </div>
                 
                 <div class="flex items-center gap-1.5 overflow-hidden">
@@ -161,3 +165,4 @@
         </div>
     @endif
 </div>
+

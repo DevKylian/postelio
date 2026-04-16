@@ -32,7 +32,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Kraft Texture Overlay --}}
     <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
     
@@ -113,7 +113,7 @@
     @endphp
     <div {!! $footerAlpine !!} class="py-2 px-10 border-t-4 border-gray-900 bg-[#CBB198] flex flex-col gap-1 relative z-20 min-h-[4rem]">
          <div class="flex items-center justify-between">
-             <span class="text-gray-900 text-[11px] font-black uppercase tracking-[0.2em] font-montserrat truncate max-w-[200px]">{{ $companyLabel }}</span>
+             <span class="text-gray-900 text-[11px] font-black uppercase tracking-[0.2em] font-montserrat whitespace-normal leading-tight">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
              
              @if(($preview || $slideIndex !== null) && !$exporting)
                 <div class="text-gray-900/50 text-[10px] font-black font-montserrat tracking-widest" @if($preview) x-text="(current + 1) + ' / ' + total" @endif>
@@ -142,3 +142,4 @@
         </div>
     @endif
 </div>
+

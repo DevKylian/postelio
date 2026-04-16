@@ -30,7 +30,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#BC9A7E] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Kraft Texture Overlay --}}
     <div class="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style="background-image: url('https://www.transparenttextures.com/patterns/cardboard.png');"></div>
 
@@ -44,11 +44,11 @@
         {{-- Image area --}}
         <div class="flex-1 min-h-0 relative flex items-center justify-center p-10 pb-4">
             <div class="relative w-full h-full border-[8px] border-neutral-800 p-3 bg-white shadow-2xl rotate-1 overflow-hidden">
-                 <div class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] overflow-hidden relative">
+                 <div class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} overflow-hidden relative">
                      @if($imageUrl)
-                         <img src="{{ $imageUrl }}" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] object-contain">
+                         <img src="{{ $imageUrl }}" class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} object-contain">
                      @else
-                         <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=600" class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] object-cover">
+                         <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=600" class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} object-cover">
                      @endif
                      <div class="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.2)]"></div>
                  </div>
@@ -60,13 +60,13 @@
             @php
                 $displayText = $text ?: 'LIFESTYLE';
                 $len = mb_strlen($displayText);
-                $fontSize = 'text-[12px]';
-                if ($len > 25) $fontSize = 'text-[9px]';
-                elseif ($len > 18) $fontSize = 'text-[10px]';
+                $fontSize = 'sm:text-[12px] text-[10px]';
+                if ($len > 25) $fontSize = 'sm:text-[9px] text-[7px]';
+                elseif ($len > 18) $fontSize = 'sm:text-[10px] text-[8px]';
             @endphp
             <div class="flex flex-col max-w-[220px] overflow-hidden">
                  <span class="text-gray-900 {{ $fontSize }} font-black uppercase tracking-[0.1em] font-montserrat leading-tight truncate">{{ $displayText }}</span>
-                 <span class="text-gray-900/40 text-[8px] font-black uppercase font-mono-technical mt-0.5 mb-1 truncate">{{ $companyLabel }}</span>
+                 <span class="text-gray-900/40 text-[8px] font-black uppercase font-mono-technical mt-0.5 mb-1 truncate">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
                  <div class="flex items-center gap-1 overflow-hidden shrink-0">
                     @if($trade)
                         <span class="px-1 py-0.5 rounded-sm bg-gray-900/5 text-gray-900/60 text-[5px] font-black uppercase tracking-wider border border-gray-900/10 whitespace-nowrap">{{ $trade }}</span>
@@ -116,3 +116,4 @@
         </div>
     @endif
 </div>
+

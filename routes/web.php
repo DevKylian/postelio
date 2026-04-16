@@ -27,6 +27,9 @@ Route::view('/mentions-legales', 'legal.mentions')->name('legal.mentions');
 Route::view('/cgv', 'legal.cgv')->name('legal.cgv');
 Route::view('/politique-confidentialite', 'legal.confidentialite')->name('legal.confidentialite');
 
+// Contact page (public)
+Route::view('/contact', 'contact')->name('contact');
+
 // Stripe webhooks (no CSRF verification)
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])
     ->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class)
@@ -102,10 +105,15 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
         Route::get('/admin/instagram', \App\Livewire\Admin\InstagramPostGenerator::class)->name('admin.instagram');
         Route::get('/admin/prospects', \App\Livewire\Admin\Prospect\ProspectManager::class)->name('admin.prospects.index');
         Route::get('/admin/announcements', \App\Livewire\Admin\Settings\AnnouncementManager::class)->name('admin.announcements.index');
+        Route::get('/admin/social-settings', \App\Livewire\Admin\Settings\SocialSettings::class)->name('admin.social-settings');
+        Route::get('/admin/promotion', \App\Livewire\Admin\Settings\PromotionManager::class)->name('admin.promotion');
         Route::get('/admin/newsletter', \App\Livewire\Admin\Newsletter\NewsletterManager::class)->name('admin.newsletter.index');
         Route::get('/admin/guides', \App\Livewire\Admin\Guide\GuideManager::class)->name('admin.guides.index');
         Route::get('/admin/guides/all-leads', \App\Livewire\Admin\Guide\GuideAllLeads::class)->name('admin.guides.all-leads');
         Route::get('/admin/guides/{guide}/leads', \App\Livewire\Admin\Guide\GuideLeads::class)->name('admin.guides.leads');
+        Route::get('/admin/simulation', \App\Livewire\Admin\RevenueSimulator::class)->name('admin.simulation');
+        Route::get('/admin/activity', \App\Livewire\Admin\ActivityStream::class)->name('admin.activity');
+        Route::get('/admin/queue', \App\Livewire\Admin\QueueMonitor::class)->name('admin.queue');
     });
 
     // Social & Sync routes (Premium only)
@@ -135,11 +143,13 @@ Route::get('/newsletter/unsubscribe/{user}', [\App\Http\Controllers\NewsletterCo
 
 Route::get('/render/post/{post}', [\App\Http\Controllers\RenderPostController::class, 'show'])->name('render.post');
 
-// Dynamic Sitemap
 Route::get('/sitemap.xml', function () {
-    $posts = \App\Models\BlogPost::published()->latest()->get();
+    $publishedPosts = \App\Models\BlogPost::published()->latest()->get();
+    $publishedGuides = \App\Models\FreeGuide::published()->latest()->get();
+    
     return response()->view('sitemap', [
-        'posts' => $posts
+        'posts' => $publishedPosts,
+        'guides' => $publishedGuides,
     ])->header('Content-Type', 'text/xml');
 })->name('sitemap');
 

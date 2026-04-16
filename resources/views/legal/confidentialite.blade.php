@@ -12,10 +12,10 @@
     <li><strong>Ressources brutes (Médias et Audios) :</strong> L'application stocke provisoirement vos photos et la note vocale que vous transmettez (le fichier audio compressé de votre micro).</li>
 </ul>
 
-<h2>2. Transfert sécurisé aux Intelligences Artificielles (OpenAI, Anthropic)</h2>
-<p>L'innovation principale de Postelio consiste à transcrire le son en texte puis formater le sujet via l'IA.<br>
-Vos pistes vocales, de même que le transcript brut, communiquent avec le modèle d'Intelligence Artificielle en l'interrogeant par <strong>API (Machine-à-Machine)</strong>. 
-Conformément aux directives Entreprise (B2B) des principaux moteurs du marché, <strong>vos contenus professionnels et vocaux injectés dans l'API de façon automatisée ne sont jamais réutilisés ou indexés afin d'entraîner le modèle global public de ces Intelligences Artificielles.</strong> Vos chantiers restent vos chantiers, aucune donnée d'entraînement ne viendra fuiter votre savoir faire technique.</p>
+<h2>2. Transfert sécurisé aux technologies de génération (OpenAI, Anthropic)</h2>
+<p>L'innovation principale de Postelio consiste à transcrire le son en texte puis formater le sujet via nos algorithmes de génération.<br>
+Vos pistes vocales, de même que le transcript brut, communiquent avec le modèle de génération en l'interrogeant par <strong>API (Machine-à-Machine)</strong>. 
+Conformément aux directives Entreprise (B2B) des principaux moteurs du marché, <strong>vos contenus professionnels et vocaux injectés dans l'API de façon automatisée ne sont jamais réutilisés ou indexés afin d'entraîner le modèle global public de ces technologies.</strong> Vos chantiers restent vos chantiers, aucune donnée d'entraînement ne viendra fuiter votre savoir faire technique.</p>
 
 <h2>3. Vos Droits d'Accès et à Oubli (Droit de Rectification)</h2>
 <p>Postelio ne vous soumettra à aucun traitement purement publicitaire avec des entreprises-tiers ou du "Démarchage Crossover". L'adresse email récoltée à l'abonnement sera exclusivement utilisée pour des actions comptables, fonctionnelles ou informatives de sécurité impérieuses.</p>

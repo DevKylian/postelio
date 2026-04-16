@@ -28,7 +28,7 @@
     $alpineData = $preview ? "x-data=\"{ current: 0, total: $total }\"" : '';
 @endphp
 
-<div {!! $alpineData !!} class="w-full aspect-[{{ ($aspectRatio ?? "4:5") === "4:5" ? "4/5" : "1/1" }}] bg-[#D1D5DB] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
+<div {!! $alpineData !!} class="w-full {{ ($aspectRatio ?? '4:5') === '4:5' ? 'aspect-[4/5]' : 'aspect-square' }} bg-[#D1D5DB] flex flex-col relative overflow-hidden group {{ $preview ? 'rounded-2xl shadow-2xl transition-all duration-500 hover:-translate-y-2' : '' }}">
     {{-- Concrete Texture --}}
     <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" style="background-image: url('https://www.transparenttextures.com/patterns/concrete-wall.png');"></div>
     
@@ -50,10 +50,7 @@
                     </div>
 
                     @php
-                        $dlen = mb_strlen($text);
-                        $fontSize = 'text-lg';
-                        if ($dlen > 120) $fontSize = 'text-sm';
-                        elseif ($dlen > 60) $fontSize = 'text-base';
+                        $fontSize = 'sm:text-xl text-lg';
                     @endphp
 
                     <div class="max-h-[140px] overflow-hidden">
@@ -66,7 +63,7 @@
         </div>
 
         <div class="h-20 px-10 flex flex-col justify-center gap-1 z-20">
-             <span class="text-gray-900/40 text-[9px] font-black uppercase tracking-widest truncate w-full">{{ $companyLabel }}</span>
+             <span class="text-gray-900/40 text-[9px] font-black uppercase tracking-widest truncate w-full">{!! mb_strlen($companyLabel) > 15 ? wordwrap($companyLabel, 15, "<br>", true) : $companyLabel !!}</span>
              <div class="flex items-center gap-1.5 overflow-hidden">
                 @if($trade)
                     <span class="px-1.5 py-0.5 rounded-sm bg-gray-900/5 text-gray-900/50 text-[6px] font-black uppercase tracking-wider border border-gray-900/10 whitespace-nowrap">{{ $trade }}</span>
@@ -110,3 +107,4 @@
         </div>
     @endif
 </div>
+

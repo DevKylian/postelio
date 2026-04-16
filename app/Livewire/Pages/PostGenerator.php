@@ -53,6 +53,7 @@ class PostGenerator extends Component
     public $aspectRatio     = '4:5';      // 1:1 | 4:5 (default 4:5)
     public bool $isFeatureDisabled = false;
     public int $currentStep = 1;
+    public ?string $photoOrientationWarning = null;
 
     // Carousel templates
     const CAROUSEL_TEMPLATES  = ['chantier_detail', 'step_by_step', 'guide_pedagogique', 'project', 'faq'];
@@ -140,6 +141,39 @@ class PostGenerator extends Component
         return array_merge($allowed, ['custom']);
     }
 
+    public function updatedImageBefore(): void
+    {
+        $this->checkPhotoOrientationMismatch();
+    }
+
+    public function updatedImageAfter(): void
+    {
+        $this->checkPhotoOrientationMismatch();
+    }
+
+    private function checkPhotoOrientationMismatch(): void
+    {
+        $this->photoOrientationWarning = null;
+
+        if ($this->template !== 'project' || !$this->imageBefore || !$this->imageAfter) {
+            return;
+        }
+
+        $isLandscape = function ($upload): bool {
+            try {
+                $mgr = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $img = $mgr->read($upload->getRealPath());
+                return $img->width() > $img->height();
+            } catch (\Throwable $e) {
+                return false;
+            }
+        };
+
+        if ($isLandscape($this->imageBefore) !== $isLandscape($this->imageAfter)) {
+            $this->photoOrientationWarning = 'Les deux photos doivent avoir la même orientation : toutes les deux en portrait ou toutes les deux en paysage. Mixte non supporté.';
+        }
+    }
+
     public function updatedAudio()
     {
         \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] updatedAudio triggered', [
@@ -163,17 +197,34 @@ class PostGenerator extends Component
             $path = $this->audio->store('temp_memos', 'public');
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] File stored', ['path' => $path]);
 
-            // 2. Transcribe
+            // 2. Transcribe — prime Whisper with nearby commune names so it spells them correctly
             $transcriber = app(\App\Services\PostGeneration\TranscriptionService::class);
-            $transcript = $transcriber->transcribe($path);
+            $company     = Auth::user()->company;
+            $geoPrompt   = \App\Services\PostGeneration\TranscriptionService::buildGeoPrompt(
+                $company?->city,
+                $company?->postal_code,
+                $company?->nearby_cities ?? []
+            );
+            $transcript = $transcriber->transcribe($path, $geoPrompt);
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Transcription finished', ['length' => strlen($transcript)]);
 
-            // 3. Pré-remplir le champ texte avec la transcription brute
+            // 3. Correct phonetic city name deformations before showing to user.
+            //    Always runs when a city is set — fetches nearby communes if not stored yet.
+            $refiner = app(\App\Services\PostGeneration\ContentRefinerService::class);
+            if ($company?->city) {
+                $transcript = $refiner->correctCityNamesInTranscript(
+                    $transcript,
+                    $company->city,
+                    $company->nearby_cities ?? [],
+                    $company->postal_code
+                );
+            }
+
+            // 4. Pré-remplir le champ texte avec la transcription corrigée
             $this->textContent = $transcript;
 
-            // 4. Extract fields
+            // 5. Extract fields
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Starting field extraction');
-            $refiner = app(\App\Services\PostGeneration\ContentRefinerService::class);
             $extracted = $refiner->extractFields($transcript);
             \Illuminate\Support\Facades\Log::info('[AUDIO DEBUG] Field extraction finished', ['extracted' => $extracted]);
 
@@ -415,6 +466,9 @@ class PostGenerator extends Component
             'company_email'          => Auth::user()->company?->email,
             'company_website'        => Auth::user()->company?->website,
             'company_city'           => Auth::user()->company?->city,
+            'company_postal'         => Auth::user()->company?->postal_code,
+            'company_context'        => Auth::user()->company?->city_context,
+            'company_nearby'         => Auth::user()->company?->nearby_cities ?? [],
             'company_trade'          => Auth::user()->company?->trade,
             'aspect_ratio'           => $this->aspectRatio,
             'variant_count'          => $user->postVariantsCount(),

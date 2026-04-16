@@ -19,7 +19,7 @@
         </div>
     </div>
     @elseif ($status === 'idle')
-        <div class="py-8 px-4 sm:px-6 lg:px-8">
+        <div wire:key="status-idle" class="py-8 px-4 sm:px-6 lg:px-8">
             <div class="max-w-4xl mx-auto space-y-8">
                 {{-- STEPPER --}}
                 <div class="mb-10" id="tour-gen-stepper">
@@ -48,32 +48,32 @@
 
         @if($currentStep === 1)
             <x-onboarding-tour wire:key="tour-gen_step1" name="gen_step1" :steps="[
-                ['target' => null, 'icon' => '🎨', 'title' => 'Nouveau Post', 'desc' => 'Prêt à briller ? On commence par choisir le gabarit idéal.'],
-                ['target' => '#tour-gen-stepper', 'icon' => '🚩', 'title' => 'Ton parcours', 'desc' => 'Le processus se fait en 4 étapes simples. Tu es à l\'étape 1.'],
-                ['target' => '#tour-gen-templates', 'icon' => '📂', 'title' => 'Choisis un modèle', 'desc' => 'Avis client, Avant/Après, Conseil utile... Sélectionne celui qui correspond à ton besoin.'],
-                ['target' => '#tour-gen-next', 'icon' => '➡️', 'title' => 'Passe à la suite', 'desc' => 'Une fois ton modèle choisi, clique sur Continuer pour passer au brief vocal !'],
+                ['target' => null, 'icon' => '🎨', 'title' => 'Nouveau Post', 'desc' => 'Prêts à briller ? On commence par choisir le gabarit idéal.'],
+                ['target' => '#tour-gen-stepper', 'icon' => '🚩', 'title' => 'Votre parcours', 'desc' => 'Le processus se fait en 4 étapes simples. Vous êtes à l\'étape 1.'],
+                ['target' => '#tour-gen-templates', 'icon' => '📂', 'title' => 'Choisissez un modèle', 'desc' => 'Avis client, Avant/Après, Conseil utile... Sélectionnez celui qui correspond à votre besoin.'],
+                ['target' => '#tour-gen-next', 'icon' => '➡️', 'title' => 'Passez à la suite', 'desc' => 'Une fois votre modèle choisi, cliquez sur Continuer pour passer au brief vocal !'],
             ]" />
         @endif
 
         @if($currentStep === 2)
             <x-onboarding-tour wire:key="tour-gen_step2" name="gen_step2" :steps="[
-                ['target' => '#tour-gen-brief', 'icon' => '🎙️', 'title' => 'Le Brief', 'desc' => 'C\'est ici que la magie opère. Enregistre un mémo vocal ou écris quelques mots.'],
-                ['target' => '#tour-gen-brief', 'icon' => '💡', 'title' => 'Précision', 'desc' => 'Plus tu donnes de détails sur tes travaux (lieu, matériaux, satisfaction client), plus l\'IA sera percutante.'],
+                ['target' => '#tour-gen-brief', 'icon' => '🎙️', 'title' => 'Le Brief', 'desc' => 'C\'est ici que la magie opère. Enregistrez un mémo vocal ou écrivez quelques mots.'],
+                ['target' => '#tour-gen-brief', 'icon' => '💡', 'title' => 'Précision', 'desc' => 'Plus vous donnez de détails sur vos travaux (lieu, matériaux, satisfaction client), plus Postelio sera percutant.'],
             ]" />
         @endif
 
         @if($currentStep === 3)
             <x-onboarding-tour wire:key="tour-gen_step3" name="gen_step3" :steps="[
-                ['target' => '#tour-gen-design', 'icon' => '✨', 'title' => 'Design & Style', 'desc' => 'Choisis l\'ambiance visuelle (Classique, Glassmorphism, etc.) et ajoute tes photos.'],
-                ['target' => '#tour-gen-design', 'icon' => '🖼️', 'title' => 'Photos', 'desc' => 'Uploade tes plus beaux clichés de chantier pour illustrer ton post.'],
+                ['target' => '#tour-gen-design', 'icon' => '📐', 'title' => 'Format du post', 'desc' => 'Choisissez le format idéal pour votre publication : Carré ou Portrait (4:5).'],
+                ['target' => '#tour-gen-design', 'icon' => '🖼️', 'title' => 'Photos', 'desc' => 'Uploadez vos plus beaux clichés de chantier pour illustrer votre post.'],
             ]" />
         @endif
 
         @if($currentStep === 4)
             <x-onboarding-tour wire:key="tour-gen_step4" name="gen_step4" :steps="[
-                ['target' => '#tour-gen-platforms', 'icon' => '📱', 'title' => 'Réseaux Sociaux', 'desc' => 'Sélectionne où tu souhaites diffuser ton post : Instagram, Facebook ou les deux !'],
-                ['target' => '#tour-gen-schedule', 'icon' => '⏰', 'title' => 'Planification', 'desc' => 'Tu peux publier immédiatement ou programmer ton post pour le moment idéal.'],
-                ['target' => '#tour-gen-submit', 'icon' => '🚀', 'title' => 'Lancement !', 'desc' => 'C\'est fini. Clique sur le bouton pour lancer l\'analyse IA et générer tes versions.'],
+                ['target' => '#tour-gen-platforms', 'icon' => '📱', 'title' => 'Réseaux Sociaux', 'desc' => 'Sélectionnez où vous souhaitez diffuser votre post : Instagram, Facebook ou les deux !'],
+                ['target' => '#tour-gen-schedule', 'icon' => '⏰', 'title' => 'Planification', 'desc' => 'Vous pouvez publier immédiatement ou programmer votre post pour le moment idéal.'],
+                ['target' => '#tour-gen-submit', 'icon' => '🚀', 'title' => 'Lancement !', 'desc' => 'C\'est fini. Cliquez sur le bouton pour lancer la génération de vos versions.'],
             ]" />
         @endif
 
@@ -112,7 +112,7 @@
                 $customGroup = [
                     'key'       => 'custom',
                     'category'  => 'Mes modèles personnalisés',
-                    'badge'     => 'IA',
+                    'badge'     => 'Nouveau',
                     'templates' => [],
                 ];
                 foreach ($customTemplates as $ct) {
@@ -120,7 +120,7 @@
                         'id'              => 'custom_' . $ct->id,
                         'custom_id'       => $ct->id,
                         'label'           => $ct->name,
-                        'desc'            => $ct->description ?? 'Modèle personnalisé généré par IA.',
+                        'desc'            => $ct->description ?? 'Modèle personnalisé créé sur-mesure.',
                         'icon'            => 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
                         'visual_style'    => $ct->visual_style,
                         'photos'          => '1 photo',
@@ -148,7 +148,7 @@
 
             // Load template spec for vocal hint
             $templateSpec = config("template-specs.{$template}");
-            $vocalHint = $templateSpec['vocal_hint'] ?? 'Décrivez votre projet — l\'IA pré-remplira les champs suivants.';
+            $vocalHint = $templateSpec['vocal_hint'] ?? 'Décrivez votre projet — Postelio pré-remplira les champs suivants.';
             $templateDescription = $templateSpec['description'] ?? null;
             @endphp
 
@@ -292,7 +292,7 @@
                                             {{ $tpl['label'] }}
                                         </p>
                                         @if($isCustomTpl)
-                                            <span class="text-[9px] font-bold text-copper bg-amber-50 px-1.5 py-0.5 rounded-full leading-none">IA</span>
+                                            <span class="text-[9px] font-bold text-copper bg-amber-50 px-1.5 py-0.5 rounded-full leading-none">PRO</span>
                                         @endif
                                         @if(isset($tpl['photos']))
                                             <span class="text-[9px] font-medium {{ $isSelected ? 'text-copper/60 bg-copper/5' : 'text-gray-400 bg-gray-100' }} px-1.5 py-0.5 rounded-lg leading-none">
@@ -356,7 +356,7 @@
                         @endphp
                         @if(count($fieldSummary) > 0)
                         <p class="text-[10px] text-amber-600 mt-1.5 leading-relaxed">
-                            L'IA va générer : {{ implode(' + ', $fieldSummary) }}
+                            Postelio va générer : {{ implode(' + ', $fieldSummary) }}
                         </p>
                         @endif
                     </div>
@@ -375,6 +375,7 @@
                             <span class="hidden sm:inline">Enregistrer</span>
                             <span class="sm:hidden">Vocal</span>
                         </button>
+                        @if(auth()->user()->is_admin)
                         <button type="button" @click="mode = 'upload'"
                                 :class="mode === 'upload' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
                                 class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm transition-all duration-200">
@@ -384,6 +385,7 @@
                             <span class="hidden sm:inline">Importer</span>
                             <span class="sm:hidden">MP3</span>
                         </button>
+                        @endif
                         <button type="button" @click="mode = 'text'"
                                 :class="mode === 'text' ? 'bg-white shadow-sm text-midnight font-semibold' : 'text-gray-400 hover:text-gray-600'"
                                 class="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm transition-all duration-200">
@@ -451,7 +453,7 @@
                             </div>
                             <div class="text-center space-y-1">
                                 <p class="text-sm text-midnight font-bold">Analyse intelligente en cours</p>
-                                <p class="text-[11px] text-gray-400">L'IA extrait les détails de votre projet...</p>
+                                <p class="text-[11px] text-gray-400">Postelio extrait les détails de votre projet...</p>
                             </div>
                         </div>
 
@@ -472,6 +474,7 @@
                         </div>
                     </div>
 
+                    @if(auth()->user()->is_admin)
                     {{-- Upload Mode --}}
                     <div x-show="mode === 'upload'">
                         <div x-data="{
@@ -535,6 +538,7 @@
                             </label>
                         </div>
                     </div>
+                    @endif
 
                     {{-- Text Mode --}}
                     <div x-show="mode === 'text'" x-transition>
@@ -547,7 +551,7 @@
                                 class="w-full px-4 py-3.5 border border-gray-200 rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-copper focus:ring-2 focus:ring-copper/10 transition-all placeholder-gray-300 resize-none leading-relaxed"
                             ></textarea>
                             <div class="flex items-center justify-between">
-                                <p class="text-xs text-gray-400">L'IA utilisera ce texte pour générer votre post — plus vous êtes précis, meilleur sera le résultat.</p>
+                                <p class="text-xs text-gray-400">Postelio utilisera ce texte pour générer votre post — plus vous êtes précis, meilleur sera le résultat.</p>
                                 <span class="text-[10px] text-gray-300 shrink-0 ml-3">max 2000 car.</span>
                             </div>
                         </div>
@@ -559,7 +563,7 @@
                     @if($analysisSuccess)
                     <div class="flex items-center gap-2 text-xs font-semibold text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-100">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                        L'IA a pré-rempli les champs basés sur votre vocal.
+                        Les champs ont été pré-remplis basés sur votre vocal.
                     </div>
                     @endif
 
@@ -584,9 +588,9 @@
                         <div class="text-left">
                             <h3 class="font-semibold text-midnight text-base leading-tight">
                                 Personnaliser le gabarit 
-                                <span class="hidden sm:inline text-gray-400 font-normal"> - Affinez le ton, le style et les détails — l'IA s'adapte.</span>
+                                <span class="hidden sm:inline text-gray-400 font-normal"> - Affinez le ton, le style et les détails — Postelio s'adapte.</span>
                             </h3>
-                            <p class="sm:hidden text-xs text-gray-400 mt-0.5">Affinez le ton, le style et les détails — l'IA s'adapte.</p>
+                            <p class="sm:hidden text-xs text-gray-400 mt-0.5">Affinez le ton, le style et les détails — Postelio s'adapte.</p>
                         </div>
                     </div>
                     <div class="text-gray-400 group-hover:text-copper transition-colors shrink-0">
@@ -596,7 +600,7 @@
                     </div>
                 </button>
 
-                <div class="p-6 space-y-6" 
+                <div class="px-4 py-6 sm:p-6 space-y-6" 
                      x-show="expanded" 
                      x-transition:enter="transition ease-out duration-200"
                      x-transition:enter-start="opacity-0 transform -translate-y-2"
@@ -605,7 +609,7 @@
                     {{-- ── Ton de voix ── --}}
                     <div>
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Ton de voix</p>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                             @php
                             $tones = [
                                 ['id' => 'professionnel', 'label' => 'Professionnel', 'desc' => 'Sérieux & direct', 'icon' => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', 'color' => 'blue'],
@@ -625,21 +629,21 @@
                             <button type="button"
                                     wire:click="$set('tone', '{{ $t['id'] }}')"
                                     @if($isAnalyzing) disabled @endif
-                                    class="group relative flex flex-col items-start gap-2.5 p-3.5 rounded-xl border-2 text-left transition-all duration-200
+                                    class="group relative flex flex-row items-center gap-4 p-4 rounded-xl border-2 text-left transition-all duration-200
                                         {{ $tone === $t['id'] ? $c['sel'] . ' shadow-sm' : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50' }}
                                         {{ $isAnalyzing ? 'animate-pulse opacity-60 pointer-events-none' : '' }}">
-                                <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all {{ $tone === $t['id'] ? $c['icon'] : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200' }}">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0 {{ $tone === $t['id'] ? $c['icon'] : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200' }}">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $t['icon'] }}" />
                                     </svg>
                                 </div>
-                                <div>
-                                    <p class="text-sm font-semibold {{ $tone === $t['id'] ? $c['label'] : 'text-midnight' }} leading-tight">{{ $t['label'] }}</p>
-                                    <p class="text-[11px] text-gray-400 mt-0.5">{{ $t['desc'] }}</p>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-bold {{ $tone === $t['id'] ? $c['label'] : 'text-midnight' }} leading-tight">{{ $t['label'] }}</p>
+                                    <p class="text-[11px] text-gray-400 mt-0.5 leading-tight truncate">{{ $t['desc'] }}</p>
                                 </div>
                                 @if($tone === $t['id'])
-                                <div class="absolute top-2.5 right-2.5 w-4 h-4 rounded-full {{ $c['dot'] }} flex items-center justify-center">
-                                    <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="w-5 h-5 rounded-full {{ $c['dot'] }} flex items-center justify-center shrink-0">
+                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                     </svg>
                                 </div>
@@ -651,23 +655,23 @@
 
                     {{-- ── Hashtags ── --}}
                     <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center">
-                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-10 h-10 bg-gray-200/50 rounded-xl flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
                                 </svg>
                             </div>
-                            <div>
-                                <p class="text-sm font-semibold text-midnight">Inclure des hashtags</p>
-                                <p class="text-xs text-gray-400">L'IA ajoute 3-5 hashtags pertinents automatiquement</p>
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold text-midnight leading-tight">Inclure des hashtags</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5 leading-tight truncate sm:whitespace-normal">Ajoute automatiquement 3-5 hashtags</p>
                             </div>
                         </div>
                         <button type="button"
                                 wire:click="$set('includeHashtags', {{ $includeHashtags ? 'false' : 'true' }})"
-                                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none
+                                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none shrink-0
                                     {{ $includeHashtags ? 'bg-copper' : 'bg-gray-300' }}">
                             <span class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200
-                                {{ $includeHashtags ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                                {{ $includeHashtags ? 'translate-x-[22px]' : 'translate-x-1' }}"></span>
                         </button>
                     </div>
 
@@ -747,7 +751,7 @@
                     @if($template === 'faq')
                     <div class="space-y-3 pt-1 border-t border-gray-100">
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest pt-2">Catégorie de la FAQ</p>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                             @php
                             $faqCats = [
                                 ['id' => 'technique',       'label' => 'Technique',       'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
@@ -759,12 +763,14 @@
                             @foreach($faqCats as $cat)
                             <button type="button"
                                     wire:click="$set('faqCategory', '{{ $cat['id'] }}')"
-                                    class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-center transition-all duration-200
+                                    class="flex flex-row items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all duration-200
                                         {{ $faqCategory === $cat['id'] ? 'border-copper bg-amber-50 shadow-sm' : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50' }}">
-                                <svg class="w-5 h-5 {{ $faqCategory === $cat['id'] ? 'text-copper' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $cat['icon'] }}" />
-                                </svg>
-                                <span class="text-xs font-semibold {{ $faqCategory === $cat['id'] ? 'text-amber-700' : 'text-gray-500' }} leading-tight">{{ $cat['label'] }}</span>
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 {{ $faqCategory === $cat['id'] ? 'bg-copper text-white' : 'bg-gray-100 text-gray-400' }}">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="{{ $cat['icon'] }}" />
+                                    </svg>
+                                </div>
+                                <span class="text-xs font-bold {{ $faqCategory === $cat['id'] ? 'text-amber-700' : 'text-gray-500' }} leading-tight">{{ $cat['label'] }}</span>
                             </button>
                             @endforeach
                         </div>
@@ -775,23 +781,23 @@
                     @if($template === 'conseil_saisonnier')
                     <div class="space-y-3 pt-1 border-t border-gray-100">
                         <p class="text-xs font-bold text-gray-400 uppercase tracking-widest pt-2">Saison ciblée</p>
-                        <div class="grid grid-cols-5 gap-2">
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                             @php
                             $seasons = [
-                                ['id' => 'auto',      'label' => 'Auto',      'emoji' => '🤖'],
-                                ['id' => 'printemps', 'label' => 'Printemps', 'emoji' => '🌸'],
-                                ['id' => 'ete',       'label' => 'Été',       'emoji' => '☀️'],
-                                ['id' => 'automne',   'label' => 'Automne',   'emoji' => '🍂'],
-                                ['id' => 'hiver',     'label' => 'Hiver',     'emoji' => '❄️'],
+                                ['id' => 'auto',      'label' => 'Automatique', 'emoji' => '🤖'],
+                                ['id' => 'printemps', 'label' => 'Printemps',   'emoji' => '🌸'],
+                                ['id' => 'ete',       'label' => 'Été',         'emoji' => '☀️'],
+                                ['id' => 'automne',   'label' => 'Automne',     'emoji' => '🍂'],
+                                ['id' => 'hiver',     'label' => 'Hiver',       'emoji' => '❄️'],
                             ];
                             @endphp
                             @foreach($seasons as $s)
                             <button type="button"
                                     wire:click="$set('season', '{{ $s['id'] }}')"
-                                    class="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-center transition-all duration-200
+                                    class="flex flex-row items-center justify-center gap-3 p-3.5 rounded-xl border-2 text-center transition-all duration-200
                                         {{ $season === $s['id'] ? 'border-copper bg-amber-50 shadow-sm' : 'border-gray-100 hover:border-gray-200 hover:bg-gray-50' }}">
-                                <span class="text-2xl leading-none">{{ $s['emoji'] }}</span>
-                                <span class="text-[10px] font-semibold {{ $season === $s['id'] ? 'text-amber-700' : 'text-gray-500' }}">{{ $s['label'] }}</span>
+                                <span class="text-xl leading-none shrink-0">{{ $s['emoji'] }}</span>
+                                <span class="text-[11px] font-bold {{ $season === $s['id'] ? 'text-amber-700' : 'text-gray-500' }} leading-tight truncate">{{ $s['label'] }}</span>
                             </button>
                             @endforeach
                         </div>
@@ -816,14 +822,14 @@
                     </div>
                     @endif
 
-                    {{-- ── Note libre pour l'IA ── --}}
+                    {{-- ── Note libre pour la rédaction ── --}}
                     <div class="space-y-1.5 pt-1 border-t border-gray-100">
                         <label class="text-xs font-semibold text-gray-600 block pt-2">
                             Contexte supplémentaire <span class="text-gray-400 font-normal">(optionnel)</span>
                         </label>
                         <div class="relative">
                             <textarea wire:model.defer="customNote"
-                                      placeholder="Précision pour l'IA — ex: 'Client dans le 16e Paris', 'Travaux urgence dégâts des eaux', 'Mettre en avant le label RGE'..."
+                                      placeholder="Précision pour la rédaction — ex: 'Client dans le 16e Paris', 'Travaux urgence dégâts des eaux', 'Mettre en avant le label RGE'..."
                                       rows="2"
                                       maxlength="300"
                                       class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm text-midnight bg-white focus:outline-none focus:border-copper focus:ring-2 focus:ring-amber-100 transition-all placeholder-gray-300 resize-none"></textarea>
@@ -846,7 +852,7 @@
                 <div class="px-6 py-5 border-b border-gray-50 flex items-center gap-4" id="tour-gen-design">
                     <div class="w-8 h-8 rounded-full bg-copper flex items-center justify-center text-white font-bold text-sm shrink-0">3</div>
                     <div>
-                        <h3 class="font-semibold text-midnight text-base">Choisissez votre ambiance</h3>
+                        <h3 class="font-semibold text-midnight text-base">Choisissez le format de votre publication</h3>
                         <p class="text-xs text-gray-400 mt-0.5">Quel univers visuel souhaitez-vous projeter ?</p>
                     </div>
                 </div>
@@ -875,7 +881,7 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-xs sm:text-sm font-bold {{ $aspectRatio === '1:1' ? 'text-copper' : 'text-midnight' }} leading-tight">Carré (1:1)</p>
-                                    <p class="text-[10px] text-gray-400 mt-0.5 font-medium">Le classique Instagram</p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5 font-medium">Format polyvalent</p>
                                 </div>
                                 @if($aspectRatio === '1:1')
                                     <div class="absolute top-2 right-2 w-4 h-4 bg-copper rounded-full flex items-center justify-center">
@@ -1014,6 +1020,12 @@
                         <p class="text-xs text-gray-400 mt-0.5">
                             {{ $template === 'project' ? 'Uploadez les deux photos pour le split Avant / Après.' : 'Uploadez la photo principale du post.' }}
                         </p>
+                        @if(in_array($template, ['project', 'lifestyle']))
+                        <div class="flex items-center gap-1.5 mt-1.5">
+                            <svg class="w-3 h-3 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2" stroke-width="2"/></svg>
+                            <span class="text-[11px] text-blue-500 font-medium">{{ $template === 'project' ? 'Photos portrait attendues' : 'Photo portrait attendue' }} — les paysages sont adaptés automatiquement.</span>
+                        </div>
+                        @endif
                     </div>
                 </div>
 
@@ -1083,6 +1095,18 @@
                         @endif
 
                     </div>
+
+                    @if($photoOrientationWarning)
+                    <div class="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 mt-2">
+                        <svg class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <div>
+                            <p class="text-xs font-bold text-amber-800">Orientations incompatibles</p>
+                            <p class="text-xs text-amber-700 mt-0.5">{{ $photoOrientationWarning }}</p>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
             @endif
@@ -1096,6 +1120,12 @@
                         <div>
                             <h3 class="font-semibold text-midnight text-base">Photos du chantier</h3>
                             <p class="text-xs text-gray-400 mt-0.5">La 1ère photo sera la couverture du carrousel.</p>
+                            @if($template === 'chantier_detail')
+                            <div class="flex items-center gap-1.5 mt-1.5">
+                                <svg class="w-3 h-3 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                <span class="text-[11px] text-emerald-600 font-medium">Photos portrait et paysage acceptées.</span>
+                            </div>
+                            @endif
                         </div>
                         <span class="text-xs font-bold text-copper bg-copper/10 px-2.5 py-1 rounded-full">2 à 5 photos</span>
                     </div>
@@ -1148,7 +1178,7 @@
                 </div>
                 <div>
                     <p class="font-semibold text-blue-900 text-sm">Aucune photo requise</p>
-                    <p class="text-blue-600 text-sm mt-0.5 leading-relaxed">Le Guide Pédagogique est un carrousel 100% textuel. L'IA génère toutes les slides à partir de votre mémo vocal uniquement.</p>
+                    <p class="text-blue-600 text-sm mt-0.5 leading-relaxed">Le Guide Pédagogique est un carrousel 100% textuel. Postelio génère toutes les slides à partir de votre mémo vocal uniquement.</p>
                 </div>
             </div>
             @endif
@@ -1203,7 +1233,6 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold {{ in_array('instagram', $safePlatforms) ? 'text-midnight' : 'text-gray-600' }}">Instagram</p>
-                                <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest">{{ $isPremium ? '1080 × 1080 px' : 'Premium' }}</p>
                             </div>
                             @if(in_array('instagram', $safePlatforms))
                                 <div class="w-5 h-5 rounded-full bg-pink-500 flex items-center justify-center shrink-0">
@@ -1236,7 +1265,6 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-semibold {{ in_array('facebook', $safePlatforms) ? 'text-midnight' : 'text-gray-600' }}">Facebook</p>
-                                <p class="text-[11px] font-bold uppercase tracking-wider {{ $isPremium ? 'text-gray-400' : 'text-copper/70' }}">{{ $isPremium ? '1080 × 1080 px' : 'Premium' }}</p>
                             </div>
                             @if(in_array('facebook', $safePlatforms))
                                 <div class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center shrink-0 shadow-sm">
@@ -1461,11 +1489,11 @@
             @endif
 
             {{-- ── NAVIGATION FOOTER ── --}}
-            <div class="flex items-center gap-4 pt-4">
+            <div id="tour-gen-footer" class="flex flex-col-reverse sm:flex-row items-center gap-3 sm:gap-4 pt-6">
                 @if($currentStep > 1)
                     <button type="button" 
                             wire:click="previousStep"
-                            class="flex-1 bg-white border-2 border-gray-100 text-midnight font-bold py-4 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                            class="w-full sm:flex-1 bg-white border-2 border-gray-100 text-midnight font-bold py-4 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
                         Précédent
                     </button>
                 @endif
@@ -1476,14 +1504,14 @@
                             wire:click="nextStep"
                             wire:loading.attr="disabled"
                             @if(auth()->user()->remaining_credits <= 0) disabled @endif
-                            class="flex-[2] bg-copper text-white font-bold py-4 rounded-2xl shadow-lg shadow-copper/20 hover:bg-amber-500 hover:shadow-xl hover:shadow-copper/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                            class="w-full sm:flex-[2] bg-copper text-white font-bold py-4 rounded-2xl shadow-lg shadow-copper/20 hover:bg-amber-500 hover:shadow-xl hover:shadow-copper/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                         <svg wire:loading wire:target="nextStep" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
                         <span wire:loading.remove wire:target="nextStep">Continuer</span>
                         <span wire:loading wire:target="nextStep">Validation...</span>
                     </button>
                 @else
                     {{-- ── Submit ── --}}
-                    <div class="flex-[2]" x-data="postSubmit()" id="tour-gen-submit">
+                    <div class="w-full sm:flex-[2]" x-data="postSubmit()" id="tour-gen-submit">
                         <button type="button"
                                 @click="navigator.onLine ? $wire.generate() : submitOffline()"
                                 :disabled="isQueuing"
@@ -1519,7 +1547,7 @@
 
     {{-- ── PROCESSING ── --}}
     @elseif($status === 'processing')
-        <div wire:poll.2s="checkProcessingStatus" class="bg-white rounded-2xl border border-gray-100 shadow-sm py-24 flex flex-col items-center justify-center text-center space-y-6">
+        <div wire:key="status-processing" wire:poll.2s="checkProcessingStatus" class="bg-white rounded-2xl border border-gray-100 shadow-sm py-24 flex flex-col items-center justify-center text-center space-y-6">
             <div class="relative">
                 <div class="w-20 h-20 border-4 border-gray-100 border-t-copper rounded-full animate-spin"></div>
                 <div class="absolute inset-0 flex items-center justify-center">
@@ -1575,11 +1603,13 @@
 
     {{-- ── REVIEW PENDING ── --}}
     @elseif($status === 'review_pending')
+        <div wire:key="status-review_pending" class="space-y-5">
+
         <div class="space-y-5">
 
             {{-- Header --}}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-5 sm:px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-start gap-4">
                     <div class="w-10 h-10 bg-copper/10 rounded-xl flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -1587,14 +1617,14 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="font-bold text-midnight text-base">
+                        <h3 class="font-bold text-midnight text-base leading-tight">
                             @if(count($previewVariants) > 1)
                                 Choisissez une version
                             @else
                                 Vérifiez votre post
                             @endif
                         </h3>
-                        <p class="text-sm text-gray-400 mt-0.5">
+                        <p class="text-xs text-gray-400 mt-1 leading-relaxed">
                             @if(count($previewVariants) > 1)
                                 {{ count($previewVariants) }} versions générées — cliquez sur "Valider" sous celle que vous préférez.
                             @else
@@ -1606,7 +1636,7 @@
                 {{-- Rejeter --}}
                 <button wire:click="discardPost" wire:loading.attr="disabled"
                         wire:confirm="Ce post sera supprimé définitivement. Recommencer depuis zéro ?"
-                        class="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-400 font-medium py-2 px-3 rounded-xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all duration-200 text-xs disabled:opacity-60 shrink-0">
+                        class="w-full sm:w-auto flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-400 font-medium py-2.5 px-4 rounded-xl hover:border-red-200 hover:text-red-500 hover:bg-red-50 transition-all duration-200 text-xs disabled:opacity-60 shrink-0">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     Tout rejeter
                 </button>
@@ -1631,8 +1661,7 @@
                     @endif
 
                     {{-- Carte Instagram --}}
-                    <div class="bg-white border-2 rounded-2xl overflow-hidden shadow-md transition-all duration-200
-                                {{ count($previewVariants) > 1 ? 'hover:shadow-xl hover:-translate-y-0.5 border-gray-200' : 'border-gray-200' }}">
+                    <div class="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden">
 
                         {{-- Header Instagram --}}
                         <div class="flex items-center justify-between px-3.5 py-2.5">
@@ -1776,10 +1805,11 @@
 
         </form>
         </div>
+    </div>
 
     {{-- ── FAILED ── --}}
     @elseif($status === 'failed')
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm py-16 px-8 flex flex-col items-center justify-center text-center space-y-5">
+        <div wire:key="status-failed" class="bg-white rounded-2xl border border-gray-100 shadow-sm py-16 px-8 flex flex-col items-center justify-center text-center space-y-5">
             <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center text-red-500">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -1804,7 +1834,7 @@
 
     {{-- ── COMPLETED ── --}}
     @elseif($status === 'completed')
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm py-24 flex flex-col items-center justify-center text-center space-y-6">
+        <div wire:key="status-completed" class="bg-white rounded-2xl border border-gray-100 shadow-sm py-24 flex flex-col items-center justify-center text-center space-y-6">
             <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 animate-scale-in">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
@@ -1828,6 +1858,7 @@
             </div>
         </div>
     @endif
+    <x-tour-help-button :name="'gen_step' . $currentStep" />
 </div>
 
 @script

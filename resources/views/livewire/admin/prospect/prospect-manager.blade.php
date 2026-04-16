@@ -22,6 +22,19 @@
                 </div>
             @endif
 
+            <!-- Sales Scripts (Modular & Copyable) -->
+            <div x-data="{ open: true }">
+                <button @click="open = !open" class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest hover:text-copper transition-colors mb-4">
+                    <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                    Bibliothèque de Scripts & Séquences
+                    <span class="bg-slate-100 px-2 py-0.5 rounded text-[10px]">{{ \App\Models\SalesScript::count() }}</span>
+                </button>
+                
+                <div x-show="open" x-collapse style="display: none;">
+                    <livewire:admin.prospect.script-flow-manager />
+                </div>
+            </div>
+
             <!-- KPI Stats -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm flex flex-col justify-center">
@@ -72,7 +85,16 @@
                     </div>
                     <div class="w-full sm:w-1/2">
                         <label class="block text-sm font-medium text-gray-700 mb-1">URL Profil (Optionnel)</label>
-                        <input type="url" wire:model="newProfileUrl" class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-copper focus:ring-copper sm:text-sm" placeholder="https://instagram.com/...">
+                        <input type="url" wire:model="newProfileUrl"
+                            x-on:paste="
+                                const text = $event.clipboardData.getData('text');
+                                const match = text.match(/instagram\.com\/([^/?#\s]+)/);
+                                const reserved = ['p','reel','reels','stories','explore','accounts','tv','direct'];
+                                if (match && match[1] && !reserved.includes(match[1])) {
+                                    $wire.set('newAccountName', match[1]);
+                                }
+                            "
+                            class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-copper focus:ring-copper sm:text-sm" placeholder="https://instagram.com/...">
                         @error('newProfileUrl') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                     </div>
                     <div class="w-full sm:w-auto">
@@ -85,6 +107,37 @@
                     </div>
                 </form>
             </div>
+
+            <!-- Script Stats -->
+            @if($scriptStats->isNotEmpty())
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <h2 class="font-bold text-sm text-midnight mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    Performance par script
+                </h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                    @foreach($scriptStats as $stat)
+                    @php $rate = $stat->total > 0 ? round(($stat->responded / $stat->total) * 100) : 0; @endphp
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Script {{ $stat->script_version }}</div>
+                        <div class="flex items-end justify-between gap-2 mb-2">
+                            <div>
+                                <div class="text-xl font-bold text-midnight">{{ $stat->responded }}<span class="text-sm font-normal text-slate-400">/{{ $stat->total }}</span></div>
+                                <div class="text-[10px] text-slate-400">réponses</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold {{ $rate >= 20 ? 'text-green-500' : ($rate >= 10 ? 'text-amber-500' : 'text-slate-400') }}">{{ $rate }}%</div>
+                                <div class="text-[10px] text-slate-400">taux</div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-1.5">
+                            <div class="h-1.5 rounded-full {{ $rate >= 20 ? 'bg-green-400' : ($rate >= 10 ? 'bg-amber-400' : 'bg-slate-300') }}" style="width: {{ min($rate, 100) }}%"></div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
 
             <!-- Prospects List -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -111,7 +164,8 @@
                         <thead class="text-gray-400 bg-white">
                             <tr>
                                 <th class="px-6 py-4 font-medium w-1/4">Compte</th>
-                                <th class="px-6 py-4 font-medium w-1/4">Statut</th>
+                                <th class="px-6 py-4 font-medium">Statut</th>
+                                <th class="px-6 py-4 font-medium" style="min-width:130px">Script</th>
                                 <th class="px-6 py-4 font-medium">Notes</th>
                                 <th class="px-6 py-4 font-medium text-right w-1/6">Dernière action</th>
                                 <th class="px-6 py-4 font-medium text-right w-12"></th>
@@ -168,6 +222,18 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4">
+                                    <select
+                                        wire:change="updateScript({{ $prospect->id }}, $event.target.value)"
+                                        class="appearance-none block w-full px-3 py-1.5 border rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-copper/30 transition-colors {{ $prospect->script_version ? 'bg-copper/10 text-amber-700 border-amber-200' : 'bg-gray-50 text-gray-400 border-gray-200' }}"
+                                        style="min-width:110px"
+                                    >
+                                        <option value="">—</option>
+                                        @foreach($scripts as $num => $label)
+                                            <option value="{{ $num }}" @if((int)$prospect->script_version === $num) selected @endif>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="px-6 py-4">
                                     <div x-data="{ editing: false, note: '{{ addslashes($prospect->notes) }}' }" class="relative">
                                         <div x-show="!editing" @click="editing = true" class="cursor-pointer group flex items-start gap-2">
                                             <div class="text-xs text-gray-500 whitespace-normal break-words w-full min-h-[1.5rem] border-b border-transparent group-hover:border-gray-300 transition-colors">
@@ -203,7 +269,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-16">
+                                <td colspan="6" class="px-6 py-16">
                                     <div class="flex flex-col items-center justify-center text-center">
                                         <div class="w-16 h-16 bg-gray-50 text-gray-300 rounded-2xl flex items-center justify-center mb-4 border border-gray-100">
                                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>

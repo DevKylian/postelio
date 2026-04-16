@@ -123,13 +123,16 @@
   <!-- Background Decoration -->
   <div class="fixed inset-0 overflow-hidden pointer-events-none">
     <div
-      class="absolute -top-[10%] -left-[10%] w-[800px] h-[800px] bg-amber-200/40 rounded-full blur-[120px] opacity-40">
+      class="absolute -top-[10%] -left-[10%] w-[800px] h-[800px] rounded-full opacity-40 pointer-events-none"
+      style="background: radial-gradient(50% 50% at 50% 50%, rgba(253,230,138,0.4) 0%, transparent 100%);">
     </div>
     <div
-      class="absolute top-[40%] -right-[15%] w-[700px] h-[700px] bg-orange-200/20 rounded-full blur-[100px] opacity-30">
+      class="absolute top-[40%] -right-[15%] w-[700px] h-[700px] rounded-full opacity-30 pointer-events-none"
+      style="background: radial-gradient(50% 50% at 50% 50%, rgba(254,215,170,0.2) 0%, transparent 100%);">
     </div>
     <div
-      class="absolute -bottom-[20%] left-[20%] w-[600px] h-[600px] bg-amber-100/30 rounded-full blur-[100px] opacity-20">
+      class="absolute -bottom-[20%] left-[20%] w-[600px] h-[600px] rounded-full opacity-20 pointer-events-none"
+      style="background: radial-gradient(50% 50% at 50% 50%, rgba(254,243,199,0.3) 0%, transparent 100%);">
     </div>
   </div>
 
@@ -160,11 +163,7 @@
           class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
           :class="navReady ? 'nav-entry-stagger' : ''"
           style="animation-delay: 250ms">Réalisations</a>
-        <a href="#benefices"
-          class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
-          :class="navReady ? 'nav-entry-stagger' : ''"
-          style="animation-delay: 300ms">Avantages</a>
-        <a href="#tarifs" 
+        <a href="#tarifs"
            class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
            :class="navReady ? 'nav-entry-stagger' : ''"
            style="animation-delay: 350ms">Tarifs</a>
@@ -172,7 +171,11 @@
           class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
           :class="navReady ? 'nav-entry-stagger' : 'opacity-0'"
           style="animation-delay: 400ms">Blog</a>
-        
+        <a href="{{ route('contact') }}"
+          class="text-sm font-medium text-slate-600 hover:text-midnight transition-colors"
+          :class="navReady ? 'nav-entry-stagger' : 'opacity-0'"
+          style="animation-delay: 425ms">Contact</a>
+
         <div class="w-px h-4 bg-slate-200 mx-1"
              :class="navReady ? 'nav-entry-stagger' : 'opacity-0'"
              style="animation-delay: 450ms"></div>
@@ -222,12 +225,12 @@
           méthode</a>
         <a href="#galerie" @click="isMenuOpen = false"
           class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Réalisations</a>
-        <a href="#benefices" @click="isMenuOpen = false"
-          class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Avantages</a>
         <a href="#tarifs" @click="isMenuOpen = false"
           class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Tarifs</a>
         <a href="{{ route('blog.index') }}" @click="isMenuOpen = false"
           class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Blog</a>
+        <a href="{{ route('contact') }}" @click="isMenuOpen = false"
+          class="block px-4 py-3 rounded-2xl text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-midnight transition-colors">Contact</a>
 
         @auth
           <a href="{{ route('dashboard') }}" wire:navigate class="block w-full text-center btn-primary mt-4">
@@ -520,7 +523,8 @@
         line-height: 1.6;
         font-style: italic;
         width: 100%;
-        max-width: 380px
+        max-width: 380px;
+        min-height: 160px;
       }
 
       .md-types {
@@ -1137,7 +1141,7 @@
           <!-- Glow + particules : Équilibré et sans coupure entre sections -->
           <div class="absolute pointer-events-none" style="inset: -220px; z-index: 5;">
             {{-- Halo équilibré (dégradé diffus) --}}
-            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.13) 45%, transparent 75%); filter: blur(45px);"></div>
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.13) 45%, transparent 75%);"></div>
             <canvas id="hero-dust" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
           </div>
           
@@ -1546,7 +1550,7 @@
             await this.wait(720);
           },
           async scene4() {
-            this.currentScene = 4; this.sceneLabel = '04 · Génération IA';
+            this.currentScene = 4; this.sceneLabel = '04 · Génération Postelio';
             const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
             this.moveCursor(sw * 0.8, sh * 0.8, 1.08);
             await this.wait(1260);
@@ -1679,7 +1683,7 @@
                 </template>
               </div>
 
-              <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left min-h-[110px] flex items-center">
+              <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-left min-h-[160px] flex items-center">
                 <p class="text-midnight font-medium leading-relaxed text-sm"
                   x-text="isPlaying ? displayedText : 'Salut ! On vient de finir cette superbe rénovation de cuisine à Lyon. Le résultat est top, regardez l\'avant-après !'">
                 </p>
@@ -1692,7 +1696,8 @@
             class="flex-1 relative w-full max-w-[340px] mx-auto lg:max-w-none lg:mx-0 flex justify-center mt-12 lg:mt-0"
             x-intersect.once="$el.classList.add('reveal-right')">
             <div
-              class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[130%] bg-gradient-to-tr from-amber-200/50 to-blue-200/40 blur-[80px] rounded-full pointer-events-none z-0">
+              class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] pointer-events-none z-0"
+              style="background: radial-gradient(circle at 50% 50%, rgba(253,230,138,0.5) 0%, rgba(191,219,254,0.3) 35%, transparent 60%);">
             </div>
 
             <div
@@ -1877,18 +1882,24 @@
               }
 
               ctx.save();
-              ctx.globalAlpha = p.alpha;
-              ctx.shadowBlur  = p.r * 6 + 4;
-              ctx.shadowColor = p.color;
-              ctx.fillStyle   = p.color;
+              ctx.fillStyle = p.color;
+              
+              // Outer glow (faked with opacity for performance)
+              ctx.globalAlpha = p.alpha * 0.2;
               ctx.beginPath();
-              ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+              ctx.arc(p.x, p.y, p.r * 3.5, 0, Math.PI * 2);
               ctx.fill();
-              // Bright core
-              ctx.globalAlpha = p.alpha * 0.7;
-              ctx.shadowBlur  = p.r * 14;
+              
+              // Mid glow
+              ctx.globalAlpha = p.alpha * 0.5;
               ctx.beginPath();
-              ctx.arc(p.x, p.y, p.r * 0.45, 0, Math.PI * 2);
+              ctx.arc(p.x, p.y, p.r * 1.5, 0, Math.PI * 2);
+              ctx.fill();
+
+              // Bright core
+              ctx.globalAlpha = p.alpha;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.r * 0.6, 0, Math.PI * 2);
               ctx.fill();
               ctx.restore();
             }
@@ -1915,7 +1926,7 @@
 
     <!-- Templates Showcase -->
     <section id="gabarits" class="py-28 relative">
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-copper/5 blur-[140px] rounded-full pointer-events-none"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none" style="background: radial-gradient(50% 50% at 50% 50%, rgba(217,119,6,0.05) 0%, transparent 100%);"></div>
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center max-w-3xl mx-auto mb-16" x-intersect.once="$el.classList.add('reveal-up')">
@@ -2128,7 +2139,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-3xl mx-auto mb-20" x-intersect.once="$el.classList.add('reveal-up')">
           <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">En ligne en
-            <span class="text-gradient-copper italic">30 secondes chrono.</span></h2>
+            <span class="text-gradient-copper italic">10 secondes chrono.</span></h2>
           <p class="text-xl font-light text-slate-600">Pas besoin d'être un pro du digital. Rangez vos outils, sortez
             votre téléphone, et laissez l'application faire le reste.</p>
         </div>
@@ -2149,7 +2160,7 @@
                 [
                   'icon' => 'mic',
                   'title' => 'Dictez votre note',
-                  'desc' => "Parlez à votre téléphone : « Pose d'une verrière sur-mesure ». L'IA structure votre message.",
+                  'desc' => "Parlez à votre téléphone : « Pose d'une verrière sur-mesure ». Postelio structure votre message.",
                   'num' => '02'
                 ],
                 [
@@ -2227,10 +2238,10 @@
     <!-- Pourquoi ça marche -->
     <section id="benefices" class="py-24 bg-slate-900 text-white relative">
       <div
-        class="absolute top-0 right-0 w-[500px] h-[500px] bg-copper/10 blur-[100px] rounded-full pointer-events-none">
+        class="absolute top-0 right-0 w-[500px] h-[500px] rounded-full pointer-events-none" style="background: radial-gradient(50% 50% at 50% 50%, rgba(217,119,6,0.1) 0%, transparent 100%);">
       </div>
       <div
-        class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/10 blur-[100px] rounded-full pointer-events-none">
+        class="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full pointer-events-none" style="background: radial-gradient(50% 50% at 50% 50%, rgba(59,130,246,0.1) 0%, transparent 100%);">
       </div>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center max-w-3xl mx-auto mb-16" x-intersect.once="$el.classList.add('reveal-up')">
@@ -2356,7 +2367,7 @@
     <!-- CTAs -->
     <section class="py-32 text-center px-4 relative">
       <div
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-300/10 blur-[120px] rounded-full pointer-events-none">
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none" style="background: radial-gradient(50% 50% at 50% 50%, rgba(252,211,77,0.1) 0%, transparent 100%);">
       </div>
       <div class="max-w-4xl mx-auto relative z-10" x-intersect.once="$el.classList.add('reveal-up')">
         <h2 class="text-4xl sm:text-5xl font-display font-semibold tracking-tight text-midnight mb-6">Rentrez chez vous,
@@ -2382,6 +2393,26 @@
     </section>
 
     <!-- Pricing -->
+    @php
+      $__promo = [
+          'active'   => (bool) \App\Models\Setting::get('promo_active', false),
+          'discount' => (int)  \App\Models\Setting::get('promo_discount', 20),
+          'label'    => (string) \App\Models\Setting::get('promo_label', 'PROMO'),
+      ];
+      // Basic: 29€/mo, 23€/mo yearly
+      $__basicMonthlyD = round(29 * (1 - $__promo['discount'] / 100));
+      $__basicYearlyD  = round(23 * (1 - $__promo['discount'] / 100));
+      $__basicMonthlySaved = 29 - $__basicMonthlyD;
+      $__basicAnnualSaved  = (29 * 12) - ($__basicYearlyD * 12);
+      $__basicYearlyTotalBilled = $__promo['active'] ? ($__basicYearlyD * 12) : 276;
+
+      // Pro: 49€/mo, 39€/mo yearly — Coming soon
+      $__proMonthlyD   = round(49 * (1 - $__promo['discount'] / 100));
+      $__proYearlyD    = round(39 * (1 - $__promo['discount'] / 100));
+      $__proMonthlySaved = 49 - $__proMonthlyD;
+      $__proAnnualSaved  = (49 * 12) - ($__proYearlyD * 12);
+      $__proYearlyTotalBilled = $__promo['active'] ? ($__proYearlyD * 12) : 468;
+    @endphp
     <section id="tarifs" class="py-32 relative" x-data="{ billingPeriod: 'monthly' }">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-3xl mx-auto mb-10" x-intersect.once="$el.classList.add('reveal-up')">
@@ -2428,28 +2459,36 @@
 
               <div class="h-px bg-slate-100 mb-8"></div>
 
-              <ul class="space-y-4 mb-10 flex-grow">
-                @foreach(["Jusqu'à 2 posts par mois", "1 version générée par post", "Modèles de posts standards", "Historique des posts sur 7 jours", "Support par email"] as $feature)
-                  <li class="flex items-start gap-3">
-                    <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
-                      <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span class="text-xs font-medium text-slate-600 leading-relaxed">{{ $feature }}</span>
-                  </li>
+              <div class="mb-10 flex-grow flex flex-col gap-6">
+                @foreach(config('subscription.plans.free.features') as $section => $features)
+                  <div>
+                    <h4 class="text-[10px] font-bold text-midnight uppercase tracking-widest mb-3">{{ $section }}</h4>
+                    <ul class="space-y-3">
+                      @foreach($features as $feature)
+                        @if($feature['enabled'])
+                          <li class="flex items-start gap-3">
+                            <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-copper/10 flex items-center justify-center">
+                              <svg class="w-2.5 h-2.5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                            <span class="text-xs font-medium text-slate-600 leading-relaxed">{!! $feature['name'] !!}</span>
+                          </li>
+                        @else
+                          <li class="flex items-start gap-3 opacity-60">
+                            <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center">
+                              <svg class="w-2.5 h-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </div>
+                            <span class="text-xs font-medium text-slate-400 leading-relaxed line-through">{!! $feature['name'] !!}</span>
+                          </li>
+                        @endif
+                      @endforeach
+                    </ul>
+                  </div>
                 @endforeach
-                @foreach(["Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium", "Support prioritaire dédié"] as $feature)
-                  <li class="flex items-start gap-3 opacity-70">
-                    <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center">
-                      <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </div>
-                    <span class="text-xs font-medium text-slate-500 leading-relaxed line-through">{{ $feature }}</span>
-                  </li>
-                @endforeach
-              </ul>
+              </div>
 
               <div class="mt-auto">
                 @auth
@@ -2464,7 +2503,7 @@
                     x-intersect:enter="if(!visibleCtas.includes('plan-starter')) visibleCtas.push('plan-starter')" 
                     x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-starter')"
                     class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-500 font-bold text-xs uppercase tracking-widest block hover:bg-slate-100 transition-colors">
-                    Démarrer gratuitement
+                    Démarrer avec Starter
                   </a>
                 @endauth
               </div>
@@ -2473,49 +2512,83 @@
 
           {{-- Offre Basic --}}
           <div
-            class="group flex flex-col h-full relative bg-white border border-slate-200/60 shadow-md rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 reveal-d1"
+            class="group flex flex-col h-full relative rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1 reveal-d1 shadow-xl shadow-copper/10 hover:shadow-2xl hover:shadow-copper/30"
+            style="border: 2px solid transparent; background-image: linear-gradient(white, white), linear-gradient(to bottom right, #f97316, #fbbf24); background-origin: border-box; background-clip: padding-box, border-box;"
             x-intersect.once="$el.classList.add('reveal-up')">
+            <div class="absolute top-0 right-0 bg-gradient-to-r from-copper to-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
+              Meilleure offre
+            </div>
             <div class="p-8 flex flex-col flex-grow">
               <div class="mb-8">
                 <div
-                  class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-blue-50 border border-blue-100 shadow-sm">
+                  class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-amber-50 border border-amber-100 shadow-sm">
                   <span class="text-2xl">🚀</span>
                 </div>
-                <h3 class="text-xl font-bold text-midnight">Basic</h3>
-                <div class="mt-4 flex items-baseline gap-1">
-                  <span class="text-4xl font-black text-midnight tracking-tighter"
-                    x-text="billingPeriod === 'yearly' ? '15€' : '19€'">19€</span>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="text-xl font-bold text-midnight">Basic</h3>
+                  @if($__promo['active'])
+                    <span class="text-[10px] font-black uppercase tracking-widest bg-gradient-to-r from-copper to-amber-500 text-white shadow-md shadow-copper/20 px-2.5 py-0.5 rounded-full ring-2 ring-white/50 relative overflow-hidden group">
+                        <span class="absolute inset-0 bg-white/20 translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-500"></span>
+                        -{{ $__promo['discount'] }}%
+                    </span>
+                  @endif
+                </div>
+                <div class="mt-4 flex items-baseline gap-2">
+                  @if($__promo['active'])
+                    <span class="text-4xl font-black text-copper tracking-tighter"
+                      x-text="billingPeriod === 'yearly' ? '{{ $__basicYearlyD }}€' : '{{ $__basicMonthlyD }}€'">{{ $__basicMonthlyD }}€</span>
+                    <span class="text-lg font-bold text-slate-300 line-through"
+                      x-text="billingPeriod === 'yearly' ? '23€' : '29€'">29€</span>
+                  @else
+                    <span class="text-4xl font-black text-midnight tracking-tighter"
+                      x-text="billingPeriod === 'yearly' ? '23€' : '29€'">29€</span>
+                  @endif
                   <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
                 </div>
+                @if($__promo['active'])
+                  <div class="mt-1 flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100/50 px-2 py-0.5 rounded-lg w-fit">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                    <span>Économisez <span x-text="billingPeriod === 'yearly' ? '{{ $__basicAnnualSaved }}€ / an' : '{{ $__basicMonthlySaved }}€ / mois'">{{ $__basicMonthlySaved }}€ / mois</span></span>
+                  </div>
+                @endif
+
                 <template x-if="billingPeriod === 'yearly'">
-                  <p class="text-xs text-gray-400 mt-1">soit 180€ facturé par an</p>
+                  <p class="text-xs text-gray-400 mt-1">soit {{ $__basicYearlyTotalBilled }}€ facturé par an</p>
                 </template>
               </div>
 
               <div class="h-px bg-slate-100 mb-8"></div>
 
-              <ul class="space-y-4 mb-10 flex-grow">
-                @foreach(["Jusqu'à 15 posts par mois", "2 versions générées par post au choix", "Modèles de posts standards", "Historique des posts sur 30 jours", "Support prioritaire dédié"] as $feature)
-                  <li class="flex items-start gap-3">
-                    <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
-                      <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span class="text-xs font-medium text-slate-600 leading-relaxed">{{ $feature }}</span>
-                  </li>
+              <div class="mb-10 flex-grow flex flex-col gap-6">
+                @foreach(config('subscription.plans.basic.features') as $section => $features)
+                  <div>
+                    <h4 class="text-[10px] font-bold text-midnight uppercase tracking-widest mb-3">{{ $section }}</h4>
+                    <ul class="space-y-3">
+                      @foreach($features as $feature)
+                        @if($feature['enabled'])
+                          <li class="flex items-start gap-3">
+                            <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-copper/10 flex items-center justify-center">
+                              <svg class="w-2.5 h-2.5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                            <span class="text-xs font-medium text-slate-600 leading-relaxed">{!! $feature['name'] !!}</span>
+                          </li>
+                        @else
+                          <li class="flex items-start gap-3 opacity-60">
+                            <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center">
+                              <svg class="w-2.5 h-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </div>
+                            <span class="text-xs font-medium text-slate-400 leading-relaxed line-through">{!! $feature['name'] !!}</span>
+                          </li>
+                        @endif
+                      @endforeach
+                    </ul>
+                  </div>
                 @endforeach
-                @foreach(["Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium"] as $feature)
-                  <li class="flex items-start gap-3 opacity-70">
-                    <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center">
-                      <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </div>
-                    <span class="text-xs font-medium text-slate-500 leading-relaxed line-through">{{ $feature }}</span>
-                  </li>
-                @endforeach
-              </ul>
+              </div>
 
               <div class="mt-auto">
                 @auth
@@ -2530,7 +2603,7 @@
                     x-intersect:enter="if(!visibleCtas.includes('plan-basic')) visibleCtas.push('plan-basic')" 
                     x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-basic')"
                     class="btn-primary w-full py-4 text-center block !rounded-2xl">
-                    Essayer Basic gratuitement
+                    Choisir le plan Basic
                   </a>
                 @endauth
               </div>
@@ -2539,13 +2612,13 @@
 
           {{-- Offre Professionnel --}}
           <div
-            class="group flex flex-col h-full relative rounded-3xl transition-all duration-300 hover:-translate-y-2 reveal-d2 md:-translate-y-2 shadow-xl shadow-copper/10 hover:shadow-2xl hover:shadow-copper/30 overflow-hidden"
-            style="border: 2px solid transparent; background-image: linear-gradient(white, white), linear-gradient(to bottom right, #f97316, #fbbf24); background-origin: border-box; background-clip: padding-box, border-box;"
+            class="group flex flex-col h-full relative rounded-3xl transition-all duration-300 hover:-translate-y-2 reveal-d2 md:-translate-y-2 shadow-xl shadow-slate-200/80 hover:shadow-2xl hover:shadow-slate-300/50 overflow-hidden opacity-80"
+            style="border: 2px solid transparent; background-image: linear-gradient(white, white), linear-gradient(to bottom right, #94a3b8, #cbd5e1); background-origin: border-box; background-clip: padding-box, border-box;"
             x-intersect.once="$el.classList.add('reveal-up')">
 
             <div
-              class="absolute top-0 right-0 bg-gradient-to-r from-copper to-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
-              Meilleure offre
+              class="absolute top-0 right-0 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10" style="background: #0F172A;">
+              Bientôt disponible
             </div>
 
             <div class="p-8 flex flex-col flex-grow relative z-0">
@@ -2554,48 +2627,76 @@
                   class="w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-amber-50 border border-amber-100 shadow-sm">
                   <span class="text-2xl">👑</span>
                 </div>
-                <h3 class="text-xl font-bold text-midnight">Professionnel</h3>
-                <div class="mt-4 flex items-baseline gap-1">
-                  <span class="text-4xl font-black text-midnight tracking-tighter"
-                    x-text="billingPeriod === 'yearly' ? '23€' : '29€'">29€</span>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="text-xl font-bold text-midnight">Professionnel</h3>
+                  @if($__promo['active'])
+                    <span class="text-[10px] font-black uppercase tracking-widest bg-gradient-to-r from-copper to-amber-500 text-white shadow-md shadow-copper/20 px-2.5 py-0.5 rounded-full ring-2 ring-white/50 relative overflow-hidden group">
+                        <span class="absolute inset-0 bg-white/20 translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-500"></span>
+                        -{{ $__promo['discount'] }}%
+                    </span>
+                  @endif
+                </div>
+                <div class="mt-4 flex items-baseline gap-2">
+                  @if($__promo['active'])
+                    <span class="text-4xl font-black text-copper tracking-tighter"
+                      x-text="billingPeriod === 'yearly' ? '{{ $__proYearlyD }}€' : '{{ $__proMonthlyD }}€'">{{ $__proMonthlyD }}€</span>
+                    <span class="text-lg font-bold text-slate-300 line-through"
+                      x-text="billingPeriod === 'yearly' ? '39€' : '49€'">49€</span>
+                  @else
+                    <span class="text-4xl font-black text-midnight tracking-tighter"
+                      x-text="billingPeriod === 'yearly' ? '39€' : '49€'">49€</span>
+                  @endif
                   <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
                 </div>
+                @if($__promo['active'])
+                  <div class="mt-1 flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100/50 px-2 py-0.5 rounded-lg w-fit">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                    <span>Économisez <span x-text="billingPeriod === 'yearly' ? '{{ $__proAnnualSaved }}€ / an' : '{{ $__proMonthlySaved }}€ / mois'">{{ $__proMonthlySaved }}€ / mois</span></span>
+                  </div>
+                @endif
+
                 <template x-if="billingPeriod === 'yearly'">
-                  <p class="text-xs text-gray-400 mt-1">soit 280€ facturé par an</p>
+                  <p class="text-xs text-gray-400 mt-1">soit {{ $__proYearlyTotalBilled }}€ facturé par an</p>
                 </template>
               </div>
 
               <div class="h-px bg-slate-100 mb-8"></div>
 
-              <ul class="space-y-4 mb-10 flex-grow">
-                @foreach(["Jusqu'à 30 posts par mois", "3 versions générées par post au choix", "Publication automatique sur vos réseaux", "Planification et programmation des posts", "Analytics de vos réseaux sociaux", "Accès aux modèles premium", "Historique des posts illimité", "Support prioritaire dédié"] as $feature)
-                  <li class="flex items-start gap-3">
-                    <div class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-copper/10 flex items-center justify-center">
-                      <svg class="w-3 h-3 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span class="text-xs font-medium text-slate-600 leading-relaxed">{{ $feature }}</span>
-                  </li>
+              <div class="mb-10 flex-grow flex flex-col gap-6">
+                @foreach(config('subscription.plans.pro.features') as $section => $features)
+                  <div>
+                    <h4 class="text-[10px] font-bold text-midnight uppercase tracking-widest mb-3">{{ $section }}</h4>
+                    <ul class="space-y-3">
+                      @foreach($features as $feature)
+                        @if($feature['enabled'])
+                          <li class="flex items-start gap-3">
+                            <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-copper/10 flex items-center justify-center">
+                              <svg class="w-2.5 h-2.5 text-copper" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                            <span class="text-xs font-medium text-slate-600 leading-relaxed">{!! $feature['name'] !!}</span>
+                          </li>
+                        @else
+                          <li class="flex items-start gap-3 opacity-60">
+                            <div class="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-slate-100 flex items-center justify-center">
+                              <svg class="w-2.5 h-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </div>
+                            <span class="text-xs font-medium text-slate-400 leading-relaxed line-through">{!! $feature['name'] !!}</span>
+                          </li>
+                        @endif
+                      @endforeach
+                    </ul>
+                  </div>
                 @endforeach
-              </ul>
+              </div>
 
               <div class="mt-auto">
-                @auth
-                  <a href="{{ route('dashboard') }}" wire:navigate
-                    x-intersect:enter="if(!visibleCtas.includes('plan-pro')) visibleCtas.push('plan-pro')" 
-                    x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-pro')"
-                    class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
-                    Accéder à mon compte
-                  </a>
-                @else
-                  <a href="{{ route('register', ['plan' => 'pro']) }}" wire:navigate
-                    x-intersect:enter="if(!visibleCtas.includes('plan-pro')) visibleCtas.push('plan-pro')" 
-                    x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-pro')"
-                    class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
-                    Choisir le plan Pro
-                  </a>
-                @endauth
+                <div class="w-full text-center py-4 px-6 rounded-2xl border border-slate-200 bg-slate-100 text-slate-400 font-bold text-xs uppercase tracking-widest cursor-not-allowed">
+                  Bientôt disponible
+                </div>
               </div>
             </div>
           </div>
@@ -2760,7 +2861,7 @@
             $faqs = [
               ['q' => "Est-ce que j'ai besoin de beaucoup d'abonnés ?", 'short' => "Non. Quelque centaines de locaux suffisent.", 'a' => "Non. Quelques centaines de personnes locales (vos anciens clients, vos partenaires) suffisent pour créer un bouche-à-oreille qualifié et puissant."],
               ['q' => "Je suis nul en informatique, c'est pour moi ?", 'short' => "Si vous utilisez WhatsApp, c'est bon.", 'a' => "Si vous savez envoyer un message vocal sur WhatsApp, vous savez utiliser Postelio. L'application gère toute la technique."],
-              ['q' => "Combien de temps ça prend par jour ?", 'short' => "Strictement 30 secondes.", 'a' => "Strictement 30 secondes par chantier. Vous parlez, on publie."],
+              ['q' => "Combien de temps ça prend par jour ?", 'short' => "Strictement 10 secondes.", 'a' => "Strictement 10 secondes par chantier. Vous parlez, on publie."],
               ['q' => "Est-ce vraiment rentable ?", 'short' => "Remboursé pour 5 ans dès le 1er devis.", 'a' => "Oui. Un seul devis haut de gamme signé au prix fort grâce à l'image professionnelle de votre page rembourse l'outil pour les 5 prochaines années."],
               ['q' => "Y a-t-il un engagement sur la durée ?", 'short' => "Strictement aucun. Annulez en 1 clic.", 'a' => "Absolument pas. Tous nos abonnements sont sans engagement. Vous pouvez annuler en un clic depuis votre espace client à tout moment. Pas de courrier recommandé, pas de préavis caché."]
             ];
@@ -2863,7 +2964,7 @@
             <li><a href="{{ route('legal.cgv') }}" class="hover:text-copper transition-colors font-light">CGV</a></li>
             <li><a href="{{ route('legal.confidentialite') }}"
                 class="hover:text-copper transition-colors font-light">Confidentialité</a></li>
-            <li><a href="mailto:hello@postelio.fr" class="hover:text-copper transition-colors font-light">Contact</a>
+            <li><a href="{{ route('contact') }}" class="hover:text-copper transition-colors font-light">Contact</a>
             </li>
           </ul>
         </div>

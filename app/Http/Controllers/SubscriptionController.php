@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Cashier\Cashier;
@@ -18,7 +19,13 @@ class SubscriptionController extends Controller
         $currentPlan = $user->currentPlanKey();
         $subscription = $user->subscription('default');
 
-        return view('subscription.plans', compact('plans', 'currentPlan', 'subscription'));
+        $promo = [
+            'active'   => (bool) Setting::get('promo_active', false),
+            'discount' => (int)  Setting::get('promo_discount', 20),
+            'label'    => (string) Setting::get('promo_label', 'PROMO'),
+        ];
+
+        return view('subscription.plans', compact('plans', 'currentPlan', 'subscription', 'promo'));
     }
 
     /**
@@ -60,9 +67,19 @@ class SubscriptionController extends Controller
 
         $plan = config("subscription.plans.{$request->plan}");
         $period = $request->input('period', 'monthly');
+
+        if (!$plan) {
+            return back()->with('error', 'Plan invalide ou non configuré.');
+        }
+
+        // Pro plan is coming soon — subscriptions not yet available
+        if (!empty($plan['coming_soon'])) {
+            return back()->with('error', 'Le plan Professionnel sera disponible prochainement. Restez à l\'écoute !');
+        }
+
         $priceId = $period === 'yearly' ? ($plan['yearly_stripe_price_id'] ?? $plan['stripe_price_id']) : $plan['stripe_price_id'];
 
-        if (!$plan || !$priceId) {
+        if (!$priceId) {
             return back()->with('error', 'Plan invalide ou non configuré.');
         }
 
@@ -73,12 +90,23 @@ class SubscriptionController extends Controller
             return redirect()->route('subscription.billing');
         }
 
+        $checkoutOptions = [
+            'success_url' => route('subscription.success') . '?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url'  => route('subscription.plans'),
+        ];
+
+        $promoActive = (bool) Setting::get('promo_active', false);
+        $promoCodeId = trim((string) Setting::get('promo_stripe_promotion_code_id', ''));
+
+        if ($promoActive && $promoCodeId) {
+            // Pre-apply the Stripe promotion code (disables manual code entry on the form)
+            $checkoutOptions['discounts'] = [['promotion_code' => $promoCodeId]];
+            return $user->newSubscription('default', $priceId)->checkout($checkoutOptions);
+        }
+
         return $user->newSubscription('default', $priceId)
             ->allowPromotionCodes()
-            ->checkout([
-                'success_url' => route('subscription.success') . '?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => route('subscription.plans'),
-            ]);
+            ->checkout($checkoutOptions);
     }
 
     /**
@@ -308,9 +336,19 @@ class SubscriptionController extends Controller
         $user = Auth::user();
         $plan = config("subscription.plans.{$request->plan}");
         $period = $request->input('period', 'monthly');
+
+        if (!$plan) {
+            return back()->with('error', 'Plan invalide.');
+        }
+
+        // Pro plan is coming soon — subscriptions not yet available
+        if (!empty($plan['coming_soon'])) {
+            return back()->with('error', 'Le plan Professionnel sera disponible prochainement. Restez à l\'écoute !');
+        }
+
         $priceId = $period === 'yearly' ? ($plan['yearly_stripe_price_id'] ?? $plan['stripe_price_id']) : $plan['stripe_price_id'];
 
-        if (!$plan || !$priceId) {
+        if (!$priceId) {
             return back()->with('error', 'Plan invalide.');
         }
 

@@ -20,10 +20,13 @@ return [
             'post_variants_count' => 1,
             'price' => 0,
             'yearly_price' => 0,
+            'coming_soon' => false,
             'features' => [
                 'Création' => [
                     ['name' => 'Jusqu\'à <b>2 publications</b> par mois', 'enabled' => true],
                     ['name' => '<b>1 proposition de texte</b> au choix par publication', 'enabled' => true],
+                    ['name' => 'Génération de publications <b>images</b>', 'enabled' => true],
+                    ['name' => 'Génération de publications <b>vidéos</b>', 'enabled' => false],
                     ['name' => 'Gabarits de posts <b>standards</b>', 'enabled' => true],
                     ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => false],
                 ],
@@ -35,7 +38,7 @@ return [
                     ['name' => '<b>Statistiques détaillées</b> de vos réseaux sociaux', 'enabled' => false],
                     ['name' => 'Historique des publications sur <b>7 jours</b>', 'enabled' => true],
                     ['name' => 'Support par <b>email</b>', 'enabled' => true],
-                    ['name' => 'Assistance pro <b>prioritaire</b>', 'enabled' => false],
+                    ['name' => 'Assistance <b>prioritaire</b>', 'enabled' => false],
                 ],
             ],
             'disabled_features' => [],
@@ -46,23 +49,25 @@ return [
             'yearly_stripe_price_id' => env('STRIPE_BASIC_YEARLY_PRICE_ID', ''),
             'credits' => 15,
             'post_variants_count' => 2,
-            'price' => 19,
-            'yearly_price' => 180,
+            'price' => 29,
+            'yearly_price' => 276,
+            'coming_soon' => false,
             'features' => [
                 'Création' => [
                     ['name' => 'Jusqu\'à <b>15 publications</b> par mois', 'enabled' => true],
                     ['name' => '<b>2 propositions de texte</b> au choix par publication', 'enabled' => true],
-                    ['name' => 'Gabarits de posts <b>standards</b>', 'enabled' => true],
-                    ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => false],
+                    ['name' => 'Génération de publications <b>images</b>', 'enabled' => true],
+                    ['name' => 'Génération de publications <b>vidéos</b>', 'enabled' => false],
+                    ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => true],
                 ],
                 'Diffusion' => [
-                    ['name' => 'Publication <b>directe</b> sur vos réseaux sociaux', 'enabled' => false],
-                    ['name' => '<b>Programmation à l\'avance</b> pour la semaine', 'enabled' => false],
+                    ['name' => 'Publication <b>directe</b> sur vos réseaux sociaux', 'enabled' => true],
+                    ['name' => '<b>Programmation à l\'avance</b> pour la semaine', 'enabled' => true],
                 ],
                 'Suivi & Support' => [
-                    ['name' => '<b>Statistiques détaillées</b> de vos réseaux sociaux', 'enabled' => false],
-                    ['name' => 'Historique des publications sur <b>30 jours</b>', 'enabled' => true],
-                    ['name' => 'Assistance pro <b>prioritaire</b>', 'enabled' => true],
+                    ['name' => '<b>Statistiques détaillées</b> de vos réseaux sociaux', 'enabled' => true],
+                    ['name' => 'Historique des publications <b>illimité</b>', 'enabled' => true],
+                    ['name' => 'Assistance <b>prioritaire</b>', 'enabled' => true],
                 ],
             ],
             'disabled_features' => [],
@@ -73,12 +78,15 @@ return [
             'yearly_stripe_price_id' => env('STRIPE_PRO_YEARLY_PRICE_ID', ''),
             'credits' => 30,
             'post_variants_count' => 3,
-            'price' => 29,
-            'yearly_price' => 280,
+            'price' => 49,
+            'yearly_price' => 468,
+            'coming_soon' => true,
             'features' => [
                 'Création' => [
                     ['name' => 'Jusqu\'à <b>30 publications</b> par mois', 'enabled' => true],
                     ['name' => '<b>3 propositions de texte</b> au choix par publication', 'enabled' => true],
+                    ['name' => 'Génération de publications <b>images</b>', 'enabled' => true],
+                    ['name' => 'Génération de publications <b>vidéos</b> <span class="text-copper font-bold">(bientôt)</span>', 'enabled' => true],
                     ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => true],
                 ],
                 'Diffusion' => [
@@ -88,11 +96,10 @@ return [
                 'Suivi & Support' => [
                     ['name' => '<b>Statistiques détaillées</b> de vos réseaux sociaux', 'enabled' => true],
                     ['name' => 'Historique des publications <b>illimité</b>', 'enabled' => true],
-                    ['name' => 'Assistance pro <b>prioritaire</b>', 'enabled' => true],
+                    ['name' => 'Assistance <b>prioritaire</b>', 'enabled' => true],
                 ],
             ],
             'disabled_features' => [],
-
         ],
     ],
 

@@ -20,12 +20,15 @@ return [
             'post_variants_count' => 1,
             'price' => 0,
             'yearly_price' => 0,
+            'coming_soon' => false,
             'features' => [
                 'Création' => [
                     ['name' => 'Jusqu\'à <b>2 publications</b> par mois', 'enabled' => true],
                     ['name' => '<b>1 proposition de texte</b> au choix par publication', 'enabled' => true],
                     ['name' => 'Gabarits de posts <b>standards</b>', 'enabled' => true],
                     ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => false],
+                    ['name' => 'Génération d\'<b>images</b> IA', 'enabled' => true],
+                    ['name' => 'Génération de <b>vidéos</b> IA', 'enabled' => false],
                 ],
                 'Diffusion' => [
                     ['name' => 'Publication <b>directe</b> sur vos réseaux sociaux', 'enabled' => false],
@@ -46,14 +49,17 @@ return [
             'yearly_stripe_price_id' => env('STRIPE_BASIC_YEARLY_PRICE_ID', ''),
             'credits' => 15,
             'post_variants_count' => 2,
-            'price' => 19,
-            'yearly_price' => 180,
+            'price' => 29,
+            'yearly_price' => 276,
+            'coming_soon' => false,
             'features' => [
                 'Création' => [
                     ['name' => 'Jusqu\'à <b>15 publications</b> par mois', 'enabled' => true],
                     ['name' => '<b>2 propositions de texte</b> au choix par publication', 'enabled' => true],
                     ['name' => 'Gabarits de posts <b>standards</b>', 'enabled' => true],
                     ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => false],
+                    ['name' => 'Génération d\'<b>images</b> IA', 'enabled' => true],
+                    ['name' => 'Génération de <b>vidéos</b> IA', 'enabled' => false],
                 ],
                 'Diffusion' => [
                     ['name' => 'Publication <b>directe</b> sur vos réseaux sociaux', 'enabled' => false],
@@ -73,13 +79,16 @@ return [
             'yearly_stripe_price_id' => env('STRIPE_PRO_YEARLY_PRICE_ID', ''),
             'credits' => 30,
             'post_variants_count' => 3,
-            'price' => 29,
-            'yearly_price' => 280,
+            'price' => 49,
+            'yearly_price' => 468,
+            'coming_soon' => true,
             'features' => [
                 'Création' => [
                     ['name' => 'Jusqu\'à <b>30 publications</b> par mois', 'enabled' => true],
                     ['name' => '<b>3 propositions de texte</b> au choix par publication', 'enabled' => true],
                     ['name' => 'Accès aux gabarits <b>premium</b>', 'enabled' => true],
+                    ['name' => 'Génération d\'<b>images</b> IA', 'enabled' => true],
+                    ['name' => 'Génération de <b>vidéos</b> IA <span class="text-copper font-bold">(bientôt)</span>', 'enabled' => true],
                 ],
                 'Diffusion' => [
                     ['name' => 'Publication <b>directe</b> sur vos réseaux sociaux', 'enabled' => true],

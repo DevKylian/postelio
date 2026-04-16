@@ -67,9 +67,19 @@ class SubscriptionController extends Controller
 
         $plan = config("subscription.plans.{$request->plan}");
         $period = $request->input('period', 'monthly');
+
+        if (!$plan) {
+            return back()->with('error', 'Plan invalide ou non configuré.');
+        }
+
+        // Pro plan is coming soon — subscriptions not yet available
+        if (!empty($plan['coming_soon'])) {
+            return back()->with('error', 'Le plan Professionnel sera disponible prochainement. Restez à l\'écoute !');
+        }
+
         $priceId = $period === 'yearly' ? ($plan['yearly_stripe_price_id'] ?? $plan['stripe_price_id']) : $plan['stripe_price_id'];
 
-        if (!$plan || !$priceId) {
+        if (!$priceId) {
             return back()->with('error', 'Plan invalide ou non configuré.');
         }
 
@@ -326,9 +336,19 @@ class SubscriptionController extends Controller
         $user = Auth::user();
         $plan = config("subscription.plans.{$request->plan}");
         $period = $request->input('period', 'monthly');
+
+        if (!$plan) {
+            return back()->with('error', 'Plan invalide.');
+        }
+
+        // Pro plan is coming soon — subscriptions not yet available
+        if (!empty($plan['coming_soon'])) {
+            return back()->with('error', 'Le plan Professionnel sera disponible prochainement. Restez à l\'écoute !');
+        }
+
         $priceId = $period === 'yearly' ? ($plan['yearly_stripe_price_id'] ?? $plan['stripe_price_id']) : $plan['stripe_price_id'];
 
-        if (!$plan || !$priceId) {
+        if (!$priceId) {
             return back()->with('error', 'Plan invalide.');
         }
 

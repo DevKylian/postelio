@@ -72,6 +72,7 @@
                         $isCurrent = ($currentPlan === $key) || (!$currentPlan && $key === 'free');
                         $isPopular = $key === 'pro';
                         $isFree = $key === 'free';
+                        $isComingSoon = !empty($plan['coming_soon']);
                     @endphp
 
                     <div class="group flex flex-col h-full relative bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1 {{ $isPopular ? 'shadow-xl shadow-copper/10 hover:shadow-2xl hover:shadow-copper/30 z-0' : 'border border-slate-200/60 shadow-md hover:shadow-xl' }}"
@@ -81,7 +82,11 @@
                     >
 
                         {{-- Labels --}}
-                        @if($isPopular)
+                        @if($isComingSoon)
+                            <div class="absolute top-0 right-0 bg-gradient-to-r from-slate-600 to-slate-700 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
+                                Bientôt disponible
+                            </div>
+                        @elseif($isPopular)
                             <div class="absolute top-0 right-0 bg-gradient-to-r from-copper to-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
                                 Meilleure Offre
                             </div>
@@ -188,7 +193,11 @@
 
                             {{-- CTA --}}
                             <div class="mt-auto">
-                                @if($isCurrent)
+                                @if($isComingSoon)
+                                    <div class="w-full text-center py-4 px-6 rounded-2xl border border-slate-200 bg-slate-100 text-slate-400 font-bold text-xs uppercase tracking-widest cursor-not-allowed">
+                                        Bientôt disponible
+                                    </div>
+                                @elseif($isCurrent)
                                     <div class="w-full text-center py-4 px-6 rounded-2xl border border-slate-100 bg-slate-50 text-slate-400 font-bold text-xs uppercase tracking-widest">
                                         Plan actuel
                                     </div>

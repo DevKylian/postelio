@@ -236,6 +236,15 @@ class User extends Authenticatable implements MustVerifyEmail
         return (bool) $this->getPermission('can_customize_template', true);
     }
 
+    /**
+     * Whether the user can generate AI videos (Pro plan only).
+     */
+    public function canGenerateVideo(): bool
+    {
+        if ($this->is_admin) return true;
+        return (bool) $this->getPermission('can_generate_video', false);
+    }
+
     public function company()
     {
         return $this->hasOne(Company::class);

@@ -142,18 +142,18 @@ class RevenueSimulator extends Component
 
     private function calculateMetrics(array $counts): array
     {
-        $revBasicMo = $counts['basicMo'] * 19;
-        $revProMo = $counts['proMo'] * 29;
-        $revBasicYr = $counts['basicYr'] * (180 / 12);
-        $revProYr = $counts['proYr'] * (280 / 12);
+        $revBasicMo = $counts['basicMo'] * 29;
+        $revProMo = $counts['proMo'] * 49;
+        $revBasicYr = $counts['basicYr'] * (276 / 12);
+        $revProYr = $counts['proYr'] * (468 / 12);
 
         $mrrBrut = $revBasicMo + $revProMo + $revBasicYr + $revProYr;
 
         // Stripe Fees (1.5% + 0.25€)
-        $stripeFees = ($counts['basicMo'] * (19 * 0.015 + 0.25))
-            + ($counts['proMo'] * (29 * 0.015 + 0.25))
-            + ($counts['basicYr'] * ((180 * 0.015 + 0.25) / 12))
-            + ($counts['proYr'] * ((280 * 0.015 + 0.25) / 12));
+        $stripeFees = ($counts['basicMo'] * (29 * 0.015 + 0.25))
+            + ($counts['proMo'] * (49 * 0.015 + 0.25))
+            + ($counts['basicYr'] * ((276 * 0.015 + 0.25) / 12))
+            + ($counts['proYr'] * ((468 * 0.015 + 0.25) / 12));
 
         $totalUsers = array_sum($counts);
         $proUsers = $counts['proMo'] + $counts['proYr'];
@@ -218,8 +218,8 @@ class RevenueSimulator extends Component
             $dataNet[] = round($metrics['mrrNet']);
             
             // For Brut mode, we want to split between Basic and Pro flavors
-            $revBasic = ($currentCounts['basicMo'] * 19) + ($currentCounts['basicYr'] * 15);
-            $revPro = ($currentCounts['proMo'] * 29) + ($currentCounts['proYr'] * 23.33);
+            $revBasic = ($currentCounts['basicMo'] * 29) + ($currentCounts['basicYr'] * 23);
+            $revPro = ($currentCounts['proMo'] * 49) + ($currentCounts['proYr'] * 39);
             
             $dataBasic[] = round($revBasic);
             $dataPro[] = round($revPro);

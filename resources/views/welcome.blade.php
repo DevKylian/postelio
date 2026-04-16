@@ -2399,19 +2399,19 @@
           'discount' => (int)  \App\Models\Setting::get('promo_discount', 20),
           'label'    => (string) \App\Models\Setting::get('promo_label', 'PROMO'),
       ];
-      // Basic: 19€/mo, 15€/mo yearly
-      $__basicMonthlyD = round(19 * (1 - $__promo['discount'] / 100));
-      $__basicYearlyD  = round(15 * (1 - $__promo['discount'] / 100));
-      $__basicMonthlySaved = 19 - $__basicMonthlyD;
-      $__basicAnnualSaved  = (19 * 12) - ($__basicYearlyD * 12);
-      $__basicYearlyTotalBilled = $__promo['active'] ? ($__basicYearlyD * 12) : 180;
+      // Basic: 29€/mo, 23€/mo yearly
+      $__basicMonthlyD = round(29 * (1 - $__promo['discount'] / 100));
+      $__basicYearlyD  = round(23 * (1 - $__promo['discount'] / 100));
+      $__basicMonthlySaved = 29 - $__basicMonthlyD;
+      $__basicAnnualSaved  = (29 * 12) - ($__basicYearlyD * 12);
+      $__basicYearlyTotalBilled = $__promo['active'] ? ($__basicYearlyD * 12) : 276;
 
-      // Pro: 29€/mo, 23€/mo yearly
-      $__proMonthlyD   = round(29 * (1 - $__promo['discount'] / 100));
-      $__proYearlyD    = round(23 * (1 - $__promo['discount'] / 100));
-      $__proMonthlySaved = 29 - $__proMonthlyD;
-      $__proAnnualSaved  = (29 * 12) - ($__proYearlyD * 12);
-      $__proYearlyTotalBilled = $__promo['active'] ? ($__proYearlyD * 12) : 280;
+      // Pro: 49€/mo, 39€/mo yearly — Coming soon
+      $__proMonthlyD   = round(49 * (1 - $__promo['discount'] / 100));
+      $__proYearlyD    = round(39 * (1 - $__promo['discount'] / 100));
+      $__proMonthlySaved = 49 - $__proMonthlyD;
+      $__proAnnualSaved  = (49 * 12) - ($__proYearlyD * 12);
+      $__proYearlyTotalBilled = $__promo['active'] ? ($__proYearlyD * 12) : 468;
     @endphp
     <section id="tarifs" class="py-32 relative" x-data="{ billingPeriod: 'monthly' }">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -2534,10 +2534,10 @@
                     <span class="text-4xl font-black text-copper tracking-tighter"
                       x-text="billingPeriod === 'yearly' ? '{{ $__basicYearlyD }}€' : '{{ $__basicMonthlyD }}€'">{{ $__basicMonthlyD }}€</span>
                     <span class="text-lg font-bold text-slate-300 line-through"
-                      x-text="billingPeriod === 'yearly' ? '15€' : '19€'">19€</span>
+                      x-text="billingPeriod === 'yearly' ? '23€' : '29€'">29€</span>
                   @else
                     <span class="text-4xl font-black text-midnight tracking-tighter"
-                      x-text="billingPeriod === 'yearly' ? '15€' : '19€'">19€</span>
+                      x-text="billingPeriod === 'yearly' ? '23€' : '29€'">29€</span>
                   @endif
                   <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
                 </div>
@@ -2608,13 +2608,13 @@
 
           {{-- Offre Professionnel --}}
           <div
-            class="group flex flex-col h-full relative rounded-3xl transition-all duration-300 hover:-translate-y-2 reveal-d2 md:-translate-y-2 shadow-xl shadow-copper/10 hover:shadow-2xl hover:shadow-copper/30 overflow-hidden"
-            style="border: 2px solid transparent; background-image: linear-gradient(white, white), linear-gradient(to bottom right, #f97316, #fbbf24); background-origin: border-box; background-clip: padding-box, border-box;"
+            class="group flex flex-col h-full relative rounded-3xl transition-all duration-300 hover:-translate-y-2 reveal-d2 md:-translate-y-2 shadow-xl shadow-slate-200/80 hover:shadow-2xl hover:shadow-slate-300/50 overflow-hidden opacity-80"
+            style="border: 2px solid transparent; background-image: linear-gradient(white, white), linear-gradient(to bottom right, #94a3b8, #cbd5e1); background-origin: border-box; background-clip: padding-box, border-box;"
             x-intersect.once="$el.classList.add('reveal-up')">
 
             <div
-              class="absolute top-0 right-0 bg-gradient-to-r from-copper to-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
-              Meilleure offre
+              class="absolute top-0 right-0 bg-gradient-to-r from-slate-600 to-slate-700 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-widest shadow-sm z-10">
+              Bientôt disponible
             </div>
 
             <div class="p-8 flex flex-col flex-grow relative z-0">
@@ -2637,10 +2637,10 @@
                     <span class="text-4xl font-black text-copper tracking-tighter"
                       x-text="billingPeriod === 'yearly' ? '{{ $__proYearlyD }}€' : '{{ $__proMonthlyD }}€'">{{ $__proMonthlyD }}€</span>
                     <span class="text-lg font-bold text-slate-300 line-through"
-                      x-text="billingPeriod === 'yearly' ? '23€' : '29€'">29€</span>
+                      x-text="billingPeriod === 'yearly' ? '39€' : '49€'">49€</span>
                   @else
                     <span class="text-4xl font-black text-midnight tracking-tighter"
-                      x-text="billingPeriod === 'yearly' ? '23€' : '29€'">29€</span>
+                      x-text="billingPeriod === 'yearly' ? '39€' : '49€'">49€</span>
                   @endif
                   <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">/ mois</span>
                 </div>
@@ -2690,21 +2690,9 @@
               </div>
 
               <div class="mt-auto">
-                @auth
-                  <a href="{{ route('dashboard') }}" wire:navigate
-                    x-intersect:enter="if(!visibleCtas.includes('plan-pro')) visibleCtas.push('plan-pro')" 
-                    x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-pro')"
-                    class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
-                    Accéder à mon compte
-                  </a>
-                @else
-                  <a href="{{ route('register', ['plan' => 'pro']) }}" wire:navigate
-                    x-intersect:enter="if(!visibleCtas.includes('plan-pro')) visibleCtas.push('plan-pro')" 
-                    x-intersect:leave="visibleCtas = visibleCtas.filter(i => i !== 'plan-pro')"
-                    class="btn-primary w-full py-4 text-center block !rounded-2xl shadow-lg shadow-copper/20">
-                    Choisir le plan Pro
-                  </a>
-                @endauth
+                <div class="w-full text-center py-4 px-6 rounded-2xl border border-slate-200 bg-slate-100 text-slate-400 font-bold text-xs uppercase tracking-widest cursor-not-allowed">
+                  Bientôt disponible
+                </div>
               </div>
             </div>
           </div>

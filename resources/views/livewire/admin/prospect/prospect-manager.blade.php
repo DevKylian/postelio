@@ -189,36 +189,98 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-4" style="min-width:180px">
                                     @php
-                                        $statusColors = [
-                                            'discovered' => 'bg-gray-100 text-gray-600 border-gray-200',
-                                            'followed' => 'bg-blue-50 text-blue-600 border-blue-200',
-                                            'dm_sent' => 'bg-yellow-50 text-yellow-600 border-yellow-200',
-                                            'relance_1' => 'bg-orange-50 text-orange-600 border-orange-200',
-                                            'not_interested' => 'bg-red-50 text-red-600 border-red-200',
-                                            'responded' => 'bg-green-50 text-green-600 border-green-200',
+                                        $currentNode = $prospect->getCurrentNode();
+                                        $branches    = $prospect->getAvailableBranches();
+                                        $needsFollowUp = $prospect->needsFollowUp();
+                                        $branchColors = [
+                                            'reply'    => 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100',
+                                            'no_reply' => 'bg-amber-50 border-amber-300 text-amber-700 hover:bg-amber-100',
+                                            'positive' => 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100',
+                                            'negative' => 'bg-rose-50 border-rose-300 text-rose-700 hover:bg-rose-100',
                                         ];
-                                        
-                                        $needsRelance = $prospect->status === 'dm_sent' && $prospect->last_action_date && $prospect->last_action_date->addHours(48)->isPast();
-                                        $colorClass = $needsRelance ? 'bg-rose-100 text-rose-700 border-rose-300 font-bold animate-pulse' : ($statusColors[$prospect->status] ?? 'bg-gray-100 text-gray-600');
                                     @endphp
-                                    
-                                    <div class="relative">
-                                        <select 
-                                            wire:change="updateStatus({{ $prospect->id }}, $event.target.value)" 
-                                            class="appearance-none block w-full px-3 py-1.5 pr-8 border rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-copper/30 transition-colors {{ $colorClass }}"
-                                        >
-                                            @foreach($statuses as $key => $label)
-                                                <option value="{{ $key }}" @if($prospect->status === $key) selected @endif>{{ $label }}</option>
-                                            @endforeach
-                                        </select>
-                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-current opacity-70">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+
+                                    @if($prospect->current_node_id)
+                                        {{-- Flow mode --}}
+                                        <div class="space-y-1.5">
+                                            @if($needsFollowUp)
+                                                <div class="flex items-center gap-1.5 animate-pulse">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
+                                                    <span class="text-[10px] text-rose-600 font-bold">À relancer !</span>
+                                                </div>
+                                            @else
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"></span>
+                                                    <span class="text-[10px] text-amber-600 font-semibold">En attente</span>
+                                                </div>
+                                            @endif
+
+                                            @if($currentNode && !empty($currentNode['content']))
+                                                <div class="text-[10px] text-gray-400 truncate max-w-[160px]" title="{{ $currentNode['content'] }}">
+                                                    {{ \Illuminate\Support\Str::limit($currentNode['content'], 45) }}
+                                                </div>
+                                            @endif
+
+                                            @if(!empty($branches))
+                                                <div class="flex flex-wrap gap-1">
+                                                    @foreach($branches as $branch)
+                                                        <button
+                                                            wire:click="advanceProspect({{ $prospect->id }}, '{{ $branch['next'] ?? '' }}', '{{ $branch['condition'] }}')"
+                                                            wire:loading.attr="disabled"
+                                                            class="text-[10px] font-bold px-2 py-0.5 rounded-md border transition-colors {{ $branchColors[$branch['condition']] ?? 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100' }}"
+                                                        >
+                                                            {{ $branch['label'] ?? $branch['condition'] }}
+                                                        </button>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-[10px] text-gray-400 italic">Fin du script</span>
+                                                    <button wire:click="resetScript({{ $prospect->id }})" class="text-[10px] text-copper font-semibold hover:underline">
+                                                        Recommencer
+                                                    </button>
+                                                </div>
+                                            @endif
                                         </div>
-                                    </div>
-                                    @if($needsRelance)
-                                        <div class="text-[10px] text-rose-500 font-bold mt-1 text-center">+ 48h ! Relancer</div>
+
+                                    @elseif($prospect->script_version)
+                                        {{-- Script assigné mais pas encore démarré --}}
+                                        <button
+                                            wire:click="startScript({{ $prospect->id }})"
+                                            class="inline-flex items-center gap-1.5 bg-midnight text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-gray-800 transition-colors"
+                                        >
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                            Démarrer
+                                        </button>
+
+                                    @else
+                                        {{-- Pas de script : dropdown legacy --}}
+                                        @php
+                                            $statusColors = [
+                                                'discovered'     => 'bg-gray-100 text-gray-600 border-gray-200',
+                                                'followed'       => 'bg-blue-50 text-blue-600 border-blue-200',
+                                                'dm_sent'        => 'bg-yellow-50 text-yellow-600 border-yellow-200',
+                                                'relance_1'      => 'bg-orange-50 text-orange-600 border-orange-200',
+                                                'not_interested' => 'bg-red-50 text-red-600 border-red-200',
+                                                'responded'      => 'bg-green-50 text-green-600 border-green-200',
+                                            ];
+                                            $colorClass = $statusColors[$prospect->status] ?? 'bg-gray-100 text-gray-600 border-gray-200';
+                                        @endphp
+                                        <div class="relative">
+                                            <select
+                                                wire:change="updateStatus({{ $prospect->id }}, $event.target.value)"
+                                                class="appearance-none block w-full px-3 py-1.5 pr-8 border rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-copper/30 transition-colors {{ $colorClass }}"
+                                            >
+                                                @foreach($statuses as $key => $label)
+                                                    <option value="{{ $key }}" @if($prospect->status === $key) selected @endif>{{ $label }}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-current opacity-70">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                            </div>
+                                        </div>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4">

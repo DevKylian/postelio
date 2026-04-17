@@ -266,11 +266,7 @@
             @endforeach
         </div>
 
-        @if($posts->hasPages())
-            <div class="mt-8 flex justify-center">
-                {{ $posts->links() }}
-            </div>
-        @endif
+        {{ $posts->links('pagination.livewire') }}
     @endif
 
     <!-- Modal Preview User -->

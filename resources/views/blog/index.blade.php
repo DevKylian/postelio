@@ -151,11 +151,9 @@
                         @endforeach
                     </div>
 
-                    @if($posts->hasPages())
-                    <div class="mt-16 flex justify-center">
-                        {{ $posts->links('pagination::tailwind') }}
+                    <div class="mt-16">
+                        {{ $posts->links('pagination.default') }}
                     </div>
-                    @endif
                 @else
                     <div class="text-center py-20">
                         <div class="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-6">

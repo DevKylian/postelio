@@ -103,6 +103,15 @@ class ProspectManager extends Component
         $prospect->save();
     }
 
+    public function markFreeDiscussion($prospectId)
+    {
+        $prospect = InstagramProspect::findOrFail($prospectId);
+        $prospect->current_node_id  = null;
+        $prospect->status           = InstagramProspect::STATUS_FREE_DISCUSSION;
+        $prospect->last_action_date = now();
+        $prospect->save();
+    }
+
     public function resetScript($prospectId)
     {
         $prospect = InstagramProspect::findOrFail($prospectId);

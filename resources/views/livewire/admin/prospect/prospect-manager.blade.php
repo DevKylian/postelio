@@ -234,6 +234,12 @@
                                                             {{ $branch['label'] ?? $branch['condition'] }}
                                                         </button>
                                                     @endforeach
+                                                    <button
+                                                        wire:click="markFreeDiscussion({{ $prospect->id }})"
+                                                        class="text-[10px] font-bold px-2 py-0.5 rounded-md border transition-colors bg-purple-50 border-purple-300 text-purple-700 hover:bg-purple-100"
+                                                    >
+                                                        Discussion libre
+                                                    </button>
                                                 </div>
                                             @else
                                                 <div class="flex items-center gap-2">
@@ -243,6 +249,29 @@
                                                     </button>
                                                 </div>
                                             @endif
+                                        </div>
+
+                                    @elseif($prospect->status === \App\Models\InstagramProspect::STATUS_FREE_DISCUSSION)
+                                        {{-- Discussion libre : hors script --}}
+                                        <div class="space-y-1.5">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-purple-400 shrink-0"></span>
+                                                <span class="text-[10px] text-purple-700 font-bold">Discussion libre</span>
+                                            </div>
+                                            <div class="flex gap-1">
+                                                <button
+                                                    wire:click="updateStatus({{ $prospect->id }}, 'responded')"
+                                                    class="text-[10px] font-bold px-2 py-0.5 rounded-md border transition-colors bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100"
+                                                >
+                                                    Réponse positive
+                                                </button>
+                                                <button
+                                                    wire:click="updateStatus({{ $prospect->id }}, 'not_interested')"
+                                                    class="text-[10px] font-bold px-2 py-0.5 rounded-md border transition-colors bg-rose-50 border-rose-300 text-rose-700 hover:bg-rose-100"
+                                                >
+                                                    Négatif
+                                                </button>
+                                            </div>
                                         </div>
 
                                     @elseif($prospect->script_version)

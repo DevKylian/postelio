@@ -17,6 +17,18 @@ class ProspectManager extends Component
     public $newAccountName = '';
     public $newProfileUrl = '';
     public $filterAction = false;
+    public $filterStatus = '';
+
+    public function updatedFilterAction()
+    {
+        $this->resetPage();
+    }
+
+    public function setFilterStatus(string $status)
+    {
+        $this->filterStatus = $this->filterStatus === $status ? '' : $status;
+        $this->resetPage();
+    }
 
     #[On('scripts-updated')]
     public function refresh()
@@ -177,6 +189,12 @@ class ProspectManager extends Component
 
         if ($this->filterAction) {
             $query->where($actionsTodoClosure);
+        }
+
+        if ($this->filterStatus === 'in_flow') {
+            $query->whereNotNull('current_node_id');
+        } elseif ($this->filterStatus !== '') {
+            $query->where('status', $this->filterStatus)->whereNull('current_node_id');
         }
 
         $prospects = $query->with('script')->orderBy('last_action_date', 'desc')->paginate(20);

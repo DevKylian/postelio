@@ -159,6 +159,34 @@
                     </div>
                 </div>
                 
+                {{-- Filtres statut --}}
+                <div class="px-6 py-3 border-b border-gray-100 flex flex-wrap gap-2">
+                    @php
+                        $statusTags = [
+                            ''               => 'Tous',
+                            'in_flow'        => '▶ En cours de script',
+                            'free_discussion'=> '💬 Discussion libre',
+                            'responded'      => '🎉 Réponse reçue',
+                            'relance_1'      => 'Relance',
+                            'dm_sent'        => 'DM Envoyé',
+                            'followed'       => 'Suivi',
+                            'discovered'     => 'Trouvé',
+                            'not_interested' => 'Non intéressé',
+                        ];
+                    @endphp
+                    @foreach($statusTags as $key => $label)
+                        <button
+                            wire:click="setFilterStatus('{{ $key }}')"
+                            class="px-3 py-1 rounded-full text-xs font-semibold border transition-colors
+                                {{ $filterStatus === $key
+                                    ? 'bg-midnight text-white border-midnight'
+                                    : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400 hover:text-gray-700' }}"
+                        >
+                            {{ $label }}
+                        </button>
+                    @endforeach
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm whitespace-nowrap">
                         <thead class="text-gray-400 bg-white">

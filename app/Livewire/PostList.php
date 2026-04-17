@@ -3,12 +3,14 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class PostList extends Component
 {
+    use WithPagination;
     public ?Post $selectedPost = null;
 
     public bool $showPublishModal = false;
@@ -201,24 +203,18 @@ class PostList extends Component
         $posts = Post::where('user_id', Auth::id())
             ->whereIn('status', ['pending', 'processing', 'review_pending', 'completed', 'published'])
             ->latest()
-            ->get();
+            ->paginate(12);
 
-        $hasPendingPosts = $posts->contains(function ($post) {
-            // actively processing (generating images/slides)
-            if ($post->status === 'processing') return true;
-
-            // scheduled for very soon (within next 30 seconds)
-            if ($post->status === 'pending' && $post->scheduled_at && $post->scheduled_at->isPast()) return true;
-            if ($post->status === 'pending' && $post->scheduled_at && $post->scheduled_at->diffInSeconds(now()) < 30) return true;
-            
-            // Waiting for Zernio Webhook (sent but not yet confirmed/failed)
-            if ($post->status === 'completed' && $post->zernio_id) {
-                // Only poll if it was updated in the last 10 minutes to avoid infinite polling
-                return $post->updated_at->gt(now()->subMinutes(10));
-            }
-
-            return false;
-        });
+        $hasPendingPosts = Post::where('user_id', Auth::id())
+            ->where(function ($q) {
+                $q->whereIn('status', ['processing', 'pending'])
+                  ->orWhere(function ($q2) {
+                      $q2->where('status', 'completed')
+                         ->whereNotNull('zernio_id')
+                         ->where('updated_at', '>=', now()->subMinutes(10));
+                  });
+            })
+            ->exists();
         
         $company = Auth::user()->company;
         $igConnected = $company?->instagram_connected ?? false;

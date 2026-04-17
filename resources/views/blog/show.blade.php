@@ -360,8 +360,8 @@
     {
         "@@context": "https://schema.org",
         "@@type": "BlogPosting",
-        "headline": {{ json_encode($post->meta_title ?: $post->title) }},
-        "description": {{ json_encode($post->meta_description ?: ($post->excerpt ?: '')) }},
+        "headline": {!! json_encode($post->meta_title ?: $post->title) !!},
+        "description": {!! json_encode($post->meta_description ?: ($post->excerpt ?: '')) !!},
         "url": "{{ route('blog.show', $post->slug) }}",
         @if($post->featured_image)
         "image": {
@@ -375,7 +375,7 @@
         "inLanguage": "fr-FR",
         "author": {
             "@@type": "Person",
-            "name": {{ json_encode($authorName) }}
+            "name": {!! json_encode($authorName) !!}
         },
         "publisher": {
             "@@type": "Organization",
@@ -412,7 +412,7 @@
             {
                 "@@type": "ListItem",
                 "position": 3,
-                "name": {{ json_encode($post->title) }},
+                "name": {!! json_encode($post->title) !!},
                 "item": "{{ route('blog.show', $post->slug) }}"
             }
         ]

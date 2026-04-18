@@ -116,8 +116,25 @@ class InstagramPostGenerator extends Component
     public string $photo_headline = '';
     public string $photo_caption  = '';
 
+    // ── Editable fields: focus ────────────────────────────────────────────────
+    public string $focus_tag         = 'FOCUS SOLUTION';
+    public string $focus_title       = '';
+    public string $focus_description = '';
+    public string $focus_benefit     = '';
+
+    // ── Editable fields: promo ───────────────────────────────────────────────
+    public string $promo_tag         = '';
+    public string $promo_headline    = '';
+    public string $promo_discount    = '';
+    public string $promo_subheadline = '';
+    public string $promo_cta         = '';
+
+    // ── Editable fields: showcase ──────────────────────────────────────────────
+    public string $showcase_tag = 'RÉSULTAT FINAL';
+    public string $showcase_caption = '';
+
     // ── Image-based templates ─────────────────────────────────────────────────
-    private const IMAGE_TEMPLATES = ['avantapres', 'appmockup', 'feature-app', 'article-blog'];
+    private const IMAGE_TEMPLATES = ['avantapres', 'appmockup', 'feature-app', 'article-blog', 'chantier', 'focus', 'showcase'];
 
     public function mount(): void
     {
@@ -160,6 +177,11 @@ class InstagramPostGenerator extends Component
         $this->article_blog_tag = 'NOUVEL ARTICLE';
         $this->article_blog_title = $this->article_blog_excerpt = $this->article_blog_cta = '';
         $this->article_blog_url = 'postelio.fr/blog';
+        $this->promo_tag = $this->promo_headline = $this->promo_discount = $this->promo_subheadline = $this->promo_cta = '';
+        $this->focus_tag = 'FOCUS SOLUTION';
+        $this->focus_title = $this->focus_description = $this->focus_benefit = '';
+        $this->showcase_tag = 'RÉSULTAT FINAL';
+        $this->showcase_caption = '';
         $this->uploadImage1 = null;
         $this->uploadImage2 = null;
         $this->hasContent   = false;
@@ -196,7 +218,7 @@ class InstagramPostGenerator extends Component
     {
         $this->validate([
             'topic'    => 'required|min:3',
-            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog,feature-app,story-article-blog,story-temoignage',
+            'template' => 'required|in:annonce,conseil,stats,cta,temoignage,avantages,question,comparaison,avantapres,appmockup,educatif,hero,article-blog,feature-app,story-article-blog,story-temoignage,promo,chantier,focus,showcase',
             'tone'     => 'required|in:professionnel,accessible,dynamique,inspirant',
         ]);
 
@@ -375,6 +397,23 @@ class InstagramPostGenerator extends Component
                 'headline' => $this->photo_headline,
                 'caption'  => $this->photo_caption,
             ],
+            'promo' => [
+                'tag'         => $this->promo_tag,
+                'headline'    => $this->promo_headline,
+                'discount'    => $this->promo_discount,
+                'subheadline' => $this->promo_subheadline,
+                'cta'         => $this->promo_cta,
+            ],
+            'focus' => [
+                'tag'         => $this->focus_tag,
+                'title'       => $this->focus_title,
+                'description' => $this->focus_description,
+                'benefit'     => $this->focus_benefit,
+            ],
+            'showcase' => [
+                'tag'     => $this->showcase_tag,
+                'caption' => $this->showcase_caption,
+            ],
             default => [],
         };
     }
@@ -547,6 +586,22 @@ class InstagramPostGenerator extends Component
                 'tag' => $tag, 'headline' => $title, 'caption' => $body,
                 'image_url' => $slide['image1_b64'] ?? null,
             ],
+            'promo' => [
+                'tag' => $tag, 'headline' => $title, 'discount' => $slide['discount'] ?? '', 'subheadline' => $body, 'cta' => $cta,
+            ],
+            'focus' => [
+                'tag'         => $tag,
+                'title'       => $title,
+                'description' => $body,
+                'benefit'     => $slide['benefit'] ?? '',
+                'image_url'   => $slide['image1_b64'] ?? null,
+            ],
+            'showcase' => [
+                'tag'       => $tag,
+                'caption'   => $slide['instagram_caption'] ?? '',
+                'image_url' => $slide['image1_b64'] ?? null,
+                'post_url'  => $slide['image2_b64'] ?? null,
+            ],
             default => $slide,
         };
     }
@@ -601,6 +656,10 @@ class InstagramPostGenerator extends Component
                 'hero'        => $this->fillHero($data),
                 'article-blog', 'story-article-blog' => $this->fillArticleBlog($data),
                 'feature-app'  => $this->fillFeatureApp($data),
+                'promo'        => $this->fillPromo($data),
+                'chantier'     => $this->fillChantier($data),
+                'focus'        => $this->fillFocus($data),
+                'showcase'     => $this->fillShowcase($data),
             };
         }
     }
@@ -689,10 +748,46 @@ class InstagramPostGenerator extends Component
         $this->photo_caption = $body;
 
         // For feature-app
-        $this->feature_tag         = $slide['feature_tag']         ?? $tag;
         $this->feature_name        = $slide['feature_name']        ?? $title;
         $this->feature_description = $slide['feature_description'] ?? $body;
         $this->feature_cta         = $slide['feature_cta']         ?? $cta;
+
+        // For promo
+        $this->promo_tag         = $tag;
+        $this->promo_headline    = $title;
+        $this->promo_discount    = $slide['discount'] ?? '';
+        $this->promo_subheadline = $body;
+        $this->promo_cta         = $cta;
+
+        // For focus
+        $this->focus_tag         = $tag;
+        $this->focus_title       = $title;
+        $this->focus_description = $body;
+        $this->focus_benefit     = $slide['benefit'] ?? $this->focus_benefit;
+
+        // For showcase
+        $this->showcase_tag      = $tag;
+    }
+
+    private function fillShowcase(array $d): void
+    {
+        $this->showcase_tag     = $d['tag']     ?? 'RÉSULTAT FINAL';
+        $this->showcase_caption = $d['caption'] ?? '';
+    }
+
+    private function fillFocus(array $d): void
+    {
+        $this->focus_tag         = $d['tag']         ?? 'FOCUS SOLUTION';
+        $this->focus_title       = $d['title']       ?? $d['headline'] ?? '';
+        $this->focus_description = $d['body']        ?? $d['description'] ?? '';
+        $this->focus_benefit     = $d['benefit']     ?? '';
+    }
+
+    private function fillChantier(array $d): void
+    {
+        $this->photo_tag      = $d['tag']      ?? 'RÉALISATION';
+        $this->photo_headline = $d['title']    ?? $d['headline'] ?? '';
+        $this->photo_caption  = $d['body']     ?? $d['caption']  ?? '';
     }
 
     private function fillAnnonce(array $d): void
@@ -803,11 +898,29 @@ class InstagramPostGenerator extends Component
         $this->feature_cta         = $d['feature_cta']         ?? $d['cta']   ?? 'Essayer gratuitement';
     }
 
-    private function fillChantier(array $data): void
+    private function fillPromo(array $d): void
     {
-        $this->photo_tag      = $data['tag'] ?? 'RÉALISATION';
-        $this->photo_headline = $data['headline'] ?? '';
-        $this->photo_caption  = $data['caption'] ?? '';
+        $this->promo_tag         = $d['tag']      ?? 'OFFRE LIMITÉE';
+        $this->promo_discount    = $d['discount'] ?? '';
+        $this->promo_subheadline = $d['body']     ?? $d['subheadline'] ?? '';
+        $this->promo_cta         = $d['cta']      ?? 'En profiter';
+
+        $headline = $d['title'] ?? $d['headline'] ?? '';
+        
+        // Anti-redundancy: if the headline contains the discount string, try to remove it
+        if (!empty($this->promo_discount) && !empty($headline)) {
+            $discountClean = preg_quote($this->promo_discount, '/');
+            $newHeadline = trim(preg_replace('/\b' . $discountClean . '\b/i', '', $headline));
+            
+            // Also clean common leading/trailing separators like " : " or " - "
+            $newHeadline = trim($newHeadline, " \t\n\r\0\x0B:-");
+            
+            if (!empty($newHeadline)) {
+                $headline = $newHeadline;
+            }
+        }
+        
+        $this->promo_headline = $headline;
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -1030,6 +1143,53 @@ class InstagramPostGenerator extends Component
                 }
                 RÈGLE : feature_name doit donner envie de cliquer. feature_description doit parler RÉSULTAT, pas technicité.
                 PROMPT,
+            'promo' => <<<PROMPT
+                Post "Promotion". FONDS ORANGE/JAUNE BRANDING. IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
+                Objectif : annoncer une promotion exceptionnelle sur le site.
+                JSON : {
+                    "tag": "OFFRE LIMITÉE" (ou "VENTE FLASH", "PROMO EXCLUSIVE"),
+                    "title": "Headline attractive (4-7 mots). INTERDICTION : Ne pas inclure le pourcentage ici car il sera affiché en GROS via le champ 'discount'.",
+                    "discount": "Pourcentage de remise (ex: -30%, -50%, Jusqu'à -40%)",
+                    "body": "Sous-titre explicatif sur la durée ou la nature de l'offre (10-15 mots)",
+                    "cta": "Texte du bouton (ex: Voir l'offre, J'en profite)",
+                    "instagram_caption": "..."
+                }
+                RÈGLE : PAS DE CODE PROMO. L'offre est directe sur le site.
+                RÈGLE D'OR : Le 'title' doit être un bénéfice ou une accroche (ex: 'Équipez-vous pour le printemps', 'Boostez votre visibilité'), PAS la valeur de la remise.
+                PROMPT,
+            'chantier' => <<<PROMPT
+                Post "Photo de chantier / Réalisation". IMAGE UNIQUE OBLIGATOIRE (Interdit : Pas de carrousel).
+                Objectif : montrer concrètement le travail de l'artisan sur le terrain.
+                JSON : {
+                    "tag": "RÉALISATION" (ou "CHANTIER EN COURS", "TRANSFORMATION"),
+                    "title": "Titre du projet (4-6 mots, ex: 'Rénovation sol à Paris')",
+                    "caption": "Détails sur l'intervention (15-20 mots). Doit valoriser le savoir-faire.",
+                    "instagram_caption": "..."
+                }
+                RÈGLE : Le ton doit être fier et professionnel.
+                PROMPT,
+            'focus' => <<<PROMPT
+                Post "Focus Postelio (Expertise)". POINT DE VUE : Postelio s'adresse à l'artisan ou à son client.
+                Objectif : montrer comment Postelio apporte une solution concrète via un exemple métier.
+                JSON : {
+                    "tag": "FOCUS SOLUTION" (ou "L'OEIL POSTELIO", "RÉSULTAT PRO"),
+                    "title": "Titre orienté succès (4-6 mots, ex: '3h gagnées par jour')",
+                    "description": "Explication sur comment Postelio a aidé (15-20 mots).",
+                    "benefit": "Un chiffre ou bénéfice court (ex: '+40% de visibilité')",
+                    "instagram_caption": "..."
+                }
+                RÈGLE : Le narrateur est Postelio. Le ton est expert, visionnaire et rassurant.
+                PROMPT,
+            'showcase' => <<<PROMPT
+                Post "Showcase Postelio". POINT DE VUE : Postelio montre un exemple de réussite.
+                Objectif : Présenter un post généré par l'IA de façon premium.
+                JSON : {
+                    "tag": "RÉSULTAT FINAL" (ou "DÉMO PRO", "AVANT / APRÈS IA"),
+                    "title": "Titre accrocheur (ex: 'Un post pro en 10s')",
+                    "instagram_caption": "..."
+                }
+                RÈGLE : Le ton est fier et technologique.
+                PROMPT,
             default => '',
         };
 
@@ -1048,7 +1208,7 @@ class InstagramPostGenerator extends Component
             Règles de STRUCTURE (CRITICAL) :
             - Réponds UNIQUEMENT en JSON valide.
             - POLITIQUES DE SLIDES :
-                - SI stats, cta, temoignage, question, avantapres, appmockup, comparaison, educatif, feature-app, article-blog, story-article-blog, story-temoignage : INTERDIT DE FAIRE UN CARROUSEL. Réponds avec un seul objet JSON simple à la racine.
+                - SI stats, cta, temoignage, question, avantapres, appmockup, comparaison, educatif, feature-app, article-blog, story-article-blog, story-temoignage, promo, chantier, focus, showcase : INTERDIT DE FAIRE UN CARROUSEL. Réponds avec un seul objet JSON simple à la racine.
                 - SI conseil, annonce, avantages : CARROUSEL AUTORISÉ (tableau "slides": [ ... ]).
             - "title" : Titre principal (4-8 mots). OBLIGATOIRE.
             - "body" : Texte descriptif (15-25 mots).

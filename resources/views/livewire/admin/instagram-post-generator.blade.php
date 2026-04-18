@@ -97,6 +97,42 @@
                                         @endforeach
                                     </div>
                                 </div>
+                                {{-- Marketing Postelio --}}
+                                <div>
+                                    <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3 px-2">
+                                        Marketing Postelio
+                                    </h4>
+                                    <div class="grid grid-cols-1 gap-1.5">
+                                        @foreach([
+                                            ['focus',    '🎯', 'Anatomie Solution'],
+                                            ['showcase', '📱', 'Rendu de Post'],
+                                        ] as [$val, $icon, $label])
+                                        <button 
+                                            wire:click="$set('template', '{{ $val }}')"
+                                            class="group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all {{ $template === $val ? 'bg-copper text-midnight shadow-md shadow-copper/10' : 'text-gray-600 hover:bg-gray-50' }}"
+                                        >
+                                            <span class="text-lg transition-transform group-hover:scale-110">{{ $icon }}</span>
+                                            {{ $label }}
+                                        </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                {{-- Portfolio Artisan --}}
+                                <div>
+                                    <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-3 px-2">
+                                        Portfolio Artisan
+                                    </h4>
+                                    <div class="grid grid-cols-1 gap-1.5">
+                                        <button 
+                                            wire:click="$set('template', 'chantier')"
+                                            class="group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all {{ $template === 'chantier' ? 'bg-copper text-midnight shadow-md shadow-copper/10' : 'text-gray-600 hover:bg-gray-50' }}"
+                                        >
+                                            <span class="text-lg transition-transform group-hover:scale-110">🏗️</span>
+                                            Chantier / Réalisation
+                                        </button>
+                                    </div>
+                                </div>
 
                                 {{-- BOFU Section --}}
                                 <div>
@@ -107,6 +143,7 @@
                                         @foreach([
                                             ['comparaison', '⚖️', 'Comparaison'],
                                             ['cta',         '🔥', 'Appel à l\'action'],
+                                            ['promo',       '🎁', 'Promotion'],
                                         ] as [$val, $icon, $label])
                                         <button 
                                             wire:click="$set('template', '{{ $val }}')"
@@ -613,6 +650,151 @@
                                         <input wire:model.live="article_blog_url" type="text" maxlength="40" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
                                     </div>
                                 </div>
+                            @elseif($template === 'chantier')
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Badge</label>
+                                    <input wire:model.live="photo_tag" type="text" maxlength="20" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Titre du projet</label>
+                                    <input wire:model.live="photo_headline" type="text" maxlength="45" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Description courte</label>
+                                    <textarea wire:model.live="photo_caption" rows="2" maxlength="100" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
+                                </div>
+                                
+                                <div class="space-y-3 pt-2">
+                                    <label class="block text-xs font-semibold text-gray-600">Photo de la réalisation</label>
+                                    <div class="relative group h-32 w-full rounded-2xl border-2 border-dashed border-gray-100 bg-gray-50/50 hover:bg-gray-100/50 hover:border-copper/30 transition-all overflow-hidden">
+                                        @if($uploadImage1)
+                                            <img src="{{ $uploadImage1->temporaryUrl() }}" class="absolute inset-0 w-full h-full object-cover">
+                                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <button wire:click="$set('uploadImage1', null)" class="bg-white/20 backdrop-filter blur-md p-2 rounded-xl text-white hover:bg-white/30 transition-all">
+                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                </button>
+                                            </div>
+                                        @else
+                                            <label class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer">
+                                                <div class="h-8 w-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-copper mb-2">
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                                </div>
+                                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Choisir une photo</span>
+                                                <input type="file" wire:model="uploadImage1" class="hidden" accept="image/*">
+                                            </label>
+                                        @endif
+                                    </div>
+                                </div>
+                            @elseif($template === 'focus')
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Badge</label>
+                                    <input wire:model.live="focus_tag" type="text" maxlength="20" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Titre (Expertise)</label>
+                                    <input wire:model.live="focus_title" type="text" maxlength="45" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Description</label>
+                                    <textarea wire:model.live="focus_description" rows="2" maxlength="100" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Bénéfice clé (Badge)</label>
+                                    <input wire:model.live="focus_benefit" type="text" maxlength="25" placeholder="ex: +40% de visibilité" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
+                                
+                                <div class="space-y-3 pt-2">
+                                    <label class="block text-xs font-semibold text-gray-600">Photo d'illustration</label>
+                                    <div class="relative group h-32 w-full rounded-2xl border-2 border-dashed border-gray-100 bg-gray-50/50 hover:bg-gray-100/50 hover:border-copper/30 transition-all overflow-hidden">
+                                        @if($uploadImage1)
+                                            <img src="{{ $uploadImage1->temporaryUrl() }}" class="absolute inset-0 w-full h-full object-cover">
+                                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <button wire:click="$set('uploadImage1', null)" class="bg-white/20 backdrop-filter blur-md p-2 rounded-xl text-white hover:bg-white/30 transition-all">
+                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                </button>
+                                            </div>
+                                        @else
+                                            <label class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer">
+                                                <div class="h-8 w-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-copper mb-2">
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                                </div>
+                                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Choisir une photo</span>
+                                                <input type="file" wire:model="uploadImage1" class="hidden" accept="image/*">
+                                            </label>
+                                        @endif
+                                    </div>
+                                </div>
+                            @elseif($template === 'showcase')
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Légende du post (Mockup)</label>
+                                    <textarea wire:model.live="showcase_caption" rows="4" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none" placeholder="Collez ici le texte qui s'affichera sous le post..."></textarea>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3 pt-2">
+                                    <div class="space-y-3">
+                                        <label class="block text-xs font-semibold text-gray-600">Photo de fond</label>
+                                        <div class="relative group h-32 w-full rounded-2xl border-2 border-dashed border-gray-100 bg-gray-50/50 hover:bg-gray-100/50 hover:border-copper/30 transition-all overflow-hidden">
+                                            @if($uploadImage1)
+                                                <img src="{{ $uploadImage1->temporaryUrl() }}" class="absolute inset-0 w-full h-full object-cover">
+                                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <button wire:click="$set('uploadImage1', null)" class="bg-white/20 backdrop-filter blur-md p-2 rounded-xl text-white hover:bg-white/30 transition-all">
+                                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                    </button>
+                                                </div>
+                                            @else
+                                                <label class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer">
+                                                    <div class="h-8 w-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-copper mb-2">
+                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                                    </div>
+                                                    <span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest text-center">Image 1<br>(Fond)</span>
+                                                    <input type="file" wire:model="uploadImage1" class="hidden" accept="image/*">
+                                                </label>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <label class="block text-xs font-semibold text-gray-600">Photo du post</label>
+                                        <div class="relative group h-32 w-full rounded-2xl border-2 border-dashed border-gray-100 bg-gray-50/50 hover:bg-gray-100/50 hover:border-copper/30 transition-all overflow-hidden">
+                                            @if($uploadImage2)
+                                                <img src="{{ $uploadImage2->temporaryUrl() }}" class="absolute inset-0 w-full h-full object-cover">
+                                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <button wire:click="$set('uploadImage2', null)" class="bg-white/20 backdrop-filter blur-md p-2 rounded-xl text-white hover:bg-white/30 transition-all">
+                                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                    </button>
+                                                </div>
+                                            @else
+                                                <label class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer">
+                                                    <div class="h-8 w-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-copper mb-2">
+                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                                    </div>
+                                                    <span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest text-center">Image 2<br>(Post)</span>
+                                                    <input type="file" wire:model="uploadImage2" class="hidden" accept="image/*">
+                                                </label>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @elseif($template === 'promo')
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Badge</label>
+                                    <input wire:model.live="promo_tag" type="text" maxlength="20" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Headline</label>
+                                    <input wire:model.live="promo_headline" type="text" maxlength="45" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Réduction (ex: -30%)</label>
+                                    <input wire:model.live="promo_discount" type="text" maxlength="15" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Sous-titre explicatif</label>
+                                    <textarea wire:model.live="promo_subheadline" rows="2" maxlength="100" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all resize-none"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Texte CTA</label>
+                                    <input wire:model.live="promo_cta" type="text" maxlength="25" class="w-full rounded-xl border-gray-100 bg-gray-50/50 text-sm focus:ring-4 focus:ring-copper/10 focus:border-copper transition-all">
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -639,8 +821,12 @@
                                         {{ $item['template'] === 'annonce' ? 'bg-midnight/5 text-midnight' : '' }}
                                         {{ $item['template'] === 'conseil' ? 'bg-amber-50 text-amber-600' : '' }}
                                         {{ $item['template'] === 'stats' ? 'bg-blue-50 text-blue-600' : '' }}
+                                        {{ $item['template'] === 'chantier' ? 'bg-emerald-50 text-emerald-600' : '' }}
+                                        {{ $item['template'] === 'focus' ? 'bg-indigo-50 text-indigo-600' : '' }}
+                                        {{ $item['template'] === 'showcase' ? 'bg-orange-50 text-orange-600' : '' }}
                                         {{ $item['template'] === 'cta' ? 'bg-copper/10 text-copper' : '' }}
-                                        {{ !in_array($item['template'], ['annonce', 'conseil', 'stats', 'cta']) ? 'bg-gray-100 text-gray-500' : '' }}
+                                        {{ $item['template'] === 'promo' ? 'bg-copper text-midnight' : '' }}
+                                        {{ !in_array($item['template'], ['annonce', 'conseil', 'stats', 'cta', 'promo']) ? 'bg-gray-100 text-gray-500' : '' }}
                                     ">
                                         {{ match($item['template']) {
                                             'annonce' => '📣',
@@ -659,6 +845,10 @@
                                             'article-blog' => '📰',
                                             'story-article-blog' => '📖',
                                             'story-temoignage'   => '⭐',
+                                            'promo'              => '🎁',
+                                            'chantier'           => '🏗️',
+                                            'focus'              => '🎯',
+                                            'showcase'           => '📱',
                                             default => '📄'
                                         } }}
                                     </div>
@@ -760,6 +950,29 @@
                                                         :headline="$photo_headline" 
                                                         :caption="$photo_caption" 
                                                         :image_url="$uploadImage1 ? $uploadImage1->temporaryUrl() : null" 
+                                                    />
+                                                @elseif($template === 'focus')
+                                                    <x-postelio-instagram.focus 
+                                                        :tag="$focus_tag" 
+                                                        :title="$focus_title" 
+                                                        :description="$focus_description" 
+                                                        :benefit="$focus_benefit" 
+                                                        :image_url="$uploadImage1 ? $uploadImage1->temporaryUrl() : null" 
+                                                    />
+                                                @elseif($template === 'showcase')
+                                                    <x-postelio-instagram.showcase 
+                                                        :tag="$showcase_tag" 
+                                                        :image_url="$uploadImage1 ? $uploadImage1->temporaryUrl() : null" 
+                                                        :post_url="$uploadImage2 ? $uploadImage2->temporaryUrl() : null" 
+                                                        :caption="$showcase_caption"
+                                                    />
+                                                @elseif($template === 'promo')
+                                                    <x-postelio-instagram.promo 
+                                                        :tag="$promo_tag" 
+                                                        :headline="$promo_headline" 
+                                                        :discount="$promo_discount" 
+                                                        :subheadline="$promo_subheadline" 
+                                                        :cta="$promo_cta" 
                                                     />
                                                 @endif
 

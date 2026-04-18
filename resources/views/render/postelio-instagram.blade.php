@@ -164,6 +164,35 @@
                 :feature_description="$data['feature_description'] ?? ''"
                 :feature_cta="$data['feature_cta'] ?? 'Essayer gratuitement'"
             />
+        @elseif($template === 'promo')
+            <x-postelio-instagram.promo
+                :tag="$data['tag'] ?? 'OFFRE LIMITÉE'"
+                :headline="$data['headline'] ?? ''"
+                :discount="$data['discount'] ?? ''"
+                :subheadline="$data['subheadline'] ?? ''"
+                :cta="$data['cta'] ?? 'En profiter'"
+            />
+        @elseif($template === 'chantier')
+            <x-postelio-instagram.chantier
+                :image_url="$data['image_url'] ?? $data['image1_b64'] ?? null"
+                :tag="$data['tag'] ?? 'RÉALISATION'"
+                :headline="$data['headline'] ?? ''"
+                :caption="$data['caption'] ?? ''"
+            />
+        @elseif($template === 'focus')
+            <x-postelio-instagram.focus
+                :image_url="$data['image_url'] ?? $data['image1_b64'] ?? null"
+                :tag="$data['tag'] ?? 'FOCUS SOLUTION'"
+                :title="$data['title'] ?? ''"
+                :description="$data['description'] ?? ''"
+                :benefit="$data['benefit'] ?? ''"
+            />
+        @elseif($template === 'showcase')
+            <x-postelio-instagram.showcase
+                :image_url="$data['image_url'] ?? $data['image1_b64'] ?? null"
+                :post_url="$data['post_url'] ?? $data['image2_b64'] ?? null"
+                :caption="$data['caption'] ?? $data['instagram_caption'] ?? null"
+            />
         @endif
     </div>
 </body>

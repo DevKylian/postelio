@@ -16,8 +16,22 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Postelio — Votre post Instagram prêt en 10 secondes, à partir d’une simple note vocale.</title>
-  <meta name="description"
-    content="Attirez de vrais clients sans sacrifier vos soirées ! Depuis votre camion, 1 photo + 1 vocal génèrent votre post Instagram parfait en 10 secondes.">
+  <meta name="description" content="Attirez de vrais clients sans sacrifier vos soirées ! Depuis votre camion, 1 photo + 1 vocal génèrent votre post Instagram parfait en 10 secondes.">
+  
+  <!-- Open Graph / Facebook / LinkedIn -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ url('/') }}">
+  <meta property="og:title" content="Postelio — Votre post Instagram prêt en 10 secondes, à partir d’une simple note vocale.">
+  <meta property="og:description" content="Attirez de vrais clients sans sacrifier vos soirées ! Depuis votre camion, 1 photo + 1 vocal génèrent votre post Instagram parfait en 10 secondes.">
+  <meta property="og:image" content="{{ asset('images/og-image.png') }}">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="{{ url('/') }}">
+  <meta property="twitter:title" content="Postelio — Votre post Instagram prêt en 10 secondes, à partir d’une simple note vocale.">
+  <meta property="twitter:description" content="Attirez de vrais clients sans sacrifier vos soirées ! Depuis votre camion, 1 photo + 1 vocal génèrent votre post Instagram parfait en 10 secondes.">
+  <meta property="twitter:image" content="{{ asset('images/og-image.png') }}">
+
   <style>[x-cloak] { display: none !important; }</style>
   <link rel="canonical" href="{{ url()->current() }}">
 

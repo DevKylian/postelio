@@ -18,19 +18,22 @@
   <title>Postelio — Votre post Instagram prêt en 10 secondes, à partir d’une simple note vocale.</title>
   <meta name="description" content="Attirez de vrais clients sans sacrifier vos soirées ! Depuis votre camion, 1 photo + 1 vocal génèrent votre post Instagram parfait en 10 secondes.">
   
-  <!-- Open Graph / Facebook / LinkedIn -->
+  <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="{{ url('/') }}">
   <meta property="og:title" content="Postelio — Votre post Instagram prêt en 10 secondes, à partir d’une simple note vocale.">
   <meta property="og:description" content="Attirez de vrais clients sans sacrifier vos soirées ! Depuis votre camion, 1 photo + 1 vocal génèrent votre post Instagram parfait en 10 secondes.">
-  <meta property="og:image" content="{{ asset('images/og-image.png') }}">
+  <meta property="og:image" content="{{ asset('images/og-image.jpg') }}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="{{ url('/') }}">
   <meta property="twitter:title" content="Postelio — Votre post Instagram prêt en 10 secondes, à partir d’une simple note vocale.">
   <meta property="twitter:description" content="Attirez de vrais clients sans sacrifier vos soirées ! Depuis votre camion, 1 photo + 1 vocal génèrent votre post Instagram parfait en 10 secondes.">
-  <meta property="twitter:image" content="{{ asset('images/og-image.png') }}">
+  <meta property="twitter:image" content="{{ asset('images/og-image.jpg') }}">
 
   <style>[x-cloak] { display: none !important; }</style>
   <link rel="canonical" href="{{ url()->current() }}">

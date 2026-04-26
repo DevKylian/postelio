@@ -683,6 +683,8 @@ if [ "\$FRONTEND_CHANGED" -gt 0 ]; then
     log "npm install..."
     # On tente npm ci (plus sûr), sinon npm install (plus flexible)
     if ! npm ci --quiet 2>/dev/null; then
+        log "npm ci échoué — nettoyage forcé de node_modules..."
+        rm -rf node_modules
         npm install --quiet
     fi
     

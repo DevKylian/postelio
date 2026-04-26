@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
 
         $middleware->web(append: [
+            \App\Http\Middleware\PreventSensitiveQueryParameters::class,
             \App\Http\Middleware\EnsureNotBanned::class,
             \App\Http\Middleware\AuditLogMiddleware::class,
             \App\Http\Middleware\UpdateUserActivity::class,

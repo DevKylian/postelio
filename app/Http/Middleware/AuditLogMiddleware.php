@@ -38,7 +38,7 @@ class AuditLogMiddleware
                 'email'         => $user?->email,
                 'ip'            => $request->ip(),
                 'method'        => $request->method(),
-                'url'           => $request->fullUrl(),
+                'url'           => $this->getCleanUrl($request),
                 'tag'           => $this->determineTag($request),
                 'city'          => $location?->cityName,
                 'country'       => $location?->countryName,
@@ -101,5 +101,19 @@ class AuditLogMiddleware
     {
         $payload = $request->except(['password', 'password_confirmation', '_token', 'card_number', 'cvc']);
         return empty($payload) ? null : $payload;
+    }
+
+    protected function getCleanUrl(Request $request): string
+    {
+        $url = $request->fullUrl();
+        $sensitiveKeys = ['password', 'password_confirmation', 'token', 'cvc', 'card_number'];
+
+        foreach ($sensitiveKeys as $key) {
+            if ($request->has($key)) {
+                $url = preg_replace('/' . $key . '=[^&]*/', $key . '=[REDACTED]', $url);
+            }
+        }
+
+        return $url;
     }
 }

@@ -3,30 +3,26 @@
     'stat_label'       => 'des artisans',
     'stat_description' => 'n\'ont aucune présence active sur les réseaux sociaux. Ne faites pas partie de la majorité.',
     'insight'          => 'Et si vous étiez différent ?',
-])
-
-@php
-    $cleanStat = html_entity_decode($stat, ENT_QUOTES, 'UTF-8');
-    $cleanLabel = html_entity_decode($stat_label, ENT_QUOTES, 'UTF-8');
-    $cleanDesc = html_entity_decode($stat_description, ENT_QUOTES, 'UTF-8');
-    $cleanInsight = html_entity_decode($insight, ENT_QUOTES, 'UTF-8');
-
+]@php
     // Stat number scaling
-    $statLen = strlen($cleanStat);
+    $statLen = strlen($stat);
     $statSize = $statLen > 4 ? '68px' : '84px';
 
     // Label scaling
-    $labelLen = strlen($cleanLabel);
+    $labelLen = strlen($stat_label);
     $labelSize = $labelLen > 25 ? '10px' : '11.5px';
 
     // Description scaling
-    $descLen = strlen($cleanDesc);
+    $descLen = strlen($stat_description);
     $descSize = $descLen > 100 ? '11px' : '13.5px';
     $descLH = $descLen > 100 ? '1.45' : '1.55';
 
     // Insight scaling
-    $insightLen = strlen($cleanInsight);
+    $insightLen = strlen($insight);
     $insightSize = $insightLen > 45 ? '10.5px' : '12px';
+
+    $cleanDesc = html_entity_decode($stat_description, ENT_QUOTES, 'UTF-8');
+    $cleanInsight = html_entity_decode($insight, ENT_QUOTES, 'UTF-8');
 @endphp
 
 <div style="
@@ -72,7 +68,7 @@
                 font-size: 8.5px; font-weight: 800;
                 letter-spacing: 0.12em; text-transform: uppercase;
                 padding: 4px 12px; border-radius: 100px;
-            ">Analyse du marché</span>
+            ">Analyse du marchÃ©</span>
         </div>
 
         {{-- Big Stat Value --}}
@@ -82,7 +78,7 @@
                 font-size: {{ $statSize }}; font-weight: 900; line-height: 1;
                 letter-spacing: -0.04em; color: rgba(0,0,0,0.4);
                 filter: blur(8px);
-            ">{{ $cleanStat }}</div>
+            ">{{ $stat }}</div>
             <div style="
                 position: relative;
                 font-size: {{ $statSize }}; font-weight: 900; line-height: 1;
@@ -91,7 +87,7 @@
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
-            ">{{ $cleanStat }}</div>
+            ">{{ $stat }}</div>
         </div>
 
         {{-- Stat Context --}}
@@ -100,7 +96,7 @@
             font-size: {{ $labelSize }}; font-weight: 700;
             letter-spacing: 0.1em; text-transform: uppercase;
             margin-bottom: 18px; text-align: center;
-        ">{{ $cleanLabel }}</div>
+        ">{{ $stat_label }}</div>
 
         {{-- Divider --}}
         <div style="width: 32px; height: 2px; background: linear-gradient(90deg, #F59E0B, #D97706); border-radius: 2px; margin-bottom: 18px;"></div>

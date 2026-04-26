@@ -3,7 +3,9 @@
     'stat_label'       => 'des artisans',
     'stat_description' => 'n\'ont aucune présence active sur les réseaux sociaux. Ne faites pas partie de la majorité.',
     'insight'          => 'Et si vous étiez différent ?',
-]@php
+])
+
+@php
     // Stat number scaling
     $statLen = strlen($stat);
     $statSize = $statLen > 4 ? '68px' : '84px';

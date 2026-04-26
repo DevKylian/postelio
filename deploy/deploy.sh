@@ -133,9 +133,12 @@ if [ "$FRONTEND_CHANGED" -gt 0 ]; then
     mkdir -p public/build
     
     log "npm install..."
+    # Récupération des droits si root a travaillé manuellement
+    sudo chown -R deploy:www-data node_modules public/build 2>/dev/null || true
+
     # On tente npm ci (plus sûr), sinon npm install (plus flexible)
     if ! npm ci --quiet 2>/dev/null; then
-        log "npm ci échoué — nettoyage forcé de node_modules et nouvelle tentative..."
+        log "npm ci échoué — nettoyage forcé de node_modules..."
         sudo rm -rf node_modules
         npm install --quiet
     fi

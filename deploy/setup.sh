@@ -132,9 +132,9 @@ else
     log "Utilisateur 'deploy' déjà existant."
 fi
 
-# Sudo limité : uniquement pour redémarrer les services
+# Sudo limité : redémarrage services + maintenance permissions/build
 cat > /etc/sudoers.d/deploy-postelio << 'EOF'
-deploy ALL=(ALL) NOPASSWD: /bin/systemctl restart postelio-queue, /bin/systemctl restart postelio-webhook, /bin/systemctl status postelio-queue
+deploy ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart postelio-queue, /usr/bin/systemctl restart postelio-webhook, /usr/bin/systemctl status postelio-queue, /usr/bin/chown -R deploy\:www-data /var/www/postelio, /usr/bin/rm -rf /var/www/postelio/node_modules, /usr/bin/rm -rf /var/www/postelio/public/build
 EOF
 chmod 0440 /etc/sudoers.d/deploy-postelio
 log "Sudoers configuré."
@@ -681,10 +681,13 @@ if [ "\$FRONTEND_CHANGED" -gt 0 ]; then
     rm -rf public/build
     
     log "npm install..."
+    # Récupération des droits si root a travaillé manuellement
+    sudo chown -R deploy:www-data node_modules public/build 2>/dev/null || true
+    
     # On tente npm ci (plus sûr), sinon npm install (plus flexible)
     if ! npm ci --quiet 2>/dev/null; then
         log "npm ci échoué — nettoyage forcé de node_modules..."
-        rm -rf node_modules
+        sudo rm -rf node_modules
         npm install --quiet
     fi
     

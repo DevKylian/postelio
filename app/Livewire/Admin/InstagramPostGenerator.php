@@ -739,10 +739,10 @@ class InstagramPostGenerator extends Component
         $this->hero_body = $body;
         
         // For stats
-        $this->stat = $slide['stat'] ?? $this->stat;
-        $this->stat_label = $title;
-        $this->stat_description = $body;
-        $this->insight = $slide['insight'] ?? $this->insight;
+        $this->stat = $this->recursiveDecode($slide['stat'] ?? $this->stat);
+        $this->stat_label = $this->recursiveDecode($title);
+        $this->stat_description = $this->recursiveDecode($body);
+        $this->insight = $this->recursiveDecode($slide['insight'] ?? $this->insight);
 
         // For chantier
         $this->photo_tag = $tag;
@@ -810,10 +810,10 @@ class InstagramPostGenerator extends Component
 
     private function fillStats(array $d): void
     {
-        $this->stat             = $d['stat']             ?? '';
-        $this->stat_label       = $d['stat_label']       ?? $d['title'] ?? '';
-        $this->stat_description = $d['stat_description'] ?? $d['body']  ?? '';
-        $this->insight          = $d['insight']          ?? '';
+        $this->stat             = $this->recursiveDecode($d['stat'] ?? '');
+        $this->stat_label       = $this->recursiveDecode($d['stat_label'] ?? $d['title'] ?? '');
+        $this->stat_description = $this->recursiveDecode($d['stat_description'] ?? $d['body'] ?? '');
+        $this->insight          = $this->recursiveDecode($d['insight'] ?? '');
     }
 
     private function fillCta(array $d): void
@@ -1064,9 +1064,10 @@ class InstagramPostGenerator extends Component
                     "instagram_caption": "..." 
                 }
                 RÈGLE D'OR : Le [Sujet] (title) doit compléter le [Stat] immédiatement.
-                - BON : [30%] [DE SIGNATURES EN PLUS] [grâce à une présence régulière.]
+                - BON : [3x] [PLUS D'ATTENTION] [grâce à une identité pro.]
                 - BON : [87%] [DES CLIENTS] [vérifient votre profil avant de signer.]
-                - MAUVAIS : [30%] [POSTER RÉGULIÈREMENT] [AUGMENTE vos devis.] (Phrase brisée)
+                - MAUVAIS : [3x] [ATTENTION MULTIPLIÉE] [PAR TROIS.] (Phrase brisée ou redondante)
+                RÈGLE : Utilise le format '3x', '5x', etc. pour les multiplicateurs, JAMAIS '3 fois'.
                 RÈGLE : L'insight doit être une conclusion courte (5-7 mots).
                 CONSEIL : Sois concret pour un artisan (ex: "votre planning sera complet").
                 PROMPT,
@@ -1263,11 +1264,12 @@ PROMPT;
         }
 
         if (is_string($data)) {
-            $prev = '';
             $curr = $data;
-            // Multi-pass decode to handle double/triple encoding
+            // Iterative decode loop (max 3 passes) to handle nested entities
             for ($i = 0; $i < 3; $i++) {
-                $curr = html_entity_decode($curr, ENT_QUOTES, 'UTF-8');
+                $next = html_entity_decode($curr, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                if ($next === $curr) break;
+                $curr = $next;
             }
             return $curr;
         }

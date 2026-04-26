@@ -23,7 +23,7 @@
         </div>
     @else
         {{-- Form --}}
-        <form wire:submit="send" class="bg-white rounded-3xl border border-slate-100 shadow-card p-8 sm:p-10 space-y-6">
+        <form wire:submit="send" method="POST" class="bg-white rounded-3xl border border-slate-100 shadow-card p-8 sm:p-10 space-y-6">
 
             @if($error)
                 <div class="flex items-start gap-3 bg-red-50 border border-red-100 rounded-2xl px-4 py-4 text-sm text-red-600">

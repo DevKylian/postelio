@@ -1057,10 +1057,10 @@ class InstagramPostGenerator extends Component
                 Post "Stats". IMAGE UNIQUE (Interdit : Pas de carrousel).
                 OBJECTIF : La suite [Stat] + [Sujet] + [Action] doit être une phrase française fluide et naturelle.
                 JSON : { 
-                    "stat": "30%", 
-                    "title": "DE DEVIS SIGNÉS EN PLUS", 
-                    "body": "pour les artisans qui publient 2 fois par semaine.", 
-                    "insight": "Ne laissez plus vos chantiers aux concurrents.", 
+                    "stat": "3x", 
+                    "title": "PLUS D'ATTENTION RETENUE", 
+                    "body": "pour les comptes pros avec une identité visuelle cohérente.", 
+                    "insight": "Votre image pro attire et captive.", 
                     "instagram_caption": "..." 
                 }
                 RÈGLE D'OR : Le [Sujet] (title) doit compléter le [Stat] immédiatement.
@@ -1263,7 +1263,13 @@ PROMPT;
         }
 
         if (is_string($data)) {
-            return html_entity_decode($data, ENT_QUOTES, 'UTF-8');
+            $prev = '';
+            $curr = $data;
+            // Multi-pass decode to handle double/triple encoding
+            for ($i = 0; $i < 3; $i++) {
+                $curr = html_entity_decode($curr, ENT_QUOTES, 'UTF-8');
+            }
+            return $curr;
         }
 
         return $data;

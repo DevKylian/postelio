@@ -70,7 +70,7 @@
                 font-size: 8.5px; font-weight: 800;
                 letter-spacing: 0.12em; text-transform: uppercase;
                 padding: 4px 12px; border-radius: 100px;
-            ">Analyse du marchÃ©</span>
+            ">Analyse du marché</span>
         </div>
 
         {{-- Big Stat Value --}}

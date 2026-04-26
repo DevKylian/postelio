@@ -145,7 +145,7 @@ class InstagramPostGenerator extends Component
             ->map(fn($item) => [
                 'id'       => $item->id,
                 'template' => $item->template,
-                'topic'    => $item->topic,
+                'topic'    => html_entity_decode($item->topic ?? '', ENT_QUOTES, 'UTF-8'),
                 'data'     => $item->content_data,
                 'caption'  => $item->caption,
                 'time'     => $item->created_at->format('H:i'),
@@ -266,7 +266,7 @@ class InstagramPostGenerator extends Component
         }
         $item           = $this->history[$index];
         $this->template = $item['template'];
-        $this->topic    = $item['topic'];
+        $this->topic    = html_entity_decode($item['topic'] ?? '', ENT_QUOTES, 'UTF-8');
         $this->caption  = $item['caption'] ?? '';
         $this->fillFields($item['data']);
         $this->hasContent = true;
@@ -610,8 +610,6 @@ class InstagramPostGenerator extends Component
 
     private function fillFields(array $data): void
     {
-        $data = $this->recursiveDecode($data);
-
         // Robust Extraction: check root first, with fallback keys
         $rawCaption = $data['instagram_caption'] ?? 
                       $data['caption'] ?? 
@@ -739,10 +737,10 @@ class InstagramPostGenerator extends Component
         $this->hero_body = $body;
         
         // For stats
-        $this->stat = $slide['stat'] ?? $this->stat;
-        $this->stat_label = $title;
-        $this->stat_description = $body;
-        $this->insight = $slide['insight'] ?? $this->insight;
+        $this->stat = html_entity_decode($slide['stat'] ?? $this->stat, ENT_QUOTES, 'UTF-8');
+        $this->stat_label = html_entity_decode($title, ENT_QUOTES, 'UTF-8');
+        $this->stat_description = html_entity_decode($body, ENT_QUOTES, 'UTF-8');
+        $this->insight = html_entity_decode($slide['insight'] ?? $this->insight, ENT_QUOTES, 'UTF-8');
 
         // For chantier
         $this->photo_tag = $tag;
@@ -810,10 +808,10 @@ class InstagramPostGenerator extends Component
 
     private function fillStats(array $d): void
     {
-        $this->stat             = $d['stat']             ?? '';
-        $this->stat_label       = $d['stat_label']       ?? $d['title'] ?? '';
-        $this->stat_description = $d['stat_description'] ?? $d['body']  ?? '';
-        $this->insight          = $d['insight']          ?? '';
+        $this->stat             = html_entity_decode($d['stat'] ?? '', ENT_QUOTES, 'UTF-8');
+        $this->stat_label       = html_entity_decode($d['stat_label'] ?? $d['title'] ?? '', ENT_QUOTES, 'UTF-8');
+        $this->stat_description = html_entity_decode($d['stat_description'] ?? $d['body'] ?? '', ENT_QUOTES, 'UTF-8');
+        $this->insight          = html_entity_decode($d['insight'] ?? '', ENT_QUOTES, 'UTF-8');
     }
 
     private function fillCta(array $d): void
@@ -1251,19 +1249,6 @@ PROMPT;
     private function buildUserPrompt(): string
     {
         return "Sujet du post : {$this->topic}\n\nPense à un HOOK très fort et un CTA vers Postelio. Génère le JSON maintenant.";
-    }
-
-    private function recursiveDecode(mixed $data): mixed
-    {
-        if (is_array($data)) {
-            return array_map([$this, 'recursiveDecode'], $data);
-        }
-
-        if (is_string($data)) {
-            return html_entity_decode($data, ENT_QUOTES, 'UTF-8');
-        }
-
-        return $data;
     }
 
     public function render()

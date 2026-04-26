@@ -1264,7 +1264,7 @@ PROMPT;
         }
 
         if (is_string($data)) {
-            $curr = $data;
+            $curr = str_replace(['&#039;', '&apos;', '&quot;', '&amp;'], ["'", "'", '"', '&'], $data);
             // Iterative decode loop (max 3 passes) to handle nested entities
             for ($i = 0; $i < 3; $i++) {
                 $next = html_entity_decode($curr, ENT_QUOTES | ENT_HTML5, 'UTF-8');

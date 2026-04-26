@@ -80,7 +80,7 @@
                 font-size: {{ $statSize }}; font-weight: 900; line-height: 1;
                 letter-spacing: -0.04em; color: rgba(0,0,0,0.4);
                 filter: blur(8px);
-            ">{{ $stat }}</div>
+            ">{!! $stat !!}</div>
             <div style="
                 position: relative;
                 font-size: {{ $statSize }}; font-weight: 900; line-height: 1;
@@ -89,7 +89,7 @@
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
-            ">{{ $stat }}</div>
+            ">{!! $stat !!}</div>
         </div>
 
         {{-- Stat Context --}}
@@ -98,7 +98,7 @@
             font-size: {{ $labelSize }}; font-weight: 700;
             letter-spacing: 0.1em; text-transform: uppercase;
             margin-bottom: 18px; text-align: center;
-        ">{{ $stat_label }}</div>
+        ">{!! $stat_label !!}</div>
 
         {{-- Divider --}}
         <div style="width: 32px; height: 2px; background: linear-gradient(90deg, #F59E0B, #D97706); border-radius: 2px; margin-bottom: 18px;"></div>

@@ -67,7 +67,7 @@ $resetPassword = function () {
         <p class="text-slate-500 mt-2 font-light">Choisissez un mot de passe sécurisé pour votre compte.</p>
     </div>
 
-    <form wire:submit="resetPassword">
+    <form wire:submit="resetPassword" method="POST">
         <!-- Email Address -->
         <div>
             <x-input-label for="email" :value="__('Adresse e-mail')" />

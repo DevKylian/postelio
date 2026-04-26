@@ -38,7 +38,7 @@ $confirmPassword = function () {
         <p class="text-slate-500 mt-2 font-light">Cette zone sécurisée nécessite une confirmation de votre mot de passe.</p>
     </div>
 
-    <form wire:submit="confirmPassword">
+    <form wire:submit="confirmPassword" method="POST">
         <!-- Password -->
         <div>
             <x-input-label for="password" :value="__('Mot de passe')" />

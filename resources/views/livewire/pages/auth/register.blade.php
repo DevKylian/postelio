@@ -92,7 +92,7 @@ $redirectToGoogle = function () {
         </div>
     </div>
 
-    <form wire:submit="register" class="space-y-5">
+    <form wire:submit="register" method="POST" class="space-y-5">
         <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Nom complet')" />

@@ -50,7 +50,7 @@ $login = function () {
         </div>
     </div>
 
-    <form wire:submit="login" class="space-y-6">
+    <form wire:submit="login" method="POST" class="space-y-6">
         <!-- Email Address -->
         <div>
             <x-input-label for="email" :value="__('Adresse e-mail')" />

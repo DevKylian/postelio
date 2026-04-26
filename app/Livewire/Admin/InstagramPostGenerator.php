@@ -610,6 +610,8 @@ class InstagramPostGenerator extends Component
 
     private function fillFields(array $data): void
     {
+        $data = $this->recursiveDecode($data);
+
         // Robust Extraction: check root first, with fallback keys
         $rawCaption = $data['instagram_caption'] ?? 
                       $data['caption'] ?? 
@@ -1249,6 +1251,19 @@ PROMPT;
     private function buildUserPrompt(): string
     {
         return "Sujet du post : {$this->topic}\n\nPense à un HOOK très fort et un CTA vers Postelio. Génère le JSON maintenant.";
+    }
+
+    private function recursiveDecode(mixed $data): mixed
+    {
+        if (is_array($data)) {
+            return array_map([$this, 'recursiveDecode'], $data);
+        }
+
+        if (is_string($data)) {
+            return html_entity_decode($data, ENT_QUOTES, 'UTF-8');
+        }
+
+        return $data;
     }
 
     public function render()

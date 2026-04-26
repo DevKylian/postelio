@@ -739,10 +739,10 @@ class InstagramPostGenerator extends Component
         $this->hero_body = $body;
         
         // For stats
-        $this->stat = $slide['stat'] ?? $this->stat;
-        $this->stat_label = $title;
-        $this->stat_description = $body;
-        $this->insight = $slide['insight'] ?? $this->insight;
+        $this->stat = html_entity_decode($slide['stat'] ?? $this->stat, ENT_QUOTES, 'UTF-8');
+        $this->stat_label = html_entity_decode($title, ENT_QUOTES, 'UTF-8');
+        $this->stat_description = html_entity_decode($body, ENT_QUOTES, 'UTF-8');
+        $this->insight = html_entity_decode($slide['insight'] ?? $this->insight, ENT_QUOTES, 'UTF-8');
 
         // For chantier
         $this->photo_tag = $tag;
@@ -810,10 +810,10 @@ class InstagramPostGenerator extends Component
 
     private function fillStats(array $d): void
     {
-        $this->stat             = $d['stat']             ?? '';
-        $this->stat_label       = $d['stat_label']       ?? $d['title'] ?? '';
-        $this->stat_description = $d['stat_description'] ?? $d['body']  ?? '';
-        $this->insight          = $d['insight']          ?? '';
+        $this->stat             = html_entity_decode($d['stat'] ?? '', ENT_QUOTES, 'UTF-8');
+        $this->stat_label       = html_entity_decode($d['stat_label'] ?? $d['title'] ?? '', ENT_QUOTES, 'UTF-8');
+        $this->stat_description = html_entity_decode($d['stat_description'] ?? $d['body'] ?? '', ENT_QUOTES, 'UTF-8');
+        $this->insight          = html_entity_decode($d['insight'] ?? '', ENT_QUOTES, 'UTF-8');
     }
 
     private function fillCta(array $d): void
@@ -1256,11 +1256,17 @@ PROMPT;
     private function recursiveDecode(mixed $data): mixed
     {
         if (is_array($data)) {
-            return array_map([$this, 'recursiveDecode'], $data);
+            $decoded = [];
+            foreach ($data as $key => $value) {
+                $decoded[$key] = $this->recursiveDecode($value);
+            }
+            return $decoded;
         }
 
         if (is_string($data)) {
-            return html_entity_decode($data, ENT_QUOTES, 'UTF-8');
+            // Double-pass to handle potential double encoding
+            $val = html_entity_decode($data, ENT_QUOTES, 'UTF-8');
+            return html_entity_decode($val, ENT_QUOTES, 'UTF-8');
         }
 
         return $data;

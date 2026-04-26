@@ -37,7 +37,7 @@ $deleteUser = function (Logout $logout) {
     >{{ __('Supprimer le compte') }}</x-danger-button>
 
     <x-modal name="confirm-user-deletion" :show="$errors->isNotEmpty()" focusable>
-        <form wire:submit="deleteUser" class="p-6 lg:p-8">
+        <form wire:submit="deleteUser" method="POST" class="p-6 lg:p-8">
 
             <h2 class="text-base font-semibold text-midnight">
                 {{ __('Êtes-vous sûr de vouloir supprimer votre compte ?') }}

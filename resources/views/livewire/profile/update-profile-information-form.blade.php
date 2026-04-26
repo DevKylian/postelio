@@ -59,7 +59,7 @@ $sendVerification = function () {
         </p>
     </header>
 
-    <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
+    <form wire:submit="updateProfileInformation" method="POST" class="mt-6 space-y-6">
         <div>
             <x-input-label for="name" :value="__('Nom')" />
             <x-text-input wire:model="name" id="name" name="name" type="text" class="mt-1 block w-full" required autofocus autocomplete="name" />

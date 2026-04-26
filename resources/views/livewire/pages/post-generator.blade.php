@@ -77,7 +77,7 @@
             ]" />
         @endif
 
-                <form wire:submit.prevent="generate" class="space-y-6">
+                <form wire:submit.prevent="generate" method="POST" class="space-y-6">
 
             @php
             $templateGroups = [

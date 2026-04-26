@@ -87,7 +87,7 @@ $updateCompanySettings = function () {
 
 <section>
 
-    <form wire:submit="updateCompanySettings" class="mt-6 space-y-6">
+    <form wire:submit="updateCompanySettings" method="POST" class="mt-6 space-y-6">
 
         <!-- Nom de la société -->
         <div>

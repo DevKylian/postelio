@@ -1424,8 +1424,20 @@
                       <div style="font-size:9px;color:#94a3b8">Lyon, France</div>
                     </div>
                   </div>
-                  <div style="position:relative">
-                    <img src="{{ asset('images/demo/result.png') }}?v=5" alt="Post" class="md-insta-img">
+                  <div style="position:relative; overflow: hidden; width: 100%; aspect-ratio: 1;">
+                    <div class="flex w-[200%] h-full transition-transform duration-500 ease-in-out" :style="`transform: translateX(${activeImage === 1 ? '0' : '-50%'})`">
+                        <div class="w-1/2 h-full flex-shrink-0">
+                            <img src="{{ asset('images/demo/result.png') }}?v=5" alt="Avant" class="md-insta-img">
+                        </div>
+                        <div class="w-1/2 h-full flex-shrink-0">
+                            <img src="{{ asset('images/demo/result2.png') }}?v=5" alt="Après" class="md-insta-img">
+                        </div>
+                    </div>
+                    {{-- Swipe Indicators --}}
+                    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                        <div class="w-1.5 h-1.5 rounded-full transition-colors duration-300 shadow-sm" :class="activeImage === 1 ? 'bg-white' : 'bg-white/50'"></div>
+                        <div class="w-1.5 h-1.5 rounded-full transition-colors duration-300 shadow-sm" :class="activeImage === 2 ? 'bg-white' : 'bg-white/50'"></div>
+                    </div>
                   </div>
                   <div class="md-insta-acts">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#EF4444"
@@ -1473,6 +1485,7 @@
           selectedType: '', hasPhoto1: false, hasPhoto2: false, showInstaPost: false, showSuccessToast: false,
           likeCount: 0, trophyToasts: [], animationRunning: false, animationTimer: null, waveformInterval: null,
           fullTranscript: "On a terminé la rénovation complète de la cuisine chez le client à Lyon, le rendu est vraiment superbe.",
+          activeImage: 1,
 
           startAnimation() {
             if (this.animationRunning) return;
@@ -1502,6 +1515,7 @@
             this.transcriptText = ''; this.selectedType = ''; this.hasPhoto1 = false; this.hasPhoto2 = false;
             this.showInstaPost = false; this.showSuccessToast = false; this.likeCount = 0;
             this.sceneLabel = ''; this.waveformHeights = Array(20).fill(15); this.trophyToasts = [];
+            this.activeImage = 1;
             if (this.waveformInterval) clearInterval(this.waveformInterval);
             await this.wait(250);
           },
@@ -1584,12 +1598,14 @@
               this.likeCount = Math.round((target / steps) * i); await this.wait(32);
             }
             await this.wait(360); this.showSuccessToast = true;
+            setTimeout(() => { if (this.currentScene === 5) this.activeImage = 2; }, 1500);
             await this.wait(630); this.trophyToasts.push({ show: false });
             setTimeout(() => { if (this.trophyToasts[0]) this.trophyToasts[0].show = true; }, 10);
             await this.wait(450); this.trophyToasts.push({ show: false });
             setTimeout(() => { if (this.trophyToasts[1]) this.trophyToasts[1].show = true; }, 10);
             await this.wait(450); this.trophyToasts.push({ show: false });
             setTimeout(() => { if (this.trophyToasts[2]) this.trophyToasts[2].show = true; }, 10);
+            await this.wait(1000);
           },
           async doClick(x, y) {
             this.clickX = x; this.clickY = y; this.showClick = false;

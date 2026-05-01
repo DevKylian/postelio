@@ -1759,9 +1759,28 @@
               </div>
 
               <!-- Post Image -->
-              <div class="relative aspect-square bg-slate-100 group">
-                <img src="{{ asset('images/demo/result.png') }}?v=5" alt="Réalisation"
-                  class="w-full h-full object-cover">
+              <div class="relative aspect-square bg-slate-100 group overflow-hidden"
+                   x-data="{ 
+                       activeImage: 1, 
+                       init() { 
+                           setInterval(() => { 
+                               this.activeImage = this.activeImage === 1 ? 2 : 1; 
+                           }, 2000); 
+                       } 
+                   }">
+                  <div class="flex w-[200%] h-full transition-transform duration-500 ease-in-out" :style="`transform: translateX(${activeImage === 1 ? '0' : '-50%'})`">
+                      <div class="w-1/2 h-full flex-shrink-0">
+                          <img src="{{ asset('images/demo/result.png') }}?v=5" alt="Avant" class="w-full h-full object-cover">
+                      </div>
+                      <div class="w-1/2 h-full flex-shrink-0">
+                          <img src="{{ asset('images/demo/result2.png') }}?v=5" alt="Après" class="w-full h-full object-cover">
+                      </div>
+                  </div>
+                  {{-- Swipe Indicators --}}
+                  <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                      <div class="w-1.5 h-1.5 rounded-full transition-colors duration-300 shadow-sm" :class="activeImage === 1 ? 'bg-white' : 'bg-white/50'"></div>
+                      <div class="w-1.5 h-1.5 rounded-full transition-colors duration-300 shadow-sm" :class="activeImage === 2 ? 'bg-white' : 'bg-white/50'"></div>
+                  </div>
               </div>
 
               <!-- Post Actions & Content -->

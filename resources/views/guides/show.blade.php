@@ -391,7 +391,7 @@
                                             <div class="w-full max-w-[280px] bg-white rounded-2xl p-4 shadow-2xl relative text-left">
                                                 <div class="absolute -top-3 -right-3 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg border border-white flex items-center gap-1 z-20">
                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                    Prêt à publier
+                                                    Publié sur Insta
                                                 </div>
                                                 
                                                 <div class="flex items-center gap-2 mb-3">

@@ -1521,14 +1521,7 @@
           },
           async scene1() {
             this.currentScene = 1; this.sceneLabel = '01 · Enregistrement vocal';
-            await this.wait(450);
-            this.cursorVisible = true;
-            const s = this.$refs.showcase; const sw = s.offsetWidth; const sh = s.offsetHeight;
-            await this.moveCursor(sw * 0.3, sh * 0.3, 0);
-            await this.wait(130);
-            await this.moveCursor(sw * 0.5, sw < 600 ? sh * 0.52 : sh * 0.54, 0.5);
-            await this.wait(130);
-            await this.doClick(this.cursorX, this.cursorY);
+            await this.wait(200);
             this.isRecording = true;
             this.waveformInterval = setInterval(() => {
               this.waveformHeights = this.waveformHeights.map(() => Math.floor(Math.random() * 70) + 20);

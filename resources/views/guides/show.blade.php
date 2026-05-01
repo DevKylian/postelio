@@ -286,25 +286,50 @@
 
                         @if($isUnlocked)
                         {{-- Final CTA (Only for unlocked) - Animated Premium Block --}}
-                        <div class="mt-20 pt-16 border-t border-slate-50 no-print"
+                        <div class="mt-12 pt-8 border-t border-slate-50 no-print"
                              x-data="{
                                 step: 1,
+                                text: '',
+                                fullText: '« Installation d\'une nouvelle cuisine sur-mesure à Bordeaux, client ravi ! »',
+                                typeWriterInterval: null,
+                                activeImage: 1,
                                 startLoop() {
-                                    this.step = 1; // Etape 1 (Input/Micro)
+                                    this.step = 1;
+                                    this.text = '';
+                                    this.activeImage = 1;
+                                    let i = 0;
+                                    clearInterval(this.typeWriterInterval);
+                                    
+                                    // Start typing after a small delay
                                     setTimeout(() => {
-                                        this.step = 2; // Etape 2 (Magie IA)
+                                        this.typeWriterInterval = setInterval(() => {
+                                            if(i < this.fullText.length) {
+                                                this.text += this.fullText.charAt(i);
+                                                i++;
+                                            } else {
+                                                clearInterval(this.typeWriterInterval);
+                                            }
+                                        }, 40); // typing speed
+                                    }, 500);
+
+                                    // Etape 1 -> Dure 4s
+                                    setTimeout(() => {
+                                        this.step = 2; // Etape 2 (Resultat)
+                                        
                                         setTimeout(() => {
-                                            this.step = 3; // Etape 3 (Resultat)
-                                            setTimeout(() => {
-                                                this.startLoop();
-                                            }, 2000); // Duree de l'etape 3 (2s) -> Total 5.5s
-                                        }, 1500); // Duree de l'etape 2 (1.5s)
-                                    }, 2000); // Duree de l'etape 1 (2s)
+                                            this.activeImage = 2;
+                                        }, 2000);
+
+                                        // Etape 2 -> Dure 5s
+                                        setTimeout(() => {
+                                            this.startLoop();
+                                        }, 5000); 
+                                    }, 4000); 
                                 }
                              }"
                              x-init="startLoop()">
                             
-                            <div class="max-w-3xl mx-auto bg-slate-900 rounded-[2.5rem] p-8 sm:p-14 shadow-2xl relative overflow-hidden border border-slate-700/50">
+                            <div class="max-w-3xl mx-auto bg-slate-900 rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-14 shadow-2xl relative overflow-hidden border border-slate-700/50">
                                 {{-- Glassmorphism Glows --}}
                                 <div class="absolute -top-32 -right-32 w-64 h-64 bg-amber-500/20 rounded-full blur-[100px]"></div>
                                 <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-slate-500/20 rounded-full blur-[100px]"></div>
@@ -312,17 +337,17 @@
                                 <div class="relative z-10 flex flex-col items-center text-center">
                                     
                                     {{-- En-tête --}}
-                                    <h3 class="font-display font-bold text-3xl sm:text-4xl text-white tracking-tight mb-4 leading-tight">
+                                    <h3 class="font-display font-bold text-2xl sm:text-4xl text-white tracking-tight mb-3 sm:mb-4 leading-tight px-2 sm:px-0">
                                         Arrêtez de perdre vos soirées sur Instagram.
                                     </h3>
-                                    <p class="text-slate-400 font-light text-lg mb-12">
+                                    <p class="text-slate-400 font-light text-base sm:text-lg mb-8 sm:mb-12 px-2 sm:px-0">
                                         Prenez une photo. Parlez 10 secondes. On s'occupe du reste.
                                     </p>
 
                                     {{-- Zone d'Animation Centrale --}}
-                                    <div class="relative w-full max-w-sm h-64 mx-auto mb-12 flex items-center justify-center">
+                                    <div class="relative w-full max-w-sm h-[420px] mx-auto mb-8 sm:mb-12 flex items-center justify-center">
                                         
-                                        {{-- ÉTAPE 1 : Le Micro --}}
+                                        {{-- ÉTAPE 1 : Le Micro + Typewrite --}}
                                         <div x-show="step === 1" 
                                              x-transition:enter="transition ease-out duration-500"
                                              x-transition:enter-start="opacity-0 scale-90"
@@ -332,40 +357,30 @@
                                              x-transition:leave-end="opacity-0 scale-90"
                                              class="absolute inset-0 flex flex-col items-center justify-center gap-6" style="display: none;">
                                             
-                                            <div class="relative flex items-center justify-center">
-                                                <div class="absolute w-32 h-32 bg-amber-500/20 rounded-full animate-ping" style="animation-duration: 2s;"></div>
-                                                <div class="w-20 h-20 bg-gradient-to-tr from-amber-600 to-amber-400 rounded-full flex items-center justify-center text-white shadow-xl shadow-amber-500/30 z-10">
+                                            <div class="relative flex items-center justify-center mb-4">
+                                                <div class="absolute w-28 h-28 bg-amber-500/20 rounded-full animate-ping" style="animation-duration: 2s;"></div>
+                                                <div class="w-20 h-20 bg-gradient-to-tr from-amber-600 to-amber-400 rounded-full flex items-center justify-center text-white shadow-xl shadow-amber-500/30 z-10 relative">
                                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
                                                 </div>
                                             </div>
-                                            <div class="flex items-center gap-1">
-                                                <div class="w-1.5 h-3 bg-amber-500 rounded-full animate-pulse"></div>
-                                                <div class="w-1.5 h-6 bg-amber-500 rounded-full animate-pulse delay-75"></div>
-                                                <div class="w-1.5 h-4 bg-amber-500 rounded-full animate-pulse delay-150"></div>
-                                                <div class="w-1.5 h-8 bg-amber-500 rounded-full animate-pulse delay-200"></div>
-                                                <div class="w-1.5 h-5 bg-amber-500 rounded-full animate-pulse delay-300"></div>
-                                            </div>
-                                        </div>
 
-                                        {{-- ÉTAPE 2 : Magie IA --}}
-                                        <div x-show="step === 2" 
-                                             x-transition:enter="transition ease-out duration-500 delay-300"
-                                             x-transition:enter-start="opacity-0 scale-90"
-                                             x-transition:enter-end="opacity-100 scale-100"
-                                             x-transition:leave="transition ease-in duration-300"
-                                             x-transition:leave-start="opacity-100 scale-100"
-                                             x-transition:leave-end="opacity-0 scale-90"
-                                             class="absolute inset-0 flex flex-col items-center justify-center gap-4" style="display: none;">
+                                            {{-- Typewrite Bubble --}}
+                                            <div class="w-full max-w-[280px] bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 min-h-[80px] flex items-center justify-center relative shadow-lg shadow-black/5">
+                                                <p class="text-amber-100 text-sm font-medium leading-relaxed italic text-center" x-text="text"></p>
+                                            </div>
                                             
-                                            <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-amber-400 shadow-inner">
-                                                <svg class="animate-spin w-8 h-8" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                            <div class="flex items-center gap-1 mt-2">
+                                                <div class="w-1 h-3 bg-amber-500/60 rounded-full animate-pulse"></div>
+                                                <div class="w-1 h-5 bg-amber-500/80 rounded-full animate-pulse delay-75"></div>
+                                                <div class="w-1 h-8 bg-amber-400 rounded-full animate-pulse delay-150"></div>
+                                                <div class="w-1 h-4 bg-amber-500/60 rounded-full animate-pulse delay-200"></div>
+                                                <div class="w-1 h-6 bg-amber-500/80 rounded-full animate-pulse delay-300"></div>
                                             </div>
-                                            <span class="text-sm font-medium text-slate-400 animate-pulse">Génération du post en cours...</span>
                                         </div>
 
-                                        {{-- ÉTAPE 3 : Résultat --}}
-                                        <div x-show="step === 3" 
-                                             x-transition:enter="transition ease-out duration-700 delay-300"
+                                        {{-- ÉTAPE 2 : Résultat Final --}}
+                                        <div x-show="step === 2" 
+                                             x-transition:enter="transition ease-out duration-700 delay-200"
                                              x-transition:enter-start="opacity-0 translate-y-8 scale-95"
                                              x-transition:enter-end="opacity-100 translate-y-0 scale-100"
                                              x-transition:leave="transition ease-in duration-300"
@@ -373,27 +388,48 @@
                                              x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                                              class="absolute inset-0 flex items-center justify-center" style="display: none;">
                                              
-                                            <div class="w-full bg-white rounded-2xl p-4 shadow-2xl relative text-left">
-                                                <div class="absolute -top-3 -right-3 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg border border-white flex items-center gap-1">
+                                            <div class="w-full max-w-[280px] bg-white rounded-2xl p-4 shadow-2xl relative text-left">
+                                                <div class="absolute -top-3 -right-3 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg border border-white flex items-center gap-1 z-20">
                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                                                     Prêt à publier
                                                 </div>
-                                                <div class="flex items-center gap-3 mb-3">
-                                                    <div class="w-8 h-8 rounded-full bg-slate-200"></div>
-                                                    <div class="space-y-1">
-                                                        <div class="w-20 h-2 bg-slate-200 rounded"></div>
-                                                        <div class="w-12 h-2 bg-slate-100 rounded"></div>
+                                                
+                                                <div class="flex items-center gap-2 mb-3">
+                                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xs shadow-inner">
+                                                        P
+                                                    </div>
+                                                    <div class="space-y-0.5">
+                                                        <div class="text-[11px] font-bold text-slate-800 leading-none">Votre Entreprise</div>
+                                                        <div class="text-[9px] text-slate-400 leading-none">Bordeaux, France</div>
                                                     </div>
                                                 </div>
-                                                <div class="w-full h-24 bg-slate-100 rounded-xl mb-3 flex items-center justify-center">
-                                                    <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                                
+                                                <div class="w-full aspect-square bg-slate-100 rounded-xl mb-3 overflow-hidden border border-slate-100 relative">
+                                                    <div class="flex w-[200%] h-full transition-transform duration-500 ease-in-out" :style="`transform: translateX(${activeImage === 1 ? '0' : '-50%'})`">
+                                                        <div class="w-1/2 h-full flex-shrink-0">
+                                                            <img src="{{ asset('images/demo/result.png') }}" alt="Avant" class="w-full h-full object-cover">
+                                                        </div>
+                                                        <div class="w-1/2 h-full flex-shrink-0">
+                                                            <img src="{{ asset('images/demo/result2.png') }}" alt="Après" class="w-full h-full object-cover">
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    {{-- Swipe Indicators --}}
+                                                    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                                                        <div class="w-1.5 h-1.5 rounded-full transition-colors duration-300 shadow-sm" :class="activeImage === 1 ? 'bg-white' : 'bg-white/50'"></div>
+                                                        <div class="w-1.5 h-1.5 rounded-full transition-colors duration-300 shadow-sm" :class="activeImage === 2 ? 'bg-white' : 'bg-white/50'"></div>
+                                                    </div>
                                                 </div>
-                                                <div class="space-y-2">
-                                                    <div class="w-full h-2 bg-slate-200 rounded"></div>
-                                                    <div class="w-5/6 h-2 bg-slate-200 rounded"></div>
-                                                    <div class="flex gap-2 pt-1">
-                                                        <span class="text-[10px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">#chantier</span>
-                                                        <span class="text-[10px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">#artisan</span>
+                                                
+                                                <div class="space-y-1.5">
+                                                    <p class="text-[10px] text-slate-700 leading-snug">
+                                                        <span class="font-bold mr-1">votre_entreprise</span>
+                                                        Installation terminée ! Une nouvelle cuisine moderne et fonctionnelle pour des moments conviviaux garantis. 🍳✨
+                                                    </p>
+                                                    <div class="flex flex-wrap gap-1 pt-1">
+                                                        <span class="text-[9px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">#Cuisine</span>
+                                                        <span class="text-[9px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">#Bordeaux</span>
+                                                        <span class="text-[9px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">#Artisan</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -402,13 +438,13 @@
                                     </div>
 
                                     {{-- Bouton d'Action --}}
-                                    <div class="flex flex-col items-center">
-                                        <a href="{{ route('register') }}" class="inline-flex items-center gap-3 px-8 py-5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-transform duration-300 shadow-xl shadow-amber-500/20 active:scale-95 group">
-                                            Tester gratuitement sur mon prochain chantier 🚀
+                                    <div class="flex flex-col items-center w-full px-4 sm:px-0">
+                                        <a href="{{ route('register') }}" class="w-full sm:w-auto inline-flex justify-center items-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-bold text-sm hover:scale-105 transition-transform duration-300 shadow-xl shadow-amber-500/20 active:scale-95 group whitespace-nowrap">
+                                            Tester gratuitement
                                         </a>
                                         <p class="mt-4 text-[11px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-2">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                                            Sans carte bancaire • 100% pensé pour le BTP
+                                            100% gratuit
                                         </p>
                                     </div>
 

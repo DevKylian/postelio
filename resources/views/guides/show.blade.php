@@ -261,7 +261,7 @@
                     <div class="bg-white rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-16 shadow-sm border border-slate-100 guide-container relative">
                         
                         @php
-                            $isUnlocked = auth()->check() || session()->has('unlocked_guide_'.$guide->id);
+                            $isUnlocked = !$guide->requires_email || auth()->check() || session()->has('unlocked_guide_'.$guide->id);
                             $displayContent = $guide->contenu_html;
                             
                             if (!$isUnlocked) {

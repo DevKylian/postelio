@@ -197,8 +197,8 @@
                         </div>
                     </div>
 
-                    {{-- Status & Date --}}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {{-- Status, Date & Access --}}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div class="space-y-2">
                             <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">Statut</label>
                             <select wire:model="status" class="w-full bg-white/50 border-slate-100 rounded-2xl p-4 text-sm font-bold text-midnight focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none">
@@ -210,6 +210,16 @@
                             <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">Date de publication</label>
                             <input type="date" wire:model="published_at"
                                    class="w-full bg-white/50 border-slate-100 rounded-2xl p-4 text-sm font-bold text-midnight focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest px-1">Accès du guide</label>
+                            <label class="flex items-center gap-3 p-4 bg-white/50 border border-slate-100 rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors">
+                                <input type="checkbox" wire:model="requires_email" class="w-5 h-5 text-orange-500 bg-slate-100 border-slate-300 rounded focus:ring-orange-500 focus:ring-2">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-midnight">Bloquer l'accès</span>
+                                    <span class="text-[10px] text-slate-400 font-medium">Demander l'email avant la lecture</span>
+                                </div>
+                            </label>
                         </div>
                     </div>
 

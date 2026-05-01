@@ -28,6 +28,7 @@ class GuideManager extends Component
     public $existing_featured_image = '';
     public $json_pasted = '';
     public $showAIPromptModal = false;
+    public $requires_email = true;
 
     public $isEditing = false;
     public $editingId = null;
@@ -46,6 +47,7 @@ class GuideManager extends Component
             'status'                => 'required|in:draft,published',
             'published_at'          => 'nullable|date',
             'featured_image_upload' => 'nullable|image|max:2048',
+            'requires_email'        => 'boolean',
         ];
     }
 
@@ -84,6 +86,7 @@ class GuideManager extends Component
         $this->published_at           = Carbon::now()->format('Y-m-d');
         $this->featured_image_upload  = null;
         $this->existing_featured_image = '';
+        $this->requires_email         = true;
         $this->isEditing              = false;
         $this->editingId              = null;
         $this->json_pasted            = '';
@@ -125,6 +128,7 @@ class GuideManager extends Component
             'meta_description' => $this->meta_description ?: \Illuminate\Support\Str::limit(strip_tags($this->contenu_html), 155),
             'status'           => $this->status,
             'published_at'     => $this->status === 'published' ? ($this->published_at ?? now()) : null,
+            'requires_email'   => $this->requires_email,
         ];
 
         if ($this->featured_image_upload) {
@@ -163,6 +167,7 @@ class GuideManager extends Component
             ? Carbon::parse($guide->published_at)->format('Y-m-d')
             : Carbon::now()->format('Y-m-d');
         $this->existing_featured_image = $guide->featured_image ?? '';
+        $this->requires_email          = $guide->requires_email ?? true;
         $this->isEditing               = true;
         $this->showForm                = true;
     }

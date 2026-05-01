@@ -19,10 +19,12 @@ class FreeGuide extends Model
         'status',
         'published_at',
         'downloads_count',
+        'requires_email',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
+        'requires_email' => 'boolean',
     ];
 
     public function user(): BelongsTo

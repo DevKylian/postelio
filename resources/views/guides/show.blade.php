@@ -51,60 +51,7 @@
 
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <style>
-        .guide-content {
-            font-family: 'Figtree', sans-serif;
-            color: #334155;
-            line-height: 1.8;
-            font-size: 1.125rem;
-        }
-        .guide-content h2 {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            color: #0F172A;
-            font-size: 2rem;
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
-            letter-spacing: -0.02em;
-            line-height: 1.2;
-        }
-        .guide-content h3 {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            color: #0F172A;
-            font-size: 1.5rem;
-            margin-top: 2.5rem;
-            margin-bottom: 1rem;
-            letter-spacing: -0.01em;
-        }
-        .guide-content p {
-            margin-bottom: 1.5rem;
-        }
-        .guide-content ul, .guide-content ol {
-            margin-bottom: 2rem;
-            padding-left: 1.5rem;
-        }
-        .guide-content li {
-            margin-bottom: 0.75rem;
-            position: relative;
-        }
-        .guide-content blockquote {
-            border-left: 4px solid #F97316;
-            padding: 1.5rem 2rem;
-            background: #FFF7ED;
-            border-radius: 0 1.5rem 1.5rem 0;
-            font-style: italic;
-            margin: 2.5rem 0;
-            color: #9A3412;
-            font-weight: 500;
-        }
-        .guide-content strong {
-            color: #0F172A;
-            font-weight: 700;
-        }
 
-        }
-    </style>
 </head>
 <body class="antialiased font-sans bg-chalk text-slate-600 selection:bg-copper/30 selection:text-amber-900 leading-normal">
 
@@ -283,7 +230,7 @@
                         @endphp
 
                         {{-- Final Content Display --}}
-                        <div class="guide-content relative">
+                        <div class="blog-content relative">
                             {!! $displayContent !!}
 
                             @if(!$isUnlocked)

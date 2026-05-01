@@ -21,7 +21,7 @@ class ScriptFlowManager extends Component
     {
         $this->validate(['newName' => 'required|string|max:255']);
         $rootId = 'node_' . uniqid();
-        SalesScript::create([
+        $script = SalesScript::create([
             'name'      => $this->newName,
             'sequences' => [],
             'flow'      => [
